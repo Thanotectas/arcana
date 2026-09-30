@@ -16,6 +16,7 @@ type PerfilRow = {
   zona_horaria: string | null;
   creditos: number;
   ilimitado: boolean;
+  idioma: string;
   creado_en: string;
   actualizado_en: string;
 };
@@ -62,6 +63,7 @@ type HoroscopoRow = {
   id: number;
   signo: string;
   fecha: string;
+  idioma: string;
   contenido: string;
   creado_en: string;
 };
@@ -76,7 +78,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -100,7 +102,7 @@ export type Database = {
       };
       horoscopos: {
         Row: HoroscopoRow;
-        Insert: Insertable<HoroscopoRow, "id" | "creado_en">;
+        Insert: Insertable<HoroscopoRow, "id" | "idioma" | "creado_en">;
         Update: Partial<HoroscopoRow>;
         Relationships: [];
       };

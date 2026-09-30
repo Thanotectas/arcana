@@ -361,3 +361,115 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .trazo-aspecto, .planeta-rueda { animation: none; }
 }
+
+/* ───────────── Estilos por mazo ───────────── */
+.dorso-carta.estilo-marsella {
+  background:
+    repeating-linear-gradient(90deg, rgba(217, 180, 90, 0.18) 0 3px, transparent 3px 9px),
+    repeating-linear-gradient(0deg, rgba(217, 180, 90, 0.18) 0 3px, transparent 3px 9px),
+    linear-gradient(180deg, #3a1f1f, #1a0d12);
+  border-color: rgba(217, 180, 90, 0.7);
+}
+.dorso-carta.estilo-angeles {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.35) 0 6%, transparent 7%),
+    radial-gradient(circle at 50% 35%, transparent 0 14%, rgba(255, 255, 255, 0.18) 15% 16%, transparent 17%),
+    linear-gradient(180deg, #2b3a7a, #141a3d);
+  border-color: rgba(191, 210, 255, 0.7);
+}
+.carta-tarot.estilo-marsella {
+  background:
+    linear-gradient(180deg, rgba(255, 244, 214, 0.06), transparent 40%),
+    linear-gradient(180deg, #3a2426, #180d13);
+  border-color: rgba(217, 180, 90, 0.7);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 4px rgba(24, 13, 19, 0.9),
+    inset 0 0 0 6px rgba(217, 180, 90, 0.35);
+}
+.carta-tarot.estilo-angeles {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(191, 210, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, #23306b, #10152f);
+  border-color: rgba(191, 210, 255, 0.55);
+}
+.carta-tarot.estilo-angeles .contenido-carta span:nth-child(2) {
+  color: rgba(230, 236, 255, 0.85);
+  text-shadow: 0 0 22px rgba(191, 210, 255, 0.8);
+}
+
+/* Trazos de la palma */
+@keyframes dibujar-trazo {
+  from { stroke-dasharray: 0 400; }
+  to { stroke-dasharray: 400 0; }
+}
+.trazo-palma {
+  animation: dibujar-trazo 1.6s ease-out both;
+  transition: stroke-width 0.2s ease, stroke-opacity 0.2s ease;
+}
+
+/* Navegación */
+.enlace-nav {
+  position: relative;
+}
+.enlace-nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--oro);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.enlace-nav:hover::after {
+  transform: scaleX(1);
+}
+
+/* Portada */
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+  50% { transform: translateY(-18px) rotate(calc(var(--rot) + 3deg)); }
+}
+.carta-flotante {
+  animation: flotar 10s ease-in-out infinite;
+}
+.brillo-oro {
+  background: linear-gradient(90deg, var(--oro-suave), #fff3c4, var(--oro-suave));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brillar 6s linear infinite;
+}
+@keyframes brillar {
+  to { background-position: 200% center; }
+}
+.tarjeta-modulo {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.tarjeta-modulo:hover {
+  transform: translateY(-4px);
+  border-color: rgba(217, 180, 90, 0.4);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+@media (prefers-reduced-motion: reduce) {
+  .carta-flotante, .brillo-oro { animation: none; }
+  .tarjeta-modulo:hover { transform: none; }
+}
+
+/* Números que brotan (numerología en vivo) */
+@keyframes brotar {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.numero-brota {
+  display: inline-block;
+  animation: brotar 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .numero-brota { animation: none; }
+}

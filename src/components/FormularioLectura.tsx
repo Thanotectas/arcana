@@ -1,10 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import type { EstadoAccion } from "@/lib/lecturas/acciones";
-import Link from "next/link";
+import { useT } from "@/lib/i18n/cliente";
+import { textoErrorLectura } from "@/lib/i18n/errores";
 
 type Accion = (prev: EstadoAccion, fd: FormData) => Promise<EstadoAccion>;
 
@@ -13,27 +15,26 @@ export function FormularioLectura({
   accion,
   children,
   textoBoton,
-  textoCargando = "Consultando…",
+  textoCargando,
 }: {
   accion: Accion;
   children: React.ReactNode;
   textoBoton: string;
   textoCargando?: string;
 }) {
+  const { t } = useT();
   const [estado, enviar] = useActionState(accion, {});
-  const sinCreditos = estado.error?.includes("créditos");
+  const sinCreditos = estado.error === "SIN_CREDITOS";
   return (
     <form action={enviar} className="space-y-5">
       {estado.error && (
         <Aviso>
-          {estado.error}{" "}
-          {sinCreditos && (
-            <Link href="/creditos" className="underline">Comprar créditos</Link>
-          )}
+          {textoErrorLectura(estado.error, t)}{" "}
+          {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
       )}
       {children}
-      <BotonEnviar cargando={textoCargando}>{textoBoton}</BotonEnviar>
+      <BotonEnviar cargando={textoCargando ?? t.comun.unMomento}>{textoBoton}</BotonEnviar>
     </form>
   );
 }
