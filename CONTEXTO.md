@@ -48,8 +48,9 @@ Una migración nueva va como archivo `0004_...sql` y se aplica en Supabase (SQL 
 
 Trabajo hecho en Claude Code (sesión con Claude Fable 5.1). Antes de fusionar a `main`:
 
-1. Aplicar `supabase/migrations/0004_quiromancia_e_idiomas.sql` en Supabase (SQL Editor). Crea el bucket privado `palmas`, el tipo de lectura `quiromancia`, el idioma en `horoscopos` y `perfiles`.
-2. Revisar la vista previa de Vercel de la rama.
+1. La migración `0004_quiromancia_e_idiomas.sql` ya está aplicada en producción (bucket privado `palmas`, tipo `quiromancia`, columna `idioma` en `horoscopos` y `perfiles`, regla nueva por signo, día e idioma).
+2. Al publicar la rama (justo antes o después del despliegue) aplicar `0005_horoscopos_por_idioma.sql`, que retira la regla vieja `horoscopos_signo_fecha_key`. Hasta entonces, los horóscopos en inglés y portugués no se cachean (se generan pero no se guardan).
+3. Revisar la vista previa de Vercel de la rama.
 
 Qué trae:
 

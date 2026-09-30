@@ -14,9 +14,11 @@ values ('palmas', 'palmas', false, 4194304, array['image/jpeg', 'image/png', 'im
 on conflict (id) do nothing;
 
 -- 3. Horóscopo por idioma: una fila por signo, día e idioma.
+--    La regla vieja (signo, fecha) se conserva aquí porque el código que hoy
+--    está en producción la usa; se retira en la migración 0005 al publicar la
+--    rama con idiomas.
 alter table public.horoscopos
   add column if not exists idioma text not null default 'es' check (idioma in ('es', 'en', 'pt'));
-alter table public.horoscopos drop constraint if exists horoscopos_signo_fecha_key;
 alter table public.horoscopos add constraint horoscopos_signo_fecha_idioma_key unique (signo, fecha, idioma);
 
 -- 4. Idioma preferido del perfil (para correos y lecturas futuras).
