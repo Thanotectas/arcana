@@ -96,6 +96,17 @@ type HoroscopoRow = {
 
 type Insertable<T, Opcionales extends keyof T> = Omit<T, Opcionales> & Partial<Pick<T, Opcionales>>;
 
+type SuscripcionPushRow = {
+  id: number;
+  usuario_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  idioma: string;
+  agente: string | null;
+  creado_en: string;
+};
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
@@ -130,6 +141,12 @@ export type Database = {
         Row: PreguntaRow;
         Insert: Insertable<PreguntaRow, "id" | "respuesta" | "estado" | "creditos_usados" | "creado_en">;
         Update: Partial<PreguntaRow>;
+        Relationships: [];
+      };
+      suscripciones_push: {
+        Row: SuscripcionPushRow;
+        Insert: Insertable<SuscripcionPushRow, "id" | "idioma" | "agente" | "creado_en">;
+        Update: Partial<SuscripcionPushRow>;
         Relationships: [];
       };
       mensajes_diarios: {

@@ -35,6 +35,7 @@ export async function memoriaDeLaPersona(
     supabase
       .from("lecturas")
       .select("id, tipo, titulo, interpretacion, creado_en")
+      .eq("usuario_id", usuarioId)
       .eq("estado", "lista")
       .not("interpretacion", "is", null)
       .order("creado_en", { ascending: false })

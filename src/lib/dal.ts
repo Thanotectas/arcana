@@ -18,6 +18,7 @@ export interface Perfil {
   codigo_invitacion: string | null;
   invitado_por: string | null;
   circulo_hasta: string | null;
+  idioma: string;
   creado_en: string;
 }
 

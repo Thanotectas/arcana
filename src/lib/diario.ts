@@ -1,4 +1,6 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import { createClient } from "./supabase/server";
 import { getSupabaseAdmin } from "./supabase/admin";
 import { generarTexto } from "./ia";
@@ -50,17 +52,28 @@ export interface MensajeDeHoy {
   recien: boolean;
 }
 
-export async function getMensajeDeHoy(perfil: Perfil, idioma: Idioma): Promise<MensajeDeHoy | null> {
+/** Cielo de hoy (fecha local de la persona) sin tocar la base de datos. */
+export function cieloDeHoyDePerfil(perfil: Perfil) {
   const datos = datosNacimientoDePerfil(perfil);
   if (!datos) return null;
-
   // Mediodía local de hoy: evita que el tránsito cambie de fecha por zona horaria.
   const fecha = fechaLocalHoy(perfil.zona_horaria);
   const cielo = cieloDeHoy(datos, new Date(`${fecha}T12:00:00${desfase(perfil.zona_horaria)}`));
+  return { datos, fecha, cielo };
+}
+
+/**
+ * Mensaje de hoy: lo lee de la caché o lo escribe (solo Círculo).
+ * `cliente` permite usar el cliente admin desde el cron; por defecto usa el de la sesión.
+ */
+export async function getMensajeDeHoy(perfil: Perfil, idioma: Idioma, cliente?: SupabaseClient<Database>): Promise<MensajeDeHoy | null> {
+  const hoy = cieloDeHoyDePerfil(perfil);
+  if (!hoy) return null;
+  const { datos, fecha, cielo } = hoy;
 
   if (!circuloActivo(perfil)) return { fecha, cielo, contenido: null, recien: false };
 
-  const supabase = await createClient();
+  const supabase = cliente ?? (await createClient());
   const { data: guardado } = await supabase
     .from("mensajes_diarios")
     .select("contenido")

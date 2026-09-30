@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FormularioPerfil } from "@/components/FormularioAuth";
 import { FormularioNacimiento } from "@/components/FormularioNacimiento";
+import { AvisoDiario } from "@/components/AvisoDiario";
 import { accionActualizarPerfil, accionGuardarNacimiento } from "@/lib/auth/acciones";
 import { getOrdenes, getPerfil, requerirUsuario, lugarDePerfil, horaDePerfil, circuloActivo } from "@/lib/dal";
 import { formatoCOP } from "@/lib/creditos";
@@ -44,6 +45,9 @@ export default async function PaginaCuenta() {
             {t.circulo.eslogan} <Link href="/creditos#circulo" className="text-oro-suave underline">{t.circulo.verMas}</Link>
           </p>
         )}
+        <div className="mt-4">
+          <AvisoDiario clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
+        </div>
       </section>
 
       <section className="tarjeta p-6">

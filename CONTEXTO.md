@@ -22,6 +22,8 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Variables de entorno (en Vercel; nunca en el repositorio)
 
+- Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
+
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`, `BOLD_ENV` (`production` con llaves reales; `test` solo con llaves de prueba), `NEXT_PUBLIC_SITE_URL` (`https://miarcana.com`). Plantilla en `.env.example`.
 
 ## Cómo funciona por dentro
@@ -92,7 +94,16 @@ Qué trae:
 - **Tu cielo hoy** (`/hoy`, `src/lib/diario.ts`, `src/lib/astro/transitos.ts`): tránsitos reales del día sobre la carta natal (aspectos de los planetas de hoy con los planetas natales, Ascendente y Medio Cielo; orbes estrechos, ponderados por planeta lento y exactitud). Todo el mundo ve la Luna del día y los tránsitos; el **mensaje escrito** (140–200 palabras, `effort: low`) solo se genera para el Círculo y se guarda en `mensajes_diarios` (una vez por persona, día e idioma). La fecha se toma en la zona horaria de nacimiento. Se transmite con `Suspense` para no bloquear la página. Enlace en la barra (con sesión) y tarjeta destacada en el panel.
 - **Círculo Arcana** (pase de 30 días, 19.900 COP, paquete `circulo` en `PAQUETE_CIRCULO`): mensaje diario, preguntas de seguimiento sin cobro (tope `CIRCULO.preguntasPorDia` = 15 por día, se cuenta en `preguntas_lectura`) y 15 créditos. No se renueva solo: cada compra suma 30 días a `perfiles.circulo_hasta` (`acreditar_orden` en 0009). Tarjeta en `/creditos#circulo` y estado en *Mi cuenta*. `circuloActivo(perfil)` en `dal.ts` (las cuentas ilimitadas cuentan como miembros).
 - Migraciones pendientes de aplicar en producción: `0007_iching_y_compra.sql`, `0008_preguntas.sql`, `0009_circulo_y_memoria.sql` y `0010_ordenes_prueba.sql` (columna `ordenes.es_prueba` para dejar las compras de prueba fuera de las métricas). Sin 0009, `/hoy` y el Círculo fallan al consultar `circulo_hasta`.
-- Siguiente paso natural: notificación diaria (web push o WhatsApp) con un cron de Vercel que pregenere los mensajes de madrugada.
+
+## Cron diario y avisos push (30 sep 2026)
+
+- **Cron** (`vercel.json` → `GET /api/cron/diario`, 09:00 UTC = 04:00 Bogotá): con el cliente admin toma los perfiles con datos de nacimiento, escribe "Tu cielo hoy" para los miembros del Círculo (hasta 60 por corrida, 3 en paralelo; los ya escritos vuelven de la caché) y envía el aviso push a quien lo activó. Exige `Authorization: Bearer CRON_SECRET` (Vercel lo manda solo si la variable existe). Responde con un resumen JSON (`perfiles, miembros, escritos, fallidos, enviados, caducadas`). Se puede disparar a mano desde el panel de Vercel (Cron Jobs → Run).
+- **Web push** (`src/lib/push.ts` con `web-push`, tabla `suscripciones_push` en la migración 0011, ruta `/api/push/suscripcion` POST/DELETE, service worker `public/sw.js`, componente `AvisoDiario` en `/hoy` y Mi cuenta). El aviso llega a todos los que lo activaron: a los del Círculo con el título y la línea "Hoy:" de su mensaje; a los demás con la Luna y el número de tránsitos del día (gancho para el Círculo). Las suscripciones que el navegador ya no reconoce (404/410) se borran.
+- **PWA**: `src/app/manifest.ts` e íconos PNG en `public/marca/icono-{192,512}.png`. En iPhone los avisos solo funcionan con Arcana añadida a la pantalla de inicio; el componente lo explica.
+- El idioma de la persona se guarda en `perfiles.idioma` al cambiarlo o al activar el aviso (el cron escribe el mensaje en ese idioma).
+- **Variables nuevas en Vercel**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (mailto:), `CRON_SECRET`. Sin las VAPID, el botón de aviso no aparece y el cron solo pregenera mensajes. Se generan con `npx web-push generate-vapid-keys`.
+- Migración pendiente además de las anteriores: `0011_push.sql`.
+- Siguiente paso: canal de WhatsApp diario (API de WhatsApp Business de Meta; requiere cuenta verificada y plantilla aprobada).
 
 ## Pendiente
 
@@ -102,7 +113,7 @@ Qué trae:
 - [ ] Saldo en la cuenta de Anthropic (estaba en plan de evaluación, sin saldo).
 - [ ] Correo propio: ImprovMX para recibir en Gmail y Resend como SMTP de Supabase para los correos de registro.
 - [ ] Hacer interactivas las pantallas de numerología y compatibilidad (hoy son formularios; la lectura ya se escribe en vivo).
-- [ ] Siguientes pasos de la estrategia: páginas SEO, notificaciones diarias, programa de creadoras, lectoras humanas.
+- [ ] Siguientes pasos de la estrategia: páginas SEO, WhatsApp diario, programa de creadoras, lectoras humanas.
 
 ## Cómo trabajar
 

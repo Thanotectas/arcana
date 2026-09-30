@@ -16,6 +16,7 @@ import type { Idioma } from "@/lib/i18n/idiomas";
 import { FormularioNacimiento } from "@/components/FormularioNacimiento";
 import { Markdown } from "@/components/Markdown";
 import { Aviso } from "@/components/Aviso";
+import { AvisoDiario } from "@/components/AvisoDiario";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -49,6 +50,7 @@ export default async function PaginaHoy() {
       ) : (
         <>
           <CieloResumen cielo={cieloDeHoy(datos)} t={t} />
+          <AvisoDiario clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
           {miembro ? (
             <Suspense fallback={<Escribiendo texto={t.hoy.escribiendo} />}>
               <MensajeDiario perfil={perfil} idioma={idioma} t={t} />
