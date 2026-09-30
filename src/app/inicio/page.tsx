@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
-import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario } from "@/lib/dal";
+import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario, circuloActivo } from "@/lib/dal";
+import { datosNacimientoDePerfil } from "@/lib/diario";
+import { cieloDeHoy } from "@/lib/astro/transitos";
+import { signoPorId } from "@/lib/zodiaco";
 import { COSTOS, CARTAS_DIA_GRATIS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
@@ -32,6 +35,14 @@ export default async function PaginaInicio() {
   const [perfil, lecturas, cartasHoy, t, idioma] = await Promise.all([getPerfil(), getLecturas(200), cartasDelDiaHoy(), getT(), getIdioma()]);
   const cartaDisponible = Boolean(perfil?.ilimitado) || cartasHoy < CARTAS_DIA_GRATIS;
   const diasSeguidos = racha(lecturas.map((l) => l.creado_en));
+  const datosNatales = datosNacimientoDePerfil(perfil);
+  const cielo = datosNatales ? cieloDeHoy(datosNatales) : null;
+  const notaHoy = cielo
+    ? plantilla(circuloActivo(perfil) ? t.inicio.hoyTarjeta.notaMiembro : t.inicio.hoyTarjeta.nota, {
+        signo: signoPorId(cielo.luna.signo)?.nombre ?? cielo.luna.signo,
+        n: cielo.transitos.length,
+      })
+    : t.inicio.hoyTarjeta.notaSinDatos;
 
   const accesos = [
     { href: "/tarot?tirada=tarot_carta", icono: Sparkles, titulo: t.inicio.accesos.cartaDia.titulo, nota: cartaDisponible ? t.inicio.accesos.cartaDia.gratisHoy : t.inicio.accesos.cartaDia.usada, costo: 0 },
@@ -73,6 +84,14 @@ export default async function PaginaInicio() {
           <Link href="/creditos" className="boton boton-primario px-4 py-1.5 text-sm">{t.persuasion.recargar}</Link>
         </div>
       )}
+      <Link href="/hoy" className="tarjeta tarjeta-modulo aparecer flex items-center gap-4 border-oro/40 bg-oro/5 p-5">
+        <Sunrise className="h-8 w-8 shrink-0 text-oro" aria-hidden />
+        <div>
+          <h2 className="font-display text-2xl font-semibold">{t.inicio.hoyTarjeta.titulo}</h2>
+          <p className="text-sm text-texto-suave">{notaHoy}</p>
+        </div>
+      </Link>
+
       {cartaDisponible && (
         <div className="tarjeta aparecer flex flex-wrap items-center justify-between gap-3 border-violeta/40 p-4">
           <p className="text-sm">{t.persuasion.cartaDiaPendiente}</p>

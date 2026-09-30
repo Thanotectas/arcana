@@ -47,6 +47,7 @@ export const en: Diccionario = {
     compatibilidad: "Compatibility",
     iching: "I Ching",
     horoscopo: "Horoscope",
+    hoy: "Your sky today",
   },
   pie: {
     aviso:
@@ -166,6 +167,10 @@ export const en: Diccionario = {
       noCambiarContrasena: "The password could not be changed.",
       perfilActualizado: "Profile updated.",
       google: "Could not sign in with Google. Try again or sign in with your email.",
+      nacimientoFecha: "Invalid birth date.",
+      nacimientoHora: "Invalid time.",
+      nacimientoLugar: "Pick your birthplace from the suggestions list.",
+      nacimientoGuardado: "Birth details saved. Your sky for today is ready to read.",
     },
   },
   cuenta: {
@@ -176,6 +181,11 @@ export const en: Diccionario = {
     sinCompras: "You haven't bought any credits yet.",
     estados: { pendiente: "Pending", aprobada: "Approved", rechazada: "Declined", anulada: "Voided", error: "Error" },
     idiomaLecturas: "Language of the interface and your readings",
+    nacimiento: {
+      titulo: "Birth details",
+      nota: "Arcana uses them to compute your sky every day and to prefill your birth chart. Only you can see them.",
+      guardar: "Save birth details",
+    },
   },
   inicio: {
     bienvenida: "Welcome",
@@ -197,6 +207,12 @@ export const en: Diccionario = {
     lunaHoy: "Today's moon",
     iluminacion: "{pct}% illuminated",
     fasesLuna: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
+    hoyTarjeta: {
+      titulo: "Your sky today",
+      nota: "Moon in {signo} · {n} transits over your chart. See what is moving for you.",
+      notaMiembro: "Moon in {signo} · {n} transits. Today's message is waiting for you.",
+      notaSinDatos: "Save your birth date and place and receive, every morning, what the sky is moving for you.",
+    },
   },
   tarot: {
     seccion: "Tarot",
@@ -404,6 +420,7 @@ export const en: Diccionario = {
       inicial: { nombre: "Starter", descripcion: "To try it out: five simple readings or one birth chart." },
       buscador: { nombre: "Seeker", descripcion: "The most popular. Enough for a month of readings." },
       iniciado: { nombre: "Initiate", descripcion: "For those who consult daily and share with others." },
+      circulo: { nombre: "Arcana Circle", descripcion: "30 days with your personal sky every morning, questions at no charge and 15 credits." },
     },
     pagar: {
       seccion: "Payment",
@@ -510,6 +527,41 @@ export const en: Diccionario = {
     sinCreditos: "You have no credits for another question.",
     tu: "You",
     arcana: "Arcana",
+  },
+  hoy: {
+    seccion: "Every morning",
+    titulo: "Your sky today",
+    sinDatos: "Tell us when and where you were born",
+    sinDatosNota: "With your birth date, time and place we compute today's real transits over your natal chart. We keep them in your profile so you never type them again.",
+    lunaEn: "Moon in {signo}",
+    transitos: "What moves over your chart today",
+    sinTransitos: "No exact aspects today: a quiet background day, guided by the Moon.",
+    aplicativo: "building",
+    separativo: "fading",
+    escribiendo: "Arcana is reading your sky for today…",
+    fallo: "We could not write today's message. Come back in a few minutes.",
+    teaserTitulo: "Today's message is already written for you",
+    teaserTexto: "A short text, every morning, on what these transits stir in your life and where to place your attention. Circle members only.",
+    editarDatos: "Edit my birth details",
+  },
+  circulo: {
+    nombre: "Arcana Circle",
+    etiqueta: "Monthly pass",
+    eslogan: "Your personal sky every morning, questions at no charge and credits to go deeper.",
+    beneficios: [
+      "A daily message written on your real transits, not on your sun sign.",
+      "Follow-up questions at no charge on any of your readings.",
+      "15 credits included for spreads, charts and palm readings.",
+      "Arcana remembers your previous readings and speaks with continuity.",
+    ],
+    letraPequena: "Up to {n} questions per day. The pass lasts {dias} days from payment and does not renew by itself: you decide when to extend it.",
+    porDias: "for {dias} days",
+    incluyeCreditos: "Includes {n} credits",
+    unirme: "Join the Circle",
+    extender: "Extend 30 days",
+    cta: "Join the Circle for {precio}",
+    activoHasta: "Arcana Circle active until {fecha}.",
+    verMas: "About the Circle",
   },
   noEncontrado: {
     texto: "This page is not in the cards.",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requerirUsuario, getPerfil } from "@/lib/dal";
+import { requerirUsuario, getPerfil, lugarDePerfil, horaDePerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { accionCartaAstral } from "@/lib/lecturas/acciones";
 import { FormularioLectura } from "@/components/FormularioLectura";
@@ -39,9 +39,9 @@ export default async function PaginaCartaAstral() {
               <label className="etiqueta" htmlFor="fecha">{t.astral.fecha}</label>
               <input id="fecha" name="fecha" type="date" className="campo" min="1900-01-01" required defaultValue={perfil?.fecha_nacimiento ?? ""} />
             </div>
-            <CampoHora />
+            <CampoHora valorInicial={horaDePerfil(perfil)} />
           </div>
-          <CampoLugar />
+          <CampoLugar valorInicial={lugarDePerfil(perfil)} />
           <p className="text-xs text-texto-suave">{t.astral.tarda}</p>
         </FormularioLectura>
       </div>

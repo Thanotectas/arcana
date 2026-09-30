@@ -5,6 +5,7 @@ import { generarTexto } from "@/lib/ia";
 import { construirPrompt } from "@/lib/lecturas/prompts";
 import Anthropic from "@anthropic-ai/sdk";
 import { marcaError, type CodigoErrorLectura } from "@/lib/lecturas/marcas";
+import { memoriaDeLaPersona } from "@/lib/lecturas/memoria";
 
 // Una carta astral puede tardar más de un minuto en escribirse.
 export const maxDuration = 300;
@@ -67,8 +68,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const admin = getSupabaseAdmin();
   const trabajo = (async () => {
     try {
-      const { usuario, sistemaExtra, opciones } = await construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado });
-      const texto = await generarTexto(usuario, sistemaExtra ?? "", opciones, enviar);
+      const [{ usuario, sistemaExtra, opciones }, memoria] = await Promise.all([
+        construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado }),
+        memoriaDeLaPersona(supabase, user.id, { excluirLectura: id }).catch(() => ""),
+      ]);
+      const texto = await generarTexto(usuario, [sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), opciones, enviar);
       await admin.from("lecturas").update({ interpretacion: texto, estado: "lista" }).eq("id", id);
     } catch (e) {
       const codigo = clasificarError(e);

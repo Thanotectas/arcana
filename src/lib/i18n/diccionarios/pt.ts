@@ -44,6 +44,7 @@ export const pt: Diccionario = {
     compatibilidad: "Compatibilidade",
     iching: "I Ching",
     horoscopo: "Horóscopo",
+    hoy: "Seu céu hoje",
   },
   pie: {
     aviso:
@@ -163,6 +164,10 @@ export const pt: Diccionario = {
       noCambiarContrasena: "Não foi possível alterar a senha.",
       perfilActualizado: "Perfil atualizado.",
       google: "Não foi possível entrar com o Google. Tente novamente ou entre com seu e-mail.",
+      nacimientoFecha: "Data de nascimento inválida.",
+      nacimientoHora: "Hora inválida.",
+      nacimientoLugar: "Selecione o lugar de nascimento na lista de sugestões.",
+      nacimientoGuardado: "Dados de nascimento salvos. Seu céu de hoje já pode ser lido.",
     },
   },
   cuenta: {
@@ -173,6 +178,11 @@ export const pt: Diccionario = {
     sinCompras: "Você ainda não comprou créditos.",
     estados: { pendiente: "Pendente", aprobada: "Aprovada", rechazada: "Recusada", anulada: "Cancelada", error: "Erro" },
     idiomaLecturas: "Idioma da interface e das suas leituras",
+    nacimiento: {
+      titulo: "Dados de nascimento",
+      nota: "Com eles a Arcana calcula seu céu de cada dia e preenche seu mapa astral. Só você os vê.",
+      guardar: "Salvar dados de nascimento",
+    },
   },
   inicio: {
     bienvenida: "Bem-vindo",
@@ -194,6 +204,12 @@ export const pt: Diccionario = {
     lunaHoy: "Lua de hoje",
     iluminacion: "{pct}% iluminada",
     fasesLuna: ["Lua nova", "Crescente", "Quarto crescente", "Gibosa crescente", "Lua cheia", "Gibosa minguante", "Quarto minguante", "Minguante"],
+    hoyTarjeta: {
+      titulo: "Seu céu hoje",
+      nota: "Lua em {signo} · {n} trânsitos sobre seu mapa. Veja o que se move para você.",
+      notaMiembro: "Lua em {signo} · {n} trânsitos. Sua mensagem de hoje espera por você.",
+      notaSinDatos: "Salve sua data e lugar de nascimento e receba cada manhã o que o céu move para você.",
+    },
   },
   tarot: {
     seccion: "Tarot",
@@ -401,6 +417,7 @@ export const pt: Diccionario = {
       inicial: { nombre: "Inicial", descripcion: "Para experimentar: cinco leituras simples ou um mapa astral." },
       buscador: { nombre: "Buscador", descripcion: "O mais escolhido. Dá para um mês de consultas." },
       iniciado: { nombre: "Iniciado", descripcion: "Para quem consulta todos os dias e compartilha com outras pessoas." },
+      circulo: { nombre: "Círculo Arcana", descripcion: "30 dias com seu céu pessoal cada manhã, perguntas sem cobrança e 15 créditos." },
     },
     pagar: {
       seccion: "Pagamento",
@@ -507,6 +524,41 @@ export const pt: Diccionario = {
     sinCreditos: "Você não tem créditos para outra pergunta.",
     tu: "Você",
     arcana: "Arcana",
+  },
+  hoy: {
+    seccion: "Cada manhã",
+    titulo: "Seu céu hoje",
+    sinDatos: "Conte quando e onde você nasceu",
+    sinDatosNota: "Com sua data, hora e lugar de nascimento calculamos os trânsitos reais de hoje sobre seu mapa natal. Guardamos no seu perfil e você não precisa digitar de novo.",
+    lunaEn: "Lua em {signo}",
+    transitos: "O que se move hoje sobre seu mapa",
+    sinTransitos: "Hoje não há aspectos exatos: um dia de fundo tranquilo, guiado pela Lua.",
+    aplicativo: "se intensifica",
+    separativo: "se dissolve",
+    escribiendo: "A Arcana está lendo seu céu de hoje…",
+    fallo: "Não conseguimos escrever sua mensagem de hoje. Volte em alguns minutos.",
+    teaserTitulo: "Sua mensagem de hoje já está escrita para você",
+    teaserTexto: "Um texto breve, cada manhã, sobre o que esses trânsitos movem na sua vida e onde colocar a atenção. Só para o Círculo.",
+    editarDatos: "Corrigir meus dados de nascimento",
+  },
+  circulo: {
+    nombre: "Círculo Arcana",
+    etiqueta: "Passe mensal",
+    eslogan: "Seu céu pessoal cada manhã, perguntas sem cobrança e créditos para ir mais fundo.",
+    beneficios: [
+      "Uma mensagem diária escrita sobre seus trânsitos reais, não sobre seu signo.",
+      "Perguntas de acompanhamento sem cobrança sobre qualquer leitura sua.",
+      "15 créditos incluídos para tiragens, mapas e leituras da mão.",
+      "A Arcana lembra suas consultas anteriores e fala com continuidade.",
+    ],
+    letraPequena: "Até {n} perguntas por dia. O passe dura {dias} dias a partir do pagamento e não se renova sozinho: você decide quando estendê-lo.",
+    porDias: "por {dias} dias",
+    incluyeCreditos: "Inclui {n} créditos",
+    unirme: "Entrar no Círculo",
+    extender: "Estender 30 dias",
+    cta: "Entrar no Círculo por {precio}",
+    activoHasta: "Círculo Arcana ativo até {fecha}.",
+    verMas: "Conhecer o Círculo",
   },
   noEncontrado: {
     texto: "Esta página não está nas cartas.",

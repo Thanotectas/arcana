@@ -53,7 +53,16 @@ export interface Paquete {
   precioCOP: number; // pesos, sin centavos
   destacado?: boolean;
   descripcion: string;
+  /** Días de Círculo Arcana que incluye (pase mensual). */
+  diasCirculo?: number;
 }
+
+/** Pase mensual: mensaje personal diario y preguntas sin cobro. */
+export const CIRCULO = {
+  id: "circulo",
+  diasPorCompra: 30,
+  preguntasPorDia: 15,
+} as const;
 
 export const PAQUETES: Paquete[] = [
   {
@@ -80,7 +89,17 @@ export const PAQUETES: Paquete[] = [
   },
 ];
 
+export const PAQUETE_CIRCULO: Paquete = {
+  id: "circulo",
+  nombre: "Círculo Arcana",
+  creditos: 15,
+  precioCOP: 19900,
+  diasCirculo: 30,
+  descripcion: "30 días con tu cielo personal cada mañana, preguntas sin cobro y 15 créditos.",
+};
+
 export function paquetePorId(id: string) {
+  if (id === PAQUETE_CIRCULO.id) return PAQUETE_CIRCULO;
   return PAQUETES.find((p) => p.id === id);
 }
 

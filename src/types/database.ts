@@ -20,6 +20,7 @@ type PerfilRow = {
   codigo_invitacion: string | null;
   invitado_por: string | null;
   invitacion_premiada: boolean;
+  circulo_hasta: string | null;
   creado_en: string;
   actualizado_en: string;
 };
@@ -58,6 +59,8 @@ type OrdenRow = {
   estado: string;
   transaccion_id: string | null;
   metodo_pago: string | null;
+  /** Pago real hecho para probar el flujo; fuera de las métricas de ventas. */
+  es_prueba: boolean;
   creado_en: string;
   actualizado_en: string;
 };
@@ -70,6 +73,15 @@ type PreguntaRow = {
   respuesta: string | null;
   estado: string;
   creditos_usados: number;
+  creado_en: string;
+};
+
+type MensajeDiarioRow = {
+  id: number;
+  usuario_id: string;
+  fecha: string;
+  idioma: string;
+  contenido: string;
   creado_en: string;
 };
 
@@ -92,7 +104,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -110,7 +122,7 @@ export type Database = {
       };
       ordenes: {
         Row: OrdenRow;
-        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "es_prueba" | "creado_en" | "actualizado_en">;
         Update: Partial<OrdenRow>;
         Relationships: [];
       };
@@ -118,6 +130,12 @@ export type Database = {
         Row: PreguntaRow;
         Insert: Insertable<PreguntaRow, "id" | "respuesta" | "estado" | "creditos_usados" | "creado_en">;
         Update: Partial<PreguntaRow>;
+        Relationships: [];
+      };
+      mensajes_diarios: {
+        Row: MensajeDiarioRow;
+        Insert: Insertable<MensajeDiarioRow, "id" | "idioma" | "creado_en">;
+        Update: Partial<MensajeDiarioRow>;
         Relationships: [];
       };
       horoscopos: {

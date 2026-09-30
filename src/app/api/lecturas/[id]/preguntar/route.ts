@@ -5,7 +5,9 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generarTexto } from "@/lib/ia";
 import { construirPrompt } from "@/lib/lecturas/prompts";
 import { marcaError, type CodigoErrorLectura } from "@/lib/lecturas/marcas";
-import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
+import { CIRCULO, COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
+import { circuloActivo } from "@/lib/dal";
+import { memoriaDeLaPersona } from "@/lib/lecturas/memoria";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
 
 export const maxDuration = 120;
@@ -41,8 +43,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return Response.json({ error: "lectura_no_lista" }, { status: 409 });
   }
 
-  const [{ data: perfil }, { data: previas }] = await Promise.all([
-    supabase.from("perfiles").select("ilimitado").eq("id", user.id).maybeSingle(),
+  const inicioDia = new Date();
+  inicioDia.setUTCHours(0, 0, 0, 0);
+  const [{ data: perfil }, { data: previas }, { count: hoyEnCirculo }] = await Promise.all([
+    supabase.from("perfiles").select("ilimitado, circulo_hasta").eq("id", user.id).maybeSingle(),
     supabase
       .from("preguntas_lectura")
       .select("pregunta, respuesta, estado")
@@ -50,9 +54,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq("estado", "lista")
       .order("creado_en", { ascending: true })
       .limit(8),
+    supabase.from("preguntas_lectura").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).gte("creado_en", inicioDia.toISOString()),
   ]);
   const hechas = previas?.length ?? 0;
-  const gratis = Boolean(perfil?.ilimitado) || hechas < PREGUNTAS_GRATIS_POR_LECTURA;
+  // Círculo Arcana: preguntas sin cobro hasta el tope diario.
+  const enCirculo = circuloActivo(perfil) && (hoyEnCirculo ?? 0) < CIRCULO.preguntasPorDia;
+  const gratis = Boolean(perfil?.ilimitado) || enCirculo || hechas < PREGUNTAS_GRATIS_POR_LECTURA;
   const costo = gratis ? 0 : COSTO_PREGUNTA;
 
   if (costo > 0) {
@@ -111,7 +118,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     try {
       const entrada = (lectura.entrada ?? {}) as Record<string, unknown>;
       const idioma = esIdioma(entrada.idioma) ? entrada.idioma : IDIOMA_PREDETERMINADO;
-      const base = await construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado });
+      const [base, memoria] = await Promise.all([
+        construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado }),
+        memoriaDeLaPersona(supabase, user.id, { excluirLectura: id }).catch(() => ""),
+      ]);
       const historial = (previas ?? [])
         .map((p) => `Pregunta anterior: ${p.pregunta}\nRespuesta anterior: ${p.respuesta ?? ""}`)
         .join("\n\n");
@@ -123,7 +133,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         `Responde solo a esta pregunta, apoyándote en los símbolos de su lectura (cita la carta, el planeta, el número o la línea que corresponda). ` +
         `Sé concreta y cálida, sin repetir la lectura. Si la pregunta se sale del tema esotérico o pide diagnóstico médico, legal o financiero, dilo con amabilidad y redirige. ` +
         `Extensión: 120 a 220 palabras. Sin título; puedes usar un par de párrafos.`;
-      const texto = await generarTexto(usuario, base.sistemaExtra ?? "", { idioma, effort: "low", maxTokens: 900 }, enviar);
+      const texto = await generarTexto(usuario, [base.sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), { idioma, effort: "low", maxTokens: 900 }, enviar);
       await admin.from("preguntas_lectura").update({ respuesta: texto, estado: "lista" }).eq("id", fila.id);
     } catch (e) {
       const codigo = clasificarError(e);

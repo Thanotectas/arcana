@@ -178,10 +178,32 @@ export async function accionCartaAstral(_prev: EstadoAccion, formData: FormData)
         modalidades: carta.modalidades,
       },
     });
+    await guardarNacimiento(datos);
   } catch (e) {
     return manejarError(e);
   }
   redirect(`/lecturas/${id}`);
+}
+
+/** Memoria: el perfil recuerda los datos de nacimiento para el cielo diario. */
+async function guardarNacimiento(datos: DatosNacimiento) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  const { error } = await supabase
+    .from("perfiles")
+    .update({
+      fecha_nacimiento: datos.fecha,
+      hora_nacimiento: datos.horaDesconocida ? null : datos.hora,
+      lugar_nacimiento: datos.lugar,
+      latitud: datos.latitud,
+      longitud: datos.longitud,
+      zona_horaria: datos.zonaHoraria,
+    })
+    .eq("id", user.id);
+  if (error) console.error("[perfil] no se guardaron los datos de nacimiento", error.message);
 }
 
 // ---------------------------------------------------------------------------

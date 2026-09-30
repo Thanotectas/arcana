@@ -16,6 +16,7 @@ const RUTAS_PRIVADAS = [
   "/cuenta",
   "/invitar",
   "/iching",
+  "/hoy",
 ];
 
 export async function proxy(request: NextRequest) {

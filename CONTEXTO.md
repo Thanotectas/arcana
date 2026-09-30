@@ -86,7 +86,13 @@ Qué trae:
 
 - **Pregúntale a Arcana** (`ConversacionLectura`, `/api/lecturas/[id]/preguntar`): sobre una lectura terminada, la persona pregunta y la respuesta se escribe en vivo con el contexto de su lectura y las preguntas anteriores. La primera pregunta de cada lectura es gratis (`PREGUNTAS_GRATIS_POR_LECTURA`), las siguientes cuestan `COSTO_PREGUNTA` (1). Tabla `preguntas_lectura` y `reembolsar_pregunta()` en la migración 0008.
 - **Tarjeta para compartir** (`/api/lecturas/[id]/tarjeta`, 1080×1350): símbolos, títulos y una frase de la síntesis, con el enlace de invitación de la persona incrustado (`miarcana.com/r/CODIGO`). En el celular se comparte como archivo (Web Share); en escritorio se descarga. Fuentes en `src/app/fuentes/` (Cormorant, Inter y Noto Sans Symbols 2 para los símbolos; los glifos zodiacales no se dibujan porque el motor los trata como emoji).
-- Migraciones pendientes de aplicar en producción: `0007_iching_y_compra.sql` y `0008_preguntas.sql`.
+## Perfil con memoria, "Tu cielo hoy" y Círculo Arcana (30 sep 2026)
+
+- **Memoria** (`src/lib/lecturas/memoria.ts`): el perfil guarda los datos de nacimiento (se llenan solos al calcular una carta astral, o desde *Mi cuenta → Datos de nacimiento*, `accionGuardarNacimiento`). Al escribir cualquier lectura o responder una pregunta, el modelo recibe el nombre, el nacimiento y un extracto de las últimas 3 consultas para hablar con continuidad (instruido a no repetirlas). La carta astral se precarga con esos datos.
+- **Tu cielo hoy** (`/hoy`, `src/lib/diario.ts`, `src/lib/astro/transitos.ts`): tránsitos reales del día sobre la carta natal (aspectos de los planetas de hoy con los planetas natales, Ascendente y Medio Cielo; orbes estrechos, ponderados por planeta lento y exactitud). Todo el mundo ve la Luna del día y los tránsitos; el **mensaje escrito** (140–200 palabras, `effort: low`) solo se genera para el Círculo y se guarda en `mensajes_diarios` (una vez por persona, día e idioma). La fecha se toma en la zona horaria de nacimiento. Se transmite con `Suspense` para no bloquear la página. Enlace en la barra (con sesión) y tarjeta destacada en el panel.
+- **Círculo Arcana** (pase de 30 días, 19.900 COP, paquete `circulo` en `PAQUETE_CIRCULO`): mensaje diario, preguntas de seguimiento sin cobro (tope `CIRCULO.preguntasPorDia` = 15 por día, se cuenta en `preguntas_lectura`) y 15 créditos. No se renueva solo: cada compra suma 30 días a `perfiles.circulo_hasta` (`acreditar_orden` en 0009). Tarjeta en `/creditos#circulo` y estado en *Mi cuenta*. `circuloActivo(perfil)` en `dal.ts` (las cuentas ilimitadas cuentan como miembros).
+- Migraciones pendientes de aplicar en producción: `0007_iching_y_compra.sql`, `0008_preguntas.sql`, `0009_circulo_y_memoria.sql` y `0010_ordenes_prueba.sql` (columna `ordenes.es_prueba` para dejar las compras de prueba fuera de las métricas). Sin 0009, `/hoy` y el Círculo fallan al consultar `circulo_hasta`.
+- Siguiente paso natural: notificación diaria (web push o WhatsApp) con un cron de Vercel que pregenere los mensajes de madrugada.
 
 ## Pendiente
 
@@ -96,7 +102,7 @@ Qué trae:
 - [ ] Saldo en la cuenta de Anthropic (estaba en plan de evaluación, sin saldo).
 - [ ] Correo propio: ImprovMX para recibir en Gmail y Resend como SMTP de Supabase para los correos de registro.
 - [ ] Hacer interactivas las pantallas de numerología y compatibilidad (hoy son formularios; la lectura ya se escribe en vivo).
-- [ ] Siguientes pasos de la estrategia: tarjetas para compartir, páginas SEO, memoria de lecturas, idiomas (portugués e inglés).
+- [ ] Siguientes pasos de la estrategia: páginas SEO, notificaciones diarias, programa de creadoras, lectoras humanas.
 
 ## Cómo trabajar
 

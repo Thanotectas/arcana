@@ -17,7 +17,27 @@ export interface Perfil {
   ilimitado: boolean;
   codigo_invitacion: string | null;
   invitado_por: string | null;
+  circulo_hasta: string | null;
   creado_en: string;
+}
+
+/** Lugar de nacimiento guardado, listo para precargar el campo de lugar. */
+export function lugarDePerfil(perfil: Pick<Perfil, "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria"> | null | undefined) {
+  if (!perfil?.lugar_nacimiento || perfil.latitud == null || perfil.longitud == null || !perfil.zona_horaria) return null;
+  return { nombre: perfil.lugar_nacimiento, latitud: perfil.latitud, longitud: perfil.longitud, zonaHoraria: perfil.zona_horaria };
+}
+
+/** Hora de nacimiento "HH:MM" del perfil; null si dijo no conocerla; undefined si no hay datos. */
+export function horaDePerfil(perfil: Pick<Perfil, "fecha_nacimiento" | "hora_nacimiento"> | null | undefined) {
+  if (!perfil?.fecha_nacimiento) return undefined;
+  return perfil.hora_nacimiento ? perfil.hora_nacimiento.slice(0, 5) : null;
+}
+
+/** ¿El pase mensual está vigente? */
+export function circuloActivo(perfil: Pick<Perfil, "circulo_hasta" | "ilimitado"> | null | undefined) {
+  if (!perfil) return false;
+  if (perfil.ilimitado) return true;
+  return Boolean(perfil.circulo_hasta && new Date(perfil.circulo_hasta) > new Date());
 }
 
 export interface Lectura {

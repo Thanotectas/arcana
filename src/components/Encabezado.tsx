@@ -9,6 +9,7 @@ import { SelectorIdioma } from "./SelectorIdioma";
 export async function Encabezado() {
   const [perfil, t] = await Promise.all([getPerfil(), getT()]);
   const NAV = [
+    ...(perfil ? [{ href: "/hoy", etiqueta: t.nav.hoy }] : []),
     { href: "/tarot", etiqueta: t.nav.tarot },
     { href: "/carta-astral", etiqueta: t.nav.cartaAstral },
     { href: "/numerologia", etiqueta: t.nav.numerologia },

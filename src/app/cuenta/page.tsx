@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { FormularioPerfil } from "@/components/FormularioAuth";
-import { accionActualizarPerfil } from "@/lib/auth/acciones";
-import { getOrdenes, getPerfil, requerirUsuario } from "@/lib/dal";
+import { FormularioNacimiento } from "@/components/FormularioNacimiento";
+import { accionActualizarPerfil, accionGuardarNacimiento } from "@/lib/auth/acciones";
+import { getOrdenes, getPerfil, requerirUsuario, lugarDePerfil, horaDePerfil, circuloActivo } from "@/lib/dal";
 import { formatoCOP } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
-import { fechaHora } from "@/lib/i18n/formato";
+import { fechaHora, fechaLarga, plantilla } from "@/lib/i18n/formato";
+import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -23,6 +25,26 @@ export default async function PaginaCuenta() {
       <div className="tarjeta p-6">
         <FormularioPerfil accion={accionActualizarPerfil} nombre={perfil?.nombre ?? ""} email={usuario.email ?? ""} />
       </div>
+
+      <section id="nacimiento" className="tarjeta scroll-mt-24 p-6">
+        <h2 className="font-display text-2xl font-semibold">{t.cuenta.nacimiento.titulo}</h2>
+        <p className="mb-4 mt-1 text-sm text-texto-suave">{t.cuenta.nacimiento.nota}</p>
+        <FormularioNacimiento accion={accionGuardarNacimiento} fecha={perfil?.fecha_nacimiento ?? ""} hora={horaDePerfil(perfil)} lugar={lugarDePerfil(perfil)} />
+      </section>
+
+      <section className="tarjeta p-6">
+        <h2 className="font-display text-2xl font-semibold">{t.circulo.nombre}</h2>
+        {circuloActivo(perfil) ? (
+          <p className="mt-2 text-sm text-texto-suave">
+            {perfil?.ilimitado ? t.comun.tuCuentaIlimitada : plantilla(t.circulo.activoHasta, { fecha: fechaLarga(perfil?.circulo_hasta ?? new Date(), idioma) })}{" "}
+            <Link href="/hoy" className="text-oro-suave underline">{t.hoy.titulo}</Link>
+          </p>
+        ) : (
+          <p className="mt-2 text-sm text-texto-suave">
+            {t.circulo.eslogan} <Link href="/creditos#circulo" className="text-oro-suave underline">{t.circulo.verMas}</Link>
+          </p>
+        )}
+      </section>
 
       <section className="tarjeta p-6">
         <h2 className="font-display text-2xl font-semibold">{t.cuenta.compras}</h2>

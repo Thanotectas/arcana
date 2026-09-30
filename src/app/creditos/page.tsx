@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
-import { requerirUsuario, getPerfil, getHaComprado } from "@/lib/dal";
-import { Gift, ShieldCheck, Lock } from "lucide-react";
-import { PAQUETES, COSTOS, formatoCOP, BONO_PRIMERA_COMPRA, type TipoLectura } from "@/lib/creditos";
+import { requerirUsuario, getPerfil, getHaComprado, circuloActivo } from "@/lib/dal";
+import { Gift, ShieldCheck, Lock, Sparkles, Sunrise } from "lucide-react";
+import { PAQUETES, PAQUETE_CIRCULO, CIRCULO, COSTOS, formatoCOP, BONO_PRIMERA_COMPRA, type TipoLectura } from "@/lib/creditos";
 import { accionComprar } from "@/lib/pagos/acciones";
 import { pagosConfigurados } from "@/lib/pagos/bold";
 import { Aviso } from "@/components/Aviso";
 import { BotonEnviar } from "@/components/BotonEnviar";
-import { getT } from "@/lib/i18n/servidor";
-import { plantilla } from "@/lib/i18n/formato";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
+import { fechaLarga, plantilla } from "@/lib/i18n/formato";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -17,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requerirUsuario();
-  const [{ error }, perfil, t, haComprado] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado()]);
+  const [{ error }, perfil, t, haComprado, idioma] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma()]);
+  const miembro = circuloActivo(perfil);
   const precioAstral = formatoCOP(Math.round((PAQUETES[1].precioCOP / PAQUETES[1].creditos) * COSTOS.carta_astral));
   const configurado = pagosConfigurados();
   const errores = t.creditos.errores as Record<string, string>;
@@ -74,6 +75,34 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           );
         })}
       </div>
+
+      <form id="circulo" action={accionComprar} className="tarjeta aparecer scroll-mt-24 border-oro/50 bg-gradient-to-br from-oro/10 via-transparent to-violeta/10 p-6 sm:p-8">
+        <input type="hidden" name="paquete" value={PAQUETE_CIRCULO.id} />
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-lg">
+            <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-oro"><Sunrise className="h-4 w-4" aria-hidden /> {t.circulo.etiqueta}</p>
+            <h2 className="font-display mt-1 text-3xl font-semibold">{t.circulo.nombre}</h2>
+            <p className="mt-1 text-texto-suave">{t.circulo.eslogan}</p>
+            <ul className="mt-4 space-y-1.5 text-sm">
+              {t.circulo.beneficios.map((b) => (
+                <li key={b} className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden />{b}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-texto-suave">{plantilla(t.circulo.letraPequena, { n: CIRCULO.preguntasPorDia, dias: CIRCULO.diasPorCompra })}</p>
+          </div>
+          <div className="w-full text-center sm:w-56">
+            <p className="text-4xl font-semibold text-oro-suave">{formatoCOP(PAQUETE_CIRCULO.precioCOP)}</p>
+            <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
+            <p className="mt-1 text-xs text-texto-suave">{plantilla(t.circulo.incluyeCreditos, { n: PAQUETE_CIRCULO.creditos })}</p>
+            <BotonEnviar className="boton boton-primario mt-4 w-full" cargando={t.creditos.preparando}>
+              {miembro ? t.circulo.extender : t.circulo.unirme}
+            </BotonEnviar>
+            {miembro && perfil?.circulo_hasta && !perfil.ilimitado && (
+              <p className="mt-2 text-xs text-exito">{plantilla(t.circulo.activoHasta, { fecha: fechaLarga(perfil.circulo_hasta, idioma) })}</p>
+            )}
+          </div>
+        </div>
+      </form>
 
       <section className="tarjeta p-6">
         <h2 className="font-display text-2xl font-semibold">{t.creditos.cuantoCuesta}</h2>

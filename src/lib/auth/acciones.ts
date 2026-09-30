@@ -115,3 +115,40 @@ export async function accionActualizarPerfil(_prev: EstadoAuth, formData: FormDa
   }
   return { mensaje: "perfilActualizado" };
 }
+
+/** Datos de nacimiento del perfil (memoria para el cielo diario y las cartas). */
+export async function accionGuardarNacimiento(_prev: EstadoAuth, formData: FormData): Promise<EstadoAuth> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar");
+
+  const fecha = String(formData.get("fecha") ?? "");
+  const horaDesconocida = formData.get("hora_desconocida") === "on";
+  const hora = String(formData.get("hora") ?? "12:00") || "12:00";
+  const lugar = String(formData.get("lugar") ?? "").trim().slice(0, 120);
+  const latitud = Number(formData.get("latitud"));
+  const longitud = Number(formData.get("longitud"));
+  const zonaHoraria = String(formData.get("zona_horaria") ?? "");
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "nacimientoFecha" };
+  const anio = Number(fecha.slice(0, 4));
+  if (anio < 1900 || anio > new Date().getFullYear()) return { error: "nacimientoFecha" };
+  if (!horaDesconocida && !/^\d{2}:\d{2}$/.test(hora)) return { error: "nacimientoHora" };
+  if (!lugar || Number.isNaN(latitud) || Number.isNaN(longitud) || !zonaHoraria) return { error: "nacimientoLugar" };
+
+  const { error } = await supabase
+    .from("perfiles")
+    .update({
+      fecha_nacimiento: fecha,
+      hora_nacimiento: horaDesconocida ? null : hora,
+      lugar_nacimiento: lugar,
+      latitud,
+      longitud,
+      zona_horaria: zonaHoraria,
+    })
+    .eq("id", user.id);
+  if (error) return { error: "noGuardar" };
+  return { mensaje: "nacimientoGuardado" };
+}
