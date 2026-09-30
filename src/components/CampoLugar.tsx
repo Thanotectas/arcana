@@ -2,9 +2,11 @@
 
 import { useRef, useState } from "react";
 import type { Lugar } from "@/lib/astro/geocodificar";
+import { useT } from "@/lib/i18n/cliente";
 
 /** Autocompletado de lugar de nacimiento; rellena lat, lon y zona horaria ocultos. */
 export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
+  const { t } = useT();
   const [texto, setTexto] = useState(valorInicial ? etiqueta(valorInicial) : "");
   const [opciones, setOpciones] = useState<Lugar[]>([]);
   const [seleccion, setSeleccion] = useState<Lugar | null>(valorInicial ?? null);
@@ -34,13 +36,13 @@ export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
 
   return (
     <div className="relative">
-      <label className="etiqueta" htmlFor="lugar-texto">Lugar de nacimiento</label>
+      <label className="etiqueta" htmlFor="lugar-texto">{t.astral.lugar}</label>
       <input
         id="lugar-texto"
         className="campo"
         value={texto}
         autoComplete="off"
-        placeholder="Ciudad, país"
+        placeholder={t.astral.lugarPlaceholder}
         onChange={(e) => {
           setTexto(e.target.value);
           setSeleccion(null);
@@ -77,7 +79,7 @@ export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
         </ul>
       )}
       {!seleccion && texto.length >= 2 && (
-        <p className="mt-1 text-xs text-texto-suave">Selecciona una opción de la lista para fijar coordenadas y zona horaria.</p>
+        <p className="mt-1 text-xs text-texto-suave">{t.astral.seleccionaLugar}</p>
       )}
     </div>
   );

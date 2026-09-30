@@ -10,6 +10,9 @@ import { calcularCarta, type DatosNacimiento } from "../astro/carta";
 import { calcularPerfil } from "../numerologia";
 import { signoPorFecha, signoPorId, compatibilidadSignos } from "../zodiaco";
 import { cartasDelDiaHoy, getPerfil } from "../dal";
+import { getIdioma } from "../i18n/servidor";
+import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
+import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import type { Json } from "@/types/database";
 
 export interface EstadoAccion {
@@ -33,6 +36,8 @@ async function usuarioActual() {
 async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada: unknown; resultado: unknown }) {
   const { supabase, user } = await usuarioActual();
   const perfil = await getPerfil();
+  const idioma = await getIdioma();
+  const entrada = { ...(datos.entrada as Record<string, unknown>), idioma };
   // Las cuentas ilimitadas pasan por el cobro (queda registro) sin pagar nada.
   const costo = perfil?.ilimitado ? 0 : COSTOS[datos.tipo];
   const costoTarifa = COSTOS[datos.tipo];
@@ -55,7 +60,7 @@ async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada:
       usuario_id: user.id,
       tipo: datos.tipo,
       titulo: datos.titulo,
-      entrada: datos.entrada as Json,
+      entrada: entrada as Json,
       resultado: datos.resultado as Json,
       creditos_usados: costo,
       estado: "pendiente",
@@ -82,7 +87,7 @@ async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada:
 function manejarError(e: unknown): EstadoAccion {
   const msg = e instanceof Error ? e.message : "Ocurrió un error inesperado.";
   if (msg === "SIN_CREDITOS") {
-    return { error: "No tienes créditos suficientes para esta lectura." };
+    return { error: "SIN_CREDITOS" };
   }
   console.error("[lecturas]", e);
   return { error: msg };
@@ -94,7 +99,10 @@ function manejarError(e: unknown): EstadoAccion {
 export async function accionTarot(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
   const tipo = String(formData.get("tipo") ?? "") as TipoTirada;
   const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  const mazoId = String(formData.get("mazo") ?? "rider");
   if (!TIRADAS[tipo]) return { error: "Tirada no válida." };
+  if (!esMazo(mazoId)) return { error: "Mazo no válido." };
+  const mazo: IdMazo = mazoId;
 
   let posiciones: number[];
   try {
@@ -110,11 +118,11 @@ export async function accionTarot(_prev: EstadoAccion, formData: FormData): Prom
     if (tipo === "tarot_carta" && !ilimitado && (await cartasDelDiaHoy()) >= CARTAS_DIA_GRATIS) {
       return { error: "Ya sacaste tu carta gratuita de hoy. Vuelve mañana o prueba una tirada completa." };
     }
-    const cartas = cartasDesdeAbanico(tipo, posiciones);
+    const cartas = cartasDesdeAbanico(tipo, posiciones, mazo);
     id = await crearLectura({
       tipo,
-      titulo: pregunta ? `${TIRADAS[tipo].nombre}: ${pregunta}` : TIRADAS[tipo].nombre,
-      entrada: { pregunta },
+      titulo: pregunta ? `${TIRADAS[tipo].nombre}: ${pregunta}` : `${TIRADAS[tipo].nombre} · ${MAZOS[mazo].nombre}`,
+      entrada: { pregunta, mazo },
       resultado: { cartas },
     });
   } catch (e) {
@@ -138,14 +146,14 @@ export async function accionCartaAstral(_prev: EstadoAccion, formData: FormData)
     zonaHoraria: String(formData.get("zona_horaria") ?? ""),
   };
 
-  if (!datos.nombre) return { error: "Escribe tu nombre." };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(datos.fecha)) return { error: "Fecha de nacimiento no válida." };
-  if (!datos.horaDesconocida && !/^\d{2}:\d{2}$/.test(datos.hora)) return { error: "Hora no válida." };
+  if (!datos.nombre) return { error: "astral.nombre" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datos.fecha)) return { error: "astral.fecha" };
+  if (!datos.horaDesconocida && !/^\d{2}:\d{2}$/.test(datos.hora)) return { error: "astral.hora" };
   if (!datos.lugar || Number.isNaN(datos.latitud) || Number.isNaN(datos.longitud) || !datos.zonaHoraria) {
-    return { error: "Selecciona el lugar de nacimiento de la lista de sugerencias." };
+    return { error: "astral.lugar" };
   }
   const anio = Number(datos.fecha.slice(0, 4));
-  if (anio < 1900 || anio > new Date().getFullYear()) return { error: "El año debe estar entre 1900 y hoy." };
+  if (anio < 1900 || anio > new Date().getFullYear()) return { error: "astral.anio" };
 
   let id: string;
   try {
@@ -181,8 +189,8 @@ export async function accionCartaAstral(_prev: EstadoAccion, formData: FormData)
 export async function accionNumerologia(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
   const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 120);
   const fecha = String(formData.get("fecha") ?? "");
-  if (nombre.length < 3) return { error: "Escribe tu nombre completo tal como aparece en tu documento." };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "Fecha de nacimiento no válida." };
+  if (nombre.length < 3) return { error: "numerologia.nombre" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "numerologia.fecha" };
 
   let id: string;
   try {
@@ -218,7 +226,7 @@ export async function accionCompatibilidad(_prev: EstadoAccion, formData: FormDa
   };
   const a = resolver(fechaA, signoIdA);
   const b = resolver(fechaB, signoIdB);
-  if (!a || !b) return { error: "Indica la fecha de nacimiento o el signo de ambas personas." };
+  if (!a || !b) return { error: "compatibilidad.faltan" };
 
   let id: string;
   try {
@@ -232,5 +240,80 @@ export async function accionCompatibilidad(_prev: EstadoAccion, formData: FormDa
   } catch (e) {
     return manejarError(e);
   }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Quiromancia: la foto se guarda en el bucket privado y la lectura se cobra.
+// ---------------------------------------------------------------------------
+const TAMANO_MAX_FOTO = 4 * 1024 * 1024;
+const TIPOS_FOTO = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+export async function accionQuiromancia(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const { user } = await usuarioActual();
+  const foto = formData.get("foto");
+  const mano = (String(formData.get("mano") ?? "derecha") === "izquierda" ? "izquierda" : "derecha") as Mano;
+  const dominante = (String(formData.get("dominante") ?? "derecha") === "izquierda" ? "izquierda" : "derecha") as Mano;
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+
+  if (!(foto instanceof File) || foto.size === 0) return { error: "FOTO_FALTA" };
+  if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
+  if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+
+  const admin = getSupabaseAdmin();
+  const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+  const ruta = `${user.id}/${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await admin.storage
+    .from("palmas")
+    .upload(ruta, foto, { contentType: foto.type, upsert: false });
+  if (errorSubida) {
+    console.error("[quiromancia] subida fallida", errorSubida);
+    return { error: "FOTO_SUBIR" };
+  }
+
+  let id: string;
+  try {
+    const entrada: EntradaQuiromancia = { foto: ruta, mano, dominante, pregunta };
+    id = await crearLectura({
+      tipo: "quiromancia",
+      titulo: pregunta ? `Lectura de la mano: ${pregunta}` : "Lectura de la mano",
+      entrada,
+      resultado: {},
+    });
+  } catch (e) {
+    await admin.storage.from("palmas").remove([ruta]);
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Reintento: una lectura fallida (ya reembolsada) vuelve a cobrarse y a
+// quedar pendiente para que la ruta de generación la escriba de nuevo.
+// ---------------------------------------------------------------------------
+export async function accionReintentarLectura(formData: FormData): Promise<void> {
+  const { supabase, user } = await usuarioActual();
+  const id = String(formData.get("id") ?? "");
+  const { data: lectura } = await supabase.from("lecturas").select("id, tipo, estado, entrada").eq("id", id).maybeSingle();
+  if (!lectura || lectura.estado !== "error") return;
+
+  const perfil = await getPerfil();
+  const tipo = lectura.tipo as TipoLectura;
+  const costoTarifa = COSTOS[tipo];
+  if (costoTarifa > 0) {
+    const { data: ok, error } = await supabase.rpc("consumir_creditos", {
+      p_cantidad: costoTarifa,
+      p_motivo: `lectura:${tipo} (reintento)`,
+      p_referencia: id,
+    });
+    if (error || !ok) redirect(`/lecturas/${id}?error=SIN_CREDITOS`);
+  }
+
+  await getSupabaseAdmin()
+    .from("lecturas")
+    .update({ estado: "pendiente", generando_desde: null, creditos_usados: perfil?.ilimitado ? 0 : costoTarifa })
+    .eq("id", id)
+    .eq("usuario_id", user.id);
+  revalidatePath(`/lecturas/${id}`);
   redirect(`/lecturas/${id}`);
 }

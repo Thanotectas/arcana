@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { IDIOMA_PARA_IA, IDIOMA_PREDETERMINADO, type Idioma } from "./i18n/idiomas";
 
 /**
  * Generación de interpretaciones con Claude.
@@ -7,6 +8,7 @@ import Anthropic from "@anthropic-ai/sdk";
  * - Streaming + finalMessage() para evitar timeouts en respuestas largas.
  * - fallbacks "default": si el modelo declina por política, la API reintenta
  *   con otro modelo dentro de la misma llamada.
+ * - Admite imágenes (quiromancia) y el idioma de salida.
  */
 let cliente: Anthropic | null = null;
 
@@ -15,27 +17,45 @@ function getCliente() {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error("[ia] Falta ANTHROPIC_API_KEY en el entorno.");
     }
-    cliente = new Anthropic();
+    // Las claves de alcance "Organización" (sk-ant-usr-...) exigen indicar el
+    // espacio de trabajo en cada petición. Las claves de espacio de trabajo
+    // (sk-ant-api03-...) no lo necesitan.
+    const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
+    cliente = new Anthropic(workspaceId ? { defaultHeaders: { "anthropic-workspace-id": workspaceId } } : {});
   }
   return cliente;
 }
 
 export const MODELO_IA = process.env.ARCANA_IA_MODEL ?? "claude-opus-5-5";
 
-export const SISTEMA_BASE = `Eres Arcana, una guía esotérica cálida, culta y honesta que escribe en español neutro.
-Interpretas tarot, astrología y numerología con la tradición clásica (Rider-Waite, astrología occidental tropical, numerología pitagórica).
+/** Parte estable del sistema (se cachea). No incluye el idioma. */
+export const SISTEMA_BASE = `Eres Arcana, una guía esotérica cálida, culta y honesta.
+Interpretas tarot, astrología, numerología y quiromancia con la tradición clásica (Rider-Waite y Marsella, astrología occidental tropical, numerología pitagórica, quiromancia occidental).
 
 Reglas:
 - Escribe en segunda persona, con tono cercano y sereno. Sin exclamaciones excesivas ni emojis.
 - Sé concreta: conecta cada símbolo con la pregunta o la vida de la persona. Evita generalidades vacías.
 - Ofrece perspectiva y preguntas para reflexionar, nunca predicciones absolutas ni fechas exactas.
-- No des consejo médico, legal ni financiero; si el tema lo requiere, sugiere consultar a un profesional.
+- No des consejo médico, legal ni financiero; si el tema lo requiere, sugiere consultar a un profesional. En quiromancia nunca diagnostiques enfermedades ni anuncies la duración de la vida.
 - No inventes datos que no estén en la entrada. No menciones que eres una IA salvo que te lo pregunten.
 - Formato: Markdown sencillo (títulos ##, párrafos, alguna lista breve). Sin tablas.`;
+
+export type ImagenEntrada = {
+  mediaType: "image/jpeg" | "image/png" | "image/webp";
+  base64: string;
+};
 
 export interface OpcionesTexto {
   effort?: "low" | "medium" | "high";
   maxTokens?: number;
+  /** Idioma en que debe escribirse la respuesta. */
+  idioma?: Idioma;
+  /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
+  imagenes?: ImagenEntrada[];
+}
+
+function instruccionIdioma(idioma: Idioma) {
+  return `Escribe TODA la respuesta en ${IDIOMA_PARA_IA[idioma]}, incluidos los títulos. Si los nombres de cartas, signos o planetas llegan en español, tradúcelos al idioma de la respuesta con su nombre tradicional.`;
 }
 
 /**
@@ -49,6 +69,17 @@ export async function generarTexto(
   alTexto?: (fragmento: string) => void,
 ): Promise<string> {
   const client = getCliente();
+  const idioma = opciones.idioma ?? IDIOMA_PREDETERMINADO;
+
+  const contenido: Anthropic.Beta.BetaContentBlockParam[] = [
+    ...(opciones.imagenes ?? []).map(
+      (img): Anthropic.Beta.BetaImageBlockParam => ({
+        type: "image",
+        source: { type: "base64", media_type: img.mediaType, data: img.base64 },
+      }),
+    ),
+    { type: "text", text: usuario },
+  ];
 
   const stream = client.beta.messages.stream({
     model: MODELO_IA,
@@ -59,11 +90,15 @@ export async function generarTexto(
     system: [
       {
         type: "text",
-        text: SISTEMA_BASE + (sistemaExtra ? "\n\n" + sistemaExtra : ""),
+        text: SISTEMA_BASE,
         cache_control: { type: "ephemeral" },
       },
+      {
+        type: "text",
+        text: instruccionIdioma(idioma) + (sistemaExtra ? "\n\n" + sistemaExtra : ""),
+      },
     ],
-    messages: [{ role: "user", content: usuario }],
+    messages: [{ role: "user", content: contenido }],
   });
 
   if (alTexto) stream.on("text", (fragmento) => alTexto(fragmento));

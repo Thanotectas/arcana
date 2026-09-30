@@ -4,8 +4,13 @@ import { requerirUsuario, getOrdenPorReferencia } from "@/lib/dal";
 import { consultarVenta, estadoOrden } from "@/lib/pagos/bold";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { Aviso } from "@/components/Aviso";
+import { getT } from "@/lib/i18n/servidor";
+import { plantilla } from "@/lib/i18n/formato";
 
-export const metadata: Metadata = { title: "Resultado del pago" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.creditos.retorno.titulo };
+}
 
 /**
  * Página de retorno tras el checkout. El webhook es la fuente de verdad, pero
@@ -17,7 +22,7 @@ export default async function PaginaRetorno({
   searchParams: Promise<{ ref?: string; "bold-order-id"?: string }>;
 }) {
   await requerirUsuario();
-  const params = await searchParams;
+  const [params, t] = await Promise.all([searchParams, getT()]);
   const ref = params.ref ?? params["bold-order-id"];
   let orden = ref ? await getOrdenPorReferencia(ref) : null;
 
@@ -40,22 +45,24 @@ export default async function PaginaRetorno({
     }
   }
 
+  const estados = t.cuenta.estados as Record<string, string>;
+
   return (
     <div className="mx-auto max-w-md space-y-6 text-center">
-      <h1 className="font-display text-4xl font-semibold">Resultado del pago</h1>
+      <h1 className="font-display text-4xl font-semibold">{t.creditos.retorno.titulo}</h1>
       {!orden ? (
-        <Aviso>No encontramos la orden. Si el pago se descontó, escríbenos con la referencia.</Aviso>
+        <Aviso>{t.creditos.retorno.noEncontrada}</Aviso>
       ) : orden.estado === "aprobada" ? (
-        <Aviso tipo="exito">Pago aprobado. Se acreditaron {orden.creditos} créditos a tu cuenta.</Aviso>
+        <Aviso tipo="exito">{plantilla(t.creditos.retorno.aprobada, { n: orden.creditos })}</Aviso>
       ) : orden.estado === "pendiente" ? (
-        <Aviso tipo="info">Tu pago está en proceso. Los créditos se acreditarán automáticamente cuando el banco confirme. Puedes revisar en unos minutos en Mi cuenta.</Aviso>
+        <Aviso tipo="info">{t.creditos.retorno.pendiente}</Aviso>
       ) : (
-        <Aviso>El pago no fue aprobado ({orden.estado}). No se realizó ningún cargo. Puedes intentarlo de nuevo.</Aviso>
+        <Aviso>{plantilla(t.creditos.retorno.rechazada, { estado: estados[orden.estado] ?? orden.estado })}</Aviso>
       )}
-      <p className="text-xs text-texto-suave">Referencia: {ref}</p>
+      <p className="text-xs text-texto-suave">{t.creditos.retorno.referencia}: {ref}</p>
       <div className="flex justify-center gap-3">
-        <Link href="/inicio" className="boton boton-primario">Ir al inicio</Link>
-        <Link href="/creditos" className="boton boton-secundario">Ver paquetes</Link>
+        <Link href="/inicio" className="boton boton-primario">{t.creditos.retorno.irInicio}</Link>
+        <Link href="/creditos" className="boton boton-secundario">{t.creditos.retorno.verPaquetes}</Link>
       </div>
     </div>
   );

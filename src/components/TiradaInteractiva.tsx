@@ -3,27 +3,40 @@
 import { useState } from "react";
 import { DisposicionTirada } from "./DisposicionTirada";
 import { CaraCarta } from "./CartaVisual";
+import { useT } from "@/lib/i18n/cliente";
+import { plantilla } from "@/lib/i18n/formato";
 
 export interface CartaRevelada {
   nombre: string;
   etiqueta: string;
   simbolo: string;
+  repeticiones: number;
   invertida: boolean;
   posicion: string;
   posicionDescripcion: string;
   palabras: string[];
   significado: string;
+  sombra: string;
   amor: string;
   trabajo: string;
 }
 
-type Tema = "significado" | "amor" | "trabajo";
+type Tema = "significado" | "amor" | "trabajo" | "sombra";
 
 /**
- * Cartas de una lectura de tarot. En una lectura nueva aparecen boca abajo y
- * la persona las voltea una a una; tocar una carta muestra su significado.
+ * Cartas de una lectura. En una lectura nueva aparecen boca abajo y la
+ * persona las voltea una a una; tocar una carta muestra su significado.
  */
-export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]; ocultas: boolean }) {
+export function TiradaInteractiva({
+  cartas,
+  ocultas,
+  estilo = "rider",
+}: {
+  cartas: CartaRevelada[];
+  ocultas: boolean;
+  estilo?: "rider" | "marsella" | "angeles";
+}) {
+  const { t } = useT();
   const [volteadas, setVolteadas] = useState<boolean[]>(() => cartas.map(() => !ocultas));
   const [activa, setActiva] = useState<number | null>(ocultas ? null : 0);
   const [tema, setTema] = useState<Tema>("significado");
@@ -43,12 +56,26 @@ export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]
   };
 
   const c = activa !== null ? cartas.at(activa) : undefined;
+  const temas: { id: Tema; etiqueta: string }[] =
+    estilo === "angeles"
+      ? [
+          { id: "significado", etiqueta: t.tarot.mensaje },
+          { id: "sombra", etiqueta: t.tarot.sombra },
+          { id: "amor", etiqueta: t.tarot.amor },
+          { id: "trabajo", etiqueta: t.tarot.trabajo },
+        ]
+      : [
+          { id: "significado", etiqueta: t.tarot.general },
+          { id: "amor", etiqueta: t.tarot.amor },
+          { id: "trabajo", etiqueta: t.tarot.trabajo },
+        ];
 
   return (
     <section className="tarjeta space-y-6 p-5 sm:p-6">
       {!todas && (
         <p className="text-center text-sm text-texto-suave">
-          Toca cada carta para revelarla{cartas.length > 1 ? " en el orden que quieras" : ""}.
+          {t.tarot.tocaRevelar}
+          {cartas.length > 1 ? ` ${t.tarot.enElOrden}` : ""}.
         </p>
       )}
 
@@ -62,15 +89,23 @@ export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]
                 type="button"
                 onClick={() => tocar(i)}
                 className={`carta-3d w-full ${volteada ? "volteada" : ""} ${activa === i ? "rounded-[0.9rem] ring-2 ring-oro/70 ring-offset-2 ring-offset-noche" : ""}`}
-                aria-label={volteada ? `${carta.posicion}: ${carta.nombre}${carta.invertida ? " invertida" : ""}` : `Revelar la carta de ${carta.posicion}`}
+                aria-label={volteada ? `${carta.posicion}: ${carta.nombre}${carta.invertida ? ` ${t.tarot.invertida}` : ""}` : plantilla(t.tarot.revelarCarta, { posicion: carta.posicion })}
                 aria-pressed={activa === i}
               >
                 <div className="carta-3d-interior">
                   <div className="lado">
-                    <div className="dorso-carta h-full w-full" />
+                    <div className={`dorso-carta estilo-${estilo} h-full w-full`} />
                   </div>
                   <div className="lado lado-cara">
-                    <CaraCarta nombre={carta.nombre} etiqueta={carta.etiqueta} simbolo={carta.simbolo} invertida={carta.invertida} compacta={cartas.length === 10} />
+                    <CaraCarta
+                      nombre={carta.nombre}
+                      etiqueta={carta.etiqueta}
+                      simbolo={carta.simbolo}
+                      invertida={carta.invertida}
+                      compacta={cartas.length === 10}
+                      estilo={estilo}
+                      repeticiones={carta.repeticiones}
+                    />
                   </div>
                 </div>
               </button>
@@ -97,7 +132,7 @@ export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]
       {!todas && (
         <div className="text-center">
           <button type="button" className="boton boton-secundario" onClick={revelarTodas}>
-            Revelar todas
+            {t.tarot.revelarTodas}
           </button>
         </div>
       )}
@@ -107,7 +142,7 @@ export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]
           <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{c.posicion}</p>
           <p className="text-xs text-texto-suave">{c.posicionDescripcion}</p>
           <h3 className="font-display mt-2 text-2xl font-semibold">
-            {c.nombre} {c.invertida && <span className="text-base text-oro">· invertida</span>}
+            {c.nombre} {c.invertida && <span className="text-base text-oro">· {t.tarot.invertida}</span>}
           </h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {c.palabras.map((p) => (
@@ -115,20 +150,22 @@ export function TiradaInteractiva({ cartas, ocultas }: { cartas: CartaRevelada[]
             ))}
           </div>
           <div className="mt-4 flex gap-1 text-sm" role="tablist">
-            {(["significado", "amor", "trabajo"] as Tema[]).map((t) => (
+            {temas.map((x) => (
               <button
-                key={t}
+                key={x.id}
                 type="button"
                 role="tab"
-                aria-selected={tema === t}
-                onClick={() => setTema(t)}
-                className={`rounded-full px-3 py-1 capitalize transition ${tema === t ? "bg-violeta/25 text-violeta-suave" : "text-texto-suave hover:text-texto"}`}
+                aria-selected={tema === x.id}
+                onClick={() => setTema(x.id)}
+                className={`rounded-full px-3 py-1 transition ${tema === x.id ? "bg-violeta/25 text-violeta-suave" : "text-texto-suave hover:text-texto"}`}
               >
-                {t === "significado" ? "General" : t}
+                {x.etiqueta}
               </button>
             ))}
           </div>
-          <p className="mt-3 leading-relaxed text-[#d9d2ea]">{tema === "significado" ? c.significado : tema === "amor" ? c.amor : c.trabajo}</p>
+          <p className="mt-3 leading-relaxed text-[#d9d2ea]">
+            {tema === "significado" ? c.significado : tema === "sombra" ? c.sombra : tema === "amor" ? c.amor : c.trabajo}
+          </p>
         </div>
       )}
     </section>

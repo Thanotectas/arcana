@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generarTexto } from "@/lib/ia";
 import { construirPrompt } from "@/lib/lecturas/prompts";
-import { MARCA_ERROR } from "@/lib/lecturas/marcas";
+import Anthropic from "@anthropic-ai/sdk";
+import { marcaError, type CodigoErrorLectura } from "@/lib/lecturas/marcas";
 
 // Una carta astral puede tardar más de un minuto en escribirse.
 export const maxDuration = 300;
@@ -66,13 +67,14 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const admin = getSupabaseAdmin();
   const trabajo = (async () => {
     try {
-      const { usuario, opciones } = construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado });
-      const texto = await generarTexto(usuario, "", opciones, enviar);
+      const { usuario, sistemaExtra, opciones } = await construirPrompt({ tipo: lectura.tipo as never, entrada: lectura.entrada, resultado: lectura.resultado });
+      const texto = await generarTexto(usuario, sistemaExtra ?? "", opciones, enviar);
       await admin.from("lecturas").update({ interpretacion: texto, estado: "lista" }).eq("id", id);
     } catch (e) {
-      console.error("[lecturas] generación fallida", id, e);
+      const codigo = clasificarError(e);
+      console.error(`[lecturas] generación fallida (${codigo})`, id, e instanceof Error ? e.message : e);
       await admin.rpc("reembolsar_lectura", { p_lectura: id });
-      enviar(MARCA_ERROR);
+      enviar(marcaError(codigo));
     } finally {
       cerrar();
     }
@@ -88,4 +90,14 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       "X-Accel-Buffering": "no",
     },
   });
+}
+
+/** Traduce el error del proveedor a un código que la interfaz sabe explicar. */
+function clasificarError(e: unknown): CodigoErrorLectura {
+  if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) return "clave";
+  if (e instanceof Anthropic.RateLimitError) return "limite";
+  if (e instanceof Anthropic.BadRequestError && /credit balance|billing/i.test(e.message)) return "saldo";
+  if (e instanceof Error && /Falta ANTHROPIC_API_KEY/.test(e.message)) return "clave";
+  if (e instanceof Error && /No fue posible generar/.test(e.message)) return "rechazo";
+  return "generico";
 }

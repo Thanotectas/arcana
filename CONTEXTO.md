@@ -44,6 +44,24 @@ Migraciones en `supabase/migrations/`, todas aplicadas en producción:
 
 Una migración nueva va como archivo `0004_...sql` y se aplica en Supabase (SQL Editor, CLI o el conector de Supabase). Antes de aplicarla conviene probarla en un Postgres local.
 
+## Novedades de la rama `mejoras-experiencia` (30 sep 2026)
+
+Trabajo hecho en Claude Code (sesión con Claude Fable 5.1). Antes de fusionar a `main`:
+
+1. La migración `0004_quiromancia_e_idiomas.sql` ya está aplicada en producción (bucket privado `palmas`, tipo `quiromancia`, columna `idioma` en `horoscopos` y `perfiles`, regla nueva por signo, día e idioma).
+2. Al publicar la rama (justo antes o después del despliegue) aplicar `0005_horoscopos_por_idioma.sql`, que retira la regla vieja `horoscopos_signo_fecha_key`. Hasta entonces, los horóscopos en inglés y portugués no se cachean (se generan pero no se guardan).
+3. Revisar la vista previa de Vercel de la rama.
+
+Qué trae:
+
+- **Idiomas**: español, inglés y portugués. Cookie `idioma` (selector en el encabezado). Diccionarios en `src/lib/i18n/diccionarios/` (es.ts es la fuente; en.ts y pt.ts deben tener las mismas claves, TypeScript lo verifica). Las lecturas se escriben en el idioma elegido (`entrada.idioma`) y el horóscopo se cachea por signo, día e idioma. Los nombres de cartas, signos y planetas siguen en español en los datos; el modelo los traduce al escribir.
+- **Quiromancia** (`/quiromancia`, 3 créditos): la foto se reduce en el navegador (máx. 1280 px), se sube al bucket privado `palmas/<usuario>/<uuid>.jpg` y se envía a Claude con visión. La lectura termina con un anexo JSON de trazos (coordenadas 0-100) que la página dibuja sobre la foto (`PalmaInteractiva`). Límite de Server Actions subido a 5 MB en `next.config.ts`.
+- **Tres mazos** (`src/lib/tarot/mazos.ts`): Rider-Waite, Marsella (mismos ids, nombres y numeración marselleses, arcanos menores por número) y Oráculo de los Ángeles (44 cartas, `oraculo-angeles.ts`, sin invertidas). El mazo va en `entrada.mazo`; el prompt recibe la tradición.
+- **Numerología y compatibilidad interactivas**: cálculo en vivo en el navegador (`numerologia-detalle.ts`, ruedas de signos y medidor de afinidad); la IA solo escribe la lectura.
+- **Errores con causa**: la ruta de generación envía `[[ERROR:clave|saldo|limite|rechazo|generico]]`; la interfaz explica y ofrece "Reintentar" (`accionReintentarLectura`, vuelve a cobrar y deja la lectura pendiente).
+- **Interfaz**: portada con cartas flotantes, panel con fase lunar y racha, historial con búsqueda y filtros, botón de compartir, animaciones en todas las secciones.
+- **docs/ESTRATEGIA-PRODUCTO.md**: valoración de precios e ideas.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

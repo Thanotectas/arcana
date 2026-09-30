@@ -9,7 +9,8 @@ export type TipoLectura =
   | "tarot_celta"
   | "carta_astral"
   | "numerologia"
-  | "compatibilidad";
+  | "compatibilidad"
+  | "quiromancia";
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -18,6 +19,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   carta_astral: 5,
   numerologia: 1,
   compatibilidad: 1,
+  quiromancia: 3,
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -27,6 +29,7 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   carta_astral: "Carta astral",
   numerologia: "Perfil numerológico",
   compatibilidad: "Compatibilidad",
+  quiromancia: "Lectura de la mano",
 };
 
 /** Cartas del día gratuitas por usuario y día. */
