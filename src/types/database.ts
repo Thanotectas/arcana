@@ -1,5 +1,5 @@
 /**
- * Tipos de la base de datos (espejo de supabase/migrations/0001_init.sql).
+ * Tipos de la base de datos (espejo de supabase/migrations/).
  * Cuando el esquema crezca, regenerar con:
  *   npx supabase gen types typescript --project-id <id> > src/types/database.ts
  */
@@ -37,6 +37,8 @@ type LecturaRow = {
   resultado: Json;
   interpretacion: string | null;
   creditos_usados: number;
+  estado: "pendiente" | "generando" | "lista" | "error";
+  generando_desde: string | null;
   creado_en: string;
 };
 
@@ -85,7 +87,7 @@ export type Database = {
       };
       lecturas: {
         Row: LecturaRow;
-        Insert: Insertable<LecturaRow, "id" | "entrada" | "resultado" | "interpretacion" | "creditos_usados" | "creado_en">;
+        Insert: Insertable<LecturaRow, "id" | "entrada" | "resultado" | "interpretacion" | "creditos_usados" | "estado" | "generando_desde" | "creado_en">;
         Update: Partial<LecturaRow>;
         Relationships: [];
       };
@@ -106,6 +108,14 @@ export type Database = {
     Functions: {
       consumir_creditos: {
         Args: { p_cantidad: number; p_motivo: string; p_referencia?: string | null };
+        Returns: boolean;
+      };
+      reclamar_generacion: {
+        Args: { p_lectura: string };
+        Returns: boolean;
+      };
+      reembolsar_lectura: {
+        Args: { p_lectura: string };
         Returns: boolean;
       };
       acreditar_orden: {

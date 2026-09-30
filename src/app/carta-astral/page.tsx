@@ -25,7 +25,7 @@ export default async function PaginaCartaAstral() {
       </div>
 
       <div className="tarjeta p-6">
-        <FormularioLectura accion={accionCartaAstral} textoBoton="Calcular mi carta" textoCargando="Calculando el cielo e interpretando…">
+        <FormularioLectura accion={accionCartaAstral} textoBoton="Calcular mi carta" textoCargando="Calculando tu cielo…">
           <div>
             <label className="etiqueta" htmlFor="nombre">Nombre</label>
             <input id="nombre" name="nombre" className="campo" defaultValue={perfil?.nombre ?? ""} required />
@@ -38,7 +38,7 @@ export default async function PaginaCartaAstral() {
             <CampoHora />
           </div>
           <CampoLugar />
-          <p className="text-xs text-texto-suave">La lectura tarda cerca de un minuto. No cierres la página.</p>
+          <p className="text-xs text-texto-suave">Tu rueda aparece al instante y la lectura se escribe en vivo frente a ti.</p>
         </FormularioLectura>
       </div>
     </div>

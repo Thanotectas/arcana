@@ -1,7 +1,9 @@
 /**
  * Construcción de la carta astral completa: posiciones, casas y aspectos.
  */
-import { posiciones, type Cuerpo, type PosicionCuerpo, NOMBRES_CUERPO } from "./efemerides";
+import { posiciones, type Cuerpo, type PosicionCuerpo } from "./efemerides";
+import { NOMBRES_CUERPO, NOMBRES_ASPECTO, type TipoAspecto } from "./textos";
+export { NOMBRES_ASPECTO, SIMBOLOS_ASPECTO, type TipoAspecto } from "./textos";
 import { calcularCasas, casaDeLongitud, type Casas } from "./casas";
 import { signoPorLongitud, formatoGrado, type Signo } from "../zodiaco";
 
@@ -15,8 +17,6 @@ export interface DatosNacimiento {
   longitud: number;
   zonaHoraria: string; // IANA, p.ej. America/Bogota
 }
-
-export type TipoAspecto = "conjuncion" | "oposicion" | "trigono" | "cuadratura" | "sextil";
 
 export interface Aspecto {
   a: Cuerpo;
@@ -52,22 +52,6 @@ const ASPECTOS: { tipo: TipoAspecto; angulo: number; orbe: number }[] = [
   { tipo: "cuadratura", angulo: 90, orbe: 7 },
   { tipo: "sextil", angulo: 60, orbe: 5 },
 ];
-
-export const NOMBRES_ASPECTO: Record<TipoAspecto, string> = {
-  conjuncion: "Conjunción",
-  oposicion: "Oposición",
-  trigono: "Trígono",
-  cuadratura: "Cuadratura",
-  sextil: "Sextil",
-};
-
-export const SIMBOLOS_ASPECTO: Record<TipoAspecto, string> = {
-  conjuncion: "☌",
-  oposicion: "☍",
-  trigono: "△",
-  cuadratura: "□",
-  sextil: "⚹",
-};
 
 /** Desfase UTC (minutos) de una zona IANA en un instante dado. */
 function desfaseMinutos(instante: Date, zona: string) {

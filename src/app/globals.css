@@ -190,9 +190,6 @@ body {
     inset 0 0 0 5px rgba(217, 180, 90, 0.3);
   transition: transform 0.4s ease;
 }
-.carta-tarot.invertida {
-  transform: rotate(180deg);
-}
 .carta-tarot .contenido-carta {
   transition: transform 0.4s ease;
 }
@@ -209,4 +206,158 @@ body {
 }
 .aparecer {
   animation: aparecer 0.5s ease both;
+}
+
+/* Lectura escribiéndose */
+@keyframes latir {
+  0%, 100% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+.orbe-carga {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, var(--oro-suave), var(--violeta) 60%, transparent 72%);
+  box-shadow: 0 0 40px rgba(139, 108, 246, 0.45);
+  animation: latir 1.8s ease-in-out infinite;
+}
+@keyframes parpadeo {
+  50% { opacity: 0; }
+}
+.cursor-escritura {
+  display: inline-block;
+  width: 0.55rem;
+  height: 1.1rem;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--oro);
+  animation: parpadeo 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbe-carga, .cursor-escritura { animation: none; }
+}
+
+/* ───────────── Ritual de tarot ───────────── */
+.dorso-carta {
+  aspect-ratio: 5 / 8.5;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(217, 180, 90, 0.55);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(217, 180, 90, 0.35) 0 8%, transparent 9%),
+    radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(217, 180, 90, 0.25) 23% 24%, transparent 25%),
+    repeating-linear-gradient(45deg, rgba(139, 108, 246, 0.16) 0 6px, transparent 6px 12px),
+    linear-gradient(180deg, #2a1d52, #140d2a);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 3px rgba(11, 7, 22, 0.8),
+    inset 0 0 0 4px rgba(217, 180, 90, 0.35);
+}
+
+/* Volteo 3D */
+.carta-3d {
+  perspective: 1200px;
+  aspect-ratio: 5 / 8.5;
+}
+.carta-3d-interior {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.carta-3d.volteada .carta-3d-interior {
+  transform: rotateY(180deg);
+}
+.carta-3d .lado {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.carta-3d .lado-cara {
+  transform: rotateY(180deg);
+}
+.carta-3d .lado-cara .carta-tarot {
+  width: 100%;
+  height: 100%;
+}
+.carta-3d.volteada {
+  filter: drop-shadow(0 0 18px rgba(217, 180, 90, 0.25));
+}
+.carta-tarot.invertida .contenido-carta {
+  transform: rotate(180deg);
+}
+
+/* Barajado */
+@keyframes barajar {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(var(--dx), -6px) rotate(var(--rot)); }
+  50% { transform: translate(calc(var(--dx) * -1), 4px) rotate(calc(var(--rot) * -1)); }
+  75% { transform: translate(calc(var(--dx) * 0.5), -2px) rotate(calc(var(--rot) * 0.5)); }
+}
+.mazo-barajando .dorso-carta {
+  animation: barajar 0.7s ease-in-out 2 both;
+}
+
+/* Abanico */
+@keyframes desplegar {
+  from { opacity: 0; transform: translateX(var(--desde)) translateY(20px) rotate(0deg); }
+  to { opacity: 1; }
+}
+.abanico-carta {
+  animation: desplegar 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+.abanico-carta:hover:not(:disabled),
+.abanico-carta:focus-visible {
+  transform: translateY(-14px);
+  outline: none;
+}
+.abanico-carta:focus-visible .dorso-carta {
+  box-shadow: 0 0 0 2px var(--oro), 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+@keyframes llegar {
+  from { opacity: 0; transform: translateY(-40px) scale(0.8); }
+  to { opacity: 1; transform: none; }
+}
+.llegar {
+  animation: llegar 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta-3d-interior, .abanico-carta, .llegar, .mazo-barajando .dorso-carta {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ───────────── Rueda astral ───────────── */
+@keyframes trazar {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.trazo-aspecto {
+  stroke-dasharray: 1;
+  animation: trazar 0.9s ease-out both;
+  transition: stroke-opacity 0.25s ease, stroke-width 0.25s ease;
+}
+@keyframes surgir {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+.planeta-rueda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: surgir 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  transition: opacity 0.25s ease;
+}
+.rueda-astral g[role="button"]:focus {
+  outline: none;
+}
+.planeta-rueda:focus-visible circle:first-child {
+  stroke: var(--violeta-suave);
+}
+@media (prefers-reduced-motion: reduce) {
+  .trazo-aspecto, .planeta-rueda { animation: none; }
 }

@@ -58,17 +58,29 @@ export interface CartaTirada {
   invertida: boolean;
 }
 
-/** Baraja con aleatoriedad criptográfica y devuelve n cartas sin repetir. */
-export function tirarCartas(tipo: TipoTirada): CartaTirada[] {
+export const TAMANO_MAZO = MAZO.length;
+
+/**
+ * Convierte las posiciones que la persona eligió en el abanico (0..77) en
+ * cartas. El orden del mazo y la orientación se deciden aquí, en el servidor,
+ * con aleatoriedad criptográfica: elegir una posición no permite elegir carta.
+ */
+export function cartasDesdeAbanico(tipo: TipoTirada, posicionesAbanico: number[]): CartaTirada[] {
   const n = TIRADAS[tipo].posiciones.length;
+  const validas =
+    posicionesAbanico.length === n &&
+    new Set(posicionesAbanico).size === n &&
+    posicionesAbanico.every((p) => Number.isInteger(p) && p >= 0 && p < MAZO.length);
+  if (!validas) throw new Error("Selección de cartas no válida.");
+
   const indices = MAZO.map((_, i) => i);
   for (let i = indices.length - 1; i > 0; i--) {
     const j = randomInt(0, i + 1);
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
-  return indices.slice(0, n).map((idx, posicion) => ({
+  return posicionesAbanico.map((p, posicion) => ({
     posicion,
-    cartaId: MAZO[idx].id,
+    cartaId: MAZO[indices[p]].id,
     invertida: randomInt(0, 100) < 30,
   }));
 }

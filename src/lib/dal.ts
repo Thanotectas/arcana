@@ -26,6 +26,7 @@ export interface Lectura {
   resultado: Record<string, unknown>;
   interpretacion: string | null;
   creditos_usados: number;
+  estado: "pendiente" | "generando" | "lista" | "error";
   creado_en: string;
 }
 
@@ -71,7 +72,7 @@ export async function getLecturas(limite = 20): Promise<Lectura[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("lecturas")
-    .select("id, usuario_id, tipo, titulo, entrada, resultado, interpretacion, creditos_usados, creado_en")
+    .select("id, usuario_id, tipo, titulo, entrada, resultado, interpretacion, creditos_usados, estado, creado_en")
     .order("creado_en", { ascending: false })
     .limit(limite);
   return (data as Lectura[] | null) ?? [];

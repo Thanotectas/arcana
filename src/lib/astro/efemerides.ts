@@ -19,46 +19,9 @@ import data from "astronomia/data";
 
 const R2D = 180 / Math.PI;
 
-export type Cuerpo =
-  | "sol"
-  | "luna"
-  | "mercurio"
-  | "venus"
-  | "marte"
-  | "jupiter"
-  | "saturno"
-  | "urano"
-  | "neptuno"
-  | "pluton"
-  | "nodo_norte";
-
-export const NOMBRES_CUERPO: Record<Cuerpo, string> = {
-  sol: "Sol",
-  luna: "Luna",
-  mercurio: "Mercurio",
-  venus: "Venus",
-  marte: "Marte",
-  jupiter: "Júpiter",
-  saturno: "Saturno",
-  urano: "Urano",
-  neptuno: "Neptuno",
-  pluton: "Plutón",
-  nodo_norte: "Nodo Norte",
-};
-
-export const SIMBOLOS_CUERPO: Record<Cuerpo, string> = {
-  sol: "☉",
-  luna: "☽",
-  mercurio: "☿",
-  venus: "♀",
-  marte: "♂",
-  jupiter: "♃",
-  saturno: "♄",
-  urano: "♅",
-  neptuno: "♆",
-  pluton: "♇",
-  nodo_norte: "☊",
-};
+import type { Cuerpo } from "./textos";
+export type { Cuerpo } from "./textos";
+export { NOMBRES_CUERPO, SIMBOLOS_CUERPO } from "./textos";
 
 let planetas: Record<string, planetposition.Planet> | null = null;
 

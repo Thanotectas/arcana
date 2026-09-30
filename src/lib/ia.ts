@@ -40,11 +40,13 @@ export interface OpcionesTexto {
 
 /**
  * Genera un texto a partir de un mensaje de usuario. Devuelve Markdown.
+ * Si se pasa `alTexto`, recibe cada fragmento a medida que el modelo escribe.
  */
 export async function generarTexto(
   usuario: string,
   sistemaExtra = "",
   opciones: OpcionesTexto = {},
+  alTexto?: (fragmento: string) => void,
 ): Promise<string> {
   const client = getCliente();
 
@@ -63,6 +65,8 @@ export async function generarTexto(
     ],
     messages: [{ role: "user", content: usuario }],
   });
+
+  if (alTexto) stream.on("text", (fragmento) => alTexto(fragmento));
 
   const mensaje = await stream.finalMessage();
 

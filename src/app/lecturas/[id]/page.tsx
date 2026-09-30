@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getLectura, requerirUsuario } from "@/lib/dal";
 import { NOMBRES_LECTURA } from "@/lib/creditos";
-import { Markdown } from "@/components/Markdown";
-import { CartaVisual } from "@/components/CartaVisual";
+import { LecturaEnVivo } from "@/components/LecturaEnVivo";
+import { rotuloCarta } from "@/components/CartaVisual";
+import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
 import { RuedaAstral } from "@/components/RuedaAstral";
 import { TIRADAS, cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { NOMBRES_CUERPO, type Cuerpo } from "@/lib/astro/efemerides";
@@ -29,13 +30,13 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         <p className="mt-1 text-sm text-texto-suave">{new Date(lectura.creado_en).toLocaleString("es-CO")}</p>
       </header>
 
-      {lectura.tipo.startsWith("tarot") && <VistaTarot tipo={lectura.tipo as TipoTirada} resultado={lectura.resultado} />}
+      {lectura.tipo.startsWith("tarot") && <VistaTarot tipo={lectura.tipo as TipoTirada} resultado={lectura.resultado} nueva={lectura.estado !== "lista"} />}
       {lectura.tipo === "carta_astral" && <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} />}
       {lectura.tipo === "numerologia" && <VistaNumerologia resultado={lectura.resultado as unknown as PerfilNumerologico} />}
       {lectura.tipo === "compatibilidad" && <VistaCompatibilidad resultado={lectura.resultado} />}
 
       <section className="tarjeta p-6 sm:p-8">
-        {lectura.interpretacion ? <Markdown texto={lectura.interpretacion} /> : <p className="text-texto-suave">Sin interpretación.</p>}
+        <LecturaEnVivo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} />
       </section>
 
       <p className="text-xs text-texto-suave">
@@ -49,18 +50,23 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
   );
 }
 
-function VistaTarot({ tipo, resultado }: { tipo: TipoTirada; resultado: Record<string, unknown> }) {
-  const cartas = cartasDeTirada((resultado.cartas as CartaTirada[]) ?? []);
+function VistaTarot({ tipo, resultado, nueva }: { tipo: TipoTirada; resultado: Record<string, unknown>; nueva: boolean }) {
   const tirada = TIRADAS[tipo];
-  return (
-    <section className="tarjeta p-6">
-      <div className={`grid justify-items-center gap-6 ${cartas.length === 1 ? "grid-cols-1" : cartas.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-5"}`}>
-        {cartas.map((c) => (
-          <CartaVisual key={c.posicion} carta={c.carta} invertida={c.invertida} posicion={tirada.posiciones[c.posicion]?.nombre} />
-        ))}
-      </div>
-    </section>
-  );
+  const cartas: CartaRevelada[] = cartasDeTirada((resultado.cartas as CartaTirada[]) ?? []).map((c) => {
+    const pos = tirada.posiciones[c.posicion];
+    return {
+      nombre: c.carta.nombre,
+      ...rotuloCarta(c.carta),
+      invertida: c.invertida,
+      posicion: pos?.nombre ?? "",
+      posicionDescripcion: pos?.descripcion ?? "",
+      palabras: c.invertida ? c.carta.palabrasClaveInvertida : c.carta.palabrasClave,
+      significado: c.invertida ? c.carta.significadoInvertido : c.carta.significado,
+      amor: c.carta.amor,
+      trabajo: c.carta.trabajo,
+    };
+  });
+  return <TiradaInteractiva cartas={cartas} ocultas={nueva} />;
 }
 
 interface ResultadoAstral {
