@@ -17,7 +17,11 @@ function getCliente() {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error("[ia] Falta ANTHROPIC_API_KEY en el entorno.");
     }
-    cliente = new Anthropic();
+    // Las claves de alcance "Organización" (sk-ant-usr-...) exigen indicar el
+    // espacio de trabajo en cada petición. Las claves de espacio de trabajo
+    // (sk-ant-api03-...) no lo necesitan.
+    const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
+    cliente = new Anthropic(workspaceId ? { defaultHeaders: { "anthropic-workspace-id": workspaceId } } : {});
   }
   return cliente;
 }
