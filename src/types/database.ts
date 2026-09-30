@@ -1,0 +1,119 @@
+/**
+ * Tipos de la base de datos (espejo de supabase/migrations/0001_init.sql).
+ * Cuando el esquema crezca, regenerar con:
+ *   npx supabase gen types typescript --project-id <id> > src/types/database.ts
+ */
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+type PerfilRow = {
+  id: string;
+  nombre: string | null;
+  fecha_nacimiento: string | null;
+  hora_nacimiento: string | null;
+  lugar_nacimiento: string | null;
+  latitud: number | null;
+  longitud: number | null;
+  zona_horaria: string | null;
+  creditos: number;
+  creado_en: string;
+  actualizado_en: string;
+};
+
+type MovimientoRow = {
+  id: number;
+  usuario_id: string;
+  cantidad: number;
+  motivo: string;
+  referencia: string | null;
+  creado_en: string;
+};
+
+type LecturaRow = {
+  id: string;
+  usuario_id: string;
+  tipo: string;
+  titulo: string;
+  entrada: Json;
+  resultado: Json;
+  interpretacion: string | null;
+  creditos_usados: number;
+  creado_en: string;
+};
+
+type OrdenRow = {
+  id: string;
+  usuario_id: string;
+  paquete: string;
+  creditos: number;
+  monto_centavos: number;
+  moneda: string;
+  referencia: string;
+  estado: string;
+  transaccion_id: string | null;
+  metodo_pago: string | null;
+  creado_en: string;
+  actualizado_en: string;
+};
+
+type HoroscopoRow = {
+  id: number;
+  signo: string;
+  fecha: string;
+  contenido: string;
+  creado_en: string;
+};
+
+type Insertable<T, Opcionales extends keyof T> = Omit<T, Opcionales> & Partial<Pick<T, Opcionales>>;
+
+export type Database = {
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
+  public: {
+    Tables: {
+      perfiles: {
+        Row: PerfilRow;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "creado_en" | "actualizado_en">;
+        Update: Partial<PerfilRow>;
+        Relationships: [];
+      };
+      movimientos_creditos: {
+        Row: MovimientoRow;
+        Insert: Insertable<MovimientoRow, "id" | "referencia" | "creado_en">;
+        Update: Partial<MovimientoRow>;
+        Relationships: [];
+      };
+      lecturas: {
+        Row: LecturaRow;
+        Insert: Insertable<LecturaRow, "id" | "entrada" | "resultado" | "interpretacion" | "creditos_usados" | "creado_en">;
+        Update: Partial<LecturaRow>;
+        Relationships: [];
+      };
+      ordenes: {
+        Row: OrdenRow;
+        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "creado_en" | "actualizado_en">;
+        Update: Partial<OrdenRow>;
+        Relationships: [];
+      };
+      horoscopos: {
+        Row: HoroscopoRow;
+        Insert: Insertable<HoroscopoRow, "id" | "creado_en">;
+        Update: Partial<HoroscopoRow>;
+        Relationships: [];
+      };
+    };
+    Views: { [_ in never]: never };
+    Functions: {
+      consumir_creditos: {
+        Args: { p_cantidad: number; p_motivo: string; p_referencia?: string | null };
+        Returns: boolean;
+      };
+      acreditar_orden: {
+        Args: { p_referencia: string; p_transaccion_id: string; p_metodo_pago?: string | null };
+        Returns: boolean;
+      };
+    };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
+  };
+};

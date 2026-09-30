@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+:root {
+  --noche: #0b0716;
+  --superficie: #150f26;
+  --superficie-2: #1d1633;
+  --borde: rgba(255, 255, 255, 0.08);
+  --texto: #ece6f7;
+  --texto-suave: #a89fc0;
+  --oro: #d9b45a;
+  --oro-suave: #f1d99a;
+  --violeta: #8b6cf6;
+  --violeta-suave: #b7a5ff;
+  --peligro: #ff7b7b;
+  --exito: #7fd6a4;
+}
+
+@theme inline {
+  --color-noche: var(--noche);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-borde: var(--borde);
+  --color-texto: var(--texto);
+  --color-texto-suave: var(--texto-suave);
+  --color-oro: var(--oro);
+  --color-oro-suave: var(--oro-suave);
+  --color-violeta: var(--violeta);
+  --color-violeta-suave: var(--violeta-suave);
+  --color-peligro: var(--peligro);
+  --color-exito: var(--exito);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(139, 108, 246, 0.18), transparent 60%),
+    radial-gradient(800px 400px at 100% 100%, rgba(217, 180, 90, 0.08), transparent 60%),
+    var(--noche);
+  color: var(--texto);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.estrellas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 20%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.3) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 45%, rgba(255, 255, 255, 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 10%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 85%, rgba(255, 255, 255, 0.35) 50%, transparent 51%);
+}
+
+.tarjeta {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--borde);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  cursor: pointer;
+}
+.boton:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.boton-primario {
+  background: linear-gradient(135deg, var(--oro), #b8923a);
+  color: #1a1206;
+  box-shadow: 0 6px 24px rgba(217, 180, 90, 0.25);
+}
+.boton-primario:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(217, 180, 90, 0.35);
+}
+.boton-secundario {
+  background: rgba(139, 108, 246, 0.14);
+  color: var(--violeta-suave);
+  border: 1px solid rgba(139, 108, 246, 0.35);
+}
+.boton-secundario:hover:not(:disabled) {
+  background: rgba(139, 108, 246, 0.22);
+}
+.boton-fantasma {
+  color: var(--texto-suave);
+}
+.boton-fantasma:hover {
+  color: var(--texto);
+}
+
+.campo {
+  width: 100%;
+  background: rgba(11, 7, 22, 0.6);
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--texto);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.campo:focus {
+  border-color: var(--violeta);
+  box-shadow: 0 0 0 3px rgba(139, 108, 246, 0.2);
+}
+.campo::placeholder {
+  color: rgba(168, 159, 192, 0.6);
+}
+.etiqueta {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  margin-bottom: 0.35rem;
+}
+
+.prosa {
+  color: var(--texto);
+}
+.prosa h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--oro-suave);
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.prosa h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--violeta-suave);
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+.prosa p {
+  line-height: 1.75;
+  margin-bottom: 1rem;
+  color: #d9d2ea;
+}
+.prosa ul,
+.prosa ol {
+  margin: 0.5rem 0 1rem 1.25rem;
+  line-height: 1.7;
+  color: #d9d2ea;
+}
+.prosa li {
+  list-style: disc;
+  margin-bottom: 0.3rem;
+}
+.prosa strong {
+  color: var(--oro-suave);
+}
+.prosa em {
+  color: var(--violeta-suave);
+}
+
+.carta-tarot {
+  aspect-ratio: 5 / 8.5;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(217, 180, 90, 0.45);
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(139, 108, 246, 0.35), transparent 60%),
+    linear-gradient(180deg, #221741, #120c24);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 4px rgba(11, 7, 22, 0.8),
+    inset 0 0 0 5px rgba(217, 180, 90, 0.3);
+  transition: transform 0.4s ease;
+}
+.carta-tarot.invertida {
+  transform: rotate(180deg);
+}
+.carta-tarot .contenido-carta {
+  transition: transform 0.4s ease;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.aparecer {
+  animation: aparecer 0.5s ease both;
+}
