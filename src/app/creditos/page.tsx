@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { PAQUETES, COSTOS, NOMBRES_LECTURA, formatoCOP, type TipoLectura } from "@/lib/creditos";
 import { accionComprar } from "@/lib/pagos/acciones";
-import { pagosConfigurados } from "@/lib/pagos/wompi";
+import { pagosConfigurados } from "@/lib/pagos/bold";
 import { Aviso } from "@/components/Aviso";
 import { BotonEnviar } from "@/components/BotonEnviar";
 
@@ -32,7 +32,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
       </div>
 
       {error && <Aviso>{ERRORES[error] ?? "Ocurrió un error."}</Aviso>}
-      {!configurado && <Aviso tipo="info">Pagos en modo de configuración: falta la clave pública o el secreto de integridad de Wompi.</Aviso>}
+      {!configurado && <Aviso tipo="info">Pagos en modo de configuración: falta la llave de identidad o la llave secreta de Bold.</Aviso>}
 
       <div className="grid gap-4 sm:grid-cols-3">
         {PAQUETES.map((p) => (
@@ -45,8 +45,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
               {p.creditos} créditos · {formatoCOP(Math.round(p.precioCOP / p.creditos))} por crédito
             </p>
             <p className="mt-3 flex-1 text-sm text-texto-suave">{p.descripcion}</p>
-            <BotonEnviar className={`boton mt-5 w-full ${p.destacado ? "boton-primario" : "boton-secundario"}`} cargando="Redirigiendo a Wompi…">
-              Comprar con Wompi
+            <BotonEnviar className={`boton mt-5 w-full ${p.destacado ? "boton-primario" : "boton-secundario"}`} cargando="Preparando el pago…">
+              Comprar
             </BotonEnviar>
           </form>
         ))}
@@ -63,7 +63,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           ))}
         </ul>
         <p className="mt-4 text-xs text-texto-suave">
-          Pagos procesados por Wompi (Bancolombia): tarjetas, PSE, Nequi y Bancolombia. Los créditos se acreditan automáticamente al aprobarse el pago.
+          Pagos procesados por Bold: tarjetas, PSE, Nequi y más. Los créditos se acreditan automáticamente al aprobarse el pago.
         </p>
       </section>
     </div>

@@ -10,7 +10,7 @@ export default function Privacidad() {
       <ul>
         <li>Cuenta: nombre, correo y contraseña (cifrada).</li>
         <li>Lecturas: preguntas, nombres, fechas, horas y lugares de nacimiento que ingresas para generarlas.</li>
-        <li>Pagos: referencia, monto y estado. Los datos de tarjeta los procesa Wompi; nunca llegan a nuestros servidores.</li>
+        <li>Pagos: referencia, monto y estado. Los datos de tarjeta los procesa Bold; nunca llegan a nuestros servidores.</li>
       </ul>
       <h2>Para qué los usamos</h2>
       <p>Para prestar el servicio (calcular y redactar tus lecturas), gestionar tu saldo y comunicarnos contigo sobre tu cuenta. Los datos de las lecturas se envían a un proveedor de inteligencia artificial únicamente para generar la interpretación.</p>

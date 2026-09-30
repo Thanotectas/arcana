@@ -11,7 +11,7 @@ export default function Terminos() {
       <h2>2. Cuenta</h2>
       <p>Debes ser mayor de 18 años. Eres responsable de la confidencialidad de tu contraseña y de la actividad en tu cuenta.</p>
       <h2>3. Créditos y pagos</h2>
-      <p>Las lecturas se pagan con créditos prepagados. Los créditos no tienen vencimiento, no son transferibles ni canjeables por dinero. Los pagos se procesan a través de Wompi; Arcana no almacena datos de tarjetas. Una vez generada una lectura, el crédito consumido no es reembolsable, salvo fallo técnico atribuible a Arcana, en cuyo caso se reintegra automáticamente.</p>
+      <p>Las lecturas se pagan con créditos prepagados. Los créditos no tienen vencimiento, no son transferibles ni canjeables por dinero. Los pagos se procesan a través de Bold; Arcana no almacena datos de tarjetas. Una vez generada una lectura, el crédito consumido no es reembolsable, salvo fallo técnico atribuible a Arcana, en cuyo caso se reintegra automáticamente.</p>
       <h2>4. Derecho de retracto</h2>
       <p>Conforme a la Ley 1480 de 2011 (Estatuto del Consumidor, Colombia), puedes ejercer el derecho de retracto sobre créditos no utilizados dentro de los cinco días hábiles siguientes a la compra, escribiendo al correo de contacto.</p>
       <h2>5. Contenido generado</h2>

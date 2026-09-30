@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { requerirUsuario, getOrdenPorReferencia } from "@/lib/dal";
-import { consultarTransaccion } from "@/lib/pagos/wompi";
+import { consultarVenta, estadoOrden } from "@/lib/pagos/bold";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { Aviso } from "@/components/Aviso";
 
@@ -9,26 +9,34 @@ export const metadata: Metadata = { title: "Resultado del pago" };
 
 /**
  * Página de retorno tras el checkout. El webhook es la fuente de verdad, pero
- * si aún no llegó consultamos la transacción directamente y acreditamos.
+ * si aún no llegó consultamos la venta directamente en Bold y acreditamos.
  */
-export default async function PaginaRetorno({ searchParams }: { searchParams: Promise<{ ref?: string; id?: string }> }) {
+export default async function PaginaRetorno({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string; "bold-order-id"?: string }>;
+}) {
   await requerirUsuario();
-  const { ref, id } = await searchParams;
+  const params = await searchParams;
+  const ref = params.ref ?? params["bold-order-id"];
   let orden = ref ? await getOrdenPorReferencia(ref) : null;
 
-  if (orden && orden.estado === "pendiente" && id) {
-    const tx = await consultarTransaccion(id);
-    if (tx && tx.reference === orden.referencia && tx.status === "APPROVED" && Number(tx.amount_in_cents) === Number(orden.monto_centavos)) {
+  if (orden && orden.estado === "pendiente") {
+    const venta = await consultarVenta(orden.referencia);
+    const montoPesos = Number(orden.monto_centavos) / 100;
+    if (venta?.estado === "APPROVED" && (venta.total === null || venta.total === montoPesos)) {
       await getSupabaseAdmin().rpc("acreditar_orden", {
-        p_referencia: tx.reference,
-        p_transaccion_id: tx.id,
-        p_metodo_pago: tx.payment_method_type ?? null,
+        p_referencia: orden.referencia,
+        p_transaccion_id: venta.transaccionId ?? orden.referencia,
+        p_metodo_pago: venta.metodoPago,
       });
       orden = await getOrdenPorReferencia(orden.referencia);
-    } else if (tx && (tx.status === "DECLINED" || tx.status === "ERROR" || tx.status === "VOIDED")) {
-      const estado = tx.status === "DECLINED" ? "rechazada" : tx.status === "VOIDED" ? "anulada" : "error";
-      await getSupabaseAdmin().from("ordenes").update({ estado, transaccion_id: tx.id }).eq("id", orden.id);
-      orden = { ...orden, estado };
+    } else if (venta) {
+      const estado = estadoOrden(venta.estado);
+      if (estado) {
+        await getSupabaseAdmin().from("ordenes").update({ estado, transaccion_id: venta.transaccionId }).eq("id", orden.id);
+        orden = { ...orden, estado };
+      }
     }
   }
 

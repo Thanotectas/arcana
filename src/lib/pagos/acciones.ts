@@ -1,12 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
 import { paquetePorId } from "../creditos";
-import { nuevaReferencia, pagosConfigurados, urlCheckout } from "./wompi";
+import { nuevaReferencia, pagosConfigurados } from "./bold";
 
-/** Crea la orden pendiente y redirige al Web Checkout de Wompi. */
+/** Crea la orden pendiente y lleva a la página que abre el checkout de Bold. */
 export async function accionComprar(formData: FormData) {
   const paquete = paquetePorId(String(formData.get("paquete") ?? ""));
   if (!paquete) redirect("/creditos?error=paquete");
@@ -19,13 +18,12 @@ export async function accionComprar(formData: FormData) {
   if (!user) redirect("/entrar?volver=/creditos");
 
   const referencia = nuevaReferencia(user.id);
-  const montoCentavos = paquete.precioCOP * 100;
 
   const { error } = await supabase.from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
     creditos: paquete.creditos,
-    monto_centavos: montoCentavos,
+    monto_centavos: paquete.precioCOP * 100,
     moneda: "COP",
     referencia,
     estado: "pendiente",
@@ -35,21 +33,5 @@ export async function accionComprar(formData: FormData) {
     redirect("/creditos?error=orden");
   }
 
-  const h = await headers();
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
-
-  const { data: perfil } = await supabase.from("perfiles").select("nombre").eq("id", user.id).maybeSingle();
-
-  redirect(
-    urlCheckout({
-      referencia,
-      montoCentavos,
-      moneda: "COP",
-      redirectUrl: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}`,
-      email: user.email ?? undefined,
-      nombre: (perfil?.nombre as string | undefined) ?? undefined,
-    }),
-  );
+  redirect(`/creditos/pagar?ref=${encodeURIComponent(referencia)}`);
 }
