@@ -69,6 +69,12 @@ Qué trae:
 - Página `/invitar`: enlace, botón de WhatsApp (`wa.me` con mensaje prellenado), compartir nativo, conteo de invitados y créditos ganados (`resumen_invitaciones()`). Tarjeta en el panel y enlace en el encabezado.
 - Migración `0006_invitaciones.sql` (aplicar en producción; sin ella la página muestra ceros y el registro no premia, pero nada falla).
 
+## Marca e imágenes de vista previa (30 sep 2026)
+
+- Logo: `src/components/Logo.tsx` (marca + logotipo), `src/app/icon.svg` (favicon), `src/app/apple-icon.tsx`. Archivos descargables en `public/marca/`.
+- Vista previa para WhatsApp y redes: `src/app/opengraph-image.tsx` (general) y `/api/og?t=&s=` (dinámica, `src/lib/marca/og.tsx`). Fuentes en `src/app/fuentes/` (incluidas en el trazado con `outputFileTracingIncludes`).
+- El registro con `?inv=CODIGO` publica metadatos personalizados ("{nombre} te invita a Arcana") con imagen dinámica: es lo que WhatsApp muestra al compartir el enlace de invitación.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

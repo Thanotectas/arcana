@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Sparkles, Coins } from "lucide-react";
+import { Coins } from "lucide-react";
+import { Logotipo } from "./Logo";
 import { getPerfil } from "@/lib/dal";
 import { accionSalir } from "@/lib/auth/acciones";
 import { getT } from "@/lib/i18n/servidor";
@@ -19,9 +20,8 @@ export async function Encabezado() {
   return (
     <header className="sticky top-0 z-20 border-b border-borde bg-noche/70 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href={perfil ? "/inicio" : "/"} className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-oro" aria-hidden />
-          <span className="font-display text-2xl font-semibold tracking-wide text-oro-suave">{t.comun.marca}</span>
+        <Link href={perfil ? "/inicio" : "/"} aria-label={t.comun.marca}>
+          <Logotipo />
         </Link>
 
         <nav className="hidden items-center gap-5 text-sm text-texto-suave lg:flex">

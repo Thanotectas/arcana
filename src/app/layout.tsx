@@ -21,7 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t.meta.tituloPredeterminado, template: "%s · Arcana" },
     description: t.meta.descripcion,
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-    openGraph: { title: "Arcana", description: t.meta.descripcion, type: "website" },
+    openGraph: { title: t.meta.tituloPredeterminado, description: t.meta.descripcion, type: "website", siteName: "Arcana" },
+    twitter: { card: "summary_large_image" },
   };
 }
 

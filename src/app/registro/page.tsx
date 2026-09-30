@@ -8,9 +8,22 @@ import { plantilla } from "@/lib/i18n/formato";
 import { Aviso } from "@/components/Aviso";
 import { BONO_INVITADO, codigoInvitacionPendiente, nombreInvitador } from "@/lib/invitaciones";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT();
-  return { title: t.auth.registroTitulo };
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ inv?: string }> }): Promise<Metadata> {
+  const [{ inv }, t] = await Promise.all([searchParams, getT()]);
+  const codigo = inv && /^[A-Z0-9]{4,12}$/i.test(inv) ? inv.toUpperCase() : null;
+  if (!codigo) return { title: t.auth.registroTitulo };
+  const invitador = await nombreInvitador(codigo);
+  const titulo = invitador
+    ? plantilla(t.invitar.ogTitulo, { nombre: invitador })
+    : t.invitar.ogTituloSinNombre;
+  const descripcion = plantilla(t.invitar.ogDescripcion, { bono: BONO_INVITADO });
+  const imagen = `/api/og?t=${encodeURIComponent(titulo)}&s=${encodeURIComponent(descripcion)}`;
+  return {
+    title: titulo,
+    description: descripcion,
+    openGraph: { title: titulo, description: descripcion, images: [{ url: imagen, width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", title: titulo, description: descripcion, images: [imagen] },
+  };
 }
 
 export default async function PaginaRegistro({ searchParams }: { searchParams: Promise<{ inv?: string }> }) {

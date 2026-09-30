@@ -434,6 +434,9 @@ export const pt: Diccionario = {
     tarjetaNota: "{bono} créditos por cada amigo que entrar",
     bienvenida: "{nombre} convidou você: ao criar sua conta você recebe {bono} créditos extras.",
     bienvenidaSinNombre: "Você veio por convite: ao criar sua conta recebe {bono} créditos extras.",
+    ogTitulo: "{nombre} convida você para o Arcana",
+    ogTituloSinNombre: "Você foi convidado para o Arcana",
+    ogDescripcion: "Tarô, mapa astral, numerologia e leitura da mão, escritos para você. Com este convite você recebe {bono} créditos extras de boas-vindas.",
   },
   noEncontrado: {
     texto: "Esta página não está nas cartas.",

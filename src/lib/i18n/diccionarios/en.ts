@@ -437,6 +437,9 @@ export const en: Diccionario = {
     tarjetaNota: "{bono} credits for every friend who joins",
     bienvenida: "{nombre} invited you: you get {bono} extra credits when you create your account.",
     bienvenidaSinNombre: "You came by invitation: you get {bono} extra credits when you create your account.",
+    ogTitulo: "{nombre} invites you to Arcana",
+    ogTituloSinNombre: "You are invited to Arcana",
+    ogDescripcion: "Tarot, birth chart, numerology and palm reading, written for you. With this invitation you get {bono} extra welcome credits.",
   },
   noEncontrado: {
     texto: "This page is not in the cards.",

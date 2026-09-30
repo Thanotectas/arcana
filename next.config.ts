@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   // El proyecto vive (por ahora) dentro de otro repositorio; fijamos la raíz
   // para que Turbopack no busque node_modules en directorios superiores.
   turbopack: { root: __dirname },
+  // Las fuentes de las imágenes de vista previa se leen en tiempo de ejecución.
+  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"] },
   async headers() {
     return [
       {

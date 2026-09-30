@@ -436,6 +436,9 @@ export const es = {
     tarjetaNota: "{bono} créditos por cada amigo que entre",
     bienvenida: "{nombre} te invitó: al crear tu cuenta recibes {bono} créditos extra.",
     bienvenidaSinNombre: "Vienes por invitación: al crear tu cuenta recibes {bono} créditos extra.",
+    ogTitulo: "{nombre} te invita a Arcana",
+    ogTituloSinNombre: "Te invitan a Arcana",
+    ogDescripcion: "Tarot, carta astral, numerología y lectura de la mano, escritos para ti. Con esta invitación recibes {bono} créditos extra de bienvenida.",
   },
   noEncontrado: {
     texto: "Esta página no está en las cartas.",
