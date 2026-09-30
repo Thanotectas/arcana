@@ -473,3 +473,24 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .numero-brota { animation: none; }
 }
+
+/* Cámara de quiromancia */
+.boton-captura {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  background: rgba(241, 217, 154, 0.9);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+.boton-captura:active {
+  transform: scale(0.92);
+}
+@keyframes marco-latir {
+  0%, 100% { stroke-opacity: 0.95; }
+  50% { stroke-opacity: 0.55; }
+}
+.marco-vivo {
+  animation: marco-latir 2s ease-in-out infinite;
+}
