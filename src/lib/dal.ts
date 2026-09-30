@@ -132,3 +132,35 @@ export async function getResumenInvitaciones(): Promise<ResumenInvitaciones> {
   const fila = Array.isArray(data) ? data[0] : undefined;
   return { invitados: fila?.invitados ?? 0, premiadas: fila?.premiadas ?? 0, creditos_ganados: fila?.creditos_ganados ?? 0 };
 }
+
+/** Lecturas escritas en los últimos 7 días (público). */
+export async function getContadorLecturas(): Promise<number> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("contador_lecturas");
+  return typeof data === "number" ? data : 0;
+}
+
+export async function getHaComprado(): Promise<boolean> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("ha_comprado");
+  return Boolean(data);
+}
+
+export interface PreguntaLectura {
+  id: string;
+  pregunta: string;
+  respuesta: string | null;
+  estado: "pendiente" | "lista" | "error";
+  creditos_usados: number;
+  creado_en: string;
+}
+
+export async function getPreguntas(lecturaId: string): Promise<PreguntaLectura[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("preguntas_lectura")
+    .select("id, pregunta, respuesta, estado, creditos_usados, creado_en")
+    .eq("lectura_id", lecturaId)
+    .order("creado_en", { ascending: true });
+  return (data as PreguntaLectura[] | null) ?? [];
+}

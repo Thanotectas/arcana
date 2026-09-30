@@ -13,6 +13,7 @@ export async function Encabezado() {
     { href: "/carta-astral", etiqueta: t.nav.cartaAstral },
     { href: "/numerologia", etiqueta: t.nav.numerologia },
     { href: "/quiromancia", etiqueta: t.nav.quiromancia },
+    { href: "/iching", etiqueta: t.nav.iching },
     { href: "/compatibilidad", etiqueta: t.nav.compatibilidad },
     { href: "/horoscopo", etiqueta: t.nav.horoscopo },
   ];
@@ -24,7 +25,7 @@ export async function Encabezado() {
           <Logotipo />
         </Link>
 
-        <nav className="hidden items-center gap-5 text-sm text-texto-suave lg:flex">
+        <nav className="hidden items-center gap-4 whitespace-nowrap text-[13px] text-texto-suave lg:flex xl:gap-5 xl:text-sm">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className="enlace-nav transition hover:text-texto">
               {n.etiqueta}

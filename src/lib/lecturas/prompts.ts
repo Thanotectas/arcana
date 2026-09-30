@@ -9,6 +9,7 @@ import { signoPorId } from "../zodiaco";
 import { esIdioma, IDIOMA_PREDETERMINADO, type Idioma } from "../i18n/idiomas";
 import { INSTRUCCION_ANEXO, resumenQuiromancia, type EntradaQuiromancia } from "../quiromancia";
 import { getSupabaseAdmin } from "../supabase/admin";
+import { resumenIChing, type ResultadoIChing } from "../iching";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -93,6 +94,21 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Recuerda: nada de diagnósticos médicos ni de duración de la vida; la línea de la vida habla de vitalidad y cambios, no de años. Extensión: 700 a 950 palabras.\n\n` +
         INSTRUCCION_ANEXO,
       opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [] },
+    };
+  }
+
+  if (l.tipo === "iching") {
+    const r = resultado as unknown as ResultadoIChing;
+    const pregunta = String(entrada.pregunta ?? "");
+    return {
+      usuario:
+        `Interpreta esta consulta al I Ching.\n\n${resumenIChing(r, pregunta)}\n\n` +
+        `Estructura: ## El hexagrama y tu pregunta (qué situación describe), ## El Juicio, ## La Imagen (el consejo de conducta), ` +
+        (r.mutantes.length ? `## Las líneas mutantes (una por una, con su texto tradicional y qué te dice), ## Hacia dónde se mueve (el hexagrama resultante), ` : "") +
+        `## Síntesis y consejo práctico. Habla del I Ching como un consejo de conducta, no como una predicción. Extensión: ${r.mutantes.length ? "700 a 900" : "500 a 650"} palabras.`,
+      sistemaExtra:
+        "Tradición del I Ching según la traducción de Richard Wilhelm: el hexagrama presente describe la situación; las líneas mutantes son el consejo concreto y tienen prioridad; el hexagrama resultante indica la tendencia si se sigue el consejo.",
+      opciones: { idioma, effort: "medium", maxTokens: 3200 },
     };
   }
 

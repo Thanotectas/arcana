@@ -504,3 +504,65 @@ body {
   background: #3ddc78;
   transform: translateY(-1px);
 }
+
+/* Cielo animado (símbolos que aparecen y se desvanecen) */
+.cielo-animado {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Monedas del I Ching */
+.moneda {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.moneda .moneda-cara,
+.moneda .moneda-cruz {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 26px;
+  backface-visibility: hidden;
+  border: 2px solid rgba(217, 180, 90, 0.8);
+  box-shadow: inset 0 0 0 4px rgba(11, 7, 22, 0.6), 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+.moneda .moneda-cara {
+  background: radial-gradient(circle at 35% 30%, #f6e4b0, #c99a3a 70%);
+  color: #3a2a08;
+}
+.moneda .moneda-cruz {
+  background: radial-gradient(circle at 35% 30%, #d9cfff, #6c52d9 70%);
+  color: #1d1240;
+  transform: rotateY(180deg);
+}
+.moneda.cruz {
+  transform: rotateY(180deg);
+}
+@keyframes girar-moneda {
+  0% { transform: translateY(0) rotateY(0); }
+  40% { transform: translateY(-46px) rotateY(540deg); }
+  100% { transform: translateY(0) rotateY(1080deg); }
+}
+.moneda.girando {
+  animation: girar-moneda 1.05s cubic-bezier(0.3, 0.6, 0.4, 1) both;
+}
+@keyframes linea-hex {
+  from { opacity: 0; transform: scaleX(0.2); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+.linea-hex {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: linea-hex 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .moneda.girando, .linea-hex { animation: none; }
+}

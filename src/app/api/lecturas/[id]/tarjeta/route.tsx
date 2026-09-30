@@ -1,0 +1,90 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { imagenTarjeta, extractoDe } from "@/lib/marca/tarjeta";
+import { getT } from "@/lib/i18n/servidor";
+import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
+import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
+import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
+import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
+import type { TipoLectura } from "@/lib/creditos";
+import type { PerfilNumerologico } from "@/lib/numerologia";
+
+/**
+ * Tarjeta vertical (1080×1350) para compartir una lectura en redes y
+ * WhatsApp. Incluye el enlace de invitación de la persona: cada lectura
+ * compartida es una invitación.
+ */
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "no_autenticado" }, { status: 401 });
+
+  const [{ data: lectura }, { data: perfil }, t] = await Promise.all([
+    supabase.from("lecturas").select("id, tipo, titulo, entrada, resultado, interpretacion, estado").eq("id", id).maybeSingle(),
+    supabase.from("perfiles").select("codigo_invitacion").eq("id", user.id).maybeSingle(),
+    getT(),
+  ]);
+  if (!lectura || lectura.estado !== "lista" || !lectura.interpretacion) {
+    return NextResponse.json({ error: "no_lista" }, { status: 409 });
+  }
+
+  const tipo = lectura.tipo as TipoLectura;
+  const entrada = (lectura.entrada ?? {}) as Record<string, unknown>;
+  const resultado = (lectura.resultado ?? {}) as Record<string, unknown>;
+  const dominio = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/^https?:\/\//, "");
+  const enlace = perfil?.codigo_invitacion ? `${dominio}/r/${perfil.codigo_invitacion}` : dominio;
+
+  let titulo = lectura.titulo;
+  let simbolos: string[] = ["✦"];
+  let hexagrama: (0 | 1)[] | undefined;
+
+  if (tipo.startsWith("tarot")) {
+    const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
+    const cartas = cartasDeTirada((resultado.cartas as CartaTirada[]) ?? [], mazo);
+    titulo = cartas.map((c) => c.carta.nombre).join(" · ");
+    simbolos = cartas.slice(0, 4).map((c) => (c.carta.arcano === "mayor" ? "✦" : { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" }[c.carta.palo ?? "bastos"]));
+    void (tipo as TipoTirada);
+  } else if (tipo === "carta_astral") {
+    const planetas = (resultado.planetas as { cuerpo: string; signo: string }[]) ?? [];
+    const casas = resultado.casas as { ascendente: number } | undefined;
+    const sol = signoPorId(planetas.find((p) => p.cuerpo === "sol")?.signo ?? "");
+    const luna = signoPorId(planetas.find((p) => p.cuerpo === "luna")?.signo ?? "");
+    const asc = casas ? signoPorLongitud(casas.ascendente) : undefined;
+    // Los glifos zodiacales no se dibujan en la tarjeta (el motor los trata como emoji); van en el título.
+    simbolos = asc && !entrada.horaDesconocida ? ["☉", "☽", "↑"] : ["☉", "☽"];
+    titulo = [sol && `☉ ${sol.nombre}`, luna && `☽ ${luna.nombre}`, asc && !entrada.horaDesconocida && `ASC ${asc.nombre}`].filter(Boolean).join(" · ");
+  } else if (tipo === "numerologia") {
+    const p = resultado as unknown as PerfilNumerologico;
+    simbolos = [String(p.caminoDeVida), String(p.expresion), String(p.almaOImpulso)];
+    titulo = `${t.numerologia.numeros.caminoDeVida} ${p.caminoDeVida} · ${t.numerologia.numeros.expresion} ${p.expresion}`;
+  } else if (tipo === "compatibilidad") {
+    const a = signoPorId(String(resultado.signoA));
+    const b = signoPorId(String(resultado.signoB));
+    simbolos = ["♡"];
+    titulo = `${a?.nombre ?? ""} + ${b?.nombre ?? ""}: ${Number(resultado.puntaje)}% ${t.compatibilidad.afinidad}`;
+  } else if (tipo === "quiromancia") {
+    simbolos = ["✋"];
+    titulo = t.lecturas.nombres.quiromancia;
+  } else if (tipo === "iching") {
+    const r = resultado as unknown as ResultadoIChing;
+    const h = hexagramaPorNumero(r.presente);
+    hexagrama = r.valores.map((v) => (esYang(v) ? 1 : 0)) as (0 | 1)[];
+    titulo = h ? `${h.numero}. ${h.nombre} ${h.chino}` : lectura.titulo;
+  }
+
+  const respuesta = await imagenTarjeta({
+    etiqueta: t.lecturas.nombres[tipo],
+    titulo,
+    simbolos,
+    extracto: extractoDe(lectura.interpretacion),
+    enlace,
+    pie: t.lecturas.detalle.tarjetaPie,
+    hexagrama,
+  });
+  respuesta.headers.set("Cache-Control", "private, max-age=3600");
+  respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);
+  return respuesta;
+}

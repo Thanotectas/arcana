@@ -75,6 +75,19 @@ Qué trae:
 - Vista previa para WhatsApp y redes: `src/app/opengraph-image.tsx` (general) y `/api/og?t=&s=` (dinámica, `src/lib/marca/og.tsx`). Fuentes en `src/app/fuentes/` (incluidas en el trazado con `outputFileTracingIncludes`).
 - El registro con `?inv=CODIGO` publica metadatos personalizados ("{nombre} te invita a Arcana") con imagen dinámica: es lo que WhatsApp muestra al compartir el enlace de invitación.
 
+## I Ching, fondo animado y persuasión (30 sep 2026)
+
+- **I Ching** (`/iching`, 2 créditos): tres monedas × seis lanzamientos en el navegador (`RitualIChing`), el servidor valida los valores (6/7/8/9) y resuelve hexagrama presente, líneas mutantes y hexagrama resultante (`src/lib/iching/`). Datos de los 64 hexagramas en `hexagramas.ts` (orden del Rey Wen, líneas de abajo hacia arriba).
+- **Cielo animado** (`CieloAnimado`): canvas a pantalla completa con glifos zodiacales y estrellas que aparecen y se desvanecen; se apaga con `prefers-reduced-motion` y se pausa con la pestaña oculta.
+- **Persuasión honesta** (todo con datos reales): bono de primera compra (+2 créditos, `acreditar_orden` en 0007), ancla de precio frente a consulta presencial, equivalencias por paquete, garantía y pago seguro en `/creditos`; avisos de saldo bajo y carta del día pendiente en el panel; "¿Quieres ir más profundo?" al final de cada lectura (`SiguientePaso`); contador real de lecturas de la semana en la portada (`contador_lecturas()`, solo se muestra desde 50).
+- Migración `0007_iching_y_compra.sql` (aplicar en producción).
+
+## Conversación y tarjetas compartibles (30 sep 2026)
+
+- **Pregúntale a Arcana** (`ConversacionLectura`, `/api/lecturas/[id]/preguntar`): sobre una lectura terminada, la persona pregunta y la respuesta se escribe en vivo con el contexto de su lectura y las preguntas anteriores. La primera pregunta de cada lectura es gratis (`PREGUNTAS_GRATIS_POR_LECTURA`), las siguientes cuestan `COSTO_PREGUNTA` (1). Tabla `preguntas_lectura` y `reembolsar_pregunta()` en la migración 0008.
+- **Tarjeta para compartir** (`/api/lecturas/[id]/tarjeta`, 1080×1350): símbolos, títulos y una frase de la síntesis, con el enlace de invitación de la persona incrustado (`miarcana.com/r/CODIGO`). En el celular se comparte como archivo (Web Share); en escritorio se descarga. Fuentes en `src/app/fuentes/` (Cormorant, Inter y Noto Sans Symbols 2 para los símbolos; los glifos zodiacales no se dibujan porque el motor los trata como emoji).
+- Migraciones pendientes de aplicar en producción: `0007_iching_y_compra.sql` y `0008_preguntas.sql`.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

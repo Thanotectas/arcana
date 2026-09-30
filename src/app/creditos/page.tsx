@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
-import { requerirUsuario, getPerfil } from "@/lib/dal";
-import { PAQUETES, COSTOS, formatoCOP, type TipoLectura } from "@/lib/creditos";
+import { requerirUsuario, getPerfil, getHaComprado } from "@/lib/dal";
+import { Gift, ShieldCheck, Lock } from "lucide-react";
+import { PAQUETES, COSTOS, formatoCOP, BONO_PRIMERA_COMPRA, type TipoLectura } from "@/lib/creditos";
 import { accionComprar } from "@/lib/pagos/acciones";
 import { pagosConfigurados } from "@/lib/pagos/bold";
 import { Aviso } from "@/components/Aviso";
@@ -16,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requerirUsuario();
-  const [{ error }, perfil, t] = await Promise.all([searchParams, getPerfil(), getT()]);
+  const [{ error }, perfil, t, haComprado] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado()]);
+  const precioAstral = formatoCOP(Math.round((PAQUETES[1].precioCOP / PAQUETES[1].creditos) * COSTOS.carta_astral));
   const configurado = pagosConfigurados();
   const errores = t.creditos.errores as Record<string, string>;
   const precioBase = PAQUETES[0].precioCOP / PAQUETES[0].creditos;
@@ -32,6 +34,16 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
       </div>
 
       {error && <Aviso>{errores[error] ?? t.creditos.errores.generico}</Aviso>}
+      {!haComprado && !perfil?.ilimitado && (
+        <div className="tarjeta aparecer flex items-center gap-4 border-oro/50 bg-oro/5 p-5">
+          <Gift className="h-8 w-8 shrink-0 text-oro" aria-hidden />
+          <div>
+            <p className="font-display text-2xl text-oro-suave">{plantilla(t.persuasion.bonoPrimera, { n: BONO_PRIMERA_COMPRA })}</p>
+            <p className="text-sm text-texto-suave">{t.persuasion.bonoPrimeraDetalle}</p>
+          </div>
+        </div>
+      )}
+      <p className="text-center text-sm text-texto-suave">{plantilla(t.persuasion.anclaAstral, { precio: precioAstral })}</p>
       {!configurado && <Aviso tipo="info">{t.creditos.sinConfigurar}</Aviso>}
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -50,6 +62,9 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
               <p className="mt-2 text-3xl font-semibold text-oro-suave">{formatoCOP(p.precioCOP)}</p>
               <p className="text-sm text-texto-suave">
                 {p.creditos} {t.comun.creditos} · {plantilla(t.creditos.porCredito, { precio: formatoCOP(Math.round(porCredito)) })}
+              </p>
+              <p className="mt-1 text-sm text-oro-suave">
+                {plantilla(t.persuasion.equivale, { texto: (t.persuasion.equivalencias as Record<string, string>)[p.id] ?? "" })}
               </p>
               <p className="mt-3 flex-1 text-sm text-texto-suave">{textos?.descripcion ?? p.descripcion}</p>
               <BotonEnviar className={`boton mt-5 w-full ${p.destacado ? "boton-primario" : "boton-secundario"}`} cargando={t.creditos.preparando}>
@@ -71,7 +86,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-texto-suave">{t.creditos.procesados}</p>
+        <ul className="mt-5 space-y-2 text-sm text-texto-suave">
+          <li className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-exito" aria-hidden />{t.persuasion.garantia}</li>
+          <li className="flex items-start gap-2"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-exito" aria-hidden />{t.persuasion.pagoSeguro}</li>
+        </ul>
       </section>
     </div>
   );

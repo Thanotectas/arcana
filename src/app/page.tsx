@@ -1,18 +1,19 @@
 import Link from "next/link";
-import { Sparkles, Star, Hash, Heart, Moon, Hand } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon } from "lucide-react";
 import { PAQUETES, formatoCOP } from "@/lib/creditos";
-import { getUsuarioOpcional } from "@/lib/dal";
+import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 
 export default async function Portada() {
-  const [usuario, t] = await Promise.all([getUsuarioOpcional(), getT()]);
+  const [usuario, t, contador] = await Promise.all([getUsuarioOpcional(), getT(), getContadorLecturas().catch(() => 0)]);
   const MODULOS = [
     { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
     { icono: Star, ...t.portada.modulos.astral, href: "/carta-astral" },
     { icono: Hand, ...t.portada.modulos.quiromancia, href: "/quiromancia" },
     { icono: Hash, ...t.portada.modulos.numerologia, href: "/numerologia" },
+    { icono: Hexagon, ...t.portada.modulos.iching, href: "/iching" },
     { icono: Heart, ...t.portada.modulos.compatibilidad, href: "/compatibilidad" },
     { icono: Moon, ...t.portada.modulos.horoscopo, href: "/horoscopo" },
   ];
@@ -27,6 +28,11 @@ export default async function Portada() {
             {t.portada.titulo1} <span className="brillo-oro text-oro-suave">{t.portada.titulo2}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-texto-suave">{t.portada.intro}</p>
+          {contador >= 50 && (
+            <p className="mt-4 inline-block rounded-full border border-exito/40 bg-exito/10 px-4 py-1 text-sm text-exito">
+              ✦ {plantilla(t.persuasion.contadorSemana, { n: contador.toLocaleString("es-CO") })}
+            </p>
+          )}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href={usuario ? "/tarot" : "/registro"} className="boton boton-primario">
               {usuario ? t.portada.ctaTarot : t.portada.ctaRegistro}

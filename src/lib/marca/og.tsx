@@ -5,13 +5,15 @@ import { join } from "node:path";
 export const TAMANO_OG = { width: 1200, height: 630 };
 
 async function fuentes() {
-  const [cormorant, inter] = await Promise.all([
+  const [cormorant, inter, simbolos] = await Promise.all([
     readFile(join(process.cwd(), "src/app/fuentes/CormorantGaramond-SemiBold.ttf")),
     readFile(join(process.cwd(), "src/app/fuentes/Inter-Medium.ttf")),
+    readFile(join(process.cwd(), "src/app/fuentes/NotoSansSymbols2.ttf")),
   ]);
   return [
     { name: "Cormorant", data: cormorant, weight: 600 as const, style: "normal" as const },
     { name: "Inter", data: inter, weight: 500 as const, style: "normal" as const },
+    { name: "Simbolos", data: simbolos, weight: 400 as const, style: "normal" as const },
   ];
 }
 

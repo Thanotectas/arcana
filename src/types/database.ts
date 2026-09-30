@@ -62,6 +62,17 @@ type OrdenRow = {
   actualizado_en: string;
 };
 
+type PreguntaRow = {
+  id: string;
+  lectura_id: string;
+  usuario_id: string;
+  pregunta: string;
+  respuesta: string | null;
+  estado: string;
+  creditos_usados: number;
+  creado_en: string;
+};
+
 type HoroscopoRow = {
   id: number;
   signo: string;
@@ -103,6 +114,12 @@ export type Database = {
         Update: Partial<OrdenRow>;
         Relationships: [];
       };
+      preguntas_lectura: {
+        Row: PreguntaRow;
+        Insert: Insertable<PreguntaRow, "id" | "respuesta" | "estado" | "creditos_usados" | "creado_en">;
+        Update: Partial<PreguntaRow>;
+        Relationships: [];
+      };
       horoscopos: {
         Row: HoroscopoRow;
         Insert: Insertable<HoroscopoRow, "id" | "idioma" | "creado_en">;
@@ -135,6 +152,18 @@ export type Database = {
       nombre_invitador: {
         Args: { p_codigo: string };
         Returns: string | null;
+      };
+      contador_lecturas: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      ha_comprado: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      reembolsar_pregunta: {
+        Args: { p_pregunta: string };
+        Returns: boolean;
       };
       acreditar_orden: {
         Args: { p_referencia: string; p_transaccion_id: string; p_metodo_pago?: string | null };

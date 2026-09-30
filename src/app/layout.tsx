@@ -4,6 +4,7 @@ import "./globals.css";
 import { Encabezado } from "@/components/Encabezado";
 import { PiePagina } from "@/components/PiePagina";
 import { ProveedorIdioma } from "@/lib/i18n/cliente";
+import { CieloAnimado } from "@/components/CieloAnimado";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -33,6 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-dvh flex-col antialiased">
         <ProveedorIdioma idioma={idioma} t={t}>
           <div className="estrellas" aria-hidden />
+          <CieloAnimado />
           <Encabezado />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />

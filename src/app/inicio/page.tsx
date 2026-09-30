@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario } from "@/lib/dal";
 import { COSTOS, CARTAS_DIA_GRATIS } from "@/lib/creditos";
@@ -39,6 +39,7 @@ export default async function PaginaInicio() {
     { href: "/carta-astral", icono: Star, ...t.inicio.accesos.astral, costo: COSTOS.carta_astral },
     { href: "/quiromancia", icono: Hand, ...t.inicio.accesos.quiromancia, costo: COSTOS.quiromancia },
     { href: "/numerologia", icono: Hash, ...t.inicio.accesos.numerologia, costo: COSTOS.numerologia },
+    { href: "/iching", icono: Hexagon, ...t.inicio.accesos.iching, costo: COSTOS.iching },
     { href: "/compatibilidad", icono: Heart, ...t.inicio.accesos.compatibilidad, costo: COSTOS.compatibilidad },
   ];
 
@@ -65,6 +66,19 @@ export default async function PaginaInicio() {
           </Link>
         </div>
       </section>
+
+      {!perfil?.ilimitado && (perfil?.creditos ?? 0) <= 1 && (
+        <div className="tarjeta aparecer flex flex-wrap items-center justify-between gap-3 border-oro/40 bg-oro/5 p-4">
+          <p className="text-sm">{(perfil?.creditos ?? 0) === 0 ? t.persuasion.saldoCero : t.persuasion.saldoUno}</p>
+          <Link href="/creditos" className="boton boton-primario px-4 py-1.5 text-sm">{t.persuasion.recargar}</Link>
+        </div>
+      )}
+      {cartaDisponible && (
+        <div className="tarjeta aparecer flex flex-wrap items-center justify-between gap-3 border-violeta/40 p-4">
+          <p className="text-sm">{t.persuasion.cartaDiaPendiente}</p>
+          <Link href="/tarot?tirada=tarot_carta" className="boton boton-secundario px-4 py-1.5 text-sm">{t.persuasion.sacarCarta}</Link>
+        </div>
+      )}
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {accesos.map((a, i) => (

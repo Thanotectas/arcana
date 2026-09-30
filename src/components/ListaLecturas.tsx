@@ -24,6 +24,7 @@ const ICONO: Record<TipoLectura, string> = {
   numerologia: "#",
   compatibilidad: "♡",
   quiromancia: "✋",
+  iching: "☰",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

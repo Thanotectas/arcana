@@ -10,7 +10,8 @@ export type TipoLectura =
   | "carta_astral"
   | "numerologia"
   | "compatibilidad"
-  | "quiromancia";
+  | "quiromancia"
+  | "iching";
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -20,6 +21,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   numerologia: 1,
   compatibilidad: 1,
   quiromancia: 3,
+  iching: 2,
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -30,7 +32,16 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   numerologia: "Perfil numerológico",
   compatibilidad: "Compatibilidad",
   quiromancia: "Lectura de la mano",
+  iching: "I Ching",
 };
+
+/** Pregunta de seguimiento sobre una lectura. */
+export const COSTO_PREGUNTA = 1;
+/** Preguntas gratis por lectura (la primera engancha; las demás se cobran). */
+export const PREGUNTAS_GRATIS_POR_LECTURA = 1;
+
+/** Créditos de regalo en la primera compra (ver acreditar_orden en la migración 0007). */
+export const BONO_PRIMERA_COMPRA = 2;
 
 /** Cartas del día gratuitas por usuario y día. */
 export const CARTAS_DIA_GRATIS = 1;

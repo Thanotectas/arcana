@@ -13,6 +13,7 @@ import { cartasDelDiaHoy, getPerfil } from "../dal";
 import { getIdioma } from "../i18n/servidor";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import type { EntradaQuiromancia, Mano } from "../quiromancia";
+import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
 import type { Json } from "@/types/database";
 
 export interface EstadoAccion {
@@ -315,5 +316,37 @@ export async function accionReintentarLectura(formData: FormData): Promise<void>
     .eq("id", id)
     .eq("usuario_id", user.id);
   revalidatePath(`/lecturas/${id}`);
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// I Ching: los valores de las monedas los genera el navegador (es un ritual
+// de la persona); el servidor valida y resuelve los hexagramas.
+// ---------------------------------------------------------------------------
+export async function accionIChing(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  if (!pregunta) return { error: "iching.pregunta" };
+  let valores: ValorLinea[];
+  try {
+    const crudo = JSON.parse(String(formData.get("valores") ?? "[]"));
+    if (!Array.isArray(crudo) || crudo.length !== 6 || !crudo.every((v) => [6, 7, 8, 9].includes(v))) throw new Error();
+    valores = crudo as ValorLinea[];
+  } catch {
+    return { error: "iching.lanzamientos" };
+  }
+
+  let id: string;
+  try {
+    const resultado = resolverHexagramas(valores);
+    const presente = hexagramaPorNumero(resultado.presente)!;
+    id = await crearLectura({
+      tipo: "iching",
+      titulo: `${presente.numero}. ${presente.nombre}: ${pregunta}`,
+      entrada: { pregunta },
+      resultado,
+    });
+  } catch (e) {
+    return manejarError(e);
+  }
   redirect(`/lecturas/${id}`);
 }

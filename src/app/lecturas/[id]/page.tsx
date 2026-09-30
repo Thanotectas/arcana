@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getLectura, requerirUsuario } from "@/lib/dal";
+import { getLectura, requerirUsuario, getPreguntas, getPerfil } from "@/lib/dal";
+import { ConversacionLectura } from "@/components/ConversacionLectura";
+import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta } from "@/components/CartaVisual";
@@ -15,6 +17,9 @@ import { NOMBRES_ASPECTO, SIMBOLOS_ASPECTO, type Aspecto } from "@/lib/astro/car
 import type { Casas } from "@/lib/astro/casas";
 import { signoPorId, signoPorLongitud, formatoGrado } from "@/lib/zodiaco";
 import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "@/lib/numerologia";
+import { HexagramaVisual } from "@/components/HexagramaVisual";
+import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } from "@/lib/iching";
+import { SiguientePaso } from "@/components/SiguientePaso";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
@@ -29,8 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PaginaLectura({ params }: { params: Promise<{ id: string }> }) {
   await requerirUsuario();
   const { id } = await params;
-  const [lectura, t, idioma] = await Promise.all([getLectura(id), getT(), getIdioma()]);
+  const [lectura, t, idioma, perfil] = await Promise.all([getLectura(id), getT(), getIdioma(), getPerfil()]);
   if (!lectura) notFound();
+  const preguntas = lectura.estado === "lista" ? await getPreguntas(lectura.id) : [];
 
   const esQuiromancia = lectura.tipo === "quiromancia";
   const urlFoto = esQuiromancia ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
@@ -43,7 +49,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <h1 className="font-display text-4xl font-semibold">{lectura.titulo}</h1>
           <p className="mt-1 text-sm text-texto-suave">{fechaHora(lectura.creado_en, idioma)}</p>
         </div>
-        <CompartirLectura titulo={lectura.titulo} />
+        <CompartirLectura titulo={lectura.titulo} id={lectura.id} lista={lectura.estado === "lista"} />
       </header>
 
       {lectura.tipo.startsWith("tarot") && (
@@ -52,6 +58,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "carta_astral" && <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />}
       {lectura.tipo === "numerologia" && <VistaNumerologia resultado={lectura.resultado as unknown as PerfilNumerologico} t={t} />}
       {lectura.tipo === "compatibilidad" && <VistaCompatibilidad resultado={lectura.resultado} t={t} />}
+      {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
 
       {esQuiromancia ? (
         <LecturaQuiromancia id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
@@ -60,6 +67,17 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <LecturaEnVivo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} />
         </section>
       )}
+
+      {lectura.estado === "lista" && (
+        <ConversacionLectura
+          lecturaId={lectura.id}
+          iniciales={preguntas}
+          costo={COSTO_PREGUNTA}
+          gratisRestantes={PREGUNTAS_GRATIS_POR_LECTURA}
+          ilimitado={Boolean(perfil?.ilimitado)}
+        />
+      )}
+      {lectura.estado === "lista" && <SiguientePaso tipo={lectura.tipo} />}
 
       <p className="text-xs text-texto-suave">{t.comun.aviso}</p>
       <div className="flex flex-wrap gap-3">
@@ -75,6 +93,7 @@ function rutaNueva(tipo: string) {
   if (tipo === "carta_astral") return "/carta-astral";
   if (tipo === "numerologia") return "/numerologia";
   if (tipo === "quiromancia") return "/quiromancia";
+  if (tipo === "iching") return "/iching";
   return "/compatibilidad";
 }
 
@@ -219,5 +238,50 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
         <p className="font-display text-xl">{b?.nombre}</p>
       </div>
     </section>
+  );
+}
+
+function VistaIChing({ resultado, t }: { resultado: ResultadoIChing; t: Diccionario }) {
+  const presente = hexagramaPorNumero(resultado.presente);
+  const futuro = resultado.futuro ? hexagramaPorNumero(resultado.futuro) : null;
+  if (!presente) return null;
+  const lineas = resultado.valores.map((v) => (esYang(v) ? 1 : 0)) as (0 | 1)[];
+  return (
+    <section className={`grid gap-4 ${futuro ? "md:grid-cols-2" : ""}`}>
+      <BloqueHexagrama h={presente} titulo={t.iching.presente} lineasH={lineas} mutantes={resultado.mutantes} t={t} />
+      {futuro && <BloqueHexagrama h={futuro} titulo={t.iching.futuro} lineasH={futuro.lineas} mutantes={[]} t={t} />}
+    </section>
+  );
+}
+
+function BloqueHexagrama({
+  h,
+  titulo,
+  lineasH,
+  mutantes,
+  t,
+}: {
+  h: NonNullable<ReturnType<typeof hexagramaPorNumero>>;
+  titulo: string;
+  lineasH: (0 | 1)[];
+  mutantes: number[];
+  t: Diccionario;
+}) {
+  return (
+    <div className="tarjeta flex flex-col items-center gap-3 p-5 text-center">
+      <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{titulo}</p>
+      <HexagramaVisual lineas={lineasH} mutantes={mutantes} tamano={110} animado />
+      <p className="font-display text-2xl text-oro-suave">
+        {h.numero}. {h.nombre} <span className="text-base text-texto-suave">{h.chino} · {h.pinyin}</span>
+      </p>
+      <p className="text-xs text-texto-suave">
+        {SIMBOLO_TRIGRAMA[h.trigramaSuperior]} {t.iching.trigramas[h.trigramaSuperior]} / {SIMBOLO_TRIGRAMA[h.trigramaInferior]} {t.iching.trigramas[h.trigramaInferior]}
+      </p>
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {h.palabrasClave.map((p) => (
+          <span key={p} className="rounded-full border border-oro/30 px-2.5 py-0.5 text-xs text-oro-suave">{p}</span>
+        ))}
+      </div>
+    </div>
   );
 }

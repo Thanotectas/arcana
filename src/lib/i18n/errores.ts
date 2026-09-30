@@ -13,6 +13,7 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     numerologia: t.numerologia.errores,
     compatibilidad: t.compatibilidad.errores,
     quiromancia: t.quiromancia.errores,
+    iching: t.iching.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }
