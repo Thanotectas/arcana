@@ -15,6 +15,8 @@ export interface Perfil {
   zona_horaria: string | null;
   creditos: number;
   ilimitado: boolean;
+  codigo_invitacion: string | null;
+  invitado_por: string | null;
   creado_en: string;
 }
 
@@ -116,4 +118,17 @@ export async function getOrdenPorReferencia(referencia: string): Promise<Orden |
     .eq("referencia", referencia)
     .maybeSingle();
   return (data as Orden | null) ?? null;
+}
+
+export interface ResumenInvitaciones {
+  invitados: number;
+  premiadas: number;
+  creditos_ganados: number;
+}
+
+export async function getResumenInvitaciones(): Promise<ResumenInvitaciones> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("resumen_invitaciones");
+  const fila = Array.isArray(data) ? data[0] : undefined;
+  return { invitados: fila?.invitados ?? 0, premiadas: fila?.premiadas ?? 0, creditos_ganados: fila?.creditos_ganados ?? 0 };
 }

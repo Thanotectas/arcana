@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
+import { aplicarInvitacionPendiente } from "../invitaciones";
 
 export interface EstadoAuth {
   error?: string;
@@ -69,7 +70,10 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
   if (error) {
     return { error: error.message.includes("already") ? "yaRegistrado" : "noCrear" };
   }
-  if (data.session) redirect("/inicio");
+  if (data.session) {
+    await aplicarInvitacionPendiente();
+    redirect("/inicio");
+  }
   return { mensaje: "revisaCorreo" };
 }
 

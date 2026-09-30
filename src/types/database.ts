@@ -17,6 +17,9 @@ type PerfilRow = {
   creditos: number;
   ilimitado: boolean;
   idioma: string;
+  codigo_invitacion: string | null;
+  invitado_por: string | null;
+  invitacion_premiada: boolean;
   creado_en: string;
   actualizado_en: string;
 };
@@ -78,7 +81,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -120,6 +123,18 @@ export type Database = {
       reembolsar_lectura: {
         Args: { p_lectura: string };
         Returns: boolean;
+      };
+      aplicar_invitacion: {
+        Args: { p_codigo: string };
+        Returns: boolean;
+      };
+      resumen_invitaciones: {
+        Args: Record<string, never>;
+        Returns: { invitados: number; premiadas: number; creditos_ganados: number }[];
+      };
+      nombre_invitador: {
+        Args: { p_codigo: string };
+        Returns: string | null;
       };
       acreditar_orden: {
         Args: { p_referencia: string; p_transaccion_id: string; p_metodo_pago?: string | null };

@@ -44,6 +44,9 @@ export async function Encabezado() {
                 <Coins className="h-4 w-4" aria-hidden />
                 {perfil.ilimitado ? "∞" : perfil.creditos}
               </Link>
+              <Link href="/invitar" className="hidden text-sm text-exito hover:underline sm:block">
+                {t.invitar.seccion}
+              </Link>
               <Link href="/cuenta" className="hidden text-sm text-texto-suave hover:text-texto sm:block">
                 {perfil.nombre ?? t.comun.miCuenta}
               </Link>

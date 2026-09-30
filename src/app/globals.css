@@ -494,3 +494,13 @@ body {
 .marco-vivo {
   animation: marco-latir 2s ease-in-out infinite;
 }
+
+/* WhatsApp */
+.boton-whatsapp {
+  background: #25d366;
+  color: #062b17;
+}
+.boton-whatsapp:hover {
+  background: #3ddc78;
+  transform: translateY(-1px);
+}

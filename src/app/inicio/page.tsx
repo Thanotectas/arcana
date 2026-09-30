@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users } from "lucide-react";
+import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario } from "@/lib/dal";
 import { COSTOS, CARTAS_DIA_GRATIS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -79,6 +80,14 @@ export default async function PaginaInicio() {
           </Link>
         ))}
       </section>
+
+      <Link href="/invitar" className="tarjeta tarjeta-modulo flex items-center gap-4 border-exito/30 p-5">
+        <Users className="h-8 w-8 text-exito" aria-hidden />
+        <div>
+          <h2 className="font-display text-2xl font-semibold">{t.invitar.tarjetaTitulo}</h2>
+          <p className="text-sm text-texto-suave">{plantilla(t.invitar.tarjetaNota, { bono: BONO_INVITADOR })}</p>
+        </div>
+      </Link>
 
       <section>
         <div className="mb-4 flex items-center justify-between">

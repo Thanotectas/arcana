@@ -62,6 +62,13 @@ Qué trae:
 - **Interfaz**: portada con cartas flotantes, panel con fase lunar y racha, historial con búsqueda y filtros, botón de compartir, animaciones en todas las secciones.
 - **docs/ESTRATEGIA-PRODUCTO.md**: valoración de precios e ideas.
 
+## Invitaciones por WhatsApp (30 sep 2026)
+
+- Cada perfil tiene `codigo_invitacion` (7 caracteres). Enlace `miarcana.com/r/<codigo>` → guarda la cookie `invitacion` 30 días y lleva a `/registro?inv=<codigo>`, que muestra quién invita.
+- Al entrar por primera vez (registro con sesión inmediata o `/auth/callback` tras confirmar correo o Google) se llama `aplicar_invitacion(codigo)`: +2 créditos al invitado, +2 a quien invita (hasta 20 invitaciones premiadas por cuenta), solo en cuentas de menos de 7 días y sin invitación previa.
+- Página `/invitar`: enlace, botón de WhatsApp (`wa.me` con mensaje prellenado), compartir nativo, conteo de invitados y créditos ganados (`resumen_invitaciones()`). Tarjeta en el panel y enlace en el encabezado.
+- Migración `0006_invitaciones.sql` (aplicar en producción; sin ella la página muestra ceros y el registro no premia, pero nada falla).
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.
