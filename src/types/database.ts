@@ -15,6 +15,7 @@ type PerfilRow = {
   longitud: number | null;
   zona_horaria: string | null;
   creditos: number;
+  ilimitado: boolean;
   creado_en: string;
   actualizado_en: string;
 };
@@ -75,7 +76,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };

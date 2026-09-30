@@ -36,10 +36,10 @@ export async function Encabezado() {
               <Link
                 href="/creditos"
                 className="flex items-center gap-1.5 rounded-full border border-oro/40 bg-oro/10 px-3 py-1.5 text-sm font-medium text-oro-suave"
-                title="Tus créditos"
+                title={perfil.ilimitado ? "Uso ilimitado" : "Tus créditos"}
               >
                 <Coins className="h-4 w-4" aria-hidden />
-                {perfil.creditos}
+                {perfil.ilimitado ? "∞" : perfil.creditos}
               </Link>
               <Link href="/cuenta" className="hidden text-sm text-texto-suave hover:text-texto sm:block">
                 {perfil.nombre ?? "Mi cuenta"}

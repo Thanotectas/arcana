@@ -29,8 +29,8 @@ export default async function PaginaInicio() {
         <Link href="/creditos" className="tarjeta flex items-center gap-3 px-5 py-3">
           <Coins className="h-6 w-6 text-oro" aria-hidden />
           <div>
-            <p className="text-2xl font-semibold text-oro-suave">{perfil?.creditos ?? 0}</p>
-            <p className="text-xs text-texto-suave">créditos · comprar más</p>
+            <p className="text-2xl font-semibold text-oro-suave">{perfil?.ilimitado ? "∞" : (perfil?.creditos ?? 0)}</p>
+            <p className="text-xs text-texto-suave">{perfil?.ilimitado ? "uso ilimitado" : "créditos · comprar más"}</p>
           </div>
         </Link>
       </section>

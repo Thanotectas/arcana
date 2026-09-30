@@ -11,7 +11,7 @@ export default async function PaginaTarot({ searchParams }: { searchParams: Prom
   const { tirada } = await searchParams;
   const [perfil, cartasHoy] = await Promise.all([getPerfil(), cartasDelDiaHoy()]);
   const inicial: TipoTirada = tirada && tirada in TIRADAS ? (tirada as TipoTirada) : "tarot_tres";
-  const cartaDisponible = cartasHoy < CARTAS_DIA_GRATIS;
+  const cartaDisponible = Boolean(perfil?.ilimitado) || cartasHoy < CARTAS_DIA_GRATIS;
 
   const tiradas: TiradaRitual[] = (Object.values(TIRADAS) as (typeof TIRADAS)[TipoTirada][]).map((t) => ({
     id: t.id,
@@ -28,8 +28,12 @@ export default async function PaginaTarot({ searchParams }: { searchParams: Prom
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Tarot</p>
         <h1 className="font-display text-4xl font-semibold">Consulta las cartas</h1>
         <p className="mt-2 text-texto-suave">
-          Elige tu tirada, baraja y escoge tus cartas del mazo. Tienes{" "}
-          <strong className="text-oro-suave">{perfil?.creditos ?? 0}</strong> créditos.
+          Elige tu tirada, baraja y escoge tus cartas del mazo.{" "}
+          {perfil?.ilimitado ? (
+            <>Tu cuenta tiene <strong className="text-oro-suave">uso ilimitado</strong>.</>
+          ) : (
+            <>Tienes <strong className="text-oro-suave">{perfil?.creditos ?? 0}</strong> créditos.</>
+          )}
         </p>
       </div>
       <RitualTarot tiradas={tiradas} inicial={inicial} tamanoMazo={TAMANO_MAZO} />

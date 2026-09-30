@@ -14,6 +14,7 @@ export interface Perfil {
   longitud: number | null;
   zona_horaria: string | null;
   creditos: number;
+  ilimitado: boolean;
   creado_en: string;
 }
 

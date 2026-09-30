@@ -21,6 +21,19 @@ function destinoSeguro(v: FormDataEntryValue | null) {
   return s.startsWith("/") && !s.startsWith("//") ? s : "/inicio";
 }
 
+/** Inicia sesión (o crea la cuenta) con Google y vuelve a /auth/callback. */
+export async function accionGoogle(formData: FormData) {
+  const volver = destinoSeguro(formData.get("volver"));
+  const supabase = await createClient();
+  const h = await headers();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${urlBase(h)}/auth/callback?siguiente=${encodeURIComponent(volver)}` },
+  });
+  if (error || !data.url) redirect("/entrar?error=google");
+  redirect(data.url);
+}
+
 export async function accionEntrar(_prev: EstadoAuth, formData: FormData): Promise<EstadoAuth> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");

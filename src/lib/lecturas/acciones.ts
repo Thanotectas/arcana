@@ -9,7 +9,7 @@ import { TIRADAS, cartasDesdeAbanico, type TipoTirada } from "../tarot/tiradas";
 import { calcularCarta, type DatosNacimiento } from "../astro/carta";
 import { calcularPerfil } from "../numerologia";
 import { signoPorFecha, signoPorId, compatibilidadSignos } from "../zodiaco";
-import { cartasDelDiaHoy } from "../dal";
+import { cartasDelDiaHoy, getPerfil } from "../dal";
 import type { Json } from "@/types/database";
 
 export interface EstadoAccion {
@@ -32,12 +32,15 @@ async function usuarioActual() {
  */
 async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada: unknown; resultado: unknown }) {
   const { supabase, user } = await usuarioActual();
-  const costo = COSTOS[datos.tipo];
+  const perfil = await getPerfil();
+  // Las cuentas ilimitadas pasan por el cobro (queda registro) sin pagar nada.
+  const costo = perfil?.ilimitado ? 0 : COSTOS[datos.tipo];
+  const costoTarifa = COSTOS[datos.tipo];
   const referencia = `${datos.tipo}-${Date.now()}`;
 
-  if (costo > 0) {
+  if (costoTarifa > 0) {
     const { data: ok, error } = await supabase.rpc("consumir_creditos", {
-      p_cantidad: costo,
+      p_cantidad: costoTarifa,
       p_motivo: `lectura:${datos.tipo}`,
       p_referencia: referencia,
     });
@@ -103,7 +106,8 @@ export async function accionTarot(_prev: EstadoAccion, formData: FormData): Prom
 
   let id: string;
   try {
-    if (tipo === "tarot_carta" && (await cartasDelDiaHoy()) >= CARTAS_DIA_GRATIS) {
+    const ilimitado = (await getPerfil())?.ilimitado;
+    if (tipo === "tarot_carta" && !ilimitado && (await cartasDelDiaHoy()) >= CARTAS_DIA_GRATIS) {
       return { error: "Ya sacaste tu carta gratuita de hoy. Vuelve mañana o prueba una tirada completa." };
     }
     const cartas = cartasDesdeAbanico(tipo, posiciones);
