@@ -49,6 +49,7 @@ export const es = {
     hoy: "Tu cielo hoy",
     chino: "Calendario chino",
     cruce: "Cruces",
+    suenos: "Sueños",
   },
   pie: {
     aviso:
@@ -69,6 +70,7 @@ export const es = {
       quiromancia: "Lectura de la mano",
       chino: "Calendario chino",
       cruce: "Lectura cruzada",
+      suenos: "Interpretación de sueños",
     },
     lista: {
       titulo: "Mis lecturas",
@@ -119,6 +121,7 @@ export const es = {
       iching: { titulo: "I Ching", texto: "Lanza las monedas seis veces, forma tu hexagrama y recibe el consejo del Libro de los Cambios." },
       chino: { titulo: "Calendario chino", texto: "Tu animal y tu elemento según el Año Nuevo chino real, tu animal secreto y lo que pide el año en curso." },
       cruce: { titulo: "Lecturas cruzadas", texto: "Dos sistemas sobre ti a la vez: tarot con carta astral, calendario chino con numerología… Donde coinciden y donde chocan." },
+      suenos: { titulo: "Sueños", texto: "Cuenta tu sueño con tus palabras y Sibila lee sus símbolos, su emoción y el hilo con tus sueños anteriores." },
     },
     comoFunciona: "Cómo funciona",
     pasos: [
@@ -208,6 +211,7 @@ export const es = {
       iching: { titulo: "I Ching", nota: "Lanza las monedas" },
       chino: { titulo: "Calendario chino", nota: "Tu animal, tu elemento y tu año" },
       cruce: { titulo: "Lectura cruzada", nota: "Dos sistemas, una respuesta" },
+      suenos: { titulo: "Interpretar un sueño", nota: "Tu diario de sueños" },
     },
     ultimas: "Tus últimas lecturas",
     vacio: "Todavía no tienes lecturas. Empieza con tu carta del día.",
@@ -531,6 +535,31 @@ export const es = {
     relaciones: { mismo: "es tu propio año: pide cuidado y protección", trino: "año de apoyo: está en tu triángulo", amigo: "año de alianzas: es tu amigo secreto", choque: "año de fricción: pide prudencia", neutra: "año neutro: depende de tus decisiones" },
     errores: { nombre: "Escribe tu nombre.", fecha: "Fecha de nacimiento no válida (desde 1900).", hora: "Hora no válida." },
   },
+  suenos: {
+    seccion: "Diario de sueños",
+    titulo: "Interpreta tu sueño",
+    intro: "Cuenta tu sueño tal como lo recuerdas, sin ordenarlo demasiado. Sibila lee sus símbolos con la tradición clásica y los arquetipos, la emoción que dejó y, si ya interpretaste otros sueños, el hilo que los une.",
+    cuentalo: "Tu sueño",
+    ejemplo: "Por ejemplo: Estaba en la casa de mi infancia pero las puertas daban al mar. Buscaba a alguien y oía su voz, pero cada habitación estaba vacía…",
+    faltan: "Cuenta un poco más: faltan {n} caracteres",
+    alDespertar: "Cómo te sentiste al despertar",
+    emociones: { paz: "Paz", alegria: "Alegría", miedo: "Miedo", angustia: "Angustia", tristeza: "Tristeza", confusion: "Confusión", nostalgia: "Nostalgia", deseo: "Deseo" },
+    esRecurrente: "Es un sueño que se repite",
+    recurrente: "Sueño recurrente",
+    cuando: "Fecha del sueño",
+    interpretar: "Interpretar mi sueño",
+    leyendo: "Sibila entra en tu sueño…",
+    tuSueno: "Tu sueño",
+    conDiario: "Leído junto a {n} sueños anteriores",
+    consejosTitulo: "Para recordar mejor tus sueños",
+    consejos: [
+      "Escríbelo apenas despiertes, aunque sean tres frases: los detalles se van en minutos.",
+      "Anota lo que sentiste, no solo lo que pasó. La emoción es la clave del sueño.",
+      "Incluye los detalles raros: colores, objetos fuera de lugar, personas que no encajan.",
+      "Cada sueño que interpretas queda en tu diario y Sibila lo recuerda en los siguientes.",
+    ],
+    errores: { texto: "Cuenta tu sueño con un poco más de detalle (al menos 20 caracteres).", fecha: "Fecha no válida." },
+  },
   cruce: {
     seccion: "Lectura premium",
     titulo: "Lecturas cruzadas",
@@ -588,6 +617,7 @@ export const es = {
       iching: { texto: "El I Ching te dijo cómo actuar. El tarot te muestra el terreno.", accion: "Hacer una tirada", href: "/tarot" },
       chino: { texto: "Tu animal habla de tu temperamento; tus números, de tu camino. Crúzalos.", accion: "Cruzar con numerología", href: "/cruce" },
       cruce: { texto: "¿Quieres ver cómo se mueve todo esto hoy? Tu cielo del día te espera.", accion: "Ver mi cielo hoy", href: "/hoy" },
+      suenos: { texto: "Tu sueño habló de lo que sientes. El tarot puede decirte qué hacer con ello.", accion: "Hacer una tirada", href: "/tarot" },
     },
   },
   preguntas: {

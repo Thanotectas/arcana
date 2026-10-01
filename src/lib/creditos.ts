@@ -13,6 +13,7 @@ export type TipoLectura =
   | "quiromancia"
   | "iching"
   | "chino"
+  | "suenos"
   | "cruce";
 
 export const COSTOS: Record<TipoLectura, number> = {
@@ -25,6 +26,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   quiromancia: 3,
   iching: 2,
   chino: 2,
+  suenos: 2,
   cruce: 4, // premium: combina dos sistemas con los datos de la persona
 };
 
@@ -38,6 +40,7 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   quiromancia: "Lectura de la mano",
   iching: "I Ching",
   chino: "Calendario chino",
+  suenos: "Interpretación de sueños",
   cruce: "Lectura cruzada",
 };
 

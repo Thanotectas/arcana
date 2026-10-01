@@ -50,6 +50,7 @@ export const en: Diccionario = {
     hoy: "Your sky today",
     chino: "Chinese calendar",
     cruce: "Cross readings",
+    suenos: "Dreams",
   },
   pie: {
     aviso:
@@ -70,6 +71,7 @@ export const en: Diccionario = {
       quiromancia: "Palm reading",
       chino: "Chinese calendar",
       cruce: "Cross reading",
+      suenos: "Dream interpretation",
     },
     lista: {
       titulo: "My readings",
@@ -120,6 +122,7 @@ export const en: Diccionario = {
       iching: { titulo: "I Ching", texto: "Toss the coins six times, build your hexagram and receive the counsel of the Book of Changes." },
       chino: { titulo: "Chinese calendar", texto: "Your animal and element by the real Chinese New Year, your secret animal and what the current year asks of you." },
       cruce: { titulo: "Cross readings", texto: "Two systems on you at once: tarot with birth chart, Chinese calendar with numerology… Where they agree and where they clash." },
+      suenos: { titulo: "Dreams", texto: "Tell your dream in your own words and Sibila reads its symbols, its emotion and the thread with your earlier dreams." },
     },
     comoFunciona: "How it works",
     pasos: [
@@ -209,6 +212,7 @@ export const en: Diccionario = {
       iching: { titulo: "I Ching", nota: "Toss the coins" },
       chino: { titulo: "Chinese calendar", nota: "Your animal, element and year" },
       cruce: { titulo: "Cross reading", nota: "Two systems, one answer" },
+      suenos: { titulo: "Interpret a dream", nota: "Your dream journal" },
     },
     ultimas: "Your latest readings",
     vacio: "You don't have any readings yet. Start with your card of the day.",
@@ -532,6 +536,31 @@ export const en: Diccionario = {
     relaciones: { mismo: "it is your own year: it asks for care and protection", trino: "a supportive year: it is in your triangle", amigo: "a year of alliances: it is your secret friend", choque: "a year of friction: it asks for prudence", neutra: "a neutral year: it depends on your choices" },
     errores: { nombre: "Enter your name.", fecha: "Invalid birth date (from 1900).", hora: "Invalid time." },
   },
+  suenos: {
+    seccion: "Dream journal",
+    titulo: "Interpret your dream",
+    intro: "Tell your dream as you remember it, without tidying it up. Sibila reads its symbols with the classic tradition and the archetypes, the emotion it left, and, if you have interpreted other dreams, the thread between them.",
+    cuentalo: "Your dream",
+    ejemplo: "For example: I was in my childhood home but the doors opened onto the sea. I was looking for someone and could hear their voice, but every room was empty…",
+    faltan: "Tell a little more: {n} characters to go",
+    alDespertar: "How you felt when you woke up",
+    emociones: { paz: "Peace", alegria: "Joy", miedo: "Fear", angustia: "Anguish", tristeza: "Sadness", confusion: "Confusion", nostalgia: "Nostalgia", deseo: "Desire" },
+    esRecurrente: "This dream keeps coming back",
+    recurrente: "Recurring dream",
+    cuando: "Date of the dream",
+    interpretar: "Interpret my dream",
+    leyendo: "Sibila is entering your dream…",
+    tuSueno: "Your dream",
+    conDiario: "Read alongside {n} earlier dreams",
+    consejosTitulo: "To remember your dreams better",
+    consejos: [
+      "Write it down as soon as you wake, even three sentences: the details fade in minutes.",
+      "Note what you felt, not only what happened. The emotion is the key to the dream.",
+      "Include the odd details: colors, objects out of place, people who do not belong.",
+      "Every dream you interpret stays in your journal and Sibila remembers it in the next ones.",
+    ],
+    errores: { texto: "Tell your dream in a little more detail (at least 20 characters).", fecha: "Invalid date." },
+  },
   cruce: {
     seccion: "Premium reading",
     titulo: "Cross readings",
@@ -589,6 +618,7 @@ export const en: Diccionario = {
       iching: { texto: "The I Ching told you how to act. The tarot shows you the terrain.", accion: "Do a spread", href: "/tarot" },
       chino: { texto: "Your animal speaks of your temperament; your numbers, of your path. Cross them.", accion: "Cross with numerology", href: "/cruce" },
       cruce: { texto: "Want to see how all this moves today? Your sky for today is waiting.", accion: "See my sky today", href: "/hoy" },
+      suenos: { texto: "Your dream spoke of what you feel. The tarot can tell you what to do with it.", accion: "Draw cards", href: "/tarot" },
     },
   },
   preguntas: {

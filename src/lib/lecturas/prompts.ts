@@ -13,6 +13,7 @@ import { getSupabaseAdmin } from "../supabase/admin";
 import { resumenIChing, type ResultadoIChing } from "../iching";
 import { resumenChino, type ResultadoChino } from "../chino";
 import type { FuenteCruce } from "../cruce";
+import type { EntradaSueno, ResultadoSueno } from "../suenos";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -151,6 +152,31 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         (pregunta ? `## Respuesta a tu pregunta (desde los dos sistemas), ` : "") +
         `## Síntesis cruzada y un consejo práctico. Nombra siempre de qué sistema sale cada idea. No repitas las lecturas anteriores: úsalas como base. Extensión: 800 a 1100 palabras.`,
       opciones: { idioma, effort: "medium", maxTokens: 4000, nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "suenos") {
+    const e = entrada as unknown as EntradaSueno;
+    const r = resultado as unknown as ResultadoSueno;
+    const emociones: Record<string, string> = { paz: "paz", alegria: "alegría", miedo: "miedo", angustia: "angustia", tristeza: "tristeza", confusion: "confusión", nostalgia: "nostalgia", deseo: "deseo" };
+    const diario = r.previos?.length
+      ? "\n\nDIARIO DE SUEÑOS (sueños anteriores de la misma persona, del más reciente al más antiguo; búscales hilo si lo hay, sin repetir lo ya dicho):\n" +
+        r.previos.map((p) => `- ${p.fecha} · ${datoDeUsuario(p.titulo, 100)}: ${datoDeUsuario(p.extracto, 240)}`).join("\n")
+      : "";
+    return {
+      usuario:
+        `Interpreta este sueño.\n\nEl sueño, contado por la persona: ${datoDeUsuario(e.texto, 2000)}\n` +
+        (e.emocion ? `Cómo se sintió al despertar: ${emociones[e.emocion] ?? e.emocion}.\n` : "") +
+        (e.recurrente ? "Es un sueño recurrente.\n" : "") +
+        (e.fecha ? `Fecha del sueño: ${e.fecha}.\n` : "") +
+        diario +
+        `\n\nEstructura: ## Lo que tu sueño cuenta (el relato visto desde fuera, en dos o tres frases), ## Los símbolos (cada símbolo o escena relevante con su sentido tradicional y el sentido que puede tener para esta persona, como lista breve), ## La emoción del sueño (qué siente el sueño y qué parte de la vida despierta toca), ` +
+        (r.previos?.length ? "## El hilo con tus sueños anteriores (solo si hay conexión real), " : "") +
+        (e.recurrente ? "## Por qué vuelve (qué pide un sueño que se repite), " : "") +
+        `## Lo que te está diciendo (la síntesis: un mensaje claro y una pregunta para llevar al día). Extensión: 600 a 850 palabras.`,
+      sistemaExtra:
+        "Interpretación de sueños: combina la lectura simbólica clásica (arquetipos junguianos, la tradición de los diccionarios de sueños, la mitología y los cuatro elementos) con el contexto de la persona. El sueño no predice: habla de lo que la persona vive, teme o desea. Nombra los símbolos concretos del relato, no generalidades. Si el sueño incluye violencia, muerte o pérdida, trátalo con calma: en los sueños suelen hablar de cambios y cierres, no de hechos. Si el relato sugiere angustia persistente, pesadillas repetidas o un trauma, sugiere con delicadeza hablar con un profesional de salud mental, sin diagnosticar. No inventes detalles que no estén en el relato.",
+      opciones: { idioma, effort: "medium", maxTokens: 3200 },
     };
   }
 

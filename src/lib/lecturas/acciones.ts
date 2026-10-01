@@ -16,6 +16,8 @@ import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
 import { calcularChino, nombrePilar, FICHA } from "../chino";
 import { esSistema, fuenteDe, type Sistema } from "../cruce";
+import { SUENO_MAX, SUENO_MIN, esEmocion, tituloDeSueno, type EntradaSueno, type ResultadoSueno } from "../suenos";
+import { extractoPlano } from "./memoria";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -255,6 +257,43 @@ export async function accionChino(_prev: EstadoAccion, formData: FormData): Prom
       entrada: { nombre, fecha, hora: horaDesconocida ? null : hora },
       resultado: r,
     });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Sueños: la persona cuenta su sueño; se guardan los anteriores como diario
+// ---------------------------------------------------------------------------
+export async function accionSuenos(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const texto = String(formData.get("texto") ?? "").replace(/\r/g, "").trim().slice(0, SUENO_MAX);
+  const emocionCruda = String(formData.get("emocion") ?? "");
+  const recurrente = formData.get("recurrente") === "on";
+  const fecha = String(formData.get("fecha") ?? "").trim();
+  if (texto.length < SUENO_MIN) return { error: "suenos.texto" };
+  if (fecha && !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "suenos.fecha" };
+
+  const { supabase, user } = await usuarioActual();
+  // Diario: los últimos sueños ya interpretados, resumidos, para dar continuidad.
+  const { data: anteriores } = await supabase
+    .from("lecturas")
+    .select("titulo, interpretacion, entrada, creado_en")
+    .eq("usuario_id", user.id)
+    .eq("tipo", "suenos")
+    .eq("estado", "lista")
+    .order("creado_en", { ascending: false })
+    .limit(5);
+  const previos = (anteriores ?? []).map((l) => {
+    const e = (l.entrada ?? {}) as Partial<EntradaSueno>;
+    return { fecha: e.fecha || l.creado_en.slice(0, 10), titulo: l.titulo, extracto: extractoPlano(l.interpretacion ?? "", 220) };
+  });
+
+  const entrada: EntradaSueno = { texto, emocion: esEmocion(emocionCruda) ? emocionCruda : null, recurrente, fecha: fecha || null };
+  const resultado: ResultadoSueno = { previos };
+  let id: string;
+  try {
+    id = await crearLectura({ tipo: "suenos", titulo: tituloDeSueno(texto), entrada, resultado });
   } catch (e) {
     return manejarError(e);
   }

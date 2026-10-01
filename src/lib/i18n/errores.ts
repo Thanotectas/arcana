@@ -16,6 +16,7 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     iching: t.iching.errores,
     chino: t.chino.errores,
     cruce: t.cruce.errores,
+    suenos: t.suenos.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }

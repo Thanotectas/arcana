@@ -22,6 +22,7 @@ import { HexagramaVisual } from "@/components/HexagramaVisual";
 import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } from "@/lib/iching";
 import { SiguientePaso } from "@/components/SiguientePaso";
 import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
+import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
 import type { FuenteCruce } from "@/lib/cruce";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -64,6 +65,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
       {lectura.tipo === "cruce" && <VistaCruce entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
+      {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
       {esQuiromancia ? (
         <LecturaQuiromancia id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
@@ -111,6 +113,7 @@ function rutaNueva(tipo: string) {
   if (tipo === "iching") return "/iching";
   if (tipo === "chino") return "/calendario-chino";
   if (tipo === "cruce") return "/cruce";
+  if (tipo === "suenos") return "/suenos";
   return "/compatibilidad";
 }
 
@@ -353,6 +356,22 @@ function VistaCruce({ entrada, resultado, t }: { entrada: Record<string, unknown
         ))}
       </div>
       {pregunta && <p className="text-sm text-texto-suave">{t.cruce.pregunta}: <span className="text-texto">{pregunta}</span></p>}
+    </section>
+  );
+}
+
+function VistaSueno({ entrada, resultado, t }: { entrada: EntradaSueno; resultado: ResultadoSueno; t: Diccionario }) {
+  const emociones = t.suenos.emociones as Record<string, string>;
+  return (
+    <section className="tarjeta space-y-3 p-6">
+      <p className="text-xs uppercase tracking-widest text-violeta-suave">{t.suenos.tuSueno}</p>
+      <p className="whitespace-pre-line text-texto-suave">{entrada.texto}</p>
+      <div className="flex flex-wrap gap-2 text-xs">
+        {entrada.emocion && <span className="rounded-full bg-violeta/20 px-3 py-1 text-violeta-suave">{emociones[entrada.emocion] ?? entrada.emocion}</span>}
+        {entrada.recurrente && <span className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{t.suenos.recurrente}</span>}
+        {entrada.fecha && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{entrada.fecha}</span>}
+        {resultado.previos?.length > 0 && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{plantilla(t.suenos.conDiario, { n: resultado.previos.length })}</span>}
+      </div>
     </section>
   );
 }

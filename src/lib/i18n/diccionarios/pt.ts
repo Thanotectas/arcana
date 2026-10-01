@@ -47,6 +47,7 @@ export const pt: Diccionario = {
     hoy: "Seu céu hoje",
     chino: "Calendário chinês",
     cruce: "Cruzamentos",
+    suenos: "Sonhos",
   },
   pie: {
     aviso:
@@ -67,6 +68,7 @@ export const pt: Diccionario = {
       quiromancia: "Leitura da mão",
       chino: "Calendário chinês",
       cruce: "Leitura cruzada",
+      suenos: "Interpretação de sonhos",
     },
     lista: {
       titulo: "Minhas leituras",
@@ -117,6 +119,7 @@ export const pt: Diccionario = {
       iching: { titulo: "I Ching", texto: "Lance as moedas seis vezes, forme seu hexagrama e receba o conselho do Livro das Mutações." },
       chino: { titulo: "Calendário chinês", texto: "Seu animal e seu elemento pelo Ano Novo chinês real, seu animal secreto e o que o ano em curso pede." },
       cruce: { titulo: "Leituras cruzadas", texto: "Dois sistemas sobre você ao mesmo tempo: tarô com mapa astral, calendário chinês com numerologia… Onde coincidem e onde se chocam." },
+      suenos: { titulo: "Sonhos", texto: "Conte seu sonho com suas palavras e Sibila lê seus símbolos, sua emoção e o fio com seus sonhos anteriores." },
     },
     comoFunciona: "Como funciona",
     pasos: [
@@ -206,6 +209,7 @@ export const pt: Diccionario = {
       iching: { titulo: "I Ching", nota: "Lance as moedas" },
       chino: { titulo: "Calendário chinês", nota: "Seu animal, seu elemento e seu ano" },
       cruce: { titulo: "Leitura cruzada", nota: "Dois sistemas, uma resposta" },
+      suenos: { titulo: "Interpretar um sonho", nota: "Seu diário de sonhos" },
     },
     ultimas: "Suas últimas leituras",
     vacio: "Você ainda não tem leituras. Comece com sua carta do dia.",
@@ -529,6 +533,31 @@ export const pt: Diccionario = {
     relaciones: { mismo: "é o seu próprio ano: pede cuidado e proteção", trino: "ano de apoio: está no seu triângulo", amigo: "ano de alianças: é seu amigo secreto", choque: "ano de atrito: pede prudência", neutra: "ano neutro: depende das suas decisões" },
     errores: { nombre: "Digite seu nome.", fecha: "Data de nascimento inválida (a partir de 1900).", hora: "Hora inválida." },
   },
+  suenos: {
+    seccion: "Diário de sonhos",
+    titulo: "Interprete seu sonho",
+    intro: "Conte seu sonho como você lembra, sem organizá-lo demais. Sibila lê seus símbolos com a tradição clássica e os arquétipos, a emoção que deixou e, se você já interpretou outros sonhos, o fio que os une.",
+    cuentalo: "Seu sonho",
+    ejemplo: "Por exemplo: Eu estava na casa da minha infância, mas as portas davam para o mar. Procurava alguém e ouvia sua voz, mas cada quarto estava vazio…",
+    faltan: "Conte um pouco mais: faltam {n} caracteres",
+    alDespertar: "Como você se sentiu ao acordar",
+    emociones: { paz: "Paz", alegria: "Alegria", miedo: "Medo", angustia: "Angústia", tristeza: "Tristeza", confusion: "Confusão", nostalgia: "Nostalgia", deseo: "Desejo" },
+    esRecurrente: "É um sonho que se repete",
+    recurrente: "Sonho recorrente",
+    cuando: "Data do sonho",
+    interpretar: "Interpretar meu sonho",
+    leyendo: "Sibila está entrando no seu sonho…",
+    tuSueno: "Seu sonho",
+    conDiario: "Lido junto com {n} sonhos anteriores",
+    consejosTitulo: "Para lembrar melhor seus sonhos",
+    consejos: [
+      "Escreva assim que acordar, mesmo que sejam três frases: os detalhes somem em minutos.",
+      "Anote o que sentiu, não só o que aconteceu. A emoção é a chave do sonho.",
+      "Inclua os detalhes estranhos: cores, objetos fora de lugar, pessoas que não encaixam.",
+      "Cada sonho que você interpreta fica no seu diário e Sibila o lembra nos seguintes.",
+    ],
+    errores: { texto: "Conte seu sonho com um pouco mais de detalhe (pelo menos 20 caracteres).", fecha: "Data inválida." },
+  },
   cruce: {
     seccion: "Leitura premium",
     titulo: "Leituras cruzadas",
@@ -586,6 +615,7 @@ export const pt: Diccionario = {
       iching: { texto: "O I Ching disse como agir. O tarô mostra o terreno.", accion: "Fazer uma tiragem", href: "/tarot" },
       chino: { texto: "Seu animal fala do temperamento; seus números, do caminho. Cruze os dois.", accion: "Cruzar com numerologia", href: "/cruce" },
       cruce: { texto: "Quer ver como tudo isso se move hoje? Seu céu de hoje espera por você.", accion: "Ver meu céu hoje", href: "/hoy" },
+      suenos: { texto: "Seu sonho falou do que você sente. O tarot pode dizer o que fazer com isso.", accion: "Fazer uma tiragem", href: "/tarot" },
     },
   },
   preguntas: {

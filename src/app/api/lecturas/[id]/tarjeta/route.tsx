@@ -84,6 +84,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     simbolos = ["✦"];
     imagenes = [await monedaComoDataUri("animales", r.pilar.animal)];
     titulo = nombrePilar(r.pilar) + (r.animalHora ? ` · ${FICHA[r.animalHora].nombre}` : "");
+  } else if (tipo === "suenos") {
+    simbolos = ["☾"];
+    titulo = lectura.titulo;
   } else if (tipo === "cruce") {
     const sistemas = ((entrada.sistemas as string[] | undefined) ?? []).map((s) => (t.cruce.sistemas as Record<string, string>)[s] ?? s);
     simbolos = ["✦", "×", "✦"];
