@@ -24,7 +24,7 @@ export interface MazoRitual {
   nombre: string;
   descripcion: string;
   tamano: number;
-  estilo: "rider" | "marsella" | "angeles";
+  estilo: "rider" | "marsella" | "angeles" | "arcana";
 }
 
 type Fase = "preparar" | "barajar" | "elegir";

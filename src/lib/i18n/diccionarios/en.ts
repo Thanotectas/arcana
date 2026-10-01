@@ -229,6 +229,7 @@ export const en: Diccionario = {
     intro: "Choose your deck and your spread, shuffle and pick your cards.",
     eligeMazo: "Choose your deck",
     mazos: {
+      arcana: { nombre: "Arcana Tarot", descripcion: "Our own deck: 22 illustrated thresholds, luminous and full of emotion. Every card is a moment of passage." },
       rider: { nombre: "Rider-Waite", descripcion: "The classic 78-card tarot with a scene on every card. Ideal for beginners." },
       marsella: { nombre: "Marseille", descripcion: "The oldest European tradition. Minor arcana read by number and suit." },
       angeles: { nombre: "Angel Oracle", descripcion: "44 messages of guidance and comfort. No reversed cards; gentle and direct." },

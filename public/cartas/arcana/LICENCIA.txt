@@ -1,0 +1,4 @@
+Tarot Arcana (Los 22 Umbrales): ilustraciones propias de Arcana, generadas con IA por el dueño del
+proyecto (octubre de 2026) a partir de cuadrículas con un estilo maestro único, recortadas con sharp
+y guardadas a 500×750. Los textos de las cartas están en src/lib/tarot/arcana.ts. El dorso es
+dorso.webp. Uso exclusivo de Arcana (miarcana.com).

@@ -36,7 +36,7 @@ export function TiradaInteractiva({
 }: {
   cartas: CartaRevelada[];
   ocultas: boolean;
-  estilo?: "rider" | "marsella" | "angeles";
+  estilo?: "rider" | "marsella" | "angeles" | "arcana";
 }) {
   const { t } = useT();
   const [volteadas, setVolteadas] = useState<boolean[]>(() => cartas.map(() => !ocultas));

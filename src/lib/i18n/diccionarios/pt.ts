@@ -226,6 +226,7 @@ export const pt: Diccionario = {
     intro: "Escolha seu baralho e sua tiragem, embaralhe e escolha suas cartas.",
     eligeMazo: "Escolha seu baralho",
     mazos: {
+      arcana: { nombre: "Tarot Arcana", descripcion: "Nosso baralho próprio: 22 umbrais ilustrados, luminosos e cheios de emoção. Cada carta é um momento de passagem." },
       rider: { nombre: "Rider-Waite", descripcion: "O tarot clássico de 78 cartas com cenas em cada arcano. Ideal para começar." },
       marsella: { nombre: "Marselha", descripcion: "A tradição europeia mais antiga. Arcanos menores lidos por número e naipe." },
       angeles: { nombre: "Oráculo dos Anjos", descripcion: "44 mensagens de orientação e consolo. Sem cartas invertidas; suave e direto." },

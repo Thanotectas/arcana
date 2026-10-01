@@ -228,6 +228,7 @@ export const es = {
     intro: "Elige tu mazo y tu tirada, baraja y escoge tus cartas.",
     eligeMazo: "Elige tu mazo",
     mazos: {
+      arcana: { nombre: "Tarot Arcana", descripcion: "Nuestro mazo propio: 22 umbrales ilustrados, luminosos y llenos de emoción. Cada carta es un momento de paso." },
       rider: { nombre: "Rider-Waite", descripcion: "El tarot clásico de 78 cartas con escenas en cada arcano. Ideal para empezar." },
       marsella: { nombre: "Marsella", descripcion: "La tradición europea más antigua. Arcanos menores leídos por número y palo." },
       angeles: { nombre: "Oráculo de los Ángeles", descripcion: "44 mensajes de guía y consuelo. Sin cartas invertidas; suave y directo." },

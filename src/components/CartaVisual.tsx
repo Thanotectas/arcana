@@ -5,9 +5,12 @@ const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X
 const SIMBOLO_PALO: Record<string, string> = { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" };
 const NOMBRE_CORTE: Record<number, string> = { 11: "Sota", 12: "Caballero", 13: "Reina", 14: "Rey" };
 
-/** Ruta de la ilustración real de la carta (solo el Rider-Waite tiene imágenes). */
+/** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). */
+export const MAZOS_CON_IMAGEN: ReadonlySet<IdMazo> = new Set<IdMazo>(["rider", "arcana"]);
+
+/** Ruta de la ilustración real de la carta, si el mazo la tiene. */
 export function imagenCarta(carta: CartaTarot, mazo: IdMazo = "rider") {
-  return mazo === "rider" ? `/cartas/rider/${carta.id}.webp` : undefined;
+  return MAZOS_CON_IMAGEN.has(mazo) ? `/cartas/${mazo}/${carta.id}.webp` : undefined;
 }
 
 /** Número o rango que va arriba de la carta y símbolo central. */
@@ -41,7 +44,7 @@ export function CaraCarta({
   simbolo: string;
   invertida: boolean;
   compacta?: boolean;
-  estilo?: "rider" | "marsella" | "angeles";
+  estilo?: "rider" | "marsella" | "angeles" | "arcana";
   /** En Marsella, los arcanos menores muestran tantos símbolos como su número. */
   repeticiones?: number;
   /** Ilustración real de la carta; si existe, reemplaza el dibujo con símbolos. */

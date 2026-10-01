@@ -377,6 +377,18 @@ body {
     linear-gradient(180deg, #2b3a7a, #141a3d);
   border-color: rgba(191, 210, 255, 0.7);
 }
+.dorso-carta.estilo-arcana {
+  background: #1a0f33 url("/cartas/arcana/dorso.webp") center / cover no-repeat;
+  border-color: rgba(217, 180, 90, 0.75);
+}
+.carta-tarot.estilo-arcana,
+.dorso-carta.estilo-arcana {
+  aspect-ratio: 2 / 3; /* las ilustraciones propias son 500×750 */
+}
+.carta-tarot.estilo-arcana {
+  border-color: rgba(217, 180, 90, 0.75);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(139, 108, 246, 0.25);
+}
 .carta-tarot.estilo-marsella {
   background:
     linear-gradient(180deg, rgba(255, 244, 214, 0.06), transparent 40%),

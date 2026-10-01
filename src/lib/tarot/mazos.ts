@@ -1,11 +1,12 @@
 import { MAZO, type CartaTarot } from "./deck";
 import { ORACULO_ANGELES } from "./oraculo-angeles";
+import { TAROT_ARCANA } from "./arcana";
 
 /**
  * Mazos disponibles. Rider-Waite y Marsella comparten ids de carta (misma
  * estructura de 78); el Oráculo de los Ángeles tiene 44 cartas propias.
  */
-export type IdMazo = "rider" | "marsella" | "angeles";
+export type IdMazo = "rider" | "marsella" | "angeles" | "arcana";
 
 export interface Mazo {
   id: IdMazo;
@@ -14,7 +15,7 @@ export interface Mazo {
   /** Si el mazo admite cartas invertidas. */
   conInvertidas: boolean;
   /** Estilo visual de la cara de la carta. */
-  estilo: "rider" | "marsella" | "angeles";
+  estilo: "rider" | "marsella" | "angeles" | "arcana";
   /** Instrucciones de tradición para el modelo. */
   tradicion: string;
 }
@@ -62,6 +63,15 @@ export const MAZOS: Record<IdMazo, Mazo> = {
     estilo: "marsella",
     tradicion:
       "Tradición del Tarot de Marsella: La Justicia es el arcano VIII y La Fuerza el XI; La Papisa, El Papa, El Enamorado, El Arcano sin nombre (XIII) y La Casa de Dios (XVI) conservan sus nombres marselleses. Los arcanos menores no tienen escenas: interprétalos por la numerología del número (1 potencial, 2 acumulación, 3 impulso, 4 estabilidad, 5 tránsito, 6 belleza, 7 acción, 8 perfección, 9 crisis, 10 fin de ciclo) combinada con el palo (bastos energía y creatividad, copas emoción, espadas mente y palabra, oros cuerpo y dinero). Da peso a la mirada de las figuras y a la dirección hacia la que apuntan dentro de la tirada.",
+  },
+  arcana: {
+    id: "arcana",
+    nombre: "Tarot Arcana",
+    cartas: TAROT_ARCANA,
+    conInvertidas: true,
+    estilo: "arcana",
+    tradicion:
+      "Tarot Arcana (Los 22 Umbrales): mazo propio de Arcana con 22 arcanos mayores reinterpretados. Cada carta equivale a un arcano clásico con el mismo número (El Viajero = El Loco, El Alquimista = El Mago, La Sibila = La Sacerdotisa, El Jardín = La Emperatriz, El Guardián = El Emperador, El Maestro = El Hierofante, El Encuentro = Los Enamorados, El Impulso = El Carro, La Serena = La Fuerza, La Linterna = El Ermitaño, La Rueda del Cielo = La Rueda de la Fortuna, La Balanza = La Justicia, El Suspendido = El Colgado, La Metamorfosis = La Muerte, El Río = La Templanza, La Sombra = El Diablo, El Relámpago = La Torre, La Estrella, La Luna, El Sol, El Despertar = El Juicio, El Cosmos = El Mundo). Usa siempre los nombres del Tarot Arcana, nunca los clásicos. Lee cada carta como un umbral: el momento de paso que describe y lo que pide a la persona. Las imágenes son luminosas y esperanzadoras incluso en las cartas difíciles: La Sombra muestra cadenas que se deshacen, El Relámpago una liberación, La Metamorfosis un renacer. Respeta las inversiones como bloqueo, exceso o interiorización de la energía de la carta.",
   },
   angeles: {
     id: "angeles",

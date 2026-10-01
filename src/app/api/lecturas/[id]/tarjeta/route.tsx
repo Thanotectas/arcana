@@ -7,6 +7,7 @@ import { imagenTarjeta, extractoDe } from "@/lib/marca/tarjeta";
 import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
+import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
 import { FICHA, nombrePilar, type ResultadoChino } from "@/lib/chino";
@@ -50,7 +51,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
     const cartas = cartasDeTirada((resultado.cartas as CartaTirada[]) ?? [], mazo);
     titulo = cartas.map((c) => c.carta.nombre).join(" · ");
-    if (mazo === "rider") imagenes = await Promise.all(cartas.slice(0, 3).map((c) => cartaComoDataUri(c.carta.id)));
+    if (MAZOS_CON_IMAGEN.has(mazo)) imagenes = await Promise.all(cartas.slice(0, 3).map((c) => cartaComoDataUri(mazo, c.carta.id)));
     simbolos = cartas.slice(0, 4).map((c) => (c.carta.arcano === "mayor" ? "✦" : { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" }[c.carta.palo ?? "bastos"]));
     void (tipo as TipoTirada);
   } else if (tipo === "carta_astral") {
@@ -111,8 +112,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 /** Ilustración de una carta como data URI PNG (el motor de la tarjeta no lee WebP). Si falta, devuelve "". */
-function cartaComoDataUri(id: string) {
-  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "rider", `${id}.webp`));
+function cartaComoDataUri(mazo: IdMazo, id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", mazo, `${id}.webp`), undefined, 527);
 }
 
 /** Moneda dorada (signo occidental o animal chino) como data URI PNG, reducida para la tarjeta. */
@@ -120,11 +121,11 @@ function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), 260);
 }
 
-async function webpComoDataUri(ruta: string, lado?: number) {
+async function webpComoDataUri(ruta: string, lado?: number, alto?: number) {
   try {
     const webp = await readFile(ruta);
     const base = sharp(webp);
-    const png = await (lado ? base.resize(lado, lado) : base).png().toBuffer();
+    const png = await (lado ? base.resize(lado, lado) : alto ? base.resize({ height: alto }) : base).png().toBuffer();
     return `data:image/png;base64,${png.toString("base64")}`;
   } catch {
     return "";
