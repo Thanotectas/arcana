@@ -73,7 +73,8 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
         memoriaDeLaPersona(supabase, user.id, { excluirLectura: id }).catch(() => ""),
       ]);
       const texto = await generarTexto(usuario, [sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), opciones, enviar);
-      await admin.from("lecturas").update({ interpretacion: texto, estado: "lista" }).eq("id", id);
+      const { data: cerrada } = await admin.rpc("finalizar_generacion", { p_lectura: id, p_texto: texto });
+      if (!cerrada) console.warn("[lecturas] la lectura ya no estaba generando al terminar (reembolsada o reclamada de nuevo)", id);
     } catch (e) {
       const codigo = clasificarError(e);
       console.error(`[lecturas] generación fallida (${codigo})`, id, e instanceof Error ? e.message : e);

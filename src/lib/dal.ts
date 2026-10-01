@@ -1,7 +1,9 @@
 import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { createClient } from "./supabase/server";
+import { getSupabaseAdmin } from "./supabase/admin";
 import type { TipoLectura } from "./creditos";
 
 export interface Perfil {
@@ -108,18 +110,12 @@ export async function getLectura(id: string): Promise<Lectura | null> {
   return (data as Lectura | null) ?? null;
 }
 
-/** Cuántas cartas del día ha sacado el usuario hoy (fecha UTC). */
-export async function cartasDelDiaHoy(): Promise<number> {
+/** ¿La persona aún puede sacar su carta del día gratis hoy? (día local; ilimitados siempre) */
+export const cartaDiaDisponible = cache(async (): Promise<boolean> => {
   const supabase = await createClient();
-  const inicio = new Date();
-  inicio.setUTCHours(0, 0, 0, 0);
-  const { count } = await supabase
-    .from("lecturas")
-    .select("id", { count: "exact", head: true })
-    .eq("tipo", "tarot_carta")
-    .gte("creado_en", inicio.toISOString());
-  return count ?? 0;
-}
+  const { data } = await supabase.rpc("carta_dia_disponible");
+  return Boolean(data);
+});
 
 export async function getOrdenes(limite = 20): Promise<Orden[]> {
   const supabase = await createClient();
@@ -154,12 +150,15 @@ export async function getResumenInvitaciones(): Promise<ResumenInvitaciones> {
   return { invitados: fila?.invitados ?? 0, premiadas: fila?.premiadas ?? 0, creditos_ganados: fila?.creditos_ganados ?? 0 };
 }
 
-/** Lecturas escritas en los últimos 7 días (público). */
-export async function getContadorLecturas(): Promise<number> {
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("contador_lecturas");
-  return typeof data === "number" ? data : 0;
-}
+/** Lecturas escritas en los últimos 7 días (público; cacheado 10 min para no barrer la tabla por visita). */
+export const getContadorLecturas = unstable_cache(
+  async (): Promise<number> => {
+    const { data } = await getSupabaseAdmin().rpc("contador_lecturas");
+    return typeof data === "number" ? data : 0;
+  },
+  ["contador-lecturas"],
+  { revalidate: 600 },
+);
 
 export async function getHaComprado(): Promise<boolean> {
   const supabase = await createClient();

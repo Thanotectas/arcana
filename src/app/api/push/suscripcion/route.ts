@@ -31,9 +31,8 @@ export async function POST(request: Request) {
   const [idioma, h] = await Promise.all([getIdioma(), headers()]);
   const agente = (h.get("user-agent") ?? "").slice(0, 200);
 
-  // El endpoint es único: si ya existía (mismo navegador), se reemplaza.
-  await supabase.from("suscripciones_push").delete().eq("endpoint", endpoint);
-  const { error } = await supabase.from("suscripciones_push").insert({ usuario_id: user.id, endpoint, p256dh, auth, idioma, agente });
+  // registrar_push: reemplaza el endpoint aunque fuera de otra cuenta (el navegador cambió de dueño) y limita a 10 dispositivos.
+  const { error } = await supabase.rpc("registrar_push", { p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth, p_idioma: idioma, p_agente: agente });
   if (error) {
     console.error("[push] no se guardó la suscripción", error.message);
     return Response.json({ error: "guardar" }, { status: 500 });

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { requerirUsuario, getPerfil, cartasDelDiaHoy } from "@/lib/dal";
+import { requerirUsuario, getPerfil, cartaDiaDisponible } from "@/lib/dal";
 import { TIRADAS, POSICIONES_I18N, tamanoMazo, type TipoTirada } from "@/lib/tarot/tiradas";
 import { IDS_MAZO, MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
-import { COSTOS, CARTAS_DIA_GRATIS } from "@/lib/creditos";
+import { COSTOS } from "@/lib/creditos";
 import { RitualTarot, type TiradaRitual, type MazoRitual } from "@/components/RitualTarot";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
@@ -15,10 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PaginaTarot({ searchParams }: { searchParams: Promise<{ tirada?: string; mazo?: string }> }) {
   await requerirUsuario();
   const { tirada, mazo } = await searchParams;
-  const [perfil, cartasHoy, t, idioma] = await Promise.all([getPerfil(), cartasDelDiaHoy(), getT(), getIdioma()]);
+  const [perfil, cartaDisponible, t, idioma] = await Promise.all([getPerfil(), cartaDiaDisponible(), getT(), getIdioma()]);
   const inicial: TipoTirada = tirada && tirada in TIRADAS ? (tirada as TipoTirada) : "tarot_tres";
   const mazoInicial: IdMazo = esMazo(mazo) ? mazo : "rider";
-  const cartaDisponible = Boolean(perfil?.ilimitado) || cartasHoy < CARTAS_DIA_GRATIS;
 
   const tiradas: TiradaRitual[] = (Object.keys(TIRADAS) as TipoTirada[]).map((id) => ({
     id,

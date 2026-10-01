@@ -5,10 +5,9 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generarTexto } from "@/lib/ia";
 import { construirPrompt } from "@/lib/lecturas/prompts";
 import { marcaError, type CodigoErrorLectura } from "@/lib/lecturas/marcas";
-import { CIRCULO, COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
-import { circuloActivo } from "@/lib/dal";
 import { memoriaDeLaPersona } from "@/lib/lecturas/memoria";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
+import { datoDeUsuario } from "@/lib/seguridad";
 
 export const maxDuration = 120;
 
@@ -43,10 +42,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return Response.json({ error: "lectura_no_lista" }, { status: 409 });
   }
 
-  const inicioDia = new Date();
-  inicioDia.setUTCHours(0, 0, 0, 0);
-  const [{ data: perfil }, { data: previas }, { count: hoyEnCirculo }] = await Promise.all([
-    supabase.from("perfiles").select("ilimitado, circulo_hasta").eq("id", user.id).maybeSingle(),
+  // La decisión de cobro (1 gratis por lectura, Círculo hasta 15 al día, resto 1 crédito)
+  // y la creación de la pregunta se hacen juntas en la base (crear_pregunta).
+  const [{ data: creada, error: errorCrear }, { data: previas }] = await Promise.all([
+    supabase.rpc("crear_pregunta", { p_lectura: id, p_pregunta: pregunta }),
     supabase
       .from("preguntas_lectura")
       .select("pregunta, respuesta, estado")
@@ -54,38 +53,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq("estado", "lista")
       .order("creado_en", { ascending: true })
       .limit(8),
-    supabase.from("preguntas_lectura").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).gte("creado_en", inicioDia.toISOString()),
   ]);
-  const hechas = previas?.length ?? 0;
-  // Círculo Arcana: preguntas sin cobro hasta el tope diario.
-  const enCirculo = circuloActivo(perfil) && (hoyEnCirculo ?? 0) < CIRCULO.preguntasPorDia;
-  const gratis = Boolean(perfil?.ilimitado) || enCirculo || hechas < PREGUNTAS_GRATIS_POR_LECTURA;
-  const costo = gratis ? 0 : COSTO_PREGUNTA;
-
-  if (costo > 0) {
-    const { data: ok, error } = await supabase.rpc("consumir_creditos", {
-      p_cantidad: costo,
-      p_motivo: "pregunta:lectura",
-      p_referencia: id,
-    });
-    if (error) return Response.json({ error: "cobro" }, { status: 500 });
-    if (!ok) return Response.json({ error: "sin_creditos" }, { status: 402 });
-  }
-
-  const admin = getSupabaseAdmin();
-  const { data: fila, error: errorInsert } = await admin
-    .from("preguntas_lectura")
-    .insert({ lectura_id: id, usuario_id: user.id, pregunta, creditos_usados: costo })
-    .select("id")
-    .single();
-  if (errorInsert || !fila) {
-    if (costo > 0) {
-      // Devolvemos el crédito: la pregunta nunca se creó.
-      const { data: p } = await admin.from("perfiles").select("creditos").eq("id", user.id).single();
-      if (p) await admin.from("perfiles").update({ creditos: p.creditos + costo }).eq("id", user.id);
-    }
+  if (errorCrear) {
+    console.error("[preguntas] no se pudo crear la pregunta", errorCrear.message);
     return Response.json({ error: "guardar" }, { status: 500 });
   }
+  const fila = creada?.[0];
+  if (!fila) return Response.json({ error: "sin_creditos" }, { status: 402 });
+  const costo = fila.costo;
+  const admin = getSupabaseAdmin();
 
   const codificador = new TextEncoder();
   let controlador!: ReadableStreamDefaultController<Uint8Array>;
@@ -123,18 +99,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         memoriaDeLaPersona(supabase, user.id, { excluirLectura: id }).catch(() => ""),
       ]);
       const historial = (previas ?? [])
-        .map((p) => `Pregunta anterior: ${p.pregunta}\nRespuesta anterior: ${p.respuesta ?? ""}`)
+        .map((p) => `Pregunta anterior: ${datoDeUsuario(p.pregunta)}\nRespuesta anterior: ${p.respuesta ?? ""}`)
         .join("\n\n");
       const usuario =
         `Contexto de la consulta original (datos que se usaron para la lectura):\n${base.usuario}\n\n` +
         `Lectura que ya recibió la persona:\n${lectura.interpretacion}\n\n` +
         (historial ? `Conversación posterior:\n${historial}\n\n` : "") +
-        `Nueva pregunta de la persona: ${pregunta}\n\n` +
+        `Nueva pregunta de la persona: ${datoDeUsuario(pregunta)}\n\n` +
         `Responde solo a esta pregunta, apoyándote en los símbolos de su lectura (cita la carta, el planeta, el número o la línea que corresponda). ` +
         `Sé concreta y cálida, sin repetir la lectura. Si la pregunta se sale del tema esotérico o pide diagnóstico médico, legal o financiero, dilo con amabilidad y redirige. ` +
         `Extensión: 120 a 220 palabras. Sin título; puedes usar un par de párrafos.`;
       const texto = await generarTexto(usuario, [base.sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), { idioma, effort: "low", maxTokens: 900 }, enviar);
-      await admin.from("preguntas_lectura").update({ respuesta: texto, estado: "lista" }).eq("id", fila.id);
+      await admin.rpc("finalizar_pregunta", { p_pregunta: fila.id, p_texto: texto });
     } catch (e) {
       const codigo = clasificarError(e);
       console.error(`[preguntas] fallo (${codigo})`, fila.id, e instanceof Error ? e.message : e);
