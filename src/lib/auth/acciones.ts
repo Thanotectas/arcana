@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
 import { aplicarInvitacionPendiente } from "../invitaciones";
+import { rutaInterna } from "../seguridad";
 
 export interface EstadoAuth {
   error?: string;
@@ -18,8 +19,7 @@ function urlBase(h: Headers) {
 }
 
 function destinoSeguro(v: FormDataEntryValue | null) {
-  const s = String(v ?? "");
-  return s.startsWith("/") && !s.startsWith("//") ? s : "/inicio";
+  return rutaInterna(String(v ?? ""));
 }
 
 /** Inicia sesión (o crea la cuenta) con Google y vuelve a /auth/callback. */

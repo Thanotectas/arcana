@@ -1,13 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { aplicarInvitacionPendiente } from "@/lib/invitaciones";
+import { rutaInterna } from "@/lib/seguridad";
 
 /** Intercambia el código de confirmación/recuperación por una sesión. */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const siguiente = searchParams.get("siguiente") ?? "/inicio";
-  const destino = siguiente.startsWith("/") && !siguiente.startsWith("//") ? siguiente : "/inicio";
+  const destino = rutaInterna(searchParams.get("siguiente"));
 
   if (code) {
     const supabase = await createClient();

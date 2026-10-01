@@ -1,3 +1,4 @@
+import { datoDeUsuario } from "../seguridad";
 import "server-only";
 import type { OpcionesTexto, ImagenEntrada } from "../ia";
 import type { TipoLectura } from "../creditos";
@@ -39,7 +40,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const tipo = l.tipo as TipoTirada;
     const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
     const cartas = (resultado.cartas ?? []) as CartaTirada[];
-    const pregunta = String(entrada.pregunta ?? "");
+    const pregunta = datoDeUsuario(entrada.pregunta, 300);
     const extension =
       tipo === "tarot_carta"
         ? " Sé breve: máximo 250 palabras."
@@ -74,7 +75,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const describir = (n: number) => `${n} (${SIGNIFICADO_NUMERO[n]?.titulo ?? ""}: ${SIGNIFICADO_NUMERO[n]?.resumen ?? ""})`;
     return {
       usuario:
-        `Interpreta este perfil numerológico pitagórico.\n\nNombre: ${String(entrada.nombre ?? "")}\nFecha de nacimiento: ${String(entrada.fecha ?? "")}\n` +
+        `Interpreta este perfil numerológico pitagórico.\n\nNombre: ${datoDeUsuario(entrada.nombre, 120)}\nFecha de nacimiento: ${String(entrada.fecha ?? "")}\n` +
         `Camino de vida: ${describir(perfil.caminoDeVida)}\nNúmero de expresión: ${describir(perfil.expresion)}\n` +
         `Impulso del alma: ${describir(perfil.almaOImpulso)}\nPersonalidad: ${describir(perfil.personalidad)}\n` +
         `Número de cumpleaños: ${describir(perfil.cumpleanos)}\nAño personal actual: ${perfil.anioPersonal}\n\n` +
@@ -99,7 +100,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
 
   if (l.tipo === "iching") {
     const r = resultado as unknown as ResultadoIChing;
-    const pregunta = String(entrada.pregunta ?? "");
+    const pregunta = datoDeUsuario(entrada.pregunta, 300);
     return {
       usuario:
         `Interpreta esta consulta al I Ching.\n\n${resumenIChing(r, pregunta)}\n\n` +
@@ -116,8 +117,8 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
   const a = signoPorId(String(resultado.signoA));
   const b = signoPorId(String(resultado.signoB));
   if (!a || !b) throw new Error("Lectura de compatibilidad incompleta.");
-  const nombreA = String(entrada.nombreA ?? "Persona A");
-  const nombreB = String(entrada.nombreB ?? "Persona B");
+  const nombreA = datoDeUsuario(entrada.nombreA, 80) || "Persona A";
+  const nombreB = datoDeUsuario(entrada.nombreB, 80) || "Persona B";
   return {
     usuario:
       `Analiza la compatibilidad astrológica entre ${nombreA} (${a.nombre}, ${a.elemento}, ${a.modalidad}, regente ${a.regente}) y ${nombreB} (${b.nombre}, ${b.elemento}, ${b.modalidad}, regente ${b.regente}). ` +

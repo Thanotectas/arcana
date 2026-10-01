@@ -4,13 +4,13 @@ import type { Metadata } from "next";
 import { FormularioRegistro } from "@/components/FormularioAuth";
 import { accionRegistrar } from "@/lib/auth/acciones";
 import { BotonGoogle } from "@/components/BotonGoogle";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { Aviso } from "@/components/Aviso";
 import { BONO_INVITADO, codigoInvitacionPendiente, nombreInvitador } from "@/lib/invitaciones";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ inv?: string }> }): Promise<Metadata> {
-  const [{ inv }, t] = await Promise.all([searchParams, getT()]);
+  const [{ inv }, t, idioma] = await Promise.all([searchParams, getT(), getIdioma()]);
   const codigo = inv && /^[A-Z0-9]{4,12}$/i.test(inv) ? inv.toUpperCase() : null;
   if (!codigo) return { title: t.auth.registroTitulo };
   const invitador = await nombreInvitador(codigo);
@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     ? plantilla(t.invitar.ogTitulo, { nombre: invitador })
     : t.invitar.ogTituloSinNombre;
   const descripcion = plantilla(t.invitar.ogDescripcion, { bono: BONO_INVITADO });
-  const imagen = `/api/og?t=${encodeURIComponent(titulo)}&s=${encodeURIComponent(descripcion)}`;
+  const imagen = `/api/og?inv=${codigo}&idioma=${idioma}`;
   return {
     title: titulo,
     description: descripcion,

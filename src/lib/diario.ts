@@ -10,6 +10,7 @@ import { circuloActivo, type Perfil } from "./dal";
 import { fechaLarga } from "./i18n/formato";
 import type { Idioma } from "./i18n/idiomas";
 import { memoriaDeLaPersona } from "./lecturas/memoria";
+import { datoDeUsuario } from "./seguridad";
 
 /**
  * "Tu cielo hoy": mensaje personal diario a partir de los tránsitos sobre la
@@ -85,7 +86,7 @@ export async function getMensajeDeHoy(perfil: Perfil, idioma: Idioma, cliente?: 
 
   const memoria = await memoriaDeLaPersona(supabase, perfil.id, { maximo: 2 });
   const usuario =
-    `${resumenCieloDeHoy(cielo, datos.nombre || "la persona", fechaLarga(`${fecha}T12:00:00`, idioma))}\n\n` +
+    `${resumenCieloDeHoy(cielo, datoDeUsuario(datos.nombre, 80) || "la persona", fechaLarga(`${fecha}T12:00:00`, idioma))}\n\n` +
     `Escribe el mensaje personal de hoy para esta persona a partir de sus tránsitos reales. ` +
     `Estructura: un título corto y evocador (##), un párrafo sobre el clima del día (qué tránsito manda y cómo se siente), ` +
     `un párrafo práctico (dónde poner la atención, qué conviene y qué no), y una última línea que empiece con "Hoy:" con una intención breve. ` +

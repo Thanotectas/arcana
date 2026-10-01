@@ -48,9 +48,9 @@ export async function POST(request: Request) {
     const total = Number(evento.data.amount?.total);
     const montoPesos = Number(orden.monto_centavos) / 100;
     const moneda = evento.data.amount?.currency ?? orden.moneda;
-    if (!(total === montoPesos || total === Number(orden.monto_centavos)) || moneda !== orden.moneda) {
+    if (total !== montoPesos || moneda !== orden.moneda) {
       console.error("[bold] monto no coincide", referencia, orden.monto_centavos, total, moneda);
-      await admin.from("ordenes").update({ estado: "error", transaccion_id: transaccionId }).eq("id", orden.id);
+      await admin.from("ordenes").update({ estado: "error", transaccion_id: transaccionId }).eq("id", orden.id).eq("estado", "pendiente");
       return NextResponse.json({ ok: false, motivo: "monto" });
     }
     const { error } = await admin.rpc("acreditar_orden", {

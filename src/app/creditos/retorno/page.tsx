@@ -29,7 +29,7 @@ export default async function PaginaRetorno({
   if (orden && orden.estado === "pendiente") {
     const venta = await consultarVenta(orden.referencia);
     const montoPesos = Number(orden.monto_centavos) / 100;
-    if (venta?.estado === "APPROVED" && (venta.total === null || venta.total === montoPesos)) {
+    if (venta?.estado === "APPROVED" && venta.total === montoPesos) {
       await getSupabaseAdmin().rpc("acreditar_orden", {
         p_referencia: orden.referencia,
         p_transaccion_id: venta.transaccionId ?? orden.referencia,

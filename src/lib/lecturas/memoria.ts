@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { NOMBRES_LECTURA } from "@/lib/creditos";
+import { datoDeUsuario } from "@/lib/seguridad";
 
 /**
  * Memoria de la persona para el modelo: nombre, cielo natal (si dio sus
@@ -46,9 +47,9 @@ export async function memoriaDeLaPersona(
   const lineas: string[] = [];
   if (perfil?.nombre) {
     lineas.push(
-      `Nombre de la persona: ${perfil.nombre}` +
+      `Nombre de la persona: ${datoDeUsuario(perfil.nombre, 80)}` +
         (perfil.fecha_nacimiento ? `, nacida el ${perfil.fecha_nacimiento}` : "") +
-        (perfil.lugar_nacimiento ? ` en ${perfil.lugar_nacimiento}` : "") +
+        (perfil.lugar_nacimiento ? ` en ${datoDeUsuario(perfil.lugar_nacimiento, 120)}` : "") +
         ".",
     );
   }
@@ -56,7 +57,7 @@ export async function memoriaDeLaPersona(
     lineas.push("Consultas anteriores de esta persona (de la más reciente a la más antigua):");
     for (const l of previas) {
       const tipo = NOMBRES_LECTURA[l.tipo as keyof typeof NOMBRES_LECTURA] ?? l.tipo;
-      lineas.push(`- ${l.creado_en.slice(0, 10)} · ${l.titulo} (${tipo}): ${extractoPlano(l.interpretacion ?? "")}`);
+      lineas.push(`- ${l.creado_en.slice(0, 10)} · ${datoDeUsuario(l.titulo, 120)} (${tipo}): ${extractoPlano(l.interpretacion ?? "")}`);
     }
   }
   if (!lineas.length) return "";

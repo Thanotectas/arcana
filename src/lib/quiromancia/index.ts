@@ -1,3 +1,4 @@
+import { datoDeUsuario } from "../seguridad";
 /**
  * Quiromancia occidental: nombres de líneas y montes, y utilidades para
  * separar el anexo de coordenadas que el modelo añade al final de la lectura.
@@ -60,7 +61,7 @@ export function resumenQuiromancia(e: EntradaQuiromancia) {
     e.mano === e.dominante
       ? "Es la mano dominante: en la tradición representa lo que la persona construye y su presente."
       : "No es la mano dominante: en la tradición representa lo innato, el potencial y lo heredado.",
-    `Pregunta de la persona: ${e.pregunta || "(sin pregunta específica)"}`,
+    `Pregunta de la persona: ${datoDeUsuario(e.pregunta, 300) || "(sin pregunta específica)"}`,
   ];
   return lineas.join("\n");
 }

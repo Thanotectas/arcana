@@ -1,6 +1,7 @@
 /**
  * Construcción de la carta astral completa: posiciones, casas y aspectos.
  */
+import { datoDeUsuario } from "../seguridad";
 import { posiciones, type Cuerpo, type PosicionCuerpo } from "./efemerides";
 import { NOMBRES_CUERPO, NOMBRES_ASPECTO, type TipoAspecto } from "./textos";
 export { NOMBRES_ASPECTO, SIMBOLOS_ASPECTO, type TipoAspecto } from "./textos";
@@ -157,8 +158,8 @@ export function calcularCarta(datos: DatosNacimiento): CartaAstral {
 /** Resumen en texto plano para enviarlo al modelo de IA. */
 export function resumenCarta(c: CartaAstral) {
   const lineas: string[] = [];
-  lineas.push(`Nombre: ${c.datos.nombre}`);
-  lineas.push(`Nacimiento: ${c.datos.fecha} ${c.datos.horaDesconocida ? "(hora desconocida, se usó mediodía)" : c.datos.hora} en ${c.datos.lugar}`);
+  lineas.push(`Nombre: ${datoDeUsuario(c.datos.nombre, 80)}`);
+  lineas.push(`Nacimiento: ${c.datos.fecha} ${c.datos.horaDesconocida ? "(hora desconocida, se usó mediodía)" : c.datos.hora} en ${datoDeUsuario(c.datos.lugar, 120)}`);
   lineas.push(`Ascendente: ${c.ascendente.signo.nombre} ${c.ascendente.grado}`);
   lineas.push(`Medio Cielo: ${c.medioCielo.signo.nombre} ${c.medioCielo.grado}`);
   lineas.push("Planetas:");

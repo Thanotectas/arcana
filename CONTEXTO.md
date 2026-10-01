@@ -102,8 +102,26 @@ Qué trae:
 - **PWA**: `src/app/manifest.ts` e íconos PNG en `public/marca/icono-{192,512}.png`. En iPhone los avisos solo funcionan con Arcana añadida a la pantalla de inicio; el componente lo explica.
 - El idioma de la persona se guarda en `perfiles.idioma` al cambiarlo o al activar el aviso (el cron escribe el mensaje en ese idioma).
 - **Variables nuevas en Vercel**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (mailto:), `CRON_SECRET`. Sin las VAPID, el botón de aviso no aparece y el cron solo pregenera mensajes. Se generan con `npx web-push generate-vapid-keys`.
-- Migración pendiente además de las anteriores: `0011_push.sql`.
+- Migración pendiente además de las anteriores: `0011_push.sql`. Tras la auditoría: `0012_endurecimiento.sql`. El código que usa sus funciones nuevas (`crear_pregunta`, `reservar_carta_dia`, `finalizar_generacion`, `registrar_push`, `reintentar_lectura`, `devolver_creditos`) vive en la rama `endurecimiento` y se fusiona a `main` solo después de aplicar la 0012; lo demás del endurecimiento ya está en `main`.
 - Siguiente paso: canal de WhatsApp diario (API de WhatsApp Business de Meta; requiere cuenta verificada y plantilla aprobada).
+
+## Auditoría de seguridad y endurecimiento (1 oct 2026)
+
+Se revisó todo el código y las migraciones. Lo corregido (migración `0012_endurecimiento.sql` + código):
+
+- **Webhook de Bold** (`src/lib/pagos/bold.ts`): ya no acepta la firma con llave vacía salvo `BOLD_ACEPTAR_FIRMA_VACIA=1` fuera del despliegue de producción de Vercel. Antes, si `BOLD_ENV` no era exactamente `production`, cualquiera podía acreditarse créditos forjando el webhook. El webhook ya solo compara el monto en pesos y no pisa órdenes ya aprobadas; el retorno exige que Bold devuelva el monto.
+- **Redirección abierta** tras el login (`volver`, `siguiente`): `rutaInterna()` en `src/lib/seguridad.ts` rechaza `//`, `/\` y rutas que normalizan a otro origen.
+- **Inyección de prompt**: lo que escribe la persona (pregunta, nombre, lugar, títulos en la memoria) entra al modelo delimitado con «…» y sin saltos de línea ni encabezados (`datoDeUsuario()`), y el sistema instruye a tratarlo como dato. Importa porque la síntesis acaba en tarjetas con marca.
+- **Decisiones de cobro en la base, atómicas**: `crear_pregunta` (1 gratis por lectura, Círculo hasta 15/día, resto 1 crédito), `reservar_carta_dia` / `carta_dia_disponible` (tabla `cartas_dia`, día local de la persona), `reintentar_lectura`, `devolver_creditos`, `finalizar_generacion` / `finalizar_pregunta` (solo cierran desde `generando`/`pendiente`: una lectura reembolsada no revive). `acreditar_orden` y `aplicar_invitacion` bloquean la fila del perfil (bono de primera compra y tope de invitaciones sin carreras). `reclamar_generacion` espera 6 minutos (más que `maxDuration`).
+- **Créditos de bienvenida solo con correo confirmado** (`bienvenida_dada`, trigger `bienvenida_al_confirmar`); las invitaciones también exigen correo confirmado. Las cuentas de Google llegan confirmadas.
+- **Permisos retirados**: borrado directo de lecturas, inserción directa de suscripciones push (ahora `registrar_push`, que además pasa el navegador al nuevo dueño y limita a 10 dispositivos), `generar_codigo_invitacion` para anon, `es_prueba` y `metodo_pago` en la política de órdenes, motivos libres en `consumir_creditos`.
+- **Otros**: `/api/og` solo genera la imagen de invitación a partir del código (nadie puede fabricar imágenes con la marca y su texto); `/api/lugares` exige sesión; cookie `invitacion` httpOnly; foto de la palma verificada por bytes mágicos; comparación constante del `CRON_SECRET`; referencias de orden con `crypto`; cabeceras HSTS, Permissions-Policy y CSP mínima (`frame-ancestors 'none'`); contador público de lecturas cacheado 10 minutos e índices nuevos.
+- La migración 0012 se probó completa (0001→0012) en un PostgreSQL 16 local con un esquema `auth` simulado, incluidas las funciones nuevas.
+
+Pendiente de seguridad que requiere decisión o cuenta externa:
+- **CAPTCHA en el registro** (Turnstile o hCaptcha en Supabase Auth) para frenar cuentas títere que cosechan créditos de bienvenida e invitación.
+- **Eliminar cuenta** (Habeas Data) con borrado de las fotos de palmas en Storage.
+- `supabase/migrations/0003` contiene un correo personal en `correos_ilimitados`; ya está aplicado, pero conviene moverlo a datos privados si el repo se hace público.
 
 ## Pendiente
 

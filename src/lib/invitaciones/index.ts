@@ -9,7 +9,7 @@ export const BONO_INVITADOR = 2;
 /** Guarda el código de invitación 30 días para aplicarlo tras el registro. */
 export async function guardarInvitacion(codigo: string) {
   const jar = await cookies();
-  jar.set(COOKIE_INVITACION, codigo.toUpperCase(), { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
+  jar.set(COOKIE_INVITACION, codigo.toUpperCase(), { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax", httpOnly: true, secure: process.env.NODE_ENV === "production" });
 }
 
 export async function codigoInvitacionPendiente(): Promise<string | null> {

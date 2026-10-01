@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 /**
  * Integración con Bold (botón de pagos, Colombia).
@@ -69,9 +69,14 @@ function firmaCoincide(esperado: string, recibido: string) {
  */
 export function verificarFirmaWebhook(cuerpoCrudo: string, firma: string | null) {
   if (!firma) return false;
-  const { secretKey, produccion } = boldEnv();
+  const { secretKey } = boldEnv();
   const base64 = Buffer.from(cuerpoCrudo, "utf8").toString("base64");
-  const llaves = produccion ? (secretKey ? [secretKey] : []) : [secretKey, ""];
+  const llaves: string[] = [];
+  if (secretKey) llaves.push(secretKey);
+  // La llave vacía del sandbox de Bold solo se admite si se pide explícitamente
+  // y nunca en el despliegue de producción de Vercel.
+  if (process.env.BOLD_ACEPTAR_FIRMA_VACIA === "1" && process.env.VERCEL_ENV !== "production") llaves.push("");
+  if (!llaves.length) return false;
   return llaves.some((llave) => firmaCoincide(createHmac("sha256", llave).update(base64).digest("hex"), firma));
 }
 
@@ -123,6 +128,6 @@ export function estadoOrden(estado: string): "rechazada" | "anulada" | "error" |
 
 export function nuevaReferencia(usuarioId: string) {
   const corto = usuarioId.replace(/-/g, "").slice(0, 8);
-  const aleatorio = Math.random().toString(36).slice(2, 8);
+  const aleatorio = randomBytes(5).toString("hex");
   return `ARC-${corto}-${Date.now().toString(36)}-${aleatorio}`.toUpperCase();
 }

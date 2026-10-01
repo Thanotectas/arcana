@@ -21,6 +21,7 @@ type PerfilRow = {
   invitado_por: string | null;
   invitacion_premiada: boolean;
   circulo_hasta: string | null;
+  bienvenida_dada: boolean;
   creado_en: string;
   actualizado_en: string;
 };
@@ -115,7 +116,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -147,6 +148,12 @@ export type Database = {
         Row: SuscripcionPushRow;
         Insert: Insertable<SuscripcionPushRow, "id" | "idioma" | "agente" | "creado_en">;
         Update: Partial<SuscripcionPushRow>;
+        Relationships: [];
+      };
+      cartas_dia: {
+        Row: { usuario_id: string; fecha: string };
+        Insert: { usuario_id: string; fecha: string };
+        Update: Partial<{ usuario_id: string; fecha: string }>;
         Relationships: [];
       };
       mensajes_diarios: {
@@ -191,6 +198,38 @@ export type Database = {
       contador_lecturas: {
         Args: Record<string, never>;
         Returns: number;
+      };
+      finalizar_generacion: {
+        Args: { p_lectura: string; p_texto: string };
+        Returns: boolean;
+      };
+      finalizar_pregunta: {
+        Args: { p_pregunta: string; p_texto: string };
+        Returns: boolean;
+      };
+      reintentar_lectura: {
+        Args: { p_lectura: string; p_costo: number };
+        Returns: boolean;
+      };
+      devolver_creditos: {
+        Args: { p_usuario: string; p_cantidad: number; p_motivo: string; p_referencia?: string | null };
+        Returns: undefined;
+      };
+      carta_dia_disponible: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      reservar_carta_dia: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      crear_pregunta: {
+        Args: { p_lectura: string; p_pregunta: string };
+        Returns: { id: string; costo: number }[];
+      };
+      registrar_push: {
+        Args: { p_endpoint: string; p_p256dh: string; p_auth: string; p_idioma: string; p_agente?: string | null };
+        Returns: undefined;
       };
       ha_comprado: {
         Args: Record<string, never>;
