@@ -54,6 +54,7 @@ export const pt: Diccionario = {
     terminos: "Termos",
     privacidad: "Privacidade",
     precios: "Preços",
+    creditosImagenes: "Animais do calendário chinês: Twemoji (CC BY 4.0).",
   },
   lecturas: {
     nombres: {

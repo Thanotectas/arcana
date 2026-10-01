@@ -1,0 +1,3 @@
+Ilustraciones de los doce animales del calendario chino: Twemoji (Twitter, Inc. y colaboradores),
+licencia CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Se muestran con un tinte dorado
+aplicado por CSS; los archivos SVG no se modificaron.

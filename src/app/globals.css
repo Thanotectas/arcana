@@ -566,3 +566,27 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .moneda.girando, .linea-hex { animation: none; }
 }
+
+/* Animales del calendario chino (Twemoji, CC BY 4.0) con tinte dorado o violeta. */
+.animal-oro {
+  filter: grayscale(1) sepia(1) saturate(1.6) brightness(0.95) contrast(1.05);
+  opacity: 0.7;
+}
+.animal-oro-vivo {
+  filter: grayscale(1) sepia(1) saturate(1.6) brightness(1.15) contrast(1.1) drop-shadow(0 0 10px rgba(217, 180, 90, 0.45));
+}
+.animal-violeta {
+  filter: grayscale(1) sepia(1) saturate(2) hue-rotate(215deg) brightness(1.2);
+}
+
+/* Cartas con ilustración real: el marco dorado envuelve la imagen. */
+.carta-tarot.con-imagen {
+  background: #f3ead6;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 3px rgba(11, 7, 22, 0.9),
+    inset 0 0 0 4px rgba(217, 180, 90, 0.55);
+}
+.carta-tarot.con-imagen .contenido-carta {
+  inset: 4px;
+}

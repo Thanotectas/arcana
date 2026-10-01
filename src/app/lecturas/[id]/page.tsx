@@ -6,7 +6,7 @@ import { ConversacionLectura } from "@/components/ConversacionLectura";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
-import { rotuloCarta } from "@/components/CartaVisual";
+import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
 import { RuedaAstral } from "@/components/RuedaAstral";
 import { CompartirLectura } from "@/components/CompartirLectura";
@@ -138,6 +138,7 @@ function VistaTarot({
     return {
       nombre: c.carta.nombre,
       ...rotuloCarta(c.carta, mazo),
+      imagen: imagenCarta(c.carta, mazo),
       repeticiones: c.carta.arcano === "menor" ? c.carta.numero : 1,
       invertida: c.invertida,
       posicion: pos?.nombre ?? "",
@@ -309,7 +310,9 @@ function VistaChino({ resultado, t }: { resultado: ResultadoChino; t: Diccionari
   return (
     <section className="grid gap-4 sm:grid-cols-[auto_1fr]">
       <div className="tarjeta flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-7xl" style={{ color }}>{FICHA[resultado.pilar.animal].caracter}</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático pequeño, sin optimización necesaria */}
+        <img src={`/animales/${resultado.pilar.animal}.svg`} alt="" width={112} height={112} className="animal-oro-vivo" />
+        <p className="mt-1 text-2xl" style={{ color }}>{FICHA[resultado.pilar.animal].caracter}</p>
         <p className="font-display mt-2 text-2xl text-oro-suave">{pilar(resultado.pilar)}</p>
         <p className="text-xs text-texto-suave">{CARACTER_ELEMENTO[resultado.pilar.elemento]} {elementos[resultado.pilar.elemento]} · {resultado.pilar.polaridad} · {resultado.pilar.anio}</p>
       </div>

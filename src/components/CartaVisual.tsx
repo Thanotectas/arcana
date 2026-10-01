@@ -5,6 +5,11 @@ const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X
 const SIMBOLO_PALO: Record<string, string> = { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" };
 const NOMBRE_CORTE: Record<number, string> = { 11: "Sota", 12: "Caballero", 13: "Reina", 14: "Rey" };
 
+/** Ruta de la ilustración real de la carta (solo el Rider-Waite tiene imágenes). */
+export function imagenCarta(carta: CartaTarot, mazo: IdMazo = "rider") {
+  return mazo === "rider" ? `/cartas/rider/${carta.id}.webp` : undefined;
+}
+
 /** Número o rango que va arriba de la carta y símbolo central. */
 export function rotuloCarta(carta: CartaTarot, mazo: IdMazo = "rider") {
   if (mazo === "angeles") {
@@ -29,6 +34,7 @@ export function CaraCarta({
   compacta = false,
   estilo = "rider",
   repeticiones = 1,
+  imagen,
 }: {
   nombre: string;
   etiqueta: string;
@@ -38,8 +44,20 @@ export function CaraCarta({
   estilo?: "rider" | "marsella" | "angeles";
   /** En Marsella, los arcanos menores muestran tantos símbolos como su número. */
   repeticiones?: number;
+  /** Ilustración real de la carta; si existe, reemplaza el dibujo con símbolos. */
+  imagen?: string;
 }) {
   const pips = estilo === "marsella" && repeticiones > 1 && repeticiones <= 10;
+  if (imagen) {
+    return (
+      <div className={`carta-tarot con-imagen estilo-${estilo} relative w-full ${invertida ? "invertida" : ""}`} aria-hidden>
+        <div className="contenido-carta absolute inset-0 overflow-hidden rounded-[0.8rem]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática del mazo, ya optimizada en WebP */}
+          <img src={imagen} alt="" className="h-full w-full object-cover" draggable={false} />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={`carta-tarot estilo-${estilo} relative w-full ${invertida ? "invertida" : ""}`} aria-hidden>
       <div className={`contenido-carta absolute inset-0 flex flex-col items-center justify-between text-center ${compacta ? "p-1.5" : "p-3"}`}>
@@ -64,7 +82,7 @@ export function CartaVisual({ carta, invertida, posicion, mazo = "rider" }: { ca
   return (
     <figure className="flex flex-col items-center gap-2">
       <div className="w-36 sm:w-40">
-        <CaraCarta nombre={carta.nombre} etiqueta={etiqueta} simbolo={simbolo} invertida={invertida} estilo={mazo} repeticiones={carta.arcano === "menor" ? carta.numero : 1} />
+        <CaraCarta nombre={carta.nombre} etiqueta={etiqueta} simbolo={simbolo} invertida={invertida} estilo={mazo} repeticiones={carta.arcano === "menor" ? carta.numero : 1} imagen={imagenCarta(carta, mazo)} />
       </div>
       <figcaption className="text-center">
         {posicion && <span className="block text-xs uppercase tracking-widest text-violeta-suave">{posicion}</span>}

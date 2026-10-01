@@ -11,6 +11,8 @@ export interface CartaRevelada {
   etiqueta: string;
   simbolo: string;
   repeticiones: number;
+  /** Ilustración real (Rider-Waite). */
+  imagen?: string;
   invertida: boolean;
   posicion: string;
   posicionDescripcion: string;
@@ -105,6 +107,7 @@ export function TiradaInteractiva({
                       compacta={cartas.length === 10}
                       estilo={estilo}
                       repeticiones={carta.repeticiones}
+                      imagen={carta.imagen}
                     />
                   </div>
                 </div>

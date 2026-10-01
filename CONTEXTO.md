@@ -139,6 +139,12 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 - Migración `0014_chino_y_cruces.sql` (amplía el `check` de `lecturas.tipo`). Sin ella, crear estas lecturas falla al insertar.
 - Las fuentes de la tarjeta compartible no tienen caracteres chinos: en la tarjeta el animal va en el título y el símbolo es ✦.
 
+## Imágenes reales de las cartas y animales (2 oct 2026)
+
+- **Rider-Waite con arte real**: `public/cartas/rider/<id>.webp` (78 cartas, 300×527, ~2,8 MB en total), convertidas desde el paquete npm `@cometpisces/tarot-kit-images` (código MIT; las imágenes son el Rider-Waite-Smith de 1909). `imagenCarta()` en `CartaVisual.tsx` devuelve la ruta solo para el mazo `rider`; `CaraCarta` muestra la ilustración dentro del marco dorado y la inversión gira la imagen. Marsella y el Oráculo de los Ángeles siguen con el dibujo de símbolos (no hay arte de dominio público equivalente para el Oráculo; para Marsella se puede añadir el Conver de 1760 cuando haya una fuente accesible).
+- **Licencia**: dominio público en EE. UU. y la UE; en Colombia (80 años post mortem de Pamela Colman Smith, † 1951) el plazo vence a fines de 2031. Está anotado en `public/cartas/rider/LICENCIA.txt`; decisión del dueño del proyecto.
+- **Animales del calendario chino**: `public/animales/*.svg` (Twemoji, CC BY 4.0, atribución en el pie de página y en `public/animales/LICENCIA.txt`), con tinte dorado o violeta por CSS (`.animal-oro`, `.animal-oro-vivo`, `.animal-violeta`). Se usan en la rueda y en la vista de la lectura.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

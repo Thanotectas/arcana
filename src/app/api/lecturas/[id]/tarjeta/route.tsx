@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { imagenTarjeta, extractoDe } from "@/lib/marca/tarjeta";
@@ -41,11 +44,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   let titulo = lectura.titulo;
   let simbolos: string[] = ["✦"];
   let hexagrama: (0 | 1)[] | undefined;
+  let imagenes: string[] | undefined;
 
   if (tipo.startsWith("tarot")) {
     const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
     const cartas = cartasDeTirada((resultado.cartas as CartaTirada[]) ?? [], mazo);
     titulo = cartas.map((c) => c.carta.nombre).join(" · ");
+    if (mazo === "rider") imagenes = await Promise.all(cartas.slice(0, 3).map((c) => cartaComoDataUri(c.carta.id)));
     simbolos = cartas.slice(0, 4).map((c) => (c.carta.arcano === "mayor" ? "✦" : { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" }[c.carta.palo ?? "bastos"]));
     void (tipo as TipoTirada);
   } else if (tipo === "carta_astral") {
@@ -93,8 +98,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     enlace,
     pie: t.lecturas.detalle.tarjetaPie,
     hexagrama,
+    imagenes: imagenes?.filter(Boolean),
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
   respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);
   return respuesta;
+}
+
+/** Ilustración de una carta como data URI PNG (el motor de la tarjeta no lee WebP). Si falta, devuelve "". */
+async function cartaComoDataUri(id: string) {
+  try {
+    const webp = await readFile(path.join(process.cwd(), "public", "cartas", "rider", `${id}.webp`));
+    const png = await sharp(webp).png().toBuffer();
+    return `data:image/png;base64,${png.toString("base64")}`;
+  } catch {
+    return "";
+  }
 }

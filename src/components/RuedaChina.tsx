@@ -72,16 +72,15 @@ export function RuedaChina({ nombreInicial, fechaInicial, horaInicial }: { nombr
               <g key={a} style={{ transition: "all .4s" }}>
                 {activo && <circle cx={x} cy={y} r="30" fill={color} opacity="0.18" />}
                 {secreto && <circle cx={x} cy={y} r="24" fill="none" stroke="#b7a5ff" strokeDasharray="3 3" />}
-                <text x={x} y={y + 2} textAnchor="middle" dominantBaseline="middle" fontSize={activo ? 34 : 24} fill={color} style={{ transition: "all .4s" }}>
-                  {FICHA[a].caracter}
-                </text>
-                <text x={x} y={y + 30} textAnchor="middle" fontSize="10" fill="rgba(168,159,192,0.9)">{nombres[a]}</text>
+                <image href={`/animales/${a}.svg`} x={x - (activo ? 24 : 17)} y={y - (activo ? 26 : 19)} width={activo ? 48 : 34} height={activo ? 48 : 34} className={activo ? "animal-oro-vivo" : secreto ? "animal-violeta" : "animal-oro"} style={{ transition: "all .4s" }} />
+                <text x={x} y={y + 32} textAnchor="middle" fontSize="10" fill={activo ? color : "rgba(168,159,192,0.9)"}>{nombres[a]}</text>
               </g>
             );
           })}
           {r ? (
             <g>
-              <text x="200" y="178" textAnchor="middle" fontSize="54" fill={COLOR_ELEMENTO[r.pilar.elemento]}>{FICHA[r.pilar.animal].caracter}</text>
+              <image href={`/animales/${r.pilar.animal}.svg`} x="156" y="118" width="88" height="88" className="animal-oro-vivo" />
+              <text x="200" y="130" textAnchor="middle" fontSize="18" fill={COLOR_ELEMENTO[r.pilar.elemento]}>{FICHA[r.pilar.animal].caracter}</text>
               <text x="200" y="212" textAnchor="middle" fontSize="20" fill="#f1d99a" fontFamily="var(--font-cormorant)">{pilar(r.pilar)}</text>
               <text x="200" y="236" textAnchor="middle" fontSize="12" fill="rgba(168,159,192,0.9)">
                 {CARACTER_ELEMENTO[r.pilar.elemento]} {elementos[r.pilar.elemento]} · {r.pilar.polaridad} · {r.pilar.anio}
