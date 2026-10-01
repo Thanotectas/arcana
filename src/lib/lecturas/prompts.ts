@@ -14,6 +14,8 @@ import { resumenIChing, type ResultadoIChing } from "../iching";
 import { resumenChino, type ResultadoChino } from "../chino";
 import type { FuenteCruce } from "../cruce";
 import type { EntradaSueno, ResultadoSueno } from "../suenos";
+import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
+import { resumenChocolate, TRADICION_CHOCOLATE, type EntradaChocolate } from "../chocolate";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -152,6 +154,34 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         (pregunta ? `## Respuesta a tu pregunta (desde los dos sistemas), ` : "") +
         `## Síntesis cruzada y un consejo práctico. Nombra siempre de qué sistema sale cada idea. No repitas las lecturas anteriores: úsalas como base. Extensión: 800 a 1100 palabras.`,
       opciones: { idioma, effort: "medium", maxTokens: 4000, nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "chocolate") {
+    const e = entrada as unknown as EntradaChocolate;
+    const imagen = await descargarPalma(e.foto);
+    return {
+      usuario:
+        `Lee la taza de chocolate de la foto adjunta.\n\n${resumenChocolate(e)}\n\n` +
+        `Estructura: ## Lo que veo en tu taza (las figuras que sí se distinguen, dónde están: cerca del borde o del fondo, del lado del asa o enfrente), ## Figura por figura (cada una con su sentido tradicional y lo que puede decir para esta persona, como lista breve), ## Lo que la taza responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ## Un consejo para los próximos días. ` +
+        `Extensión: 500 a 700 palabras.`,
+      sistemaExtra: TRADICION_CHOCOLATE,
+      opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "sinastria") {
+    const r = resultado as unknown as ResultadoSinastria;
+    const nombreA = datoDeUsuario(r.a.nombre, 80) || "A";
+    const nombreB = datoDeUsuario(r.b.nombre, 80) || "B";
+    return {
+      usuario:
+        `Interpreta esta sinastría (compatibilidad entre dos cartas astrales completas).\n\n${resumenSinastria(r)}\n\n` +
+        `Estructura: ## Quiénes son (el temperamento de cada uno en tres líneas: Sol, Luna y Ascendente si lo hay), ## Lo que los une (los aspectos armónicos más fuertes, nombrando los planetas y qué se siente en la vida real), ## Donde chocan (los aspectos tensos, sin dramatizar: qué fricción concreta y cómo se trabaja), ## En el amor y el deseo (Venus, Marte, Luna), ## En la convivencia y el tiempo (Saturno, Júpiter, estabilidad; solapamientos de casas si los hay), ## Síntesis y un consejo para ${nombreA} y otro para ${nombreB}. ` +
+        `Usa los nombres de las dos personas. El puntaje es orientativo: explícalo, no lo repitas como veredicto. Extensión: 900 a 1200 palabras.`,
+      sistemaExtra:
+        "Sinastría clásica: los contactos Sol-Luna, Luna-Luna y Venus-Marte pesan más; las conjunciones y trígonos unen, las cuadraturas tensan y las oposiciones atraen con fricción; Saturno da duración o frialdad según el aspecto. Habla de dinámicas, no de destinos: ninguna sinastría condena ni garantiza una relación.",
+      opciones: { idioma, effort: "medium", maxTokens: 5000, nivel: "premium" },
     };
   }
 

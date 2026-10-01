@@ -11,6 +11,7 @@ import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
 import { FICHA, nombrePilar, type ResultadoChino } from "@/lib/chino";
+import type { ResultadoSinastria } from "@/lib/astro/sinastria";
 import type { TipoLectura } from "@/lib/creditos";
 import type { PerfilNumerologico } from "@/lib/numerologia";
 
@@ -84,6 +85,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     simbolos = ["✦"];
     imagenes = [await monedaComoDataUri("animales", r.pilar.animal)];
     titulo = nombrePilar(r.pilar) + (r.animalHora ? ` · ${FICHA[r.animalHora].nombre}` : "");
+  } else if (tipo === "chocolate") {
+    simbolos = ["☕"];
+    titulo = t.lecturas.nombres.chocolate;
+  } else if (tipo === "sinastria") {
+    const r = resultado as unknown as ResultadoSinastria;
+    simbolos = ["♡"];
+    imagenes = await Promise.all([r.a.sol, r.b.sol].map((x) => monedaComoDataUri("signos", x)));
+    titulo = `${r.a.nombre} + ${r.b.nombre}: ${r.puntaje}% ${t.compatibilidad.afinidad}`;
   } else if (tipo === "suenos") {
     simbolos = ["☾"];
     titulo = lectura.titulo;
@@ -107,7 +116,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     pie: t.lecturas.detalle.tarjetaPie,
     hexagrama,
     imagenes: imagenes?.filter(Boolean),
-    monedas: tipo === "carta_astral" || tipo === "compatibilidad" || tipo === "chino",
+    monedas: tipo === "carta_astral" || tipo === "compatibilidad" || tipo === "chino" || tipo === "sinastria",
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
   respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);

@@ -5,7 +5,7 @@ import type { Lugar } from "@/lib/astro/geocodificar";
 import { useT } from "@/lib/i18n/cliente";
 
 /** Autocompletado de lugar de nacimiento; rellena lat, lon y zona horaria ocultos. */
-export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
+export function CampoLugar({ valorInicial, sufijo = "", etiquetaTexto }: { valorInicial?: Lugar | null; /** Para formularios con dos personas: "_b" nombra los campos lugar_b, latitud_b… */ sufijo?: string; etiquetaTexto?: string }) {
   const { t } = useT();
   const [texto, setTexto] = useState(valorInicial ? etiqueta(valorInicial) : "");
   const [opciones, setOpciones] = useState<Lugar[]>([]);
@@ -36,9 +36,9 @@ export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
 
   return (
     <div className="relative">
-      <label className="etiqueta" htmlFor="lugar-texto">{t.astral.lugar}</label>
+      <label className="etiqueta" htmlFor={`lugar-texto${sufijo}`}>{etiquetaTexto ?? t.astral.lugar}</label>
       <input
-        id="lugar-texto"
+        id={`lugar-texto${sufijo}`}
         className="campo"
         value={texto}
         autoComplete="off"
@@ -52,10 +52,10 @@ export function CampoLugar({ valorInicial }: { valorInicial?: Lugar | null }) {
         onBlur={() => setTimeout(() => setAbierto(false), 150)}
         required
       />
-      <input type="hidden" name="lugar" value={seleccion ? etiqueta(seleccion) : ""} />
-      <input type="hidden" name="latitud" value={seleccion?.latitud ?? ""} />
-      <input type="hidden" name="longitud" value={seleccion?.longitud ?? ""} />
-      <input type="hidden" name="zona_horaria" value={seleccion?.zonaHoraria ?? ""} />
+      <input type="hidden" name={`lugar${sufijo}`} value={seleccion ? etiqueta(seleccion) : ""} />
+      <input type="hidden" name={`latitud${sufijo}`} value={seleccion?.latitud ?? ""} />
+      <input type="hidden" name={`longitud${sufijo}`} value={seleccion?.longitud ?? ""} />
+      <input type="hidden" name={`zona_horaria${sufijo}`} value={seleccion?.zonaHoraria ?? ""} />
 
       {abierto && opciones.length > 0 && (
         <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-borde bg-superficie-2 shadow-xl">

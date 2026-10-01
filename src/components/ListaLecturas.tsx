@@ -28,6 +28,8 @@ const ICONO: Record<TipoLectura, string> = {
   chino: "龙",
   cruce: "✦×✦",
   suenos: "☾",
+  sinastria: "☉☽",
+  chocolate: "☕",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

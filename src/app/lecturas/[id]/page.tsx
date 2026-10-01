@@ -23,6 +23,7 @@ import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } fr
 import { SiguientePaso } from "@/components/SiguientePaso";
 import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
+import type { ResultadoSinastria, Dimension } from "@/lib/astro/sinastria";
 import type { FuenteCruce } from "@/lib/cruce";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -43,7 +44,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
   const preguntas = lectura.estado === "lista" ? await getPreguntas(lectura.id) : [];
 
   const esQuiromancia = lectura.tipo === "quiromancia";
-  const urlFoto = esQuiromancia ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
+  const esChocolate = lectura.tipo === "chocolate";
+  const urlFoto = esQuiromancia || esChocolate ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
 
   return (
     <article className="mx-auto max-w-4xl space-y-8">
@@ -65,6 +67,14 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
       {lectura.tipo === "cruce" && <VistaCruce entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
+      {esChocolate && urlFoto && (
+        <section className="tarjeta p-4">
+          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.chocolate.tuTaza}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
+          <img src={urlFoto} alt={t.chocolate.tuTaza} className="mx-auto max-h-96 rounded-xl" />
+        </section>
+      )}
+      {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} t={t} />}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
       {esQuiromancia ? (
@@ -114,6 +124,8 @@ function rutaNueva(tipo: string) {
   if (tipo === "chino") return "/calendario-chino";
   if (tipo === "cruce") return "/cruce";
   if (tipo === "suenos") return "/suenos";
+  if (tipo === "sinastria") return "/sinastria";
+  if (tipo === "chocolate") return "/chocolate";
   return "/compatibilidad";
 }
 
@@ -371,6 +383,65 @@ function VistaSueno({ entrada, resultado, t }: { entrada: EntradaSueno; resultad
         {entrada.recurrente && <span className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{t.suenos.recurrente}</span>}
         {entrada.fecha && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{entrada.fecha}</span>}
         {resultado.previos?.length > 0 && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{plantilla(t.suenos.conDiario, { n: resultado.previos.length })}</span>}
+      </div>
+    </section>
+  );
+}
+
+function VistaSinastria({ resultado, t }: { resultado: ResultadoSinastria; t: Diccionario }) {
+  const r = resultado;
+  const solA = signoPorId(r.a.sol);
+  const solB = signoPorId(r.b.sol);
+  const dims: Dimension[] = ["emocional", "pasion", "comunicacion", "estabilidad"];
+  const nombres = t.sinastria.dimensiones as Record<Dimension, string>;
+  const punto = (p: string) => (p === "ascendente" ? t.astral.ascendente : NOMBRES_CUERPO[p as keyof typeof NOMBRES_CUERPO]);
+  return (
+    <section className="space-y-6">
+      <div className="tarjeta flex flex-wrap items-center justify-center gap-8 p-6 text-center">
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+          {solA && <img src={imagenSigno(solA.id)} alt="" width={96} height={96} className="moneda-signo mx-auto" />}
+          <p className="font-display mt-2 text-xl">{r.a.nombre}</p>
+          <p className="text-xs text-texto-suave">☉ {solA?.nombre} · ☽ {signoPorId(r.a.luna)?.nombre}{r.a.ascendente ? ` · ↑ ${signoPorId(r.a.ascendente)?.nombre}` : ""}</p>
+        </div>
+        <div>
+          <p className="font-display text-6xl text-oro-suave">{r.puntaje}%</p>
+          <p className="text-xs uppercase tracking-widest text-texto-suave">{t.compatibilidad.afinidad}</p>
+        </div>
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+          {solB && <img src={imagenSigno(solB.id)} alt="" width={96} height={96} className="moneda-signo mx-auto" />}
+          <p className="font-display mt-2 text-xl">{r.b.nombre}</p>
+          <p className="text-xs text-texto-suave">☉ {solB?.nombre} · ☽ {signoPorId(r.b.luna)?.nombre}{r.b.ascendente ? ` · ↑ ${signoPorId(r.b.ascendente)?.nombre}` : ""}</p>
+        </div>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="tarjeta p-5">
+          <h2 className="font-display mb-3 text-2xl">{t.sinastria.dimensionesTitulo}</h2>
+          <ul className="space-y-3">
+            {dims.map((d) => (
+              <li key={d}>
+                <div className="flex justify-between text-sm"><span>{nombres[d]}</span><span className="text-oro-suave">{r.dimensiones[d]}</span></div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-violeta to-oro" style={{ width: `${r.dimensiones[d]}%` }} /></div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="tarjeta p-5">
+          <h2 className="font-display mb-3 text-2xl">{t.sinastria.aspectosTitulo}</h2>
+          {r.aspectos.length ? (
+            <ul className="space-y-1.5 text-sm">
+              {r.aspectos.slice(0, 8).map((a, i) => (
+                <li key={i} className="flex items-center justify-between gap-3 border-t border-borde pt-1.5 first:border-0">
+                  <span>{punto(a.a)} <span className="text-texto-suave">{SIMBOLOS_ASPECTO[a.tipo]} {NOMBRES_ASPECTO[a.tipo].toLowerCase()}</span> {punto(a.b)}</span>
+                  <span className={a.aporte >= 0 ? "text-exito" : "text-oro"}>{a.aporte >= 0 ? t.sinastria.armonico : t.sinastria.tenso} · {a.orbe}°</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-texto-suave">{t.sinastria.sinAspectos}</p>
+          )}
+        </div>
       </div>
     </section>
   );

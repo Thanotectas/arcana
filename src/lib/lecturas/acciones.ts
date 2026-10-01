@@ -18,6 +18,8 @@ import { calcularChino, nombrePilar, FICHA } from "../chino";
 import { esSistema, fuenteDe, type Sistema } from "../cruce";
 import { SUENO_MAX, SUENO_MIN, esEmocion, tituloDeSueno, type EntradaSueno, type ResultadoSueno } from "../suenos";
 import { extractoPlano } from "./memoria";
+import { calcularSinastria } from "../astro/sinastria";
+import type { EntradaChocolate } from "../chocolate";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -264,6 +266,57 @@ export async function accionChino(_prev: EstadoAccion, formData: FormData): Prom
 }
 
 // ---------------------------------------------------------------------------
+// Sinastría: dos cartas completas (premium)
+// ---------------------------------------------------------------------------
+function leerNacimiento(formData: FormData, sufijo: string): DatosNacimiento {
+  const v = (campo: string) => formData.get(`${campo}${sufijo}`);
+  return {
+    nombre: String(v("nombre") ?? "").trim().slice(0, 80),
+    fecha: String(v("fecha") ?? ""),
+    hora: String(v("hora") ?? "12:00") || "12:00",
+    horaDesconocida: v("hora_desconocida") === "on",
+    lugar: String(v("lugar") ?? "").trim().slice(0, 120),
+    latitud: Number(v("latitud")),
+    longitud: Number(v("longitud")),
+    zonaHoraria: String(v("zona_horaria") ?? ""),
+  };
+}
+
+function errorNacimiento(d: DatosNacimiento, grupo: string): string | null {
+  if (!d.nombre) return `${grupo}.nombre`;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d.fecha)) return `${grupo}.fecha`;
+  if (!d.horaDesconocida && !/^\d{2}:\d{2}$/.test(d.hora)) return `${grupo}.hora`;
+  if (!d.lugar || Number.isNaN(d.latitud) || Number.isNaN(d.longitud) || !zonaHorariaValida(d.zonaHoraria)) return `${grupo}.lugar`;
+  if (Math.abs(d.latitud) > 90 || Math.abs(d.longitud) > 180) return `${grupo}.lugar`;
+  const anio = Number(d.fecha.slice(0, 4));
+  if (anio < 1900 || anio > new Date().getFullYear()) return `${grupo}.anio`;
+  return null;
+}
+
+export async function accionSinastria(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const a = leerNacimiento(formData, "");
+  const b = leerNacimiento(formData, "_b");
+  const errorA = errorNacimiento(a, "astral");
+  if (errorA) return { error: errorA };
+  const errorB = errorNacimiento(b, "sinastria");
+  if (errorB) return { error: errorB };
+
+  let id: string;
+  try {
+    const r = calcularSinastria(a, b);
+    id = await crearLectura({
+      tipo: "sinastria",
+      titulo: `${a.nombre} y ${b.nombre}: ${r.puntaje}% de afinidad`,
+      entrada: { a, b },
+      resultado: r,
+    });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
 // Sueños: la persona cuenta su sueño; se guardan los anteriores como diario
 // ---------------------------------------------------------------------------
 export async function accionSuenos(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
@@ -413,6 +466,45 @@ export async function accionQuiromancia(_prev: EstadoAccion, formData: FormData)
     id = await crearLectura({
       tipo: "quiromancia",
       titulo: pregunta ? `Lectura de la mano: ${pregunta}` : "Lectura de la mano",
+      entrada,
+      resultado: {},
+    });
+  } catch (e) {
+    await admin.storage.from("palmas").remove([ruta]);
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Lectura del chocolate: foto del interior de la taza (mismo bucket que las palmas)
+// ---------------------------------------------------------------------------
+export async function accionChocolate(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const { user } = await usuarioActual();
+  const foto = formData.get("foto");
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+
+  if (!(foto instanceof File) || foto.size === 0) return { error: "chocolate.foto" };
+  if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
+  if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+  const tipoReal = tipoImagenReal(new Uint8Array(await foto.slice(0, 16).arrayBuffer()));
+  if (!tipoReal || tipoReal !== foto.type) return { error: "FOTO_FORMATO" };
+
+  const admin = getSupabaseAdmin();
+  const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+  const ruta = `${user.id}/taza-${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await admin.storage.from("palmas").upload(ruta, foto, { contentType: foto.type, upsert: false });
+  if (errorSubida) {
+    console.error("[chocolate] subida fallida", errorSubida);
+    return { error: "FOTO_SUBIR" };
+  }
+
+  let id: string;
+  try {
+    const entrada: EntradaChocolate = { foto: ruta, pregunta };
+    id = await crearLectura({
+      tipo: "chocolate",
+      titulo: pregunta ? `Lectura del chocolate: ${pregunta}` : "Lectura del chocolate",
       entrada,
       resultado: {},
     });

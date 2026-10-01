@@ -32,6 +32,8 @@ const RUTAS: Record<TipoLectura, string> = {
   chino: "/calendario-chino",
   cruce: "/cruce",
   suenos: "/suenos",
+  sinastria: "/sinastria",
+  chocolate: "/chocolate",
 };
 
 /** Sistema para el chat: quién es, qué sabe de la persona y de la app. */

@@ -15,8 +15,13 @@ type Modo = "inicio" | "camara" | "vista";
  * permiso, se puede elegir una imagen de la galería. La foto se recorta al
  * marco, se reduce (máx. 1280 px, JPEG) y queda en un input oculto.
  */
-export function CapturaPalma({ nombreCampo = "foto" }: { nombreCampo?: string }) {
+export function CapturaPalma({ nombreCampo = "foto", variante = "mano" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" }) {
   const { t } = useT();
+  const taza = variante === "taza";
+  const textos = taza
+    ? { alinea: t.chocolate.alineaTaza, guia: t.chocolate.guia, alt: t.chocolate.tuTaza }
+    : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
+  const Guia = taza ? GuiaTaza : GuiaMano;
   const [modo, setModo] = useState<Modo>("inicio");
   const [vista, setVista] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -168,9 +173,9 @@ export function CapturaPalma({ nombreCampo = "foto" }: { nombreCampo?: string })
               style={{ transform: camaraTrasera ? undefined : "scaleX(-1)" }}
             />
             <div className="absolute inset-0">
-              <GuiaMano enVivo />
+              <Guia enVivo />
             </div>
-            <p className="absolute inset-x-0 top-3 text-center text-xs font-medium text-white drop-shadow">{t.quiromancia.alineaPalma}</p>
+            <p className="absolute inset-x-0 top-3 text-center text-xs font-medium text-white drop-shadow">{textos.alinea}</p>
             <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-4">
               <button type="button" onClick={cambiarCamara} className="rounded-full bg-black/50 p-2.5 text-white backdrop-blur" aria-label={t.quiromancia.cambiarCamara}>
                 <SwitchCamera className="h-5 w-5" aria-hidden />
@@ -200,14 +205,14 @@ export function CapturaPalma({ nombreCampo = "foto" }: { nombreCampo?: string })
         {modo === "vista" && vista && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={vista} alt={t.quiromancia.tuPalma} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={vista} alt={textos.alt} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 opacity-40">
-              <GuiaMano enVivo />
+              <Guia enVivo />
             </div>
           </>
         )}
 
-        {modo === "inicio" && <GuiaMano />}
+        {modo === "inicio" && <Guia />}
 
         {procesando && (
           <div className="absolute inset-0 flex items-center justify-center bg-noche/60">
@@ -219,7 +224,7 @@ export function CapturaPalma({ nombreCampo = "foto" }: { nombreCampo?: string })
       {pocaLuz && modo === "vista" && (
         <p className="text-center text-xs text-oro" role="status">{t.quiromancia.pocaLuz}</p>
       )}
-      <p className="text-center text-xs text-texto-suave">{t.quiromancia.guia}</p>
+      <p className="text-center text-xs text-texto-suave">{textos.guia}</p>
 
       <div className="flex flex-wrap justify-center gap-2">
         {modo === "vista" ? (
@@ -285,6 +290,28 @@ function GuiaMano({ enVivo = false }: { enVivo?: boolean }) {
           <path d="M160 370c0-50 5-100 2-150" fill="none" stroke="rgba(217,180,90,0.6)" strokeWidth="2" />
         </>
       )}
+    </svg>
+  );
+}
+
+/** Contorno de una taza vista desde arriba (borde, interior y asa a la derecha). */
+function GuiaTaza({ enVivo = false }: { enVivo?: boolean }) {
+  return (
+    <svg viewBox="0 0 300 400" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <defs>
+        <radialGradient id="brilloTaza" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(217,180,90,0.08)" />
+          <stop offset="1" stopColor="rgba(139,108,246,0.25)" />
+        </radialGradient>
+        <mask id="fueraTaza">
+          <rect width="300" height="400" fill="white" />
+          <circle cx="140" cy="200" r="118" fill="black" />
+        </mask>
+      </defs>
+      {enVivo ? <rect width="300" height="400" fill="rgba(11,7,22,0.55)" mask="url(#fueraTaza)" /> : <circle cx="140" cy="200" r="118" fill="url(#brilloTaza)" />}
+      <circle cx="140" cy="200" r="118" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
+      <circle cx="140" cy="200" r="70" fill="none" stroke="rgba(241,217,154,0.35)" strokeWidth="1.5" strokeDasharray="3 5" />
+      <path d="M258 165c28 0 36 20 36 35s-8 35-36 35" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" />
     </svg>
   );
 }

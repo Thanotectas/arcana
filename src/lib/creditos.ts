@@ -14,6 +14,8 @@ export type TipoLectura =
   | "iching"
   | "chino"
   | "suenos"
+  | "sinastria"
+  | "chocolate"
   | "cruce";
 
 export const COSTOS: Record<TipoLectura, number> = {
@@ -27,6 +29,8 @@ export const COSTOS: Record<TipoLectura, number> = {
   iching: 2,
   chino: 2,
   suenos: 2,
+  sinastria: 4, // premium: dos cartas completas
+  chocolate: 3,
   cruce: 4, // premium: combina dos sistemas con los datos de la persona
 };
 
@@ -41,6 +45,8 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   iching: "I Ching",
   chino: "Calendario chino",
   suenos: "Interpretación de sueños",
+  sinastria: "Sinastría",
+  chocolate: "Lectura del chocolate",
   cruce: "Lectura cruzada",
 };
 
