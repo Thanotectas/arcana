@@ -108,6 +108,17 @@ type SuscripcionPushRow = {
   creado_en: string;
 };
 
+type PublicacionRedRow = {
+  id: number;
+  red: string;
+  tipo: string;
+  fecha: string;
+  estado: "pendiente" | "publicada" | "error";
+  referencia: string | null;
+  detalle: string | null;
+  creado_en: string;
+};
+
 export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
@@ -160,6 +171,12 @@ export type Database = {
         Row: MensajeDiarioRow;
         Insert: Insertable<MensajeDiarioRow, "id" | "idioma" | "creado_en">;
         Update: Partial<MensajeDiarioRow>;
+        Relationships: [];
+      };
+      publicaciones_redes: {
+        Row: PublicacionRedRow;
+        Insert: Insertable<PublicacionRedRow, "id" | "estado" | "referencia" | "detalle" | "creado_en">;
+        Update: Partial<PublicacionRedRow>;
         Relationships: [];
       };
       horoscopos: {
