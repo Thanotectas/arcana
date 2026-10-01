@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { simboloDataUri } from "./simbolo";
 
 export const TAMANO_TARJETA = { width: 1080, height: 1350 };
 
@@ -65,12 +66,8 @@ export async function imagenTarjeta(d: DatosTarjeta) {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <svg viewBox="0 0 64 64" width="64" height="64">
-              <circle cx="32" cy="32" r="29" fill="none" stroke="#e2bd63" strokeWidth="2" />
-              <path d="M32 3a29 29 0 0 0 0 58 23 23 0 0 1 0-58z" fill="#e2bd63" opacity="0.18" />
-              <path d="M32 12l3.2 14.8L50 32l-14.8 5.2L32 52l-3.2-14.8L14 32l14.8-5.2z" fill="#e8c76f" />
-              <path d="M32 22l1.3 8.7L42 32l-8.7 1.3L32 42l-1.3-8.7L22 32l8.7-1.3z" fill="#0b0716" opacity="0.55" />
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image */}
+            <img src={simboloDataUri()} width={64} height={64} alt="" />
             <span style={{ fontFamily: "Cormorant", fontSize: 48, color: "#f1d99a", letterSpacing: 2 }}>Arcana</span>
           </div>
           <span style={{ fontSize: 22, color: "#b7a5ff", letterSpacing: 5, textTransform: "uppercase" }}>{d.etiqueta}</span>

@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { simboloDataUri } from "./simbolo";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -18,17 +19,8 @@ async function fuentes() {
 }
 
 function MarcaOG({ tamano }: { tamano: number }) {
-  return (
-    <svg viewBox="0 0 64 64" width={tamano} height={tamano}>
-      <circle cx="32" cy="32" r="29" fill="none" stroke="#e2bd63" strokeWidth="2" />
-      <path d="M32 3a29 29 0 0 0 0 58 23 23 0 0 1 0-58z" fill="#e2bd63" opacity="0.18" />
-      <path d="M32 12l3.2 14.8L50 32l-14.8 5.2L32 52l-3.2-14.8L14 32l14.8-5.2z" fill="#e8c76f" />
-      <path d="M32 22l1.3 8.7L42 32l-8.7 1.3L32 42l-1.3-8.7L22 32l8.7-1.3z" fill="#0b0716" opacity="0.55" />
-      <circle cx="49" cy="15" r="1.6" fill="#f1d99a" />
-      <circle cx="53" cy="47" r="1.2" fill="#f1d99a" />
-      <circle cx="13" cy="50" r="1" fill="#f1d99a" />
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image
+  return <img src={simboloDataUri()} width={tamano} height={tamano} alt="" />;
 }
 
 /**
