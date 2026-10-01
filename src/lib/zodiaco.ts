@@ -29,6 +29,11 @@ export const SIGNOS: Signo[] = [
   { id: "piscis", nombre: "Piscis", simbolo: "♓", elemento: "agua", modalidad: "mutable", regente: "Neptuno", inicio: [2, 19], fin: [3, 20], rasgos: ["empatía", "imaginación", "evasión"] },
 ];
 
+/** Moneda dorada del signo (public/signos, 512×512 con fondo transparente). */
+export function imagenSigno(id: string) {
+  return `/signos/${id}.webp`;
+}
+
 export function signoPorId(id: string) {
   return SIGNOS.find((s) => s.id === id);
 }

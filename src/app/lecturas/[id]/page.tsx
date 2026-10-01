@@ -16,7 +16,7 @@ import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { NOMBRES_CUERPO, type Cuerpo } from "@/lib/astro/efemerides";
 import { NOMBRES_ASPECTO, SIMBOLOS_ASPECTO, type Aspecto } from "@/lib/astro/carta";
 import type { Casas } from "@/lib/astro/casas";
-import { signoPorId, signoPorLongitud, formatoGrado } from "@/lib/zodiaco";
+import { signoPorId, signoPorLongitud, formatoGrado, imagenSigno } from "@/lib/zodiaco";
 import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "@/lib/numerologia";
 import { HexagramaVisual } from "@/components/HexagramaVisual";
 import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } from "@/lib/iching";
@@ -244,7 +244,8 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
   return (
     <section className="tarjeta flex flex-wrap items-center justify-center gap-8 p-6 text-center">
       <div>
-        <p className="text-5xl">{a?.simbolo}</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+        {a && <img src={imagenSigno(a.id)} alt="" width={96} height={96} className="moneda-signo mx-auto" />}
         <p className="font-display text-xl">{a?.nombre}</p>
       </div>
       <div>
@@ -252,7 +253,8 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
         <p className="text-xs uppercase tracking-widest text-texto-suave">{t.compatibilidad.afinidad}</p>
       </div>
       <div>
-        <p className="text-5xl">{b?.simbolo}</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+        {b && <img src={imagenSigno(b.id)} alt="" width={96} height={96} className="moneda-signo mx-auto" />}
         <p className="font-display text-xl">{b?.nombre}</p>
       </div>
     </section>

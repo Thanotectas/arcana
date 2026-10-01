@@ -3,7 +3,7 @@
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { accionCompatibilidad, type EstadoAccion } from "@/lib/lecturas/acciones";
-import { SIGNOS, compatibilidadSignos, signoPorFecha, signoPorId, type Signo } from "@/lib/zodiaco";
+import { SIGNOS, compatibilidadSignos, imagenSigno, signoPorFecha, signoPorId, type Signo } from "@/lib/zodiaco";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { useT } from "@/lib/i18n/cliente";
@@ -53,9 +53,9 @@ export function CompatibilidadInteractiva({ nombreInicial }: { nombreInicial: st
 
       <div className="tarjeta flex flex-col items-center gap-3 p-6 text-center">
         <div className="flex items-center gap-6">
-          <span className="text-4xl" style={{ color: signoA ? COLOR_ELEMENTO[signoA.elemento] : undefined }}>{signoA?.simbolo ?? "?"}</span>
+          <MonedaSigno signo={signoA} />
           <Medidor valor={puntaje ?? 0} activo={puntaje !== null} etiqueta={t.compatibilidad.afinidad} />
-          <span className="text-4xl" style={{ color: signoB ? COLOR_ELEMENTO[signoB.elemento] : undefined }}>{signoB?.simbolo ?? "?"}</span>
+          <MonedaSigno signo={signoB} />
         </div>
         {puntaje !== null && (
           <div className="aparecer" key={`${signoA?.id}-${signoB?.id}`}>
@@ -140,10 +140,8 @@ function RuedaSignos({ seleccionado, alElegir }: { seleccionado?: string; alEleg
             onClick={() => alElegir(s.id)}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && alElegir(s.id)}
           >
-            <circle cx={x} cy={y} r={activo ? 17 : 14} fill={activo ? COLOR_ELEMENTO[s.elemento] : "rgba(255,255,255,0.05)"} fillOpacity={activo ? 0.35 : 1} stroke={activo ? COLOR_ELEMENTO[s.elemento] : "rgba(255,255,255,0.15)"} className="transition-all" />
-            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={activo ? 18 : 15} fill={activo ? "#fff" : COLOR_ELEMENTO[s.elemento]} className="select-none transition-all">
-              {s.simbolo}
-            </text>
+            {activo && <circle cx={x} cy={y} r={21} fill={COLOR_ELEMENTO[s.elemento]} fillOpacity={0.25} stroke={COLOR_ELEMENTO[s.elemento]} strokeOpacity={0.7} />}
+            <image href={imagenSigno(s.id)} x={x - (activo ? 18 : 13)} y={y - (activo ? 18 : 13)} width={activo ? 36 : 26} height={activo ? 36 : 26} className={activo ? "animal-oro-vivo" : "animal-oro"} style={{ transition: "all .3s" }} />
           </g>
         );
       })}
@@ -182,4 +180,10 @@ function Medidor({ valor, activo, etiqueta }: { valor: number; activo: boolean; 
       </div>
     </div>
   );
+}
+
+function MonedaSigno({ signo }: { signo: Signo | null | undefined }) {
+  if (!signo) return <span className="flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-white/20 text-2xl text-texto-suave">?</span>;
+  // eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña
+  return <img src={imagenSigno(signo.id)} alt={signo.nombre} width={64} height={64} className="moneda-signo" />;
 }

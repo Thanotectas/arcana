@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SIGNOS, signoPorId } from "@/lib/zodiaco";
+import { SIGNOS, imagenSigno, signoPorId } from "@/lib/zodiaco";
 import { horoscopoDelDia, fechaHoy } from "@/lib/horoscopo";
 import { Markdown } from "@/components/Markdown";
 import { getUsuarioOpcional } from "@/lib/dal";
@@ -41,7 +41,8 @@ export default async function PaginaSigno({ params }: { params: Promise<{ signo:
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <header className="text-center">
-        <p className="text-6xl">{s.simbolo}</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+        <img src={imagenSigno(s.id)} alt="" width={128} height={128} className="moneda-signo mx-auto" />
         <h1 className="font-display text-4xl font-semibold">{s.nombre}</h1>
         <p className="text-texto-suave">
           {fecha} · {t.horoscopo.elementos[s.elemento]} · {t.horoscopo.regente} {s.regente}

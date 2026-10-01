@@ -575,6 +575,9 @@ body {
 .animal-oro-vivo {
   filter: drop-shadow(0 0 12px rgba(217, 180, 90, 0.55));
 }
+.moneda-signo {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+}
 .animal-violeta {
   filter: hue-rotate(215deg) saturate(1.4) brightness(1.1) drop-shadow(0 0 8px rgba(139, 108, 246, 0.5));
 }

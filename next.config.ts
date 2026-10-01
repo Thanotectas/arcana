@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   // para que Turbopack no busque node_modules en directorios superiores.
   turbopack: { root: __dirname },
   // Las fuentes de las imágenes de vista previa se leen en tiempo de ejecución.
-  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**"] },
+  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**", "./public/signos/**", "./public/animales/**"] },
   async headers() {
     return [
       {

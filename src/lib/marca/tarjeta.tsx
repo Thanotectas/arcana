@@ -29,6 +29,8 @@ export interface DatosTarjeta {
   hexagrama?: (0 | 1)[];
   /** Ilustraciones de cartas (data URI); si hay, reemplazan los glifos. */
   imagenes?: string[];
+  /** Las imágenes son monedas redondas (signos, animales): sin marco de carta. */
+  monedas?: boolean;
 }
 
 /** Recorta el Markdown a una frase limpia para la tarjeta. */
@@ -91,10 +93,15 @@ export async function imagenTarjeta(d: DatosTarjeta) {
             </div>
           ) : d.imagenes && d.imagenes.length ? (
             <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-              {d.imagenes.slice(0, 3).map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image
-                <img key={i} src={src} width={d.imagenes!.length === 1 ? 300 : 230} height={d.imagenes!.length === 1 ? 527 : 404} alt="" style={{ borderRadius: 18, border: "4px solid rgba(241,217,154,0.7)", boxShadow: "0 30px 60px rgba(0,0,0,0.6)" }} />
-              ))}
+              {/* eslint-disable @next/next/no-img-element -- ImageResponse no usa next/image */}
+              {d.imagenes.slice(0, 3).map((src, i) =>
+                d.monedas ? (
+                  <img key={i} src={src} width={d.imagenes!.length === 1 ? 260 : 220} height={d.imagenes!.length === 1 ? 260 : 220} alt="" style={{ filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }} />
+                ) : (
+                  <img key={i} src={src} width={d.imagenes!.length === 1 ? 300 : 230} height={d.imagenes!.length === 1 ? 527 : 404} alt="" style={{ borderRadius: 18, border: "4px solid rgba(241,217,154,0.7)", boxShadow: "0 30px 60px rgba(0,0,0,0.6)" }} />
+                ),
+              )}
+              {/* eslint-enable @next/next/no-img-element */}
             </div>
           ) : (
             <div style={{ display: "flex", gap: 28, fontSize: 132, color: "#f1d99a", lineHeight: 1, fontFamily: "Simbolos" }}>

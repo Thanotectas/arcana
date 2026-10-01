@@ -59,8 +59,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const sol = signoPorId(planetas.find((p) => p.cuerpo === "sol")?.signo ?? "");
     const luna = signoPorId(planetas.find((p) => p.cuerpo === "luna")?.signo ?? "");
     const asc = casas ? signoPorLongitud(casas.ascendente) : undefined;
-    // Los glifos zodiacales no se dibujan en la tarjeta (el motor los trata como emoji); van en el título.
+    // Los glifos zodiacales no se dibujan en la tarjeta (el motor los trata como emoji): van las monedas y el título.
     simbolos = asc && !entrada.horaDesconocida ? ["☉", "☽", "↑"] : ["☉", "☽"];
+    const monedas = [sol, luna, asc && !entrada.horaDesconocida ? asc : undefined].filter((x): x is NonNullable<typeof x> => Boolean(x));
+    imagenes = await Promise.all(monedas.map((x) => monedaComoDataUri("signos", x.id)));
     titulo = [sol && `☉ ${sol.nombre}`, luna && `☽ ${luna.nombre}`, asc && !entrada.horaDesconocida && `ASC ${asc.nombre}`].filter(Boolean).join(" · ");
   } else if (tipo === "numerologia") {
     const p = resultado as unknown as PerfilNumerologico;
@@ -70,6 +72,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const a = signoPorId(String(resultado.signoA));
     const b = signoPorId(String(resultado.signoB));
     simbolos = ["♡"];
+    if (a && b) imagenes = await Promise.all([a, b].map((x) => monedaComoDataUri("signos", x.id)));
     titulo = `${a?.nombre ?? ""} + ${b?.nombre ?? ""}: ${Number(resultado.puntaje)}% ${t.compatibilidad.afinidad}`;
   } else if (tipo === "quiromancia") {
     simbolos = ["✋"];
@@ -78,6 +81,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const r = resultado as unknown as ResultadoChino;
     // Las fuentes de la tarjeta no traen caracteres chinos: el animal va en el título.
     simbolos = ["✦"];
+    imagenes = [await monedaComoDataUri("animales", r.pilar.animal)];
     titulo = nombrePilar(r.pilar) + (r.animalHora ? ` · ${FICHA[r.animalHora].nombre}` : "");
   } else if (tipo === "cruce") {
     const sistemas = ((entrada.sistemas as string[] | undefined) ?? []).map((s) => (t.cruce.sistemas as Record<string, string>)[s] ?? s);
@@ -99,6 +103,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     pie: t.lecturas.detalle.tarjetaPie,
     hexagrama,
     imagenes: imagenes?.filter(Boolean),
+    monedas: tipo === "carta_astral" || tipo === "compatibilidad" || tipo === "chino",
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
   respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);
@@ -106,10 +111,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 /** Ilustración de una carta como data URI PNG (el motor de la tarjeta no lee WebP). Si falta, devuelve "". */
-async function cartaComoDataUri(id: string) {
+function cartaComoDataUri(id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "rider", `${id}.webp`));
+}
+
+/** Moneda dorada (signo occidental o animal chino) como data URI PNG, reducida para la tarjeta. */
+function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), 260);
+}
+
+async function webpComoDataUri(ruta: string, lado?: number) {
   try {
-    const webp = await readFile(path.join(process.cwd(), "public", "cartas", "rider", `${id}.webp`));
-    const png = await sharp(webp).png().toBuffer();
+    const webp = await readFile(ruta);
+    const base = sharp(webp);
+    const png = await (lado ? base.resize(lado, lado) : base).png().toBuffer();
     return `data:image/png;base64,${png.toString("base64")}`;
   } catch {
     return "";

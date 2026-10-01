@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { SIGNOS } from "@/lib/zodiaco";
+import { SIGNOS, imagenSigno } from "@/lib/zodiaco";
 import { getT } from "@/lib/i18n/servidor";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,7 +25,8 @@ export default async function PaginaHoroscopo() {
             className="tarjeta aparecer group p-5 text-center transition hover:-translate-y-1 hover:border-oro/40"
             style={{ animationDelay: `${i * 40}ms` }}
           >
-            <p className="text-4xl transition group-hover:scale-110">{s.simbolo}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
+            <img src={imagenSigno(s.id)} alt="" width={88} height={88} className="moneda-signo mx-auto transition group-hover:scale-110" />
             <p className="font-display mt-2 text-2xl">{s.nombre}</p>
             <p className="text-xs text-texto-suave">
               {s.inicio[1]}/{s.inicio[0]} – {s.fin[1]}/{s.fin[0]}
