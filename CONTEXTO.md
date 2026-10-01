@@ -14,7 +14,7 @@ App web de tarot, carta astral, numerología, compatibilidad y horóscopo, con l
 | Publicación | Vercel, cuenta thanotectas ("campana-edil's projects"), proyecto `arcana` | Cada push a `main` se publica solo |
 | Dominio | `miarcana.com` (comprado en Vercel); `www` redirige | Respaldo: `arcana-nu-two.vercel.app` |
 | Base de datos y usuarios | Supabase, organización "Thanotectas's Org", proyecto `arcana` | Ref `wclgoyvcowauadfnfewe`, región São Paulo |
-| IA | Anthropic API, modelo `claude-opus-5-5` (cambiable con `ARCANA_IA_MODEL`) | Clave en Vercel |
+| IA | Anthropic API en dos niveles: `claude-opus-5-5` (premium: carta astral, Cruz Celta, quiromancia, cruces) y `claude-sonnet-5-5` (estándar: carta del día, Sibila, preguntas, numerología, I Ching, chino, compatibilidad, horóscopo). `ARCANA_IA_MODEL_PREMIUM` / `ARCANA_IA_MODEL_ESTANDAR` los cambian; `ARCANA_IA_MODEL` fuerza uno para todo | Clave en Vercel |
 | Pagos | Bold (botón de pagos con firma de integridad) | Webhook: `https://miarcana.com/api/webhooks/bold` |
 | Entrar con Google | Google Cloud, proyecto `arcana-510218`, cliente OAuth "Arcana web" | Activado en Supabase → Authentication → Providers |
 

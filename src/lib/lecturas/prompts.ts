@@ -64,7 +64,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: un breve encuadre, luego una sección por posición (## nombre de la posición — carta), y un cierre con síntesis y un consejo práctico.` +
         extension,
       sistemaExtra: MAZOS[mazo].tradicion,
-      opciones: { idioma, effort: tipo === "tarot_celta" ? "medium" : "low", maxTokens: tipo === "tarot_celta" ? 3500 : 1500 },
+      opciones: { idioma, effort: tipo === "tarot_celta" ? "medium" : "low", maxTokens: tipo === "tarot_celta" ? 3500 : 1500, nivel: tipo === "tarot_celta" ? "premium" : "estandar" },
     };
   }
 
@@ -77,7 +77,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura sugerida: ## Tu esencia (Sol, Luna y Ascendente como trío), ## Cómo piensas y te comunicas (Mercurio), ## Amor y valores (Venus), ## Energía y deseo (Marte), ## Expansión y límites (Júpiter y Saturno), ## Aspectos que marcan tu carta (los 3 o 4 más relevantes), ## Balance de elementos, ## Tu camino (Nodo Norte y Medio Cielo), ## Síntesis.` +
         (datos.horaDesconocida ? " La hora es desconocida: no interpretes casas ni Ascendente, y menciona brevemente por qué." : "") +
         ` Extensión: 1100 a 1500 palabras.`,
-      opciones: { idioma, effort: "medium", maxTokens: 5000 },
+      opciones: { idioma, effort: "medium", maxTokens: 5000, nivel: "premium" },
     };
   }
 
@@ -105,7 +105,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: ## Lo que veo en tu mano, ## Línea de la vida, ## Línea de la cabeza, ## Línea del corazón, ## Línea del destino (o su ausencia), ## Montes y forma de la mano, ## Síntesis y consejo. ` +
         `Recuerda: nada de diagnósticos médicos ni de duración de la vida; la línea de la vida habla de vitalidad y cambios, no de años. Extensión: 700 a 950 palabras.\n\n` +
         INSTRUCCION_ANEXO,
-      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [] },
+      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 
@@ -150,7 +150,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: ## Lo que los dos sistemas dicen a la vez (los acuerdos, con el símbolo concreto de cada lado), ## Donde se matizan (qué añade cada uno que el otro no ve), ## La tensión (si hay contradicción, explícala y qué significa vivirla), ` +
         (pregunta ? `## Respuesta a tu pregunta (desde los dos sistemas), ` : "") +
         `## Síntesis cruzada y un consejo práctico. Nombra siempre de qué sistema sale cada idea. No repitas las lecturas anteriores: úsalas como base. Extensión: 800 a 1100 palabras.`,
-      opciones: { idioma, effort: "medium", maxTokens: 4000 },
+      opciones: { idioma, effort: "medium", maxTokens: 4000, nivel: "premium" },
     };
   }
 

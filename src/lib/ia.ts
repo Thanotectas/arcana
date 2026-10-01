@@ -4,7 +4,9 @@ import { IDIOMA_PARA_IA, IDIOMA_PREDETERMINADO, type Idioma } from "./i18n/idiom
 /**
  * Generación de interpretaciones con Claude.
  *
- * - Modelo configurable por ARCANA_IA_MODEL (por defecto claude-opus-5-5).
+ * - Dos niveles de modelo: "premium" (Opus, lecturas largas y caras) y
+ *   "estandar" (Sonnet, lo breve y lo gratis). ARCANA_IA_MODEL fuerza un
+ *   solo modelo para todo (útil para abaratar una fase de prueba).
  * - Streaming + finalMessage() para evitar timeouts en respuestas largas.
  * - fallbacks "default": si el modelo declina por política, la API reintenta
  *   con otro modelo dentro de la misma llamada.
@@ -26,7 +28,21 @@ function getCliente() {
   return cliente;
 }
 
-export const MODELO_IA = process.env.ARCANA_IA_MODEL ?? "claude-opus-5-5";
+/** Nivel de calidad de una generación: decide el modelo. */
+export type NivelIA = "premium" | "estandar";
+
+const MODELO_PREMIUM = process.env.ARCANA_IA_MODEL_PREMIUM ?? "claude-opus-5-5";
+const MODELO_ESTANDAR = process.env.ARCANA_IA_MODEL_ESTANDAR ?? "claude-sonnet-5-5";
+
+/**
+ * Modelo para un nivel. ARCANA_IA_MODEL, si está definida, manda sobre los
+ * dos niveles (por ejemplo, Sonnet para todo durante la prueba cerrada).
+ */
+export function modeloPara(nivel: NivelIA = "estandar") {
+  const forzado = process.env.ARCANA_IA_MODEL;
+  if (forzado) return forzado;
+  return nivel === "premium" ? MODELO_PREMIUM : MODELO_ESTANDAR;
+}
 
 /** Parte estable del sistema (se cachea). No incluye el idioma. */
 export const SISTEMA_BASE = `Eres Sibila, la guía esotérica de Arcana: cálida, culta y honesta. Firmas y hablas como Sibila; Arcana es el lugar.
@@ -49,6 +65,8 @@ export type ImagenEntrada = {
 export interface OpcionesTexto {
   effort?: "low" | "medium" | "high";
   maxTokens?: number;
+  /** "premium" usa el modelo grande; por defecto "estandar". */
+  nivel?: NivelIA;
   /** Idioma en que debe escribirse la respuesta. */
   idioma?: Idioma;
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
@@ -83,7 +101,7 @@ export async function generarTexto(
   ];
 
   const stream = client.beta.messages.stream({
-    model: MODELO_IA,
+    model: modeloPara(opciones.nivel),
     max_tokens: opciones.maxTokens ?? 4000,
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
