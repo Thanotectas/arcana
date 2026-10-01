@@ -11,8 +11,8 @@ import { useT } from "@/lib/i18n/cliente";
 import { textoErrorLectura } from "@/lib/i18n/errores";
 import { plantilla } from "@/lib/i18n/formato";
 
-const RUTA: Record<Sistema, string> = { carta_astral: "/carta-astral", numerologia: "/numerologia", chino: "/calendario-chino", tarot: "/tarot", iching: "/iching", quiromancia: "/quiromancia" };
-const ICONO: Record<Sistema, string> = { carta_astral: "☉", numerologia: "#", chino: "龙", tarot: "✦", iching: "☰", quiromancia: "✋" };
+const RUTA: Record<Sistema, string> = { carta_astral: "/carta-astral", numerologia: "/numerologia", chino: "/calendario-chino", tarot: "/tarot", iching: "/iching", quiromancia: "/quiromancia", suenos: "/suenos", chocolate: "/chocolate", sinastria: "/sinastria" };
+const ICONO: Record<Sistema, string> = { carta_astral: "☉", numerologia: "#", chino: "龙", tarot: "✦", iching: "☰", quiromancia: "✋", suenos: "☾", chocolate: "☕", sinastria: "♡" };
 
 /** Elige exactamente dos sistemas; cada tarjeta dice de dónde saldrán sus datos. */
 export function CruceSelector({ disponibilidad, costo, fechas }: { disponibilidad: Disponibilidad[]; costo: number; fechas: Record<string, string> }) {

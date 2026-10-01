@@ -38,6 +38,9 @@ const NOMBRE_SISTEMA_CRUCE: Record<FuenteCruce["sistema"], string> = {
   tarot: "Tarot",
   iching: "I Ching",
   quiromancia: "Quiromancia",
+  suenos: "Interpretación de sueños",
+  chocolate: "Lectura del chocolate",
+  sinastria: "Sinastría (compatibilidad entre dos cartas astrales)",
 };
 
 function idiomaDe(entrada: Objeto): Idioma {

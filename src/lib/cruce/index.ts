@@ -12,13 +12,17 @@ import { resumenQuiromancia, type EntradaQuiromancia } from "../quiromancia";
 import { extractoPlano } from "../lecturas/memoria";
 import { datosNacimientoDePerfil } from "../diario";
 import { datoDeUsuario } from "../seguridad";
+import { resumenSueno, type EntradaSueno } from "../suenos";
+import { resumenChocolate, type EntradaChocolate } from "../chocolate";
+import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
 
 /**
  * Lecturas cruzadas: dos sistemas sobre la misma persona. Los sistemas que
  * salen de los datos de nacimiento se calculan al momento; los que nacen de
- * un ritual (tarot, I Ching, mano) usan la última lectura terminada.
+ * un ritual (tarot, I Ching, mano, sueños, chocolate, sinastría) usan la
+ * última lectura terminada.
  */
-export const SISTEMAS = ["carta_astral", "numerologia", "chino", "tarot", "iching", "quiromancia"] as const;
+export const SISTEMAS = ["carta_astral", "numerologia", "chino", "tarot", "iching", "quiromancia", "suenos", "chocolate", "sinastria"] as const;
 export type Sistema = (typeof SISTEMAS)[number];
 
 export function esSistema(v: unknown): v is Sistema {
@@ -51,6 +55,9 @@ const TIPOS_POR_SISTEMA: Record<Sistema, string[]> = {
   tarot: ["tarot_tres", "tarot_celta", "tarot_carta"],
   iching: ["iching"],
   quiromancia: ["quiromancia"],
+  suenos: ["suenos"],
+  chocolate: ["chocolate"],
+  sinastria: ["sinastria"],
 };
 
 async function ultimasLecturas(supabase: SupabaseClient<Database>, usuarioId: string): Promise<LecturaBreve[]> {
@@ -117,6 +124,12 @@ export async function fuenteDe(supabase: SupabaseClient<Database>, perfil: Perfi
       resumen = resumenNumerologia(String(e.nombre ?? ""), String(e.fecha ?? ""));
     } else if (previa.tipo === "chino") {
       resumen = resumenChino(calcularChino(String(e.fecha ?? ""), (e.hora as string | null) ?? null), nombre);
+    } else if (previa.tipo === "suenos") {
+      resumen = resumenSueno(e as unknown as EntradaSueno, datoDeUsuario);
+    } else if (previa.tipo === "chocolate") {
+      resumen = resumenChocolate(e as unknown as EntradaChocolate) + "\n(La foto no se reenvía: las figuras leídas están en la síntesis de la lectura anterior.)";
+    } else if (previa.tipo === "sinastria") {
+      resumen = resumenSinastria(r as unknown as ResultadoSinastria);
     }
     return { sistema, resumen, extracto: extractoPlano(previa.interpretacion ?? "", 700), lecturaId: previa.id, titulo: previa.titulo };
   }

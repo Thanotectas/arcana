@@ -390,6 +390,9 @@ const NOMBRE_SISTEMA: Record<Sistema, string> = {
   tarot: "Tarot",
   iching: "I Ching",
   quiromancia: "Mano",
+  suenos: "Sueño",
+  chocolate: "Chocolate",
+  sinastria: "Sinastría",
 };
 
 // ---------------------------------------------------------------------------

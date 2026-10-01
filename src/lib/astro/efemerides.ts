@@ -142,6 +142,18 @@ export function posiciones(fechaUtc: Date): PosicionCuerpo[] {
   });
 }
 
+/** Solo Sol y Luna (longitudes aparentes): barato, para buscar lunaciones. */
+export function solYLuna(fechaUtc: Date): { sol: number; luna: number } {
+  const { jde } = diasJulianos(fechaUtc);
+  const pl = getPlanetas();
+  const [dPsi] = nutation.nutation(jde);
+  const nut = dPsi * R2D;
+  return {
+    sol: norm360(solar.apparentVSOP87(pl.tierra, jde).lon * R2D),
+    luna: norm360(moonposition.position(jde).lon * R2D + nut),
+  };
+}
+
 /** Oblicuidad verdadera de la eclíptica (grados). */
 export function oblicuidad(jde: number) {
   const [, dEps] = nutation.nutation(jde);

@@ -41,3 +41,14 @@ export function tituloDeSueno(texto: string, max = 60) {
   const espacio = corte.lastIndexOf(" ");
   return (espacio > 30 ? corte.slice(0, espacio) : corte).trim() + "…";
 }
+
+const NOMBRE_EMOCION: Record<Emocion, string> = { paz: "paz", alegria: "alegría", miedo: "miedo", angustia: "angustia", tristeza: "tristeza", confusion: "confusión", nostalgia: "nostalgia", deseo: "deseo" };
+
+/** Texto plano del sueño para el modelo (lo usa la lectura cruzada). */
+export function resumenSueno(e: EntradaSueno, limpiar: (texto: string, max: number) => string) {
+  return (
+    `Sueño contado por la persona${e.fecha ? ` (${e.fecha})` : ""}: ${limpiar(e.texto, 1200)}` +
+    (e.emocion ? `\nAl despertar sintió ${NOMBRE_EMOCION[e.emocion]}.` : "") +
+    (e.recurrente ? "\nEs un sueño recurrente." : "")
+  );
+}
