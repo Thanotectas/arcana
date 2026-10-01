@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { Encabezado } from "@/components/Encabezado";
@@ -39,6 +40,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />
         </ProveedorIdioma>
+        {/* Visitas anónimas y sin cookies (Vercel Web Analytics). */}
+        <Analytics />
       </body>
     </html>
   );
