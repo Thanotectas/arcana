@@ -103,7 +103,7 @@ Qué trae:
 - **PWA**: `src/app/manifest.ts` e íconos PNG en `public/marca/icono-{192,512}.png`. En iPhone los avisos solo funcionan con Arcana añadida a la pantalla de inicio; el componente lo explica.
 - El idioma de la persona se guarda en `perfiles.idioma` al cambiarlo o al activar el aviso (el cron escribe el mensaje en ese idioma).
 - **Variables nuevas en Vercel**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (mailto:), `CRON_SECRET`. Sin las VAPID, el botón de aviso no aparece y el cron solo pregenera mensajes. Se generan con `npx web-push generate-vapid-keys`.
-- Migración pendiente además de las anteriores: `0011_push.sql`. Tras la auditoría: `0012_endurecimiento.sql`. El código que usa sus funciones nuevas (`crear_pregunta`, `reservar_carta_dia`, `finalizar_generacion`, `registrar_push`, `reintentar_lectura`, `devolver_creditos`) vive en la rama `endurecimiento` y se fusiona a `main` solo después de aplicar la 0012; lo demás del endurecimiento ya está en `main`.
+- Migración pendiente además de las anteriores: `0011_push.sql`. Tras la auditoría: `0012_endurecimiento.sql` (aplicada el 1 oct 2026; la rama `endurecimiento` ya está fusionada en `main`). La zona horaria del perfil se valida como IANA al guardarla (`zonaHorariaValida`), porque la carta del día depende de ella.
 - Siguiente paso: canal de WhatsApp diario (API de WhatsApp Business de Meta; requiere cuenta verificada y plantilla aprobada).
 
 ## Auditoría de seguridad y endurecimiento (1 oct 2026)

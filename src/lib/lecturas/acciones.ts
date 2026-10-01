@@ -15,7 +15,7 @@ import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
 import type { Json } from "@/types/database";
-import { tipoImagenReal } from "../seguridad";
+import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
 export interface EstadoAccion {
   error?: string;
@@ -150,9 +150,10 @@ export async function accionCartaAstral(_prev: EstadoAccion, formData: FormData)
   if (!datos.nombre) return { error: "astral.nombre" };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datos.fecha)) return { error: "astral.fecha" };
   if (!datos.horaDesconocida && !/^\d{2}:\d{2}$/.test(datos.hora)) return { error: "astral.hora" };
-  if (!datos.lugar || Number.isNaN(datos.latitud) || Number.isNaN(datos.longitud) || !datos.zonaHoraria) {
+  if (!datos.lugar || Number.isNaN(datos.latitud) || Number.isNaN(datos.longitud) || !zonaHorariaValida(datos.zonaHoraria)) {
     return { error: "astral.lugar" };
   }
+  if (Math.abs(datos.latitud) > 90 || Math.abs(datos.longitud) > 180) return { error: "astral.lugar" };
   const anio = Number(datos.fecha.slice(0, 4));
   if (anio < 1900 || anio > new Date().getFullYear()) return { error: "astral.anio" };
 
