@@ -4,17 +4,18 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "../supabase/server";
 import { getSupabaseAdmin } from "../supabase/admin";
-import { COSTOS, CARTAS_DIA_GRATIS, type TipoLectura } from "../creditos";
+import { COSTOS, type TipoLectura } from "../creditos";
 import { TIRADAS, cartasDesdeAbanico, type TipoTirada } from "../tarot/tiradas";
 import { calcularCarta, type DatosNacimiento } from "../astro/carta";
 import { calcularPerfil } from "../numerologia";
 import { signoPorFecha, signoPorId, compatibilidadSignos } from "../zodiaco";
-import { cartasDelDiaHoy, getPerfil } from "../dal";
+import { getPerfil } from "../dal";
 import { getIdioma } from "../i18n/servidor";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
 import type { Json } from "@/types/database";
+import { tipoImagenReal } from "../seguridad";
 
 export interface EstadoAccion {
   error?: string;
@@ -71,11 +72,7 @@ async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada:
 
   if (error || !data) {
     if (costo > 0) {
-      const { data: perfil } = await admin.from("perfiles").select("creditos").eq("id", user.id).single();
-      if (perfil) {
-        await admin.from("perfiles").update({ creditos: perfil.creditos + costo }).eq("id", user.id);
-        await admin.from("movimientos_creditos").insert({ usuario_id: user.id, cantidad: costo, motivo: `reembolso:${datos.tipo}`, referencia });
-      }
+      await admin.rpc("devolver_creditos", { p_usuario: user.id, p_cantidad: costo, p_motivo: `reembolso:${datos.tipo}`, p_referencia: referencia });
     }
     throw new Error("No se pudo guardar la lectura. No se cobró nada.");
   }
@@ -115,9 +112,12 @@ export async function accionTarot(_prev: EstadoAccion, formData: FormData): Prom
 
   let id: string;
   try {
-    const ilimitado = (await getPerfil())?.ilimitado;
-    if (tipo === "tarot_carta" && !ilimitado && (await cartasDelDiaHoy()) >= CARTAS_DIA_GRATIS) {
-      return { error: "Ya sacaste tu carta gratuita de hoy. Vuelve mañana o prueba una tirada completa." };
+    if (tipo === "tarot_carta") {
+      // Reserva atómica en la base: una carta gratis por persona y día local.
+      const { supabase } = await usuarioActual();
+      const { data: reservada, error } = await supabase.rpc("reservar_carta_dia");
+      if (error) throw new Error("No se pudo reservar tu carta del día. Intenta de nuevo.");
+      if (!reservada) return { error: "Ya sacaste tu carta gratuita de hoy. Vuelve mañana o prueba una tirada completa." };
     }
     const cartas = cartasDesdeAbanico(tipo, posiciones, mazo);
     id = await crearLectura({
@@ -282,6 +282,9 @@ export async function accionQuiromancia(_prev: EstadoAccion, formData: FormData)
   if (!(foto instanceof File) || foto.size === 0) return { error: "FOTO_FALTA" };
   if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
   if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+  // El tipo declarado lo controla el navegador: comprobamos los bytes reales.
+  const tipoReal = tipoImagenReal(new Uint8Array(await foto.slice(0, 16).arrayBuffer()));
+  if (!tipoReal || tipoReal !== foto.type) return { error: "FOTO_FORMATO" };
 
   const admin = getSupabaseAdmin();
   const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
@@ -317,26 +320,12 @@ export async function accionQuiromancia(_prev: EstadoAccion, formData: FormData)
 export async function accionReintentarLectura(formData: FormData): Promise<void> {
   const { supabase, user } = await usuarioActual();
   const id = String(formData.get("id") ?? "");
-  const { data: lectura } = await supabase.from("lecturas").select("id, tipo, estado, entrada").eq("id", id).maybeSingle();
+  const { data: lectura } = await supabase.from("lecturas").select("id, tipo, estado").eq("id", id).eq("usuario_id", user.id).maybeSingle();
   if (!lectura || lectura.estado !== "error") return;
 
-  const perfil = await getPerfil();
-  const tipo = lectura.tipo as TipoLectura;
-  const costoTarifa = COSTOS[tipo];
-  if (costoTarifa > 0) {
-    const { data: ok, error } = await supabase.rpc("consumir_creditos", {
-      p_cantidad: costoTarifa,
-      p_motivo: `lectura:${tipo} (reintento)`,
-      p_referencia: id,
-    });
-    if (error || !ok) redirect(`/lecturas/${id}?error=SIN_CREDITOS`);
-  }
-
-  await getSupabaseAdmin()
-    .from("lecturas")
-    .update({ estado: "pendiente", generando_desde: null, creditos_usados: perfil?.ilimitado ? 0 : costoTarifa })
-    .eq("id", id)
-    .eq("usuario_id", user.id);
+  // Cobro y vuelta a 'pendiente' en una sola operación (dos clics no cobran dos veces).
+  const { data: ok, error } = await supabase.rpc("reintentar_lectura", { p_lectura: id, p_costo: COSTOS[lectura.tipo as TipoLectura] });
+  if (error || !ok) redirect(`/lecturas/${id}?error=SIN_CREDITOS`);
   revalidatePath(`/lecturas/${id}`);
   redirect(`/lecturas/${id}`);
 }

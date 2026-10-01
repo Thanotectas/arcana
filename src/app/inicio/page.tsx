@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
-import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
+import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
 import { cieloDeHoy } from "@/lib/astro/transitos";
 import { signoPorId } from "@/lib/zodiaco";
-import { COSTOS, CARTAS_DIA_GRATIS } from "@/lib/creditos";
+import { COSTOS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
@@ -32,15 +32,14 @@ function racha(fechas: string[]) {
 
 export default async function PaginaInicio() {
   await requerirUsuario();
-  const [perfil, lecturas, cartasHoy, t, idioma, invitaciones] = await Promise.all([
+  const [perfil, lecturas, cartaDisponible, t, idioma, invitaciones] = await Promise.all([
     getPerfil(),
     getLecturas(200),
-    cartasDelDiaHoy(),
+    cartaDiaDisponible(),
     getT(),
     getIdioma(),
     getResumenInvitaciones().catch(() => ({ invitados: 0, premiadas: 0, creditos_ganados: 0 })),
   ]);
-  const cartaDisponible = Boolean(perfil?.ilimitado) || cartasHoy < CARTAS_DIA_GRATIS;
   const diasSeguidos = racha(lecturas.map((l) => l.creado_en));
   const datosNatales = datosNacimientoDePerfil(perfil);
   const cielo = datosNatales ? cieloDeHoy(datosNatales) : null;
