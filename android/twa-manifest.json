@@ -36,7 +36,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://miarcana.com/",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "fingerprints": [
