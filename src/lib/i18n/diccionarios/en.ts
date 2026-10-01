@@ -262,6 +262,7 @@ export const en: Diccionario = {
     opcional: "(optional)",
     ejemploPregunta: "For example: What do I need to see about my current relationship?",
     respira: "Breathe, focus on your question and shuffle when you feel ready.",
+    escribePregunta: "Write your question to shuffle: the cards answer best to a clear intention.",
     yaUsaste: "You've already drawn your free card for today. Come back tomorrow or choose another spread.",
     barajar: "Shuffle the deck",
     barajando: "Shuffling…",

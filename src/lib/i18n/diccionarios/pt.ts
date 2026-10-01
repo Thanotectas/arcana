@@ -259,6 +259,7 @@ export const pt: Diccionario = {
     opcional: "(opcional)",
     ejemploPregunta: "Por exemplo: O que preciso enxergar sobre minha relação atual?",
     respira: "Respire, pense na sua pergunta e embaralhe quando se sentir pronto.",
+    escribePregunta: "Escreva sua pergunta para embaralhar: as cartas respondem melhor a uma intenção clara.",
     yaUsaste: "Você já tirou sua carta gratuita de hoje. Volte amanhã ou escolha outra tiragem.",
     barajar: "Embaralhar",
     barajando: "Embaralhando…",

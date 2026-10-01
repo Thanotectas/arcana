@@ -261,6 +261,7 @@ export const es = {
     opcional: "(opcional)",
     ejemploPregunta: "Por ejemplo: ¿Qué necesito ver sobre mi relación actual?",
     respira: "Respira, piensa en tu pregunta y baraja cuando te sientas listo.",
+    escribePregunta: "Escribe tu pregunta para barajar: las cartas responden mejor a una intención clara.",
     yaUsaste: "Ya sacaste tu carta gratuita de hoy. Vuelve mañana o elige otra tirada.",
     barajar: "Barajar el mazo",
     barajando: "Barajando…",

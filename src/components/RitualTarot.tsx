@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, type CSSProperties } from "react";
+import { useActionState, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { accionTarot, type EstadoAccion } from "@/lib/lecturas/acciones";
 import { DisposicionTirada } from "./DisposicionTirada";
@@ -62,15 +62,23 @@ export function RitualTarot({
   const [pregunta, setPregunta] = useState("");
   const [fase, setFase] = useState<Fase>("preparar");
   const [seleccion, setSeleccion] = useState<number[]>([]);
+  const [faltaPregunta, setFaltaPregunta] = useState(false);
+  const campoPregunta = useRef<HTMLTextAreaElement>(null);
 
   const tirada = tiradas.find((x) => x.id === tiradaId)!;
   const mazo = mazos.find((m) => m.id === mazoId)!;
   const total = tirada.posiciones.length;
   const completa = seleccion.length === total;
   const preguntaObligatoria = tirada.id !== "tarot_carta";
-  const puedeBarajar = tirada.disponible && (!preguntaObligatoria || pregunta.trim().length > 0);
+  const tienePregunta = !preguntaObligatoria || pregunta.trim().length > 0;
 
   const barajar = () => {
+    // Sin pregunta el botón no se apaga en silencio: avisa y lleva al campo.
+    if (!tienePregunta) {
+      setFaltaPregunta(true);
+      campoPregunta.current?.focus();
+      return;
+    }
     setSeleccion([]);
     setFase("barajar");
     window.setTimeout(() => setFase("elegir"), 1500);
@@ -162,17 +170,27 @@ export function RitualTarot({
               </label>
               <textarea
                 id="pregunta"
+                ref={campoPregunta}
                 rows={3}
                 maxLength={300}
                 className="campo"
                 value={pregunta}
-                onChange={(e) => setPregunta(e.target.value)}
+                onChange={(e) => {
+                  setPregunta(e.target.value);
+                  if (e.target.value.trim()) setFaltaPregunta(false);
+                }}
                 placeholder={t.tarot.ejemploPregunta}
+                aria-invalid={faltaPregunta}
+                aria-describedby={faltaPregunta ? "falta-pregunta" : undefined}
               />
-              <p className="mt-2 text-xs text-texto-suave">{t.tarot.respira}</p>
+              {faltaPregunta ? (
+                <p id="falta-pregunta" className="mt-2 text-xs text-oro-suave" role="alert">{t.tarot.escribePregunta}</p>
+              ) : (
+                <p className="mt-2 text-xs text-texto-suave">{t.tarot.respira}</p>
+              )}
             </div>
             {!tirada.disponible && <Aviso tipo="info">{t.tarot.yaUsaste}</Aviso>}
-            <button type="button" className="boton boton-primario w-full sm:w-auto" disabled={!puedeBarajar} onClick={barajar}>
+            <button type="button" className="boton boton-primario w-full sm:w-auto" disabled={!tirada.disponible} onClick={barajar}>
               {t.tarot.barajar}
             </button>
           </div>
