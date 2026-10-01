@@ -50,6 +50,13 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+
+  // La app de Google Play abre con ?app=android: se recuerda en una cookie para
+  // esconder las compras (la política de Play exige su propio sistema de pago).
+  const app = request.nextUrl.searchParams.get("app");
+  if (app === "android" || app === "pwa") {
+    response.cookies.set("plataforma", app, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax", httpOnly: true, secure: process.env.NODE_ENV === "production" });
+  }
   const esPrivada = RUTAS_PRIVADAS.some(
     (r) => pathname === r || pathname.startsWith(r + "/"),
   );

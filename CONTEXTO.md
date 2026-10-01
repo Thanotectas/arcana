@@ -152,6 +152,13 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 - **Cobro en la base** (`crear_mensaje_asistente`, migración `0015_asistente.sql`): 3 mensajes gratis al día, Círculo hasta 30 al día, el resto 1 crédito; `finalizar_mensaje_asistente` y `reembolsar_mensaje_asistente` con guarda de estado; `mensajes_asistente_hoy()` para mostrar el saldo gratis. Tabla `mensajes_asistente` (rol persona/asistente). Ruta `/api/asistente` (GET historial, POST mensaje en streaming con las marcas `[[ERROR:…]]`).
 - Probado en PostgreSQL local: reglas de cobro, cierre y reembolso.
 
+## App para Google Play (2 oct 2026)
+
+- **Trusted Web Activity** con Bubblewrap: `android/twa-manifest.json` (paquete `com.miarcana.app`, inicio `/inicio?app=android`, colores noche, atajos), compilada en GitHub Actions (`.github/workflows/android.yml`: JDK 17 + SDK del runner, `bubblewrap update` + `bubblewrap build`, artefactos AAB y APK). La llave de subida se restaura desde el secreto `ANDROID_KEYSTORE_BASE64`; contraseñas en `ANDROID_KEYSTORE_PASSWORD` y `ANDROID_KEY_PASSWORD`. La huella SHA-256 de esa llave está en `public/.well-known/assetlinks.json`.
+- **Manifiesto PWA** ampliado (`id`, categorías, orientación, ícono maskable `public/marca/icono-maskable-512.png`, atajos) y `start_url` con `?app=pwa`.
+- **Sin compras dentro de la app de Play**: `?app=android` deja la cookie `plataforma`; `comprasVisibles()` (`src/lib/plataforma.ts`) oculta los enlaces a `/creditos`, la tarjeta del Círculo y los avisos de recarga, y `/creditos` muestra solo el saldo. Motivo: la política de pagos de Play. Segunda fase: Google Play Billing con la Digital Goods API.
+- Guía completa de publicación, ficha de la tienda y respuestas de seguridad de datos en `docs/GOOGLE-PLAY.md`.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

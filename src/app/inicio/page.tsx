@@ -6,6 +6,7 @@ import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloAct
 import { datosNacimientoDePerfil } from "@/lib/diario";
 import { cieloDeHoy } from "@/lib/astro/transitos";
 import { signoPorId } from "@/lib/zodiaco";
+import { comprasVisibles } from "@/lib/plataforma";
 import { COSTOS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
@@ -40,6 +41,7 @@ export default async function PaginaInicio() {
     getIdioma(),
     getResumenInvitaciones().catch(() => ({ invitados: 0, premiadas: 0, creditos_ganados: 0 })),
   ]);
+  const compras = await comprasVisibles();
   const diasSeguidos = racha(lecturas.map((l) => l.creado_en));
   const datosNatales = datosNacimientoDePerfil(perfil);
   const cielo = datosNatales ? cieloDeHoy(datosNatales) : null;
@@ -86,17 +88,17 @@ export default async function PaginaInicio() {
         </div>
         <div className="flex flex-wrap gap-3">
           <LunaHoy t={t} />
-          <Link href="/creditos" className="tarjeta tarjeta-modulo flex items-center gap-3 px-5 py-3">
+          <Link href={compras ? "/creditos" : "/cuenta"} className="tarjeta tarjeta-modulo flex items-center gap-3 px-5 py-3">
             <Coins className="h-6 w-6 text-oro" aria-hidden />
             <div>
               <p className="text-2xl font-semibold text-oro-suave">{perfil?.ilimitado ? "∞" : (perfil?.creditos ?? 0)}</p>
-              <p className="text-xs text-texto-suave">{perfil?.ilimitado ? t.comun.usoIlimitado : t.inicio.comprarMas}</p>
+              <p className="text-xs text-texto-suave">{perfil?.ilimitado ? t.comun.usoIlimitado : compras ? t.inicio.comprarMas : t.comun.creditos}</p>
             </div>
           </Link>
         </div>
       </section>
 
-      {!perfil?.ilimitado && (perfil?.creditos ?? 0) <= 1 && (
+      {compras && !perfil?.ilimitado && (perfil?.creditos ?? 0) <= 1 && (
         <div className="tarjeta aparecer flex flex-wrap items-center justify-between gap-3 border-oro/40 bg-oro/5 p-4">
           <p className="text-sm">{(perfil?.creditos ?? 0) === 0 ? t.persuasion.saldoCero : t.persuasion.saldoUno}</p>
           <Link href="/creditos" className="boton boton-primario px-4 py-1.5 text-sm">{t.persuasion.recargar}</Link>

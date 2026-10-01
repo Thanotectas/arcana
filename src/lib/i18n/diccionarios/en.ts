@@ -425,6 +425,7 @@ export const en: Diccionario = {
       generico: "An error occurred.",
     },
     sinConfigurar: "Payments in setup mode: the Bold identity key or secret key is missing.",
+    noDisponibleApp: "Credit top-ups are not available in this version of the app.",
     paquetes: {
       inicial: { nombre: "Starter", descripcion: "To try it out: five simple readings or one birth chart." },
       buscador: { nombre: "Seeker", descripcion: "The most popular. Enough for a month of readings." },

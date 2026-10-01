@@ -9,6 +9,7 @@ import { Aviso } from "@/components/Aviso";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaLarga, plantilla } from "@/lib/i18n/formato";
+import { comprasVisibles } from "@/lib/plataforma";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -19,6 +20,15 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   await requerirUsuario();
   const [{ error }, perfil, t, haComprado, idioma] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma()]);
   const miembro = circuloActivo(perfil);
+  if (!(await comprasVisibles())) {
+    return (
+      <div className="mx-auto max-w-md space-y-4 text-center">
+        <h1 className="font-display text-4xl font-semibold">{t.creditos.seccion}</h1>
+        <p className="text-texto-suave">{perfil?.ilimitado ? t.comun.tuCuentaIlimitada : plantilla(t.creditos.tienes, { n: perfil?.creditos ?? 0 })}</p>
+        <Aviso tipo="info">{t.creditos.noDisponibleApp}</Aviso>
+      </div>
+    );
+  }
   const precioAstral = formatoCOP(Math.round((PAQUETES[1].precioCOP / PAQUETES[1].creditos) * COSTOS.carta_astral));
   const configurado = pagosConfigurados();
   const errores = t.creditos.errores as Record<string, string>;

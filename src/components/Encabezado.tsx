@@ -5,9 +5,10 @@ import { getPerfil } from "@/lib/dal";
 import { accionSalir } from "@/lib/auth/acciones";
 import { getT } from "@/lib/i18n/servidor";
 import { SelectorIdioma } from "./SelectorIdioma";
+import { comprasVisibles } from "@/lib/plataforma";
 
 export async function Encabezado() {
-  const [perfil, t] = await Promise.all([getPerfil(), getT()]);
+  const [perfil, t, compras] = await Promise.all([getPerfil(), getT(), comprasVisibles()]);
   const NAV = [
     ...(perfil ? [{ href: "/hoy", etiqueta: t.nav.hoy }] : []),
     { href: "/tarot", etiqueta: t.nav.tarot },
@@ -41,7 +42,7 @@ export async function Encabezado() {
           {perfil ? (
             <>
               <Link
-                href="/creditos"
+                href={compras ? "/creditos" : "/cuenta"}
                 className="flex items-center gap-1.5 rounded-full border border-oro/40 bg-oro/10 px-3 py-1.5 text-sm font-medium text-oro-suave transition hover:bg-oro/20"
                 title={perfil.ilimitado ? t.comun.usoIlimitado : t.comun.tusCreditos}
               >

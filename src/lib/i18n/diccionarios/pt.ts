@@ -422,6 +422,7 @@ export const pt: Diccionario = {
       generico: "Ocorreu um erro.",
     },
     sinConfigurar: "Pagamentos em modo de configuração: falta a chave de identidade ou a chave secreta da Bold.",
+    noDisponibleApp: "A recarga de créditos não está disponível nesta versão do app.",
     paquetes: {
       inicial: { nombre: "Inicial", descripcion: "Para experimentar: cinco leituras simples ou um mapa astral." },
       buscador: { nombre: "Buscador", descripcion: "O mais escolhido. Dá para um mês de consultas." },

@@ -1,0 +1,45 @@
+{
+  "packageId": "com.miarcana.app",
+  "host": "miarcana.com",
+  "name": "Arcana: tarot, carta astral y más",
+  "launcherName": "Arcana",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0b0716",
+  "themeColorDark": "#0b0716",
+  "navigationColor": "#0b0716",
+  "navigationColorDark": "#0b0716",
+  "navigationDividerColor": "#0b0716",
+  "navigationDividerColorDark": "#0b0716",
+  "backgroundColor": "#0b0716",
+  "enableNotifications": true,
+  "startUrl": "/inicio?app=android",
+  "iconUrl": "https://miarcana.com/marca/icono-512.png",
+  "maskableIconUrl": "https://miarcana.com/marca/icono-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./arcana-upload.keystore",
+    "alias": "arcana"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    { "name": "Tu cielo hoy", "short_name": "Hoy", "url": "/hoy?app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" },
+    { "name": "Carta del día", "short_name": "Carta", "url": "/tarot?tirada=tarot_carta&app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://miarcana.com/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": { "enabled": false },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://miarcana.com/",
+  "minSdkVersion": 21,
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "fingerprints": [
+    { "name": "Clave de subida", "value": "9F:D9:F9:21:E4:49:B5:C7:E7:14:5C:FD:02:84:EF:DB:88:6F:E5:E8:26:A2:C3:83:37:57:38:89:20:FC:B5:3C" }
+  ]
+}

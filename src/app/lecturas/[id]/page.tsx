@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getLectura, requerirUsuario, getPreguntas, getPerfil, circuloActivo } from "@/lib/dal";
+import { comprasVisibles } from "@/lib/plataforma";
 import { ConversacionLectura } from "@/components/ConversacionLectura";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
@@ -36,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PaginaLectura({ params }: { params: Promise<{ id: string }> }) {
   await requerirUsuario();
   const { id } = await params;
-  const [lectura, t, idioma, perfil] = await Promise.all([getLectura(id), getT(), getIdioma(), getPerfil()]);
+  const [lectura, t, idioma, perfil, compras] = await Promise.all([getLectura(id), getT(), getIdioma(), getPerfil(), comprasVisibles()]);
   if (!lectura) notFound();
   const preguntas = lectura.estado === "lista" ? await getPreguntas(lectura.id) : [];
 
@@ -80,13 +81,14 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           gratisRestantes={PREGUNTAS_GRATIS_POR_LECTURA}
           ilimitado={Boolean(perfil?.ilimitado)}
           enCirculo={circuloActivo(perfil)}
+          compras={compras}
         />
       )}
       {lectura.estado === "lista" && <SiguientePaso tipo={lectura.tipo} />}
       {lectura.estado === "lista" && perfil && !perfil.ilimitado && (
         <p className="flex flex-wrap items-center gap-2 text-sm text-texto-suave">
           {plantilla(t.crecimiento.saldoLectura, { n: perfil.creditos })}
-          {perfil.creditos <= 1 && (
+          {compras && perfil.creditos <= 1 && (
             <Link href="/creditos" className="text-oro-suave underline">{t.persuasion.recargar}</Link>
           )}
         </p>

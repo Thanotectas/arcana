@@ -424,6 +424,7 @@ export const es = {
       generico: "Ocurrió un error.",
     },
     sinConfigurar: "Pagos en modo de configuración: falta la llave de identidad o la llave secreta de Bold.",
+    noDisponibleApp: "La recarga de créditos no está disponible en esta versión de la app.",
     paquetes: {
       inicial: { nombre: "Inicial", descripcion: "Para probar: cinco lecturas sencillas o una carta astral." },
       buscador: { nombre: "Buscador", descripcion: "El más elegido. Alcanza para un mes de consultas." },

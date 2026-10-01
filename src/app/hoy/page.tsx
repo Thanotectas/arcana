@@ -17,6 +17,7 @@ import { FormularioNacimiento } from "@/components/FormularioNacimiento";
 import { Markdown } from "@/components/Markdown";
 import { Aviso } from "@/components/Aviso";
 import { AvisoDiario } from "@/components/AvisoDiario";
+import { comprasVisibles } from "@/lib/plataforma";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -30,6 +31,7 @@ export default async function PaginaHoy() {
   const datos = datosNacimientoDePerfil(perfil);
   const fecha = fechaLocalHoy(perfil.zona_horaria);
   const miembro = circuloActivo(perfil);
+  const compras = await comprasVisibles();
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -55,10 +57,10 @@ export default async function PaginaHoy() {
             <Suspense fallback={<Escribiendo texto={t.hoy.escribiendo} />}>
               <MensajeDiario perfil={perfil} idioma={idioma} t={t} />
             </Suspense>
-          ) : (
+          ) : compras ? (
             <Invitacion t={t} />
-          )}
-          {miembro && perfil.circulo_hasta && !perfil.ilimitado && (
+          ) : null}
+          {compras && miembro && perfil.circulo_hasta && !perfil.ilimitado && (
             <p className="text-center text-xs text-texto-suave">
               {plantilla(t.circulo.activoHasta, { fecha: fechaLarga(perfil.circulo_hasta, idioma) })} ·{" "}
               <Link href="/creditos#circulo" className="underline">{t.circulo.extender}</Link>

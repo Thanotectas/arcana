@@ -30,6 +30,7 @@ export function ConversacionLectura({
   gratisRestantes,
   ilimitado,
   enCirculo = false,
+  compras = true,
 }: {
   lecturaId: string;
   iniciales: PreguntaLectura[];
@@ -38,6 +39,8 @@ export function ConversacionLectura({
   ilimitado: boolean;
   /** Miembro del Círculo: las preguntas no se cobran (el servidor aplica el tope diario). */
   enCirculo?: boolean;
+  /** false en la app de Google Play: sin enlaces a compras. */
+  compras?: boolean;
 }) {
   const { t } = useT();
   const router = useRouter();
@@ -166,7 +169,7 @@ export function ConversacionLectura({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-texto-suave">
             {gratis ? t.preguntas.primeraGratis : plantilla(t.preguntas.cuesta, { n: costo })}
-            {!gratis && (
+            {!gratis && compras && (
               <>
                 {" "}
                 <Link href="/creditos#circulo" className="text-oro-suave underline">{t.crecimiento.preguntaCirculo}</Link>

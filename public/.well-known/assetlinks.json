@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.miarcana.app",
+      "sha256_cert_fingerprints": [
+        "9F:D9:F9:21:E4:49:B5:C7:E7:14:5C:FD:02:84:EF:DB:88:6F:E5:E8:26:A2:C3:83:37:57:38:89:20:FC:B5:3C"
+      ]
+    }
+  }
+]
