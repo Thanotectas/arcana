@@ -109,7 +109,7 @@ Qué trae:
 
 ## Instagram automático (1 oct 2026)
 
-- **Cron** (`vercel.json` → `GET /api/cron/instagram`, 12:00 UTC = 07:00 Bogotá) publica en @miarcana.oficial la "Carta del día de Arcana" con la API Graph de Meta (`src/lib/redes/instagram.ts`: contenedor, espera y `media_publish`; el token va en la cabecera). Exige `Authorization: Bearer CRON_SECRET`. Se dispara a mano desde Vercel (Cron Jobs → Run).
+- **Cron** (`vercel.json` → `GET /api/cron/instagram`, 12:00 UTC = 07:00 Bogotá) publica en @miarcana.oficial la "Carta del día de Arcana" con la API Graph de Meta (`src/lib/redes/instagram.ts`: contenedor, espera y `media_publish`; el token va en la cabecera). Exige `Authorization: Bearer CRON_SECRET`. Se dispara a mano desde Vercel (Cron Jobs → Run). Reintento automático a las 17:00 UTC (12:00 Bogotá): solo publica si la de la mañana falló o quedó colgada. El 1 oct 2026 la primera corrida falló por el límite de solicitudes de la app de Meta (código 4), que comparte con Thanotectas.
 - **Carta**: `src/lib/redes/carta-dia.ts`. La misma para todos por fecha de Bogotá; recorre la rotación sin repetir. Quedan fuera de la rotación pública las cartas cuyo texto habla de salud, crisis, pérdidas o traiciones.
 - **Imagen**: `/api/redes/carta-dia?fecha=AAAA-MM-DD` (pública, 1080×1350, `imagenTarjeta`); el texto sale del mazo, nunca de la URL.
 - **Una por día**: tabla `publicaciones_redes` (migración `0013_publicaciones_redes.sql`, aplicada el 1 oct 2026) con clave única red + tipo + fecha; si una publicación falla queda en `error` y el siguiente intento la retoma.

@@ -8,7 +8,8 @@ export const maxDuration = 120;
 
 /**
  * Cron diario (vercel.json, 12:00 UTC = 07:00 Bogotá): publica en Instagram la
- * carta del día de Arcana. Vercel manda `Authorization: Bearer CRON_SECRET`.
+ * carta del día de Arcana. Una segunda corrida (17:00 UTC = 12:00 Bogotá) solo
+ * actúa si la de la mañana falló. Vercel manda `Authorization: Bearer CRON_SECRET`.
  * Una sola publicación por día: la tabla publicaciones_redes lo garantiza.
  */
 export async function GET(request: Request) {
@@ -33,11 +34,14 @@ export async function GET(request: Request) {
     if (errorReserva && errorReserva.code !== "23505") {
       return Response.json({ error: "reserva", detalle: errorReserva.message }, { status: 500 });
     }
-    // Ya existía: solo se reintenta si el intento anterior falló.
+    // Ya existía: se reintenta si el intento anterior falló o quedó colgado
+    // (más de 10 minutos en 'pendiente', p. ej. si la función se cortó).
+    const colgadoAntes = new Date(Date.now() - 10 * 60_000).toISOString();
     const { data: retomada } = await admin
       .from("publicaciones_redes")
-      .update({ estado: "pendiente", detalle: null })
-      .match({ ...clave, estado: "error" })
+      .update({ estado: "pendiente", detalle: null, creado_en: new Date().toISOString() })
+      .match(clave)
+      .or(`estado.eq.error,and(estado.eq.pendiente,creado_en.lt."${colgadoAntes}")`)
       .select("id")
       .maybeSingle();
     if (!retomada) return Response.json({ fecha, carta: carta.nombre, omitida: "ya_publicada_o_en_curso" });
