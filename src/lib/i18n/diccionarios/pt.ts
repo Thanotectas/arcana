@@ -533,6 +533,13 @@ export const pt: Diccionario = {
     relaciones: { mismo: "é o seu próprio ano: pede cuidado e proteção", trino: "ano de apoio: está no seu triângulo", amigo: "ano de alianças: é seu amigo secreto", choque: "ano de atrito: pede prudência", neutra: "ano neutro: depende das suas decisões" },
     errores: { nombre: "Digite seu nome.", fecha: "Data de nascimento inválida (a partir de 1900).", hora: "Hora inválida." },
   },
+  voz: {
+    dictar: "Ditar por voz",
+    detener: "Parar",
+    escuchando: "Ouvindo… fale com naturalidade e toque em Parar ao terminar.",
+    sinPermiso: "O navegador não permitiu usar o microfone. Verifique a permissão e tente de novo.",
+    fallo: "Não foi possível reconhecer a voz. Tente de novo ou escreva o texto.",
+  },
   suenos: {
     seccion: "Diário de sonhos",
     titulo: "Interprete seu sonho",

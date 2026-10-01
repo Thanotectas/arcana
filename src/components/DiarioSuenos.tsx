@@ -6,6 +6,7 @@ import { accionSuenos, type EstadoAccion } from "@/lib/lecturas/acciones";
 import { EMOCIONES, SUENO_MAX, SUENO_MIN, type Emocion } from "@/lib/suenos";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
+import { BotonVoz } from "./BotonVoz";
 import { useT } from "@/lib/i18n/cliente";
 import { textoErrorLectura } from "@/lib/i18n/errores";
 import { plantilla } from "@/lib/i18n/formato";
@@ -45,9 +46,12 @@ export function DiarioSuenos() {
           placeholder={t.suenos.ejemplo}
           className="campo min-h-40 w-full resize-y"
         />
-        <p className="mt-1 text-right text-xs text-texto-suave">
-          {faltan > 0 ? plantilla(t.suenos.faltan, { n: faltan }) : `${texto.length} / ${SUENO_MAX}`}
-        </p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <BotonVoz valor={texto} onChange={(v) => setTexto(v.slice(0, SUENO_MAX))} />
+          <p className="text-xs text-texto-suave">
+            {faltan > 0 ? plantilla(t.suenos.faltan, { n: faltan }) : `${texto.length} / ${SUENO_MAX}`}
+          </p>
+        </div>
       </div>
 
       <fieldset>

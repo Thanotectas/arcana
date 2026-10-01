@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BotonVoz } from "./BotonVoz";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sparkles, Send, X } from "lucide-react";
@@ -206,6 +207,7 @@ export function Asistente({ nombre, gratisPorDia, circuloPorDia, costo, enCircul
                   }
                 }}
               />
+              <BotonVoz valor={texto} onChange={(v) => setTexto(v.slice(0, 600))} disabled={enviando} compacto />
               <button type="submit" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-oro-suave to-oro text-noche shadow-[0_8px_24px_rgba(217,180,90,0.35)] transition disabled:opacity-40" disabled={enviando || texto.trim().length < 2} aria-label={t.asistente.enviar}>
                 <Send className="h-5 w-5" aria-hidden />
               </button>

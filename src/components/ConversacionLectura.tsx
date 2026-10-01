@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BotonVoz } from "./BotonVoz";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MessageCircleQuestion, Send } from "lucide-react";
@@ -167,6 +168,7 @@ export function ConversacionLectura({
           }}
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
+          <BotonVoz valor={texto} onChange={(v) => setTexto(v.slice(0, 400))} disabled={enviando} />
           <p className="text-xs text-texto-suave">
             {gratis ? t.preguntas.primeraGratis : plantilla(t.preguntas.cuesta, { n: costo })}
             {!gratis && compras && (

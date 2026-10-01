@@ -536,6 +536,13 @@ export const en: Diccionario = {
     relaciones: { mismo: "it is your own year: it asks for care and protection", trino: "a supportive year: it is in your triangle", amigo: "a year of alliances: it is your secret friend", choque: "a year of friction: it asks for prudence", neutra: "a neutral year: it depends on your choices" },
     errores: { nombre: "Enter your name.", fecha: "Invalid birth date (from 1900).", hora: "Invalid time." },
   },
+  voz: {
+    dictar: "Dictate by voice",
+    detener: "Stop",
+    escuchando: "Listening… speak naturally and press Stop when you are done.",
+    sinPermiso: "The browser did not allow the microphone. Check the permission and try again.",
+    fallo: "Voice could not be recognized. Try again or type the text.",
+  },
   suenos: {
     seccion: "Dream journal",
     titulo: "Interpret your dream",

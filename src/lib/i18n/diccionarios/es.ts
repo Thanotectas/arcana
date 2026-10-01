@@ -535,6 +535,13 @@ export const es = {
     relaciones: { mismo: "es tu propio año: pide cuidado y protección", trino: "año de apoyo: está en tu triángulo", amigo: "año de alianzas: es tu amigo secreto", choque: "año de fricción: pide prudencia", neutra: "año neutro: depende de tus decisiones" },
     errores: { nombre: "Escribe tu nombre.", fecha: "Fecha de nacimiento no válida (desde 1900).", hora: "Hora no válida." },
   },
+  voz: {
+    dictar: "Dictar con la voz",
+    detener: "Detener",
+    escuchando: "Escuchando… habla con naturalidad y pulsa Detener al terminar.",
+    sinPermiso: "El navegador no permitió usar el micrófono. Revisa el permiso y vuelve a intentar.",
+    fallo: "No se pudo reconocer la voz. Intenta de nuevo o escribe el texto.",
+  },
   suenos: {
     seccion: "Diario de sueños",
     titulo: "Interpreta tu sueño",
