@@ -34,9 +34,21 @@ jobs:
       - name: Restaurar la llave de firma
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then echo "Falta el secreto ANDROID_KEYSTORE_BASE64"; exit 1; fi
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/arcana-upload.keystore
+          if [ -z "$ANDROID_KEYSTORE_PASSWORD" ]; then echo "Falta el secreto ANDROID_KEYSTORE_PASSWORD"; exit 1; fi
+          # Copiado desde el Bloc de notas puede traer saltos de línea (\r\n) o espacios: se quitan.
+          limpio=$(printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d ' \r\n\t')
+          echo "Largo del secreto sin espacios: ${#limpio} caracteres"
+          if ! printf '%s' "$limpio" | base64 -d > android/arcana-upload.keystore; then
+            echo "El secreto ANDROID_KEYSTORE_BASE64 no es base64 válido: vuelve a copiar todo el archivo keystore.base64"; exit 1
+          fi
+          # La llave debe abrirse con la contraseña antes de compilar.
+          if ! keytool -list -keystore android/arcana-upload.keystore -storepass "$ANDROID_KEYSTORE_PASSWORD" > /dev/null; then
+            echo "La llave no abre con ANDROID_KEYSTORE_PASSWORD: revisa la contraseña o vuelve a copiar keystore.base64 completo"; exit 1
+          fi
+          echo "Llave restaurada y verificada"
 
       - name: Generar el proyecto Android
         working-directory: android
