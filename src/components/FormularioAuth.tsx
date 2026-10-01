@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
+import { Turnstile } from "./Turnstile";
 import type { EstadoAuth } from "@/lib/auth/acciones";
 import { useT } from "@/lib/i18n/cliente";
 
@@ -34,6 +35,7 @@ export function FormularioEntrar({ accion, volver }: { accion: Accion; volver?: 
         <label className="etiqueta" htmlFor="password">{t.auth.contrasena}</label>
         <input id="password" name="password" type="password" autoComplete="current-password" required className="campo" />
       </div>
+      <Turnstile reinicio={estado} />
       <BotonEnviar className="boton boton-primario w-full" cargando={t.auth.entrando}>{t.comun.entrar}</BotonEnviar>
       <p className="text-center text-sm text-texto-suave">
         <Link href="/recuperar" className="hover:text-texto">{t.auth.olvidaste}</Link>
@@ -73,6 +75,7 @@ export function FormularioRegistro({ accion }: { accion: Accion }) {
           {despues}
         </span>
       </label>
+      <Turnstile reinicio={estado} />
       <BotonEnviar className="boton boton-primario w-full" cargando={t.auth.creando}>{t.comun.crearCuenta}</BotonEnviar>
     </form>
   );
@@ -89,6 +92,7 @@ export function FormularioRecuperar({ accion }: { accion: Accion }) {
         <label className="etiqueta" htmlFor="email">{t.auth.correo}</label>
         <input id="email" name="email" type="email" required className="campo" />
       </div>
+      <Turnstile reinicio={estado} />
       <BotonEnviar className="boton boton-primario w-full">{t.auth.enviarEnlace}</BotonEnviar>
     </form>
   );

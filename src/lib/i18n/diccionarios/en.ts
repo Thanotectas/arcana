@@ -167,6 +167,7 @@ export const en: Diccionario = {
       noCambiarContrasena: "The password could not be changed.",
       perfilActualizado: "Profile updated.",
       google: "Could not sign in with Google. Try again or sign in with your email.",
+      captcha: "We could not verify that you are a person. Wait a moment and try again.",
       nacimientoFecha: "Invalid birth date.",
       nacimientoHora: "Invalid time.",
       nacimientoLugar: "Pick your birthplace from the suggestions list.",

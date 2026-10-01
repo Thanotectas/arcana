@@ -23,6 +23,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 ## Variables de entorno (en Vercel; nunca en el repositorio)
 
 - Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
+- CAPTCHA: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (la clave secreta de Turnstile se configura en Supabase Auth, no en Vercel).
 
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`, `BOLD_ENV` (`production` con llaves reales; `test` solo con llaves de prueba), `NEXT_PUBLIC_SITE_URL` (`https://miarcana.com`). Plantilla en `.env.example`.
 
@@ -119,7 +120,7 @@ Se revisó todo el código y las migraciones. Lo corregido (migración `0012_end
 - La migración 0012 se probó completa (0001→0012) en un PostgreSQL 16 local con un esquema `auth` simulado, incluidas las funciones nuevas.
 
 Pendiente de seguridad que requiere decisión o cuenta externa:
-- **CAPTCHA en el registro** (Turnstile o hCaptcha en Supabase Auth) para frenar cuentas títere que cosechan créditos de bienvenida e invitación.
+- ~~CAPTCHA en el registro~~ Hecho: Cloudflare Turnstile en entrar, registro y recuperar (`src/components/Turnstile.tsx`, token en el campo `captcha`, verificado por Supabase Auth). Activación: (1) en Cloudflare → Turnstile crear un widget para `miarcana.com` (modo Managed); (2) la **clave del sitio** va en Vercel como `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y se hace Redeploy; (3) la **clave secreta** va en Supabase → Authentication → Attack Protection → Enable Captcha protection → Turnstile. Sin la variable el widget no aparece y Supabase no debe tener el CAPTCHA activado (rechazaría todos los registros). Google OAuth no pasa por el CAPTCHA (Supabase no lo exige ahí).
 - **Eliminar cuenta** (Habeas Data) con borrado de las fotos de palmas en Storage.
 - `supabase/migrations/0003` contiene un correo personal en `correos_ilimitados`; ya está aplicado, pero conviene moverlo a datos privados si el repo se hace público.
 

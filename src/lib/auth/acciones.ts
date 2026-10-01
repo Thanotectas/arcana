@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
 import { aplicarInvitacionPendiente } from "../invitaciones";
-import { rutaInterna } from "../seguridad";
+import { rutaInterna, zonaHorariaValida } from "../seguridad";
 
 export interface EstadoAuth {
   error?: string;
@@ -16,6 +16,16 @@ function urlBase(h: Headers) {
     process.env.NEXT_PUBLIC_SITE_URL ??
     `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`
   );
+}
+
+/** Token de Turnstile del formulario (lo verifica Supabase Auth). */
+function tokenCaptcha(formData: FormData) {
+  const v = String(formData.get("captcha") ?? "").trim();
+  return v ? v.slice(0, 4096) : undefined;
+}
+
+function esErrorCaptcha(mensaje: string) {
+  return /captcha/i.test(mensaje);
 }
 
 function destinoSeguro(v: FormDataEntryValue | null) {
@@ -41,8 +51,8 @@ export async function accionEntrar(_prev: EstadoAuth, formData: FormData): Promi
   if (!email || !password) return { error: "campos" };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: "credenciales" };
+  const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken: tokenCaptcha(formData) } });
+  if (error) return { error: esErrorCaptcha(error.message) ? "captcha" : "credenciales" };
   redirect(destinoSeguro(formData.get("volver")));
 }
 
@@ -65,9 +75,11 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
     options: {
       data: { nombre },
       emailRedirectTo: `${urlBase(h)}/auth/callback?siguiente=/inicio`,
+      captchaToken: tokenCaptcha(formData),
     },
   });
   if (error) {
+    if (esErrorCaptcha(error.message)) return { error: "captcha" };
     return { error: error.message.includes("already") ? "yaRegistrado" : "noCrear" };
   }
   if (data.session) {
@@ -88,9 +100,11 @@ export async function accionRecuperar(_prev: EstadoAuth, formData: FormData): Pr
   if (!email) return { error: "escribeCorreo" };
   const supabase = await createClient();
   const h = await headers();
-  await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${urlBase(h)}/auth/callback?siguiente=/cuenta`,
+    captchaToken: tokenCaptcha(formData),
   });
+  if (error && esErrorCaptcha(error.message)) return { error: "captcha" };
   return { mensaje: "enlaceEnviado" };
 }
 
@@ -136,7 +150,8 @@ export async function accionGuardarNacimiento(_prev: EstadoAuth, formData: FormD
   const anio = Number(fecha.slice(0, 4));
   if (anio < 1900 || anio > new Date().getFullYear()) return { error: "nacimientoFecha" };
   if (!horaDesconocida && !/^\d{2}:\d{2}$/.test(hora)) return { error: "nacimientoHora" };
-  if (!lugar || Number.isNaN(latitud) || Number.isNaN(longitud) || !zonaHoraria) return { error: "nacimientoLugar" };
+  if (!lugar || Number.isNaN(latitud) || Number.isNaN(longitud) || !zonaHorariaValida(zonaHoraria)) return { error: "nacimientoLugar" };
+  if (Math.abs(latitud) > 90 || Math.abs(longitud) > 180) return { error: "nacimientoLugar" };
 
   const { error } = await supabase
     .from("perfiles")

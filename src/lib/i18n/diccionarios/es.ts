@@ -166,6 +166,7 @@ export const es = {
       noCambiarContrasena: "No se pudo cambiar la contraseña.",
       perfilActualizado: "Perfil actualizado.",
       google: "No se pudo iniciar sesión con Google. Intenta de nuevo o entra con tu correo.",
+      captcha: "No pudimos comprobar que eres una persona. Espera un momento e intenta de nuevo.",
       nacimientoFecha: "Fecha de nacimiento no válida.",
       nacimientoHora: "Hora no válida.",
       nacimientoLugar: "Selecciona el lugar de nacimiento de la lista de sugerencias.",

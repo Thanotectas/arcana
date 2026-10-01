@@ -37,6 +37,17 @@ export function datoDeUsuario(texto: unknown, max = 400) {
   return limpio ? `«${limpio}»` : "";
 }
 
+/** ¿Es una zona horaria IANA que el motor reconoce? (la carta del día depende de ella) */
+export function zonaHorariaValida(zona: unknown): zona is string {
+  if (typeof zona !== "string" || !/^[A-Za-z_]+(?:\/[A-Za-z0-9_+-]+){0,2}$/.test(zona)) return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: zona });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Comprueba por bytes mágicos que un archivo es JPEG, PNG o WebP. */
 export function tipoImagenReal(bytes: Uint8Array): "image/jpeg" | "image/png" | "image/webp" | null {
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";

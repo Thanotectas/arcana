@@ -164,6 +164,7 @@ export const pt: Diccionario = {
       noCambiarContrasena: "Não foi possível alterar a senha.",
       perfilActualizado: "Perfil atualizado.",
       google: "Não foi possível entrar com o Google. Tente novamente ou entre com seu e-mail.",
+      captcha: "Não conseguimos confirmar que você é uma pessoa. Aguarde um momento e tente de novo.",
       nacimientoFecha: "Data de nascimento inválida.",
       nacimientoHora: "Hora inválida.",
       nacimientoLugar: "Selecione o lugar de nascimento na lista de sugestões.",
