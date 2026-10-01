@@ -38,7 +38,7 @@ export function Asistente({ nombre, gratisPorDia, circuloPorDia, costo, enCircul
     if (!abierto || cargado) return;
     let activo = true;
     fetch("/api/asistente")
-      .then((r) => (r.ok ? r.json() : { mensajes: [], hoy: 0 }))
+      .then((r) => (r.ok ? r.json() : { mensajes: [], hoy: usadosHoy }))
       .then((d: { mensajes: Mensaje[]; hoy: number }) => {
         if (!activo) return;
         setMensajes(d.mensajes.map((m) => ({ ...m, estado: "lista" })));
@@ -51,7 +51,7 @@ export function Asistente({ nombre, gratisPorDia, circuloPorDia, costo, enCircul
     return () => {
       activo = false;
     };
-  }, [abierto, cargado]);
+  }, [abierto, cargado, usadosHoy]);
 
   useEffect(() => {
     if (abierto) fin.current?.scrollIntoView({ block: "end" });
@@ -206,8 +206,8 @@ export function Asistente({ nombre, gratisPorDia, circuloPorDia, costo, enCircul
                   }
                 }}
               />
-              <button type="submit" className="boton boton-primario h-11 w-11 shrink-0 rounded-full p-0" disabled={enviando || texto.trim().length < 2} aria-label={t.asistente.enviar}>
-                <Send className="h-4 w-4" aria-hidden />
+              <button type="submit" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-oro-suave to-oro text-noche shadow-[0_8px_24px_rgba(217,180,90,0.35)] transition disabled:opacity-40" disabled={enviando || texto.trim().length < 2} aria-label={t.asistente.enviar}>
+                <Send className="h-5 w-5" aria-hidden />
               </button>
             </div>
             <p className="mt-2 flex items-center gap-1 text-[11px] text-texto-suave">
