@@ -52,6 +52,14 @@ export default async function PaginaSigno({ params }: { params: Promise<{ signo:
           <Contenido signoId={s.id} idioma={idioma} noDisponible={t.horoscopo.noDisponible} />
         </Suspense>
       </section>
+      <section className="tarjeta border-oro/40 bg-oro/5 p-6 text-center">
+        <h2 className="font-display text-2xl">{plantilla(t.crecimiento.horoscopoPersonal.titulo, { signo: s.nombre })}</h2>
+        <p className="mt-1 text-sm text-texto-suave">{t.crecimiento.horoscopoPersonal.texto}</p>
+        <Link href={usuario ? "/hoy" : "/registro"} className="boton boton-primario mt-4">
+          {usuario ? t.crecimiento.horoscopoPersonal.cta : t.horoscopo.crearCuenta}
+        </Link>
+        {!usuario && <p className="mt-2 text-xs text-texto-suave">{t.crecimiento.sinTarjeta}</p>}
+      </section>
       <section className="tarjeta p-6 text-center">
         <h2 className="font-display text-2xl">{t.horoscopo.masProfundo}</h2>
         <p className="mt-1 text-sm text-texto-suave">{t.horoscopo.cartaRevela}</p>

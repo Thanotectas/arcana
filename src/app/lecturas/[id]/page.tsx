@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getLectura, requerirUsuario, getPreguntas, getPerfil } from "@/lib/dal";
+import { getLectura, requerirUsuario, getPreguntas, getPerfil, circuloActivo } from "@/lib/dal";
 import { ConversacionLectura } from "@/components/ConversacionLectura";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
@@ -75,9 +75,18 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           costo={COSTO_PREGUNTA}
           gratisRestantes={PREGUNTAS_GRATIS_POR_LECTURA}
           ilimitado={Boolean(perfil?.ilimitado)}
+          enCirculo={circuloActivo(perfil)}
         />
       )}
       {lectura.estado === "lista" && <SiguientePaso tipo={lectura.tipo} />}
+      {lectura.estado === "lista" && perfil && !perfil.ilimitado && (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-texto-suave">
+          {plantilla(t.crecimiento.saldoLectura, { n: perfil.creditos })}
+          {perfil.creditos <= 1 && (
+            <Link href="/creditos" className="text-oro-suave underline">{t.persuasion.recargar}</Link>
+          )}
+        </p>
+      )}
 
       <p className="text-xs text-texto-suave">{t.comun.aviso}</p>
       <div className="flex flex-wrap gap-3">

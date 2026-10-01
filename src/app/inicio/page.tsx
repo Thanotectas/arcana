@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
-import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario, circuloActivo } from "@/lib/dal";
+import { getLecturas, getPerfil, cartasDelDiaHoy, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
 import { cieloDeHoy } from "@/lib/astro/transitos";
 import { signoPorId } from "@/lib/zodiaco";
@@ -32,7 +32,14 @@ function racha(fechas: string[]) {
 
 export default async function PaginaInicio() {
   await requerirUsuario();
-  const [perfil, lecturas, cartasHoy, t, idioma] = await Promise.all([getPerfil(), getLecturas(200), cartasDelDiaHoy(), getT(), getIdioma()]);
+  const [perfil, lecturas, cartasHoy, t, idioma, invitaciones] = await Promise.all([
+    getPerfil(),
+    getLecturas(200),
+    cartasDelDiaHoy(),
+    getT(),
+    getIdioma(),
+    getResumenInvitaciones().catch(() => ({ invitados: 0, premiadas: 0, creditos_ganados: 0 })),
+  ]);
   const cartaDisponible = Boolean(perfil?.ilimitado) || cartasHoy < CARTAS_DIA_GRATIS;
   const diasSeguidos = racha(lecturas.map((l) => l.creado_en));
   const datosNatales = datosNacimientoDePerfil(perfil);
@@ -43,6 +50,16 @@ export default async function PaginaInicio() {
         n: cielo.transitos.length,
       })
     : t.inicio.hoyTarjeta.notaSinDatos;
+
+  // Primeros pasos (progreso dotado: la cuenta ya cuenta como el primero).
+  const pasos = [
+    { clave: "cuenta", texto: t.crecimiento.primerosPasos.cuenta, hecho: true, href: "/cuenta" },
+    { clave: "nacimiento", texto: t.crecimiento.primerosPasos.nacimiento, hecho: Boolean(datosNatales), href: "/hoy" },
+    { clave: "carta", texto: t.crecimiento.primerosPasos.carta, hecho: lecturas.some((l) => l.tipo === "tarot_carta"), href: "/tarot?tirada=tarot_carta" },
+    { clave: "lectura", texto: t.crecimiento.primerosPasos.lectura, hecho: lecturas.some((l) => l.tipo !== "tarot_carta"), href: "/tarot" },
+    { clave: "invitar", texto: t.crecimiento.primerosPasos.invitar, hecho: invitaciones.invitados > 0, href: "/invitar" },
+  ];
+  const hechos = pasos.filter((p) => p.hecho).length;
 
   const accesos = [
     { href: "/tarot?tirada=tarot_carta", icono: Sparkles, titulo: t.inicio.accesos.cartaDia.titulo, nota: cartaDisponible ? t.inicio.accesos.cartaDia.gratisHoy : t.inicio.accesos.cartaDia.usada, costo: 0 },
@@ -84,6 +101,28 @@ export default async function PaginaInicio() {
           <Link href="/creditos" className="boton boton-primario px-4 py-1.5 text-sm">{t.persuasion.recargar}</Link>
         </div>
       )}
+      {hechos < pasos.length && (
+        <section className="tarjeta aparecer p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-2xl font-semibold">{t.crecimiento.primerosPasos.titulo}</h2>
+            <span className="text-xs text-texto-suave">{plantilla(t.crecimiento.primerosPasos.progreso, { hechos, total: pasos.length })}</span>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-superficie-2">
+            <div className="h-full rounded-full bg-oro transition-all" style={{ width: `${(hechos / pasos.length) * 100}%` }} />
+          </div>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {pasos.map((p) => (
+              <li key={p.clave}>
+                <Link href={p.href} className={`flex items-center gap-2 text-sm ${p.hecho ? "text-texto-suave line-through decoration-exito/60" : "hover:text-oro-suave"}`}>
+                  {p.hecho ? <CheckCircle2 className="h-4 w-4 shrink-0 text-exito" aria-hidden /> : <Circle className="h-4 w-4 shrink-0 text-violeta-suave" aria-hidden />}
+                  {p.texto}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <Link href="/hoy" className="tarjeta tarjeta-modulo aparecer flex items-center gap-4 border-oro/40 bg-oro/5 p-5">
         <Sunrise className="h-8 w-8 shrink-0 text-oro" aria-hidden />
         <div>

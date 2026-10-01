@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { FormularioRegistro } from "@/components/FormularioAuth";
 import { accionRegistrar } from "@/lib/auth/acciones";
@@ -33,7 +34,11 @@ export default async function PaginaRegistro({ searchParams }: { searchParams: P
   return (
     <div className="mx-auto max-w-md">
       <h1 className="font-display mb-2 text-4xl font-semibold">{t.auth.registroTitulo}</h1>
-      <p className="mb-6 text-texto-suave">{t.auth.registroIntro}</p>
+      <ul className="mb-6 space-y-1.5 text-sm text-texto-suave">
+        {t.crecimiento.ventajasRegistro.map((v) => (
+          <li key={v} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-exito" aria-hidden />{v}</li>
+        ))}
+      </ul>
       {codigo && (
         <div className="mb-4">
           <Aviso tipo="info">

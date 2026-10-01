@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon } from "lucide-react";
-import { PAQUETES, formatoCOP } from "@/lib/creditos";
+import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise } from "lucide-react";
+import { PAQUETES, PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
@@ -10,6 +10,7 @@ export default async function Portada() {
   const [usuario, t, contador] = await Promise.all([getUsuarioOpcional(), getT(), getContadorLecturas().catch(() => 0)]);
   const MODULOS = [
     { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
+    { icono: Sunrise, ...t.crecimiento.moduloHoy, href: "/hoy" },
     { icono: Star, ...t.portada.modulos.astral, href: "/carta-astral" },
     { icono: Hand, ...t.portada.modulos.quiromancia, href: "/quiromancia" },
     { icono: Hash, ...t.portada.modulos.numerologia, href: "/numerologia" },
@@ -39,6 +40,7 @@ export default async function Portada() {
             </Link>
             <Link href="/horoscopo" className="boton boton-secundario">{t.portada.ctaHoroscopo}</Link>
           </div>
+          {!usuario && <p className="mt-3 text-xs text-texto-suave">{t.crecimiento.sinTarjeta}</p>}
         </div>
       </section>
 
@@ -84,6 +86,17 @@ export default async function Portada() {
             );
           })}
         </div>
+        <Link href={usuario ? "/creditos#circulo" : "/registro"} className="tarjeta tarjeta-modulo mt-6 flex flex-wrap items-center justify-between gap-4 border-oro/40 bg-oro/5 p-6">
+          <div className="flex items-start gap-4">
+            <Sunrise className="mt-1 h-8 w-8 shrink-0 text-oro" aria-hidden />
+            <div>
+              <h3 className="font-display text-2xl font-semibold">{t.crecimiento.circuloPortada.titulo}</h3>
+              <p className="mt-1 text-sm text-texto-suave">{plantilla(t.crecimiento.circuloPortada.texto, { precio: formatoCOP(PAQUETE_CIRCULO.precioCOP) })}</p>
+              <p className="mt-1 text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>
+            </div>
+          </div>
+          <span className="boton boton-primario">{t.crecimiento.circuloPortada.cta}</span>
+        </Link>
       </section>
     </div>
   );

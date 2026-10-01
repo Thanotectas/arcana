@@ -60,10 +60,22 @@ export default async function PaginaRetorno({
         <Aviso>{plantilla(t.creditos.retorno.rechazada, { estado: estados[orden.estado] ?? orden.estado })}</Aviso>
       )}
       <p className="text-xs text-texto-suave">{t.creditos.retorno.referencia}: {ref}</p>
-      <div className="flex justify-center gap-3">
-        <Link href="/inicio" className="boton boton-primario">{t.creditos.retorno.irInicio}</Link>
-        <Link href="/creditos" className="boton boton-secundario">{t.creditos.retorno.verPaquetes}</Link>
-      </div>
+      {orden?.estado === "aprobada" ? (
+        <div className="flex flex-wrap justify-center gap-3">
+          {orden.paquete === "circulo" ? (
+            <Link href="/hoy" className="boton boton-primario">{t.crecimiento.retorno.hoy}</Link>
+          ) : (
+            <Link href="/carta-astral" className="boton boton-primario">{t.crecimiento.retorno.astral}</Link>
+          )}
+          <Link href="/tarot" className="boton boton-secundario">{t.crecimiento.retorno.tarot}</Link>
+          <Link href="/invitar" className="boton boton-fantasma">{t.crecimiento.retorno.invitar}</Link>
+        </div>
+      ) : (
+        <div className="flex justify-center gap-3">
+          <Link href="/inicio" className="boton boton-primario">{t.creditos.retorno.irInicio}</Link>
+          <Link href="/creditos" className="boton boton-secundario">{t.creditos.retorno.verPaquetes}</Link>
+        </div>
+      )}
     </div>
   );
 }

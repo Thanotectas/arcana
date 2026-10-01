@@ -29,12 +29,15 @@ export function ConversacionLectura({
   costo,
   gratisRestantes,
   ilimitado,
+  enCirculo = false,
 }: {
   lecturaId: string;
   iniciales: PreguntaLectura[];
   costo: number;
   gratisRestantes: number;
   ilimitado: boolean;
+  /** Miembro del Círculo: las preguntas no se cobran (el servidor aplica el tope diario). */
+  enCirculo?: boolean;
 }) {
   const { t } = useT();
   const router = useRouter();
@@ -44,7 +47,7 @@ export function ConversacionLectura({
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const gratis = ilimitado || gratisRestantes - turnos.length > 0;
+  const gratis = ilimitado || enCirculo || gratisRestantes - turnos.length > 0;
 
   async function preguntar() {
     const pregunta = texto.trim();
@@ -161,7 +164,15 @@ export function ConversacionLectura({
           }}
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-texto-suave">{gratis ? t.preguntas.primeraGratis : plantilla(t.preguntas.cuesta, { n: costo })}</p>
+          <p className="text-xs text-texto-suave">
+            {gratis ? t.preguntas.primeraGratis : plantilla(t.preguntas.cuesta, { n: costo })}
+            {!gratis && (
+              <>
+                {" "}
+                <Link href="/creditos#circulo" className="text-oro-suave underline">{t.crecimiento.preguntaCirculo}</Link>
+              </>
+            )}
+          </p>
           <button type="submit" className="boton boton-primario" disabled={enviando || texto.trim().length < 3}>
             <Send className="h-4 w-4" aria-hidden />
             {t.preguntas.preguntar} · {gratis ? t.preguntas.gratis : `${costo} ${t.comun.credito}`}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { requerirUsuario, getPerfil, getHaComprado, circuloActivo } from "@/lib/dal";
 import { Gift, ShieldCheck, Lock, Sparkles, Sunrise } from "lucide-react";
-import { PAQUETES, PAQUETE_CIRCULO, CIRCULO, COSTOS, formatoCOP, BONO_PRIMERA_COMPRA, type TipoLectura } from "@/lib/creditos";
+import { PAQUETES, PAQUETE_CIRCULO, CIRCULO, COSTOS, formatoCOP, BONO_PRIMERA_COMPRA, precioCirculoPorDia, type TipoLectura } from "@/lib/creditos";
 import { accionComprar } from "@/lib/pagos/acciones";
 import { pagosConfigurados } from "@/lib/pagos/bold";
 import { Aviso } from "@/components/Aviso";
@@ -93,6 +93,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           <div className="w-full text-center sm:w-56">
             <p className="text-4xl font-semibold text-oro-suave">{formatoCOP(PAQUETE_CIRCULO.precioCOP)}</p>
             <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
+            <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>
             <p className="mt-1 text-xs text-texto-suave">{plantilla(t.circulo.incluyeCreditos, { n: PAQUETE_CIRCULO.creditos })}</p>
             <BotonEnviar className="boton boton-primario mt-4 w-full" cargando={t.creditos.preparando}>
               {miembro ? t.circulo.extender : t.circulo.unirme}

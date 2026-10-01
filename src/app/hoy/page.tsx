@@ -7,7 +7,7 @@ import { getMensajeDeHoy, datosNacimientoDePerfil, fechaLocalHoy } from "@/lib/d
 import { cieloDeHoy, type CieloDeHoy } from "@/lib/astro/transitos";
 import { NOMBRES_CUERPO, SIMBOLOS_CUERPO, NOMBRES_ASPECTO } from "@/lib/astro/textos";
 import { signoPorId } from "@/lib/zodiaco";
-import { PAQUETE_CIRCULO, formatoCOP } from "@/lib/creditos";
+import { PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { accionGuardarNacimiento } from "@/lib/auth/acciones";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaLarga, plantilla } from "@/lib/i18n/formato";
@@ -162,6 +162,7 @@ function Invitacion({ t }: { t: Diccionario }) {
         <Link href="/creditos#circulo" className="boton boton-primario mt-2 inline-flex">
           {plantilla(t.circulo.cta, { precio: formatoCOP(PAQUETE_CIRCULO.precioCOP) })}
         </Link>
+        <p className="text-xs text-texto-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>
       </div>
     </section>
   );

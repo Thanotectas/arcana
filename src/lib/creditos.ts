@@ -98,6 +98,11 @@ export const PAQUETE_CIRCULO: Paquete = {
   descripcion: "30 días con tu cielo personal cada mañana, preguntas sin cobro y 15 créditos.",
 };
 
+/** Precio del Círculo por día, redondeado hacia arriba a la centena (para "menos de X al día"). */
+export function precioCirculoPorDia() {
+  return Math.ceil(PAQUETE_CIRCULO.precioCOP / PAQUETE_CIRCULO.diasCirculo! / 100) * 100;
+}
+
 export function paquetePorId(id: string) {
   if (id === PAQUETE_CIRCULO.id) return PAQUETE_CIRCULO;
   return PAQUETES.find((p) => p.id === id);
