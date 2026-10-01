@@ -23,6 +23,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 ## Variables de entorno (en Vercel; nunca en el repositorio)
 
 - Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
+- Instagram automático: `IG_USER_ID` (cuenta @miarcana.oficial) e `IG_PAGE_TOKEN` (token de la página de Facebook "Mi Arcana", app de Meta "Thanotectas Automation"; no caduca, pero el acceso a datos vence hacia el 30 dic 2026 y entonces hay que renovarlo con el Explorador de la API Graph).
 - CAPTCHA: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (la clave secreta de Turnstile se configura en Supabase Auth, no en Vercel).
 
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`, `BOLD_ENV` (`production` con llaves reales; `test` solo con llaves de prueba), `NEXT_PUBLIC_SITE_URL` (`https://miarcana.com`). Plantilla en `.env.example`.
@@ -105,6 +106,13 @@ Qué trae:
 - **Variables nuevas en Vercel**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (mailto:), `CRON_SECRET`. Sin las VAPID, el botón de aviso no aparece y el cron solo pregenera mensajes. Se generan con `npx web-push generate-vapid-keys`.
 - Migración pendiente además de las anteriores: `0011_push.sql`. Tras la auditoría: `0012_endurecimiento.sql` (aplicada el 1 oct 2026; la rama `endurecimiento` ya está fusionada en `main`). La zona horaria del perfil se valida como IANA al guardarla (`zonaHorariaValida`), porque la carta del día depende de ella.
 - Siguiente paso: canal de WhatsApp diario (API de WhatsApp Business de Meta; requiere cuenta verificada y plantilla aprobada).
+
+## Instagram automático (1 oct 2026)
+
+- **Cron** (`vercel.json` → `GET /api/cron/instagram`, 12:00 UTC = 07:00 Bogotá) publica en @miarcana.oficial la "Carta del día de Arcana" con la API Graph de Meta (`src/lib/redes/instagram.ts`: contenedor, espera y `media_publish`; el token va en la cabecera). Exige `Authorization: Bearer CRON_SECRET`. Se dispara a mano desde Vercel (Cron Jobs → Run).
+- **Carta**: `src/lib/redes/carta-dia.ts`. La misma para todos por fecha de Bogotá; recorre la rotación sin repetir. Quedan fuera de la rotación pública las cartas cuyo texto habla de salud, crisis, pérdidas o traiciones.
+- **Imagen**: `/api/redes/carta-dia?fecha=AAAA-MM-DD` (pública, 1080×1350, `imagenTarjeta`); el texto sale del mazo, nunca de la URL.
+- **Una por día**: tabla `publicaciones_redes` (migración `0013_publicaciones_redes.sql`, aplicada el 1 oct 2026) con clave única red + tipo + fecha; si una publicación falla queda en `error` y el siguiente intento la retoma.
 
 ## Auditoría de seguridad y endurecimiento (1 oct 2026)
 
