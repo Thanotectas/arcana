@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/diario", "schedule": "0 9 * * *" },
-    { "path": "/api/cron/instagram", "schedule": "0 12 * * *" }
+    { "path": "/api/cron/instagram", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/instagram", "schedule": "0 17 * * *" }
   ]
 }
