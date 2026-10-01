@@ -24,8 +24,8 @@
   "appVersionName": "1.0.0",
   "appVersionCode": 1,
   "shortcuts": [
-    { "name": "Tu cielo hoy", "short_name": "Hoy", "url": "/hoy?app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" },
-    { "name": "Carta del día", "short_name": "Carta", "url": "/tarot?tirada=tarot_carta&app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" }
+    { "name": "Tu cielo hoy", "shortName": "Hoy", "url": "/hoy?app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" },
+    { "name": "Carta del día", "shortName": "Carta", "url": "/tarot?tirada=tarot_carta&app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" }
   ],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://miarcana.com/manifest.webmanifest",
