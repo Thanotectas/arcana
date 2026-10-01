@@ -311,7 +311,7 @@ function VistaChino({ resultado, t }: { resultado: ResultadoChino; t: Diccionari
     <section className="grid gap-4 sm:grid-cols-[auto_1fr]">
       <div className="tarjeta flex flex-col items-center justify-center p-6 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático pequeño, sin optimización necesaria */}
-        <img src={`/animales/${resultado.pilar.animal}.svg`} alt="" width={112} height={112} className="animal-oro-vivo" />
+        <img src={`/animales/${resultado.pilar.animal}.webp`} alt="" width={128} height={128} className="animal-oro-vivo" />
         <p className="mt-1 text-2xl" style={{ color }}>{FICHA[resultado.pilar.animal].caracter}</p>
         <p className="font-display mt-2 text-2xl text-oro-suave">{pilar(resultado.pilar)}</p>
         <p className="text-xs text-texto-suave">{CARACTER_ELEMENTO[resultado.pilar.elemento]} {elementos[resultado.pilar.elemento]} · {resultado.pilar.polaridad} · {resultado.pilar.anio}</p>

@@ -72,14 +72,14 @@ export function RuedaChina({ nombreInicial, fechaInicial, horaInicial }: { nombr
               <g key={a} style={{ transition: "all .4s" }}>
                 {activo && <circle cx={x} cy={y} r="30" fill={color} opacity="0.18" />}
                 {secreto && <circle cx={x} cy={y} r="24" fill="none" stroke="#b7a5ff" strokeDasharray="3 3" />}
-                <image href={`/animales/${a}.svg`} x={x - (activo ? 24 : 17)} y={y - (activo ? 26 : 19)} width={activo ? 48 : 34} height={activo ? 48 : 34} className={activo ? "animal-oro-vivo" : secreto ? "animal-violeta" : "animal-oro"} style={{ transition: "all .4s" }} />
+                <image href={`/animales/${a}.webp`} x={x - (activo ? 27 : 19)} y={y - (activo ? 29 : 21)} width={activo ? 54 : 38} height={activo ? 54 : 38} className={activo ? "animal-oro-vivo" : secreto ? "animal-violeta" : "animal-oro"} style={{ transition: "all .4s" }} />
                 <text x={x} y={y + 32} textAnchor="middle" fontSize="10" fill={activo ? color : "rgba(168,159,192,0.9)"}>{nombres[a]}</text>
               </g>
             );
           })}
           {r ? (
             <g>
-              <image href={`/animales/${r.pilar.animal}.svg`} x="156" y="118" width="88" height="88" className="animal-oro-vivo" />
+              <image href={`/animales/${r.pilar.animal}.webp`} x="152" y="114" width="96" height="96" className="animal-oro-vivo" />
               <text x="200" y="130" textAnchor="middle" fontSize="18" fill={COLOR_ELEMENTO[r.pilar.elemento]}>{FICHA[r.pilar.animal].caracter}</text>
               <text x="200" y="212" textAnchor="middle" fontSize="20" fill="#f1d99a" fontFamily="var(--font-cormorant)">{pilar(r.pilar)}</text>
               <text x="200" y="236" textAnchor="middle" fontSize="12" fill="rgba(168,159,192,0.9)">

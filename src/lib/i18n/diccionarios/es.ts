@@ -56,7 +56,6 @@ export const es = {
     terminos: "Términos",
     privacidad: "Privacidad",
     precios: "Precios",
-    creditosImagenes: "Animales del calendario chino: Twemoji (CC BY 4.0).",
   },
   lecturas: {
     nombres: {

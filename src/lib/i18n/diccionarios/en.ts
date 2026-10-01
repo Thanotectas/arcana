@@ -57,7 +57,6 @@ export const en: Diccionario = {
     terminos: "Terms",
     privacidad: "Privacy",
     precios: "Pricing",
-    creditosImagenes: "Chinese zodiac animals: Twemoji (CC BY 4.0).",
   },
   lecturas: {
     nombres: {

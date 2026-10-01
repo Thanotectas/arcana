@@ -143,7 +143,7 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 
 - **Rider-Waite con arte real**: `public/cartas/rider/<id>.webp` (78 cartas, 300×527, ~2,8 MB en total), convertidas desde el paquete npm `@cometpisces/tarot-kit-images` (código MIT; las imágenes son el Rider-Waite-Smith de 1909). `imagenCarta()` en `CartaVisual.tsx` devuelve la ruta solo para el mazo `rider`; `CaraCarta` muestra la ilustración dentro del marco dorado y la inversión gira la imagen. Marsella y el Oráculo de los Ángeles siguen con el dibujo de símbolos (no hay arte de dominio público equivalente para el Oráculo; para Marsella se puede añadir el Conver de 1760 cuando haya una fuente accesible).
 - **Licencia**: dominio público en EE. UU. y la UE; en Colombia (80 años post mortem de Pamela Colman Smith, † 1951) el plazo vence a fines de 2031. Está anotado en `public/cartas/rider/LICENCIA.txt`; decisión del dueño del proyecto.
-- **Animales del calendario chino**: `public/animales/*.svg` (Twemoji, CC BY 4.0, atribución en el pie de página y en `public/animales/LICENCIA.txt`), con tinte dorado o violeta por CSS (`.animal-oro`, `.animal-oro-vivo`, `.animal-violeta`). Se usan en la rueda y en la vista de la lectura.
+- **Animales del calendario chino**: `public/animales/*.webp` (512×512, fondo transparente), monedas doradas propias generadas con IA por el dueño del proyecto a partir de una sola cuadrícula (estilo uniforme); recortadas y con el fondo convertido a alfa con sharp. Clases `.animal-oro` (apagado), `.animal-oro-vivo` (halo) y `.animal-violeta` (animal secreto). Se usan en la rueda y en la vista de la lectura.
 
 ## Pendiente
 
