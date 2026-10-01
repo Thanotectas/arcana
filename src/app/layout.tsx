@@ -6,6 +6,7 @@ import { Encabezado } from "@/components/Encabezado";
 import { PiePagina } from "@/components/PiePagina";
 import { ProveedorIdioma } from "@/lib/i18n/cliente";
 import { CieloAnimado } from "@/components/CieloAnimado";
+import { AsistenteFlotante } from "@/components/AsistenteFlotante";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Encabezado />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />
+          <AsistenteFlotante />
         </ProveedorIdioma>
         {/* Visitas anónimas y sin cookies (Vercel Web Analytics). */}
         <Analytics />

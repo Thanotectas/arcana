@@ -145,6 +145,13 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 - **Licencia**: dominio público en EE. UU. y la UE; en Colombia (80 años post mortem de Pamela Colman Smith, † 1951) el plazo vence a fines de 2031. Está anotado en `public/cartas/rider/LICENCIA.txt`; decisión del dueño del proyecto.
 - **Animales del calendario chino**: `public/animales/*.webp` (512×512, fondo transparente), monedas doradas propias generadas con IA por el dueño del proyecto a partir de una sola cuadrícula (estilo uniforme); recortadas y con el fondo convertido a alfa con sharp. Clases `.animal-oro` (apagado), `.animal-oro-vivo` (halo) y `.animal-violeta` (animal secreto). Se usan en la rueda y en la vista de la lectura.
 
+## Sibila, la asistente (2 oct 2026)
+
+- **La voz de Arcana se llama Sibila** (`NOMBRE_ASISTENTE` en `src/lib/asistente.ts`; el sistema base en `ia.ts` la presenta así). Firma las lecturas, responde las preguntas de seguimiento ("Pregúntale a Sibila") y vive en un chat flotante.
+- **Chat flotante** (`AsistenteFlotante` → `Asistente`, montado en el layout solo con sesión): orienta sobre qué lectura conviene (con enlaces a las rutas), explica símbolos de lecturas anteriores (memoria), comenta el cielo de hoy y resuelve dudas de créditos y Círculo. No escribe lecturas completas. Respuestas de 40 a 140 palabras, `effort: low`.
+- **Cobro en la base** (`crear_mensaje_asistente`, migración `0015_asistente.sql`): 3 mensajes gratis al día, Círculo hasta 30 al día, el resto 1 crédito; `finalizar_mensaje_asistente` y `reembolsar_mensaje_asistente` con guarda de estado; `mensajes_asistente_hoy()` para mostrar el saldo gratis. Tabla `mensajes_asistente` (rol persona/asistente). Ruta `/api/asistente` (GET historial, POST mensaje en streaming con las marcas `[[ERROR:…]]`).
+- Probado en PostgreSQL local: reglas de cobro, cierre y reembolso.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

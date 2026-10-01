@@ -77,6 +77,16 @@ type PreguntaRow = {
   creado_en: string;
 };
 
+type MensajeAsistenteRow = {
+  id: string;
+  usuario_id: string;
+  rol: "persona" | "asistente";
+  contenido: string;
+  estado: "pendiente" | "lista" | "error";
+  creditos_usados: number;
+  creado_en: string;
+};
+
 type MensajeDiarioRow = {
   id: number;
   usuario_id: string;
@@ -167,6 +177,12 @@ export type Database = {
         Update: Partial<{ usuario_id: string; fecha: string }>;
         Relationships: [];
       };
+      mensajes_asistente: {
+        Row: MensajeAsistenteRow;
+        Insert: Insertable<MensajeAsistenteRow, "id" | "estado" | "creditos_usados" | "creado_en">;
+        Update: Partial<MensajeAsistenteRow>;
+        Relationships: [];
+      };
       mensajes_diarios: {
         Row: MensajeDiarioRow;
         Insert: Insertable<MensajeDiarioRow, "id" | "idioma" | "creado_en">;
@@ -243,6 +259,22 @@ export type Database = {
       crear_pregunta: {
         Args: { p_lectura: string; p_pregunta: string };
         Returns: { id: string; costo: number }[];
+      };
+      crear_mensaje_asistente: {
+        Args: { p_texto: string };
+        Returns: { id: string; costo: number }[];
+      };
+      finalizar_mensaje_asistente: {
+        Args: { p_mensaje: string; p_texto: string };
+        Returns: boolean;
+      };
+      reembolsar_mensaje_asistente: {
+        Args: { p_mensaje: string };
+        Returns: boolean;
+      };
+      mensajes_asistente_hoy: {
+        Args: Record<string, never>;
+        Returns: number;
       };
       registrar_push: {
         Args: { p_endpoint: string; p_p256dh: string; p_auth: string; p_idioma: string; p_agente?: string | null };
