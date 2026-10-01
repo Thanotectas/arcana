@@ -15,6 +15,8 @@ export async function Encabezado() {
     { href: "/numerologia", etiqueta: t.nav.numerologia },
     { href: "/quiromancia", etiqueta: t.nav.quiromancia },
     { href: "/iching", etiqueta: t.nav.iching },
+    { href: "/calendario-chino", etiqueta: t.nav.chino },
+    { href: "/cruce", etiqueta: t.nav.cruce },
     { href: "/compatibilidad", etiqueta: t.nav.compatibilidad },
     { href: "/horoscopo", etiqueta: t.nav.horoscopo },
   ];

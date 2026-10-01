@@ -6,6 +6,7 @@ import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/t
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
+import { FICHA, nombrePilar, type ResultadoChino } from "@/lib/chino";
 import type { TipoLectura } from "@/lib/creditos";
 import type { PerfilNumerologico } from "@/lib/numerologia";
 
@@ -68,6 +69,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   } else if (tipo === "quiromancia") {
     simbolos = ["✋"];
     titulo = t.lecturas.nombres.quiromancia;
+  } else if (tipo === "chino") {
+    const r = resultado as unknown as ResultadoChino;
+    // Las fuentes de la tarjeta no traen caracteres chinos: el animal va en el título.
+    simbolos = ["✦"];
+    titulo = nombrePilar(r.pilar) + (r.animalHora ? ` · ${FICHA[r.animalHora].nombre}` : "");
+  } else if (tipo === "cruce") {
+    const sistemas = ((entrada.sistemas as string[] | undefined) ?? []).map((s) => (t.cruce.sistemas as Record<string, string>)[s] ?? s);
+    simbolos = ["✦", "×", "✦"];
+    titulo = sistemas.join(" × ");
   } else if (tipo === "iching") {
     const r = resultado as unknown as ResultadoIChing;
     const h = hexagramaPorNumero(r.presente);

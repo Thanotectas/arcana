@@ -132,6 +132,13 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 - **Eliminar cuenta** (Habeas Data) con borrado de las fotos de palmas en Storage.
 - `supabase/migrations/0003` contiene un correo personal en `correos_ilimitados`; ya está aplicado, pero conviene moverlo a datos privados si el repo se hace público.
 
+## Calendario chino y lecturas cruzadas (2 oct 2026)
+
+- **Calendario chino** (`/calendario-chino`, tipo `chino`, 2 créditos): `src/lib/chino/index.ts` calcula animal, elemento (tallo celeste) y polaridad del año chino con la tabla real de Años Nuevos 1900–2044, el animal de la hora ("animal secreto"), el triángulo de afinidad, el amigo secreto, el choque y la relación con el año en curso. `RuedaChina` ilumina el animal mientras la persona escribe la fecha. Prompt en `prompts.ts`; vista `VistaChino` en la lectura.
+- **Lecturas cruzadas** (`/cruce`, tipo `cruce`, 4 créditos, premium): la persona elige dos sistemas (carta astral, numerología, calendario chino, tarot, I Ching, mano). `src/lib/cruce/index.ts` decide de dónde sale cada uno: los que dependen del nacimiento se calculan con el perfil; los rituales usan la última lectura terminada (y su síntesis). Las fuentes se guardan en `resultado.fuentes` al crear la lectura, así el prompt es reproducible. `CruceSelector` muestra qué sistemas están listos y enlaza a los que faltan.
+- Migración `0014_chino_y_cruces.sql` (amplía el `check` de `lecturas.tipo`). Sin ella, crear estas lecturas falla al insertar.
+- Las fuentes de la tarjeta compartible no tienen caracteres chinos: en la tarjeta el animal va en el título y el símbolo es ✦.
+
 ## Pendiente
 
 - [ ] Llaves de Bold en Vercel (`NEXT_PUBLIC_BOLD_API_KEY`, `BOLD_SECRET_KEY`) y registrar el webhook en el panel de Bold.

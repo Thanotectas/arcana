@@ -11,7 +11,9 @@ export type TipoLectura =
   | "numerologia"
   | "compatibilidad"
   | "quiromancia"
-  | "iching";
+  | "iching"
+  | "chino"
+  | "cruce";
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -22,6 +24,8 @@ export const COSTOS: Record<TipoLectura, number> = {
   compatibilidad: 1,
   quiromancia: 3,
   iching: 2,
+  chino: 2,
+  cruce: 4, // premium: combina dos sistemas con los datos de la persona
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -33,6 +37,8 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   compatibilidad: "Compatibilidad",
   quiromancia: "Lectura de la mano",
   iching: "I Ching",
+  chino: "Calendario chino",
+  cruce: "Lectura cruzada",
 };
 
 /** Pregunta de seguimiento sobre una lectura. */

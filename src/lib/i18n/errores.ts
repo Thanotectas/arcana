@@ -14,6 +14,8 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     compatibilidad: t.compatibilidad.errores,
     quiromancia: t.quiromancia.errores,
     iching: t.iching.errores,
+    chino: t.chino.errores,
+    cruce: t.cruce.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }

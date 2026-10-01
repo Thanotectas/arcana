@@ -14,6 +14,8 @@ import { getIdioma } from "../i18n/servidor";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
+import { calcularChino, nombrePilar, FICHA } from "../chino";
+import { esSistema, fuenteDe, type Sistema } from "../cruce";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -229,6 +231,74 @@ export async function accionNumerologia(_prev: EstadoAccion, formData: FormData)
   }
   redirect(`/lecturas/${id}`);
 }
+
+// ---------------------------------------------------------------------------
+// Calendario chino
+// ---------------------------------------------------------------------------
+export async function accionChino(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 80);
+  const fecha = String(formData.get("fecha") ?? "");
+  const hora = String(formData.get("hora") ?? "").trim();
+  const horaDesconocida = formData.get("hora_desconocida") === "on" || !hora;
+  if (!nombre) return { error: "chino.nombre" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "chino.fecha" };
+  const anio = Number(fecha.slice(0, 4));
+  if (anio < 1900 || anio > new Date().getFullYear()) return { error: "chino.fecha" };
+  if (!horaDesconocida && !/^\d{2}:\d{2}$/.test(hora)) return { error: "chino.hora" };
+
+  let id: string;
+  try {
+    const r = calcularChino(fecha, horaDesconocida ? null : hora);
+    id = await crearLectura({
+      tipo: "chino",
+      titulo: `${nombre}: ${nombrePilar(r.pilar)}${r.animalHora ? ` · ${FICHA[r.animalHora].nombre} de hora` : ""}`,
+      entrada: { nombre, fecha, hora: horaDesconocida ? null : hora },
+      resultado: r,
+    });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Lectura cruzada: dos sistemas sobre la misma persona (premium)
+// ---------------------------------------------------------------------------
+export async function accionCruce(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const elegidos = formData.getAll("sistema").map(String).filter(esSistema);
+  const sistemas = Array.from(new Set(elegidos)) as Sistema[];
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  if (sistemas.length !== 2) return { error: "cruce.dos" };
+
+  const { supabase } = await usuarioActual();
+  const perfil = await getPerfil();
+  if (!perfil) redirect("/entrar");
+
+  let id: string;
+  try {
+    const fuentes = await Promise.all(sistemas.map((s) => fuenteDe(supabase, perfil, s)));
+    if (fuentes.some((f) => !f)) return { error: "cruce.faltaFuente" };
+    const listas = fuentes.filter((f): f is NonNullable<typeof f> => Boolean(f));
+    id = await crearLectura({
+      tipo: "cruce",
+      titulo: `${NOMBRE_SISTEMA[sistemas[0]]} × ${NOMBRE_SISTEMA[sistemas[1]]}${pregunta ? `: ${pregunta}` : ""}`,
+      entrada: { sistemas, pregunta },
+      resultado: { fuentes: listas },
+    });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+const NOMBRE_SISTEMA: Record<Sistema, string> = {
+  carta_astral: "Carta astral",
+  numerologia: "Numerología",
+  chino: "Calendario chino",
+  tarot: "Tarot",
+  iching: "I Ching",
+  quiromancia: "Mano",
+};
 
 // ---------------------------------------------------------------------------
 // Compatibilidad

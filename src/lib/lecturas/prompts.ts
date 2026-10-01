@@ -11,6 +11,8 @@ import { esIdioma, IDIOMA_PREDETERMINADO, type Idioma } from "../i18n/idiomas";
 import { INSTRUCCION_ANEXO, resumenQuiromancia, type EntradaQuiromancia } from "../quiromancia";
 import { getSupabaseAdmin } from "../supabase/admin";
 import { resumenIChing, type ResultadoIChing } from "../iching";
+import { resumenChino, type ResultadoChino } from "../chino";
+import type { FuenteCruce } from "../cruce";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -25,6 +27,15 @@ export interface Prompt {
 }
 
 type Objeto = Record<string, unknown>;
+
+const NOMBRE_SISTEMA_CRUCE: Record<FuenteCruce["sistema"], string> = {
+  carta_astral: "Carta astral (astrología occidental)",
+  numerologia: "Numerología pitagórica",
+  chino: "Calendario chino",
+  tarot: "Tarot",
+  iching: "I Ching",
+  quiromancia: "Quiromancia",
+};
 
 function idiomaDe(entrada: Objeto): Idioma {
   return esIdioma(entrada.idioma) ? entrada.idioma : IDIOMA_PREDETERMINADO;
@@ -110,6 +121,36 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
       sistemaExtra:
         "Tradición del I Ching según la traducción de Richard Wilhelm: el hexagrama presente describe la situación; las líneas mutantes son el consejo concreto y tienen prioridad; el hexagrama resultante indica la tendencia si se sigue el consejo.",
       opciones: { idioma, effort: "medium", maxTokens: 3200 },
+    };
+  }
+
+  if (l.tipo === "chino") {
+    const r = resultado as unknown as ResultadoChino;
+    return {
+      usuario:
+        `Interpreta este perfil del calendario chino (astrología china tradicional).\n\n${resumenChino(r, datoDeUsuario(entrada.nombre, 80) || "la persona")}\n\n` +
+        `Estructura: ## Tu animal y tu elemento (carácter del animal y cómo lo matiza el elemento del año), ` +
+        (r.animalHora ? `## Tu animal secreto (lo que la hora revela de tu mundo íntimo), ` : "") +
+        `## Afinidades y choques (con quién fluyes y con quién chocas, en amor, amistad y trabajo), ## Tu año en curso (qué pide este ${r.anioActual.anio} a tu animal, con consejo concreto), ## Síntesis. ` +
+        `Usa la tradición (cinco elementos, yin y yang, triángulos de afinidad) sin fatalismos. Extensión: 650 a 850 palabras.`,
+      opciones: { idioma, effort: "low", maxTokens: 2800 },
+    };
+  }
+
+  if (l.tipo === "cruce") {
+    const fuentes = ((resultado.fuentes as FuenteCruce[] | undefined) ?? []).slice(0, 2);
+    const pregunta = datoDeUsuario(entrada.pregunta, 300);
+    const bloque = (f: FuenteCruce, n: number) =>
+      `=== SISTEMA ${n}: ${NOMBRE_SISTEMA_CRUCE[f.sistema]} ===\n${f.resumen}` + (f.extracto ? `\nSíntesis de la lectura anterior de este sistema: ${f.extracto}` : "");
+    return {
+      usuario:
+        `Lectura cruzada: combina dos sistemas distintos sobre la misma persona y busca lo que uno confirma, matiza o contradice del otro.\n\n` +
+        fuentes.map(bloque).join("\n\n") + "\n\n" +
+        (pregunta ? `Pregunta de la persona: ${pregunta}\n\n` : "") +
+        `Estructura: ## Lo que los dos sistemas dicen a la vez (los acuerdos, con el símbolo concreto de cada lado), ## Donde se matizan (qué añade cada uno que el otro no ve), ## La tensión (si hay contradicción, explícala y qué significa vivirla), ` +
+        (pregunta ? `## Respuesta a tu pregunta (desde los dos sistemas), ` : "") +
+        `## Síntesis cruzada y un consejo práctico. Nombra siempre de qué sistema sale cada idea. No repitas las lecturas anteriores: úsalas como base. Extensión: 800 a 1100 palabras.`,
+      opciones: { idioma, effort: "medium", maxTokens: 4000 },
     };
   }
 

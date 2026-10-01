@@ -25,6 +25,8 @@ const ICONO: Record<TipoLectura, string> = {
   compatibilidad: "♡",
   quiromancia: "✋",
   iching: "☰",
+  chino: "龙",
+  cruce: "✦×✦",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */
