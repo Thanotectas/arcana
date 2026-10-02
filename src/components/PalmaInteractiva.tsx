@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useT } from "@/lib/i18n/cliente";
 import { COLOR_LINEA, LINEAS, type LineaMano, type TrazosMano } from "@/lib/quiromancia";
 
+/** Orden en que se dibujan las líneas (y aparecen sus nombres). */
+const ORDEN: LineaMano[] = ["corazon", "cabeza", "vida", "destino"];
+
 /**
  * Foto de la palma con los trazos que el modelo identificó. Cada línea se
  * puede encender o apagar; al pasar el cursor se resalta.
@@ -41,6 +44,7 @@ export function PalmaInteractiva({ urlFoto, trazos }: { urlFoto: string; trazos:
                 <path
                   key={l}
                   d={suavizar(puntos)}
+                  pathLength={400}
                   fill="none"
                   stroke={COLOR_LINEA[l]}
                   strokeWidth={resaltada ? 1.6 : 0.9}
@@ -48,12 +52,27 @@ export function PalmaInteractiva({ urlFoto, trazos }: { urlFoto: string; trazos:
                   strokeLinecap="round"
                   vectorEffect="non-scaling-stroke"
                   className="trazo-palma"
-                  style={{ filter: resaltada ? `drop-shadow(0 0 3px ${COLOR_LINEA[l]})` : undefined }}
+                  style={{ animationDelay: `${ORDEN.indexOf(l) * 1.3}s`, filter: resaltada ? `drop-shadow(0 0 3px ${COLOR_LINEA[l]})` : undefined }}
                 />
               );
             })}
           </svg>
         )}
+        {trazos &&
+          LINEAS.map((l) => {
+            const puntos = trazos[l];
+            if (!puntos || !visibles[l]) return null;
+            const [x, y] = puntos[puntos.length - 1];
+            return (
+              <span
+                key={l}
+                className="etiqueta-trazo"
+                style={{ left: `${x}%`, top: `${y}%`, color: COLOR_LINEA[l], borderColor: COLOR_LINEA[l], animationDelay: `${ORDEN.indexOf(l) * 1.3 + 1.2}s`, transform: `translate(${x > 60 ? "-100%" : "0"}, ${y > 70 ? "-120%" : "20%"})` }}
+              >
+                {t.quiromancia.lineas[l]}
+              </span>
+            );
+          })}
       </div>
       {trazos && (
         <div className="flex flex-wrap justify-center gap-2" role="group">

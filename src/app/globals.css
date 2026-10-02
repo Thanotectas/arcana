@@ -416,8 +416,20 @@ body {
   to { stroke-dasharray: 400 0; }
 }
 .trazo-palma {
-  animation: dibujar-trazo 1.6s ease-out both;
+  animation: dibujar-trazo 1.4s ease-out both;
   transition: stroke-width 0.2s ease, stroke-opacity 0.2s ease;
+}
+.etiqueta-trazo {
+  position: absolute;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  background: rgba(11, 7, 22, 0.78);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: aparecer 0.4s ease both;
 }
 
 /* Navegación */

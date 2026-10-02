@@ -34,8 +34,6 @@ export function FormularioQuiromancia() {
         </Aviso>
       )}
 
-      <CapturaPalma />
-
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <p className="etiqueta">{t.quiromancia.manoDominante}</p>
@@ -46,6 +44,8 @@ export function FormularioQuiromancia() {
           <OpcionesMano valor={mano} alCambiar={setMano} nombre="mano" />
         </div>
       </div>
+
+      <CapturaPalma mano={mano} />
 
       <div>
         <label className="etiqueta" htmlFor="pregunta">{t.quiromancia.pregunta}</label>

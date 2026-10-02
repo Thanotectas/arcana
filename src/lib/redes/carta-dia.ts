@@ -1,4 +1,5 @@
-import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
+import type { CartaTarot } from "@/lib/tarot/deck";
+import { MAZOS, type IdMazo } from "@/lib/tarot/mazos";
 
 /**
  * "Carta del día de Arcana" para redes: la misma carta para todos en una
@@ -11,11 +12,18 @@ import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
 const EPOCA = Date.UTC(2026, 0, 1);
 const DELICADO = /salud|enferm|crisis|ruina|p[ée]rdida|traici|duelo|depresi|ansiedad|suicid|violen/i;
 
-const ROTACION: CartaTarot[] = MAZO.filter((c) => !DELICADO.test(`${frase(c.significado, 320)} ${c.amor} ${c.trabajo}`));
+/** Mazos que se alternan día a día (todos con ilustración propia). */
+const MAZOS_REDES: IdMazo[] = ["rider", "arcana"];
+
+const ROTACION: Record<IdMazo, CartaTarot[]> = Object.fromEntries(
+  (Object.keys(MAZOS) as IdMazo[]).map((m) => [m, MAZOS[m].cartas.filter((c) => !DELICADO.test(`${frase(c.significado, 320)} ${c.amor} ${c.trabajo}`))]),
+) as Record<IdMazo, CartaTarot[]>;
 
 const mcd = (a: number, b: number): number => (b ? mcd(b, a % b) : a);
 // Un paso coprimo con el tamaño de la rotación visita cada carta una vez por ciclo.
-const PASO = [29, 31, 37, 41, 43, 47].find((p) => mcd(p, ROTACION.length) === 1) ?? 1;
+function pasoPara(n: number) {
+  return [29, 31, 37, 41, 43, 47, 7, 11, 13].find((p) => mcd(p, n) === 1) ?? 1;
+}
 
 export function fechaBogota(d = new Date()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(d); // AAAA-MM-DD
@@ -25,11 +33,24 @@ export function esFecha(valor: string | null | undefined): valor is string {
   return Boolean(valor && /^\d{4}-\d{2}-\d{2}$/.test(valor) && !Number.isNaN(Date.parse(`${valor}T00:00:00Z`)));
 }
 
+function diasDesdeEpoca(fecha: string) {
+  return Math.round((Date.parse(`${fecha}T00:00:00Z`) - EPOCA) / 864e5);
+}
+
+/** Mazo del día: se alternan los mazos con ilustración (hoy Rider-Waite, mañana Tarot Arcana…). */
+export function mazoDelDia(fecha: string): IdMazo {
+  const d = diasDesdeEpoca(fecha);
+  return MAZOS_REDES[((d % MAZOS_REDES.length) + MAZOS_REDES.length) % MAZOS_REDES.length];
+}
+
 export function cartaDelDia(fecha: string): CartaTarot {
-  const dias = Math.round((Date.parse(`${fecha}T00:00:00Z`) - EPOCA) / 864e5);
-  const n = ROTACION.length;
-  const i = (((dias * PASO) % n) + n) % n;
-  return ROTACION[i];
+  const mazo = mazoDelDia(fecha);
+  const lista = ROTACION[mazo];
+  // Cada mazo lleva su propio contador: los días en que le toca a él.
+  const turno = Math.floor(diasDesdeEpoca(fecha) / MAZOS_REDES.length);
+  const n = lista.length;
+  const i = (((turno * pasoPara(n)) % n) + n) % n;
+  return lista[i];
 }
 
 /** Las primeras frases de un texto, hasta `max` caracteres. */
@@ -55,9 +76,10 @@ function fechaLarga(fecha: string) {
 /** Texto de la publicación (Instagram admite hasta 2.200 caracteres). */
 export function textoCartaDelDia(fecha: string) {
   const c = cartaDelDia(fecha);
+  const mazo = mazoDelDia(fecha);
   return [
     `✨ Carta del día · ${fechaLarga(fecha)}`,
-    `${c.nombre}`,
+    `${c.nombre}${mazo === "arcana" ? " · Tarot Arcana, nuestro mazo propio" : ` · ${MAZOS[mazo].nombre}`}`,
     "",
     frase(c.significado, 320),
     "",
@@ -68,7 +90,7 @@ export function textoCartaDelDia(fecha: string) {
     "",
     "🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en miarcana.com (enlace en la biografía).",
     "",
-    "#tarot #tarotenespañol #cartadeldia #tarotdiario #espiritualidad #arcana",
+    mazo === "arcana" ? "#tarot #tarotarcana #cartadeldia #tarotdiario #espiritualidad #miarcana" : "#tarot #tarotenespañol #cartadeldia #tarotdiario #espiritualidad #miarcana",
   ]
     .join("\n")
     .slice(0, 2200);

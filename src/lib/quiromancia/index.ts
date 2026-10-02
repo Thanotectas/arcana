@@ -43,7 +43,7 @@ export function separarAnexo(texto: string): { cuerpo: string; trazos: TrazosMan
       if (Array.isArray(puntos)) {
         const validos = puntos
           .filter((p): p is [number, number] => Array.isArray(p) && p.length === 2 && p.every((n) => typeof n === "number" && n >= 0 && n <= 100))
-          .slice(0, 12);
+          .slice(0, 16);
         if (validos.length >= 2) limpio[l] = validos;
       }
     }
@@ -69,4 +69,4 @@ export function resumenQuiromancia(e: EntradaQuiromancia) {
 export const INSTRUCCION_ANEXO =
   "Al final, después de la lectura, añade un bloque de código con este formato exacto y nada más dentro:\n" +
   "```json\n{\"lineas\":{\"vida\":[[x,y],[x,y],[x,y],[x,y]],\"cabeza\":[[x,y],[x,y],[x,y]],\"corazon\":[[x,y],[x,y],[x,y]],\"destino\":[[x,y],[x,y],[x,y]]}}\n```\n" +
-  "donde x e y son porcentajes enteros (0 a 100) sobre el ancho y el alto de la foto, de 3 a 6 puntos por línea siguiendo su recorrido tal como la ves. Omite una línea si no la distingues. No expliques el bloque.";
+  "donde x e y son porcentajes enteros (0 a 100) sobre el ancho y el alto de la foto, de 5 a 8 puntos por línea siguiendo su recorrido tal como la ves, desde donde empieza hasta donde termina. Omite una línea si no la distingues. No expliques el bloque.";

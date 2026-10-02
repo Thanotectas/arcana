@@ -1,8 +1,10 @@
-import type { CartaTarot } from "@/lib/tarot/deck";
+import type { CartaTarot, Palo } from "@/lib/tarot/deck";
 import type { IdMazo } from "@/lib/tarot/mazos";
+import { CaraDibujada } from "./CaraDibujada";
 
 const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
 const SIMBOLO_PALO: Record<string, string> = { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" };
+const PALO_POR_SIMBOLO: Record<string, Palo | undefined> = { "🜂": "bastos", "🜄": "copas", "🜁": "espadas", "🜃": "oros" };
 const NOMBRE_CORTE: Record<number, string> = { 11: "Sota", 12: "Caballero", 13: "Reina", 14: "Rey" };
 
 /** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). */
@@ -45,12 +47,11 @@ export function CaraCarta({
   invertida: boolean;
   compacta?: boolean;
   estilo?: "rider" | "marsella" | "angeles" | "arcana";
-  /** En Marsella, los arcanos menores muestran tantos símbolos como su número. */
+  /** Número del arcano menor (pips o rango); 1 en los mayores. */
   repeticiones?: number;
   /** Ilustración real de la carta; si existe, reemplaza el dibujo con símbolos. */
   imagen?: string;
 }) {
-  const pips = estilo === "marsella" && repeticiones > 1 && repeticiones <= 10;
   if (imagen) {
     return (
       <div className={`carta-tarot con-imagen estilo-${estilo} relative w-full ${invertida ? "invertida" : ""}`} aria-hidden>
@@ -61,20 +62,14 @@ export function CaraCarta({
       </div>
     );
   }
+  // Sin ilustración: cara dibujada en SVG (marco, numeral, pips o sello).
+  const palo = PALO_POR_SIMBOLO[simbolo];
+  const arcano: "mayor" | "menor" = palo ? "menor" : "mayor";
+  void compacta;
   return (
     <div className={`carta-tarot estilo-${estilo} relative w-full ${invertida ? "invertida" : ""}`} aria-hidden>
-      <div className={`contenido-carta absolute inset-0 flex flex-col items-center justify-between text-center ${compacta ? "p-1.5" : "p-3"}`}>
-        <span className={`font-display text-oro-suave ${compacta ? "text-[10px]" : "text-sm"}`}>{etiqueta}</span>
-        {pips ? (
-          <span className={`grid gap-0.5 font-display leading-none text-oro/80 ${repeticiones > 4 ? "grid-cols-2" : "grid-cols-1"} ${compacta ? "text-sm" : "text-2xl"}`}>
-            {Array.from({ length: repeticiones }, (_, i) => (
-              <span key={i}>{simbolo}</span>
-            ))}
-          </span>
-        ) : (
-          <span className={`block font-display leading-none text-oro/80 ${compacta ? "text-3xl" : "text-7xl"}`}>{simbolo}</span>
-        )}
-        <span className={`font-display font-semibold leading-tight text-texto ${compacta ? "text-[10px]" : "text-base"}`}>{nombre}</span>
+      <div className="contenido-carta absolute inset-0 overflow-hidden rounded-[0.8rem]">
+        <CaraDibujada nombre={nombre} etiqueta={etiqueta} estilo={estilo} arcano={arcano} numero={repeticiones} palo={palo} />
       </div>
     </div>
   );

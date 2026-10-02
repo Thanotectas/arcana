@@ -15,13 +15,13 @@ type Modo = "inicio" | "camara" | "vista";
  * permiso, se puede elegir una imagen de la galería. La foto se recorta al
  * marco, se reduce (máx. 1280 px, JPEG) y queda en un input oculto.
  */
-export function CapturaPalma({ nombreCampo = "foto", variante = "mano" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" }) {
+export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
   const { t } = useT();
   const taza = variante === "taza";
   const textos = taza
     ? { alinea: t.chocolate.alineaTaza, guia: t.chocolate.guia, alt: t.chocolate.tuTaza }
     : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
-  const Guia = taza ? GuiaTaza : GuiaMano;
+  const guia = (enVivo = false) => (taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
   const [modo, setModo] = useState<Modo>("inicio");
   const [vista, setVista] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +173,7 @@ export function CapturaPalma({ nombreCampo = "foto", variante = "mano" }: { nomb
               style={{ transform: camaraTrasera ? undefined : "scaleX(-1)" }}
             />
             <div className="absolute inset-0">
-              <Guia enVivo />
+              {guia(true)}
             </div>
             <p className="absolute inset-x-0 top-3 text-center text-xs font-medium text-white drop-shadow">{textos.alinea}</p>
             <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-4">
@@ -207,12 +207,12 @@ export function CapturaPalma({ nombreCampo = "foto", variante = "mano" }: { nomb
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={vista} alt={textos.alt} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 opacity-40">
-              <Guia enVivo />
+              {guia(true)}
             </div>
           </>
         )}
 
-        {modo === "inicio" && <Guia />}
+        {modo === "inicio" && guia()}
 
         {procesando && (
           <div className="absolute inset-0 flex items-center justify-center bg-noche/60">
@@ -261,7 +261,9 @@ export function CapturaPalma({ nombreCampo = "foto", variante = "mano" }: { nomb
  * Contorno de una palma abierta para encuadrar. En vivo, el exterior se
  * oscurece y el borde brilla para que la mano se coloque dentro.
  */
-function GuiaMano({ enVivo = false }: { enVivo?: boolean }) {
+function GuiaMano({ enVivo = false, mano: lado = "derecha" }: { enVivo?: boolean; mano?: "derecha" | "izquierda" }) {
+  // El trazado base es una palma izquierda (pulgar a la izquierda); la derecha se refleja.
+  const espejo = lado === "derecha" ? "scale(-1 1) translate(-300 0)" : undefined;
   const mano =
     "M150 385c-42 0-70-26-78-62l-30-96c-4-13 4-24 15-26 10-2 19 5 23 16l18 52V120c0-12 9-20 19-20s18 8 18 20v100V85c0-12 9-21 19-21s19 9 19 21v135V95c0-12 9-21 19-21s18 9 18 21v125V125c0-12 8-20 18-20s18 8 18 20v130c0 70-40 130-96 130z";
   return (
@@ -276,20 +278,22 @@ function GuiaMano({ enVivo = false }: { enVivo?: boolean }) {
           <path d={mano} fill="black" />
         </mask>
       </defs>
-      {enVivo ? (
-        <rect width="300" height="400" fill="rgba(11,7,22,0.55)" mask="url(#fuera)" />
-      ) : (
-        <path d={mano} fill="url(#brillo)" />
-      )}
-      <path d={mano} fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
-      {!enVivo && (
-        <>
-          <path d="M120 235c-6 40-8 80 20 130" fill="none" stroke="rgba(255,138,91,0.6)" strokeWidth="2" />
-          <path d="M118 232c30-6 60-4 95 20" fill="none" stroke="rgba(143,199,255,0.6)" strokeWidth="2" />
-          <path d="M110 205c35-22 70-24 110-8" fill="none" stroke="rgba(255,123,156,0.6)" strokeWidth="2" />
-          <path d="M160 370c0-50 5-100 2-150" fill="none" stroke="rgba(217,180,90,0.6)" strokeWidth="2" />
-        </>
-      )}
+      <g transform={espejo}>
+        {enVivo ? (
+          <rect width="300" height="400" fill="rgba(11,7,22,0.55)" mask="url(#fuera)" />
+        ) : (
+          <path d={mano} fill="url(#brillo)" />
+        )}
+        <path d={mano} fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
+        {!enVivo && (
+          <>
+            <path d="M120 235c-6 40-8 80 20 130" fill="none" stroke="rgba(255,138,91,0.6)" strokeWidth="2" />
+            <path d="M118 232c30-6 60-4 95 20" fill="none" stroke="rgba(143,199,255,0.6)" strokeWidth="2" />
+            <path d="M110 205c35-22 70-24 110-8" fill="none" stroke="rgba(255,123,156,0.6)" strokeWidth="2" />
+            <path d="M160 370c0-50 5-100 2-150" fill="none" stroke="rgba(217,180,90,0.6)" strokeWidth="2" />
+          </>
+        )}
+      </g>
     </svg>
   );
 }

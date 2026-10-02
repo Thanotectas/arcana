@@ -1,6 +1,3 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { imagenTarjeta, extractoDe } from "@/lib/marca/tarjeta";
@@ -8,6 +5,7 @@ import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
+import { cartaComoDataUri, monedaComoDataUri } from "@/lib/marca/imagenes";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
 import { FICHA, nombrePilar, type ResultadoChino } from "@/lib/chino";
@@ -121,25 +119,4 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
   respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);
   return respuesta;
-}
-
-/** Ilustración de una carta como data URI PNG (el motor de la tarjeta no lee WebP). Si falta, devuelve "". */
-function cartaComoDataUri(mazo: IdMazo, id: string) {
-  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", mazo, `${id}.webp`), undefined, 527);
-}
-
-/** Moneda dorada (signo occidental o animal chino) como data URI PNG, reducida para la tarjeta. */
-function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
-  return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), 260);
-}
-
-async function webpComoDataUri(ruta: string, lado?: number, alto?: number) {
-  try {
-    const webp = await readFile(ruta);
-    const base = sharp(webp);
-    const png = await (lado ? base.resize(lado, lado) : alto ? base.resize({ height: alto }) : base).png().toBuffer();
-    return `data:image/png;base64,${png.toString("base64")}`;
-  } catch {
-    return "";
-  }
 }
