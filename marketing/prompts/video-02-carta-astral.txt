@@ -1,0 +1,21 @@
+PROMPT PARA GEMINI / VEO — Video vertical 9:16 (Instagram Reels y TikTok), 10 segundos
+(Pega el bloque completo tal cual. Los textos, el logo y las cuentas se agregan después en el montaje, igual que con el video de la mano. Si Gemini genera 10 segundos, con uno basta: yo le pongo los rótulos y el cierre.)
+
+---
+Crea un video vertical 9:16 de 10 segundos, cinematográfico, sin texto incrustado ni marcas de agua. Estética: noche profunda azul-violeta (#0b0716 a #2a1a5e), dorado cálido (#f1d99a), partículas de luz como polvo de estrellas, luz suave de velas, movimientos lentos y elegantes. Sin rostros reconocibles. Estilo: misticismo moderno y lujo tranquilo.
+
+Escena 1 (0–3 s): Una mujer latina, de espaldas o de perfil sin que se vea el rostro, sostiene un teléfono en una habitación oscura con velas. En la pantalla, un formulario elegante sobre fondo oscuro: tres campos vacíos que se llenan solos con luz dorada (una fecha, una hora, el nombre de una ciudad; los caracteres deben ser ilegibles, solo trazos de luz). Cámara: acercamiento lento al teléfono.
+
+Escena 2 (3–7 s): La pantalla se expande y de ella sale, flotando en el aire, una rueda astral dorada de líneas finas: un círculo exterior con los doce símbolos del zodiaco grabados en oro, un círculo interior dividido en doce casas, y pequeños planetas brillantes que se posicionan uno por uno sobre la rueda dejando una estela de luz. Entre los planetas se tienden líneas de luz (algunas azules, algunas rojas) formando un dibujo geométrico. La rueda gira muy lentamente en 3D. Cámara: orbital suave alrededor de la rueda.
+
+Escena 3 (7–10 s): La rueda se aleja y debajo aparece una tarjeta oscura flotando con texto caligráfico dorado que se escribe solo, borroso e ilegible, como una carta manuscrita. Alrededor, los símbolos del zodiaco aparecen y desaparecen muy tenues. Al final, fundido a un resplandor violeta central donde irá el logo.
+
+Ritmo: calmado, hipnótico. Música sugerida (añadir en el editor): ambient con piano suave y campanillas.
+---
+
+TEXTOS QUE SE SOBREPONEN EN EL MONTAJE (serif dorada para títulos, sans blanca para subtítulos):
+- 0–1.4 s: "¿Qué decía el cielo el día en que naciste?"
+- Escena 1: "Paso 1 · Fecha, hora y lugar de nacimiento"
+- Escena 2: "Paso 2 · Arcana calcula tu cielo" (subtítulo: "Planetas, casas y aspectos reales")
+- Escena 3: "Paso 3 · Tu carta astral se escribe frente a ti"
+- Cierre (5 s): logo de Arcana + "miarcana.com" + "3 créditos gratis al crear tu cuenta" + Instagram "@miarcana.oficial" y TikTok "@miarcana4"

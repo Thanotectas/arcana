@@ -1,0 +1,11 @@
+Una sola imagen cuadrada, 4 filas por 4 columnas, con 12 monedas de oro antiguas (las 4 celdas de la última fila quedan vacías: deja ahí solo el fondo). Fondo negro uniforme y liso, sin degradados ni textura, para poder recortar cada moneda.
+
+Cada moneda es redonda, del mismo tamaño, centrada en su celda, con un borde de puntos en relieve y la figura de un signo del zodíaco occidental grabada en bajorrelieve dorado, estilo medalla clásica, vista frontal, iluminación suave desde arriba a la izquierda, sin brillos exagerados. Las 12 monedas deben compartir exactamente el mismo estilo, el mismo dorado y el mismo grosor de borde.
+
+Orden, de izquierda a derecha y de arriba abajo:
+Fila 1: Aries (carnero), Tauro (toro), Géminis (dos figuras gemelas), Cáncer (cangrejo).
+Fila 2: Leo (león), Virgo (doncella con espiga de trigo), Libra (balanza), Escorpio (escorpión).
+Fila 3: Sagitario (centauro arquero), Capricornio (cabra con cola de pez), Acuario (aguador vertiendo agua), Piscis (dos peces).
+Fila 4: vacía.
+
+Muy importante: ninguna letra, número, palabra ni símbolo astrológico escrito. Solo la figura de cada signo. Sin marcas de agua. Sin sombras proyectadas fuera de la moneda.

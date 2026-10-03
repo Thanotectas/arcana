@@ -1,0 +1,82 @@
+TAROT ARCANA: LOS 22 UMBRALES — PROMPTS PARA GEMINI (versión 2: pintura expresiva)
+
+Pide siempre la resolución más alta. Si una cuadrícula sale con texto, con cartas de distinto tamaño o con un estilo muy distinto a la anterior, vuelve a generarla. Si Gemini permite adjuntar una imagen de referencia, adjunta la cuadrícula 1 aprobada al pedir las siguientes y añade: "Mismo estilo exacto que la imagen adjunta".
+
+
+==================== CUADRÍCULA 1 (6 cartas) ====================
+
+Una sola imagen cuadrada que contiene 6 cartas de tarot ordenadas en 3 columnas y 2 filas. Cada carta es un rectángulo vertical en proporción 2:3 (más alta que ancha), todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de fondo negro liso de unos 40 píxeles, sin ningún elemento en esas franjas, para poder recortar cada carta limpiamente.
+
+Estilo de todas las cartas, idéntico entre sí: pintura digital de calidad editorial, como la portada de una novela de fantasía, con pinceladas visibles, texturas y profundidad, inspirada en el art nouveau de Alphonse Mucha y en la luz de las auroras boreales. Colores joya intensos y luminosos (violeta profundo, azul eléctrico, magenta, turquesa, naranja aurora, dorado) sobre cielos nocturnos vivos con estrellas y constelaciones en línea dorada fina. Iluminación cinematográfica: una fuente de luz clara que modela los cuerpos y los rostros, con brillos y sombras suaves.
+
+Los personajes son lo más importante: personas reales y vivas, con rostros expresivos y emoción evidente (asombro, serenidad, ternura, determinación, alegría, según la carta), ojos que miran, manos que sienten, cuerpos en movimiento con gesto natural y ropa que fluye. Nada de poses rígidas ni rostros vacíos. Cada escena cuenta un momento emocional, no una pose.
+
+Cada carta lleva un marco dorado delgado con las esquinas ligeramente ornamentadas, todos los marcos iguales, y la ilustración ocupa toda la carta hasta el marco: sin franja inferior, sin cartela, sin título. Sin texto, sin letras, sin números, sin firmas ni marcas de agua en ninguna parte de la imagen.
+
+De izquierda a derecha y de arriba abajo, las cartas son:
+1. El Viajero: una joven con la mochila al hombro y el rostro iluminado de asombro y alegría, a punto de dar el primer paso desde el borde de un acantilado hacia un puente hecho de estrellas; un perrito de luz salta a su lado; amanecer turquesa y dorado al fondo.
+2. El Alquimista: un hombre con mirada concentrada y una sonrisa de certeza, de pie con los brazos abiertos, uniendo cuatro luces (una llama, una gota de agua, un remolino de aire y un cristal de tierra) en una esfera brillante sobre su pecho; magenta y dorado.
+3. La Sibila: una mujer velada de mirada profunda y serena, que sabe algo que aún no dice, sentada entre dos lunas (una creciente y una menguante) con un libro cerrado que brilla sobre su regazo y una cortina de estrellas detrás; azul índigo y plata.
+4. El Jardín: una mujer embarazada o maternal, con una sonrisa plena y los ojos entrecerrados de gozo, sentada entre flores gigantes luminosas junto a un río de luz, acariciando su vientre donde brilla un pequeño cielo estrellado; verde esmeralda y rosa.
+5. El Guardián: un hombre maduro de mirada firme y protectora, de pie en la cima de una montaña con la capa al viento, un sol de forma cuadrada brillando detrás de su cabeza y un bastón de luz en la mano; rojo y ámbar.
+6. El Maestro: un anciano de rostro bondadoso y una joven de ojos atentos, en el momento exacto en que él le entrega una llave hecha de luz y ella la recibe con las dos manos, bajo un arco de estrellas; violeta y dorado.
+
+
+==================== CUADRÍCULA 2 (6 cartas) ====================
+
+Una sola imagen cuadrada que contiene 6 cartas de tarot ordenadas en 3 columnas y 2 filas. Cada carta es un rectángulo vertical en proporción 2:3 (más alta que ancha), todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de fondo negro liso de unos 40 píxeles, sin ningún elemento en esas franjas, para poder recortar cada carta limpiamente.
+
+Estilo de todas las cartas, idéntico entre sí: pintura digital de calidad editorial, como la portada de una novela de fantasía, con pinceladas visibles, texturas y profundidad, inspirada en el art nouveau de Alphonse Mucha y en la luz de las auroras boreales. Colores joya intensos y luminosos (violeta profundo, azul eléctrico, magenta, turquesa, naranja aurora, dorado) sobre cielos nocturnos vivos con estrellas y constelaciones en línea dorada fina. Iluminación cinematográfica: una fuente de luz clara que modela los cuerpos y los rostros, con brillos y sombras suaves.
+
+Los personajes son lo más importante: personas reales y vivas, con rostros expresivos y emoción evidente (asombro, serenidad, ternura, determinación, alegría, según la carta), ojos que miran, manos que sienten, cuerpos en movimiento con gesto natural y ropa que fluye. Nada de poses rígidas ni rostros vacíos. Cada escena cuenta un momento emocional, no una pose.
+
+Cada carta lleva un marco dorado delgado con las esquinas ligeramente ornamentadas, todos los marcos iguales, y la ilustración ocupa toda la carta hasta el marco: sin franja inferior, sin cartela, sin título. Sin texto, sin letras, sin números, sin firmas ni marcas de agua en ninguna parte de la imagen.
+
+De izquierda a derecha y de arriba abajo, las cartas son:
+1. El Encuentro: dos personas que se miran con amor evidente, frente a frente, a punto de tocarse, con sus auras de luz fundiéndose en el centro bajo un eclipse solar con corona dorada; rosa y naranja.
+2. El Impulso: una persona con expresión decidida y el pelo al viento, de pie sobre un cometa que cruza el cielo, sujetando las riendas de dos caballos de luz, uno azul y otro rojo, que corren hacia adelante; azul eléctrico y rojo.
+3. La Serena: una mujer que acaricia con ternura la cabeza de un león hecho de constelaciones; los dos se miran con confianza y el león cierra los ojos; dorado y naranja.
+4. La Linterna: una persona mayor encapuchada, de perfil, con el rostro pensativo iluminado desde abajo por una linterna cuya luz es una estrella de ocho puntas, en un sendero de montaña; azul noche y dorado.
+5. La Rueda del Cielo: una gran rueda zodiacal girando entre nubes de todos los colores, con las doce constelaciones como puntos de luz en su borde; una persona pequeña la contempla desde abajo con asombro; multicolor con oro.
+6. La Balanza: una mujer de mirada clara y serena que sostiene una balanza de luz en perfecto equilibrio en una mano y una espada vertical de luz en la otra; azul y plata.
+
+
+==================== CUADRÍCULA 3 (6 cartas) ====================
+
+Una sola imagen cuadrada que contiene 6 cartas de tarot ordenadas en 3 columnas y 2 filas. Cada carta es un rectángulo vertical en proporción 2:3 (más alta que ancha), todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de fondo negro liso de unos 40 píxeles, sin ningún elemento en esas franjas, para poder recortar cada carta limpiamente.
+
+Estilo de todas las cartas, idéntico entre sí: pintura digital de calidad editorial, como la portada de una novela de fantasía, con pinceladas visibles, texturas y profundidad, inspirada en el art nouveau de Alphonse Mucha y en la luz de las auroras boreales. Colores joya intensos y luminosos (violeta profundo, azul eléctrico, magenta, turquesa, naranja aurora, dorado) sobre cielos nocturnos vivos con estrellas y constelaciones en línea dorada fina. Iluminación cinematográfica: una fuente de luz clara que modela los cuerpos y los rostros, con brillos y sombras suaves.
+
+Los personajes son lo más importante: personas reales y vivas, con rostros expresivos y emoción evidente (asombro, serenidad, ternura, determinación, alegría, según la carta), ojos que miran, manos que sienten, cuerpos en movimiento con gesto natural y ropa que fluye. Nada de poses rígidas ni rostros vacíos. Cada escena cuenta un momento emocional, no una pose.
+
+Cada carta lleva un marco dorado delgado con las esquinas ligeramente ornamentadas, todos los marcos iguales, y la ilustración ocupa toda la carta hasta el marco: sin franja inferior, sin cartela, sin título. Sin texto, sin letras, sin números, sin firmas ni marcas de agua en ninguna parte de la imagen.
+
+De izquierda a derecha y de arriba abajo, las cartas son:
+1. El Suspendido: una persona flotando cabeza abajo con una sonrisa serena y los ojos cerrados, una pierna cruzada, suspendida de una rama de luz, con la luna llena como halo alrededor de su cabeza; turquesa y violeta.
+2. La Metamorfosis: una mujer emergiendo con los ojos abiertos de asombro de una crisálida hecha de estrellas, mientras unas alas de mariposa gigantes y luminosas se despliegan en su espalda; azul oscuro y magenta.
+3. El Río: una persona con un pie en el agua y otro en la tierra, concentrada y en paz, vertiendo agua de luz entre dos copas, con un arcoíris suave que cruza la escena; celeste y dorado.
+4. La Sombra: una persona sentada que levanta la mirada con alivio mientras las cadenas de humo que la ataban se deshacen en el aire, y una luz cálida y poderosa nace detrás de ella; púrpura y rojo; belleza, no miedo.
+5. El Relámpago: dos personas saltando con los brazos abiertos desde una torre de cristal partida por un rayo dorado, con expresión de liberación, mientras semillas de luz y pétalos caen hacia un suelo fértil; naranja y blanco; liberación, no desastre.
+6. La Estrella: una mujer arrodillada con el rostro en calma y esperanza junto a un lago que refleja una gran estrella de ocho puntas, vertiendo agua de dos cántaros; celeste y plata.
+
+
+==================== CUADRÍCULA 4 (4 cartas) ====================
+
+Una sola imagen cuadrada que contiene 4 cartas de tarot ordenadas en 3 columnas y 2 filas: las cuatro primeras posiciones ocupadas (fila 1 completa y la primera de la fila 2) y las dos últimas celdas vacías, solo fondo negro. Cada carta es un rectángulo vertical en proporción 2:3 (más alta que ancha), todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de fondo negro liso de unos 40 píxeles, sin ningún elemento en esas franjas, para poder recortar cada carta limpiamente.
+
+Estilo de todas las cartas, idéntico entre sí: pintura digital de calidad editorial, como la portada de una novela de fantasía, con pinceladas visibles, texturas y profundidad, inspirada en el art nouveau de Alphonse Mucha y en la luz de las auroras boreales. Colores joya intensos y luminosos (violeta profundo, azul eléctrico, magenta, turquesa, naranja aurora, dorado) sobre cielos nocturnos vivos con estrellas y constelaciones en línea dorada fina. Iluminación cinematográfica: una fuente de luz clara que modela los cuerpos y los rostros, con brillos y sombras suaves.
+
+Los personajes son lo más importante: personas reales y vivas, con rostros expresivos y emoción evidente (asombro, serenidad, ternura, determinación, alegría, según la carta), ojos que miran, manos que sienten, cuerpos en movimiento con gesto natural y ropa que fluye. Nada de poses rígidas ni rostros vacíos. Cada escena cuenta un momento emocional, no una pose.
+
+Cada carta lleva un marco dorado delgado con las esquinas ligeramente ornamentadas, todos los marcos iguales, y la ilustración ocupa toda la carta hasta el marco: sin franja inferior, sin cartela, sin título. Sin texto, sin letras, sin números, sin firmas ni marcas de agua en ninguna parte de la imagen.
+
+De izquierda a derecha y de arriba abajo, las cartas son:
+1. La Luna: una persona caminando con cautela y curiosidad por un sendero bajo una luna enorme, entre dos torres lejanas, con un lobo y un perro de luz a cada lado y un cangrejo de luz saliendo del agua; azul profundo y plata.
+2. El Sol: un niño o niña riendo a carcajadas con los brazos abiertos frente a un sol enorme de rayos de todos los colores, entre girasoles luminosos; amarillo y naranja.
+3. El Despertar: varias personas que se elevan flotando con los rostros vueltos hacia una luz blanca en lo alto, con expresión de reconocimiento y emoción, llamadas por una trompeta hecha de estrellas que suena desde una nube; blanco y dorado.
+4. El Cosmos: una mujer danzando con gracia y una sonrisa plena dentro de un gran anillo de galaxias, con los cuatro elementos (llama, agua, viento, cristal) en las cuatro esquinas; multicolor con dorado.
+
+
+==================== REVERSO DEL MAZO ====================
+
+Una sola imagen vertical en proporción 2:3 (más alta que ancha): el reverso de una carta de tarot. Pintura digital con textura, fondo de cielo nocturno con aurora boreal en violeta profundo, azul eléctrico y magenta, con estrellas y constelaciones finas en línea dorada. En el centro, un símbolo geométrico sagrado dorado: una estrella de ocho puntas dentro de un círculo, rodeada por un anillo fino con pequeñas lunas en sus fases. Marco dorado delgado con las esquinas ligeramente ornamentadas, igual al de las cartas. Diseño perfectamente simétrico, de modo que se vea igual al girarlo 180 grados. Sin texto, sin letras, sin números, sin marcas de agua.

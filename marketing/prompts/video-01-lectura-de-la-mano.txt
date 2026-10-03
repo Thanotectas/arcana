@@ -1,0 +1,21 @@
+PROMPT PARA GEMINI / VEO — Video vertical 9:16 (Instagram Reels y TikTok), 20 a 30 segundos
+(Pega el bloque completo. Si Gemini genera clips de 8 segundos, pídele los tres clips por separado con las escenas 1, 2 y 3, y une los clips en CapCut o en el editor de Instagram. El logo y el cierre con las redes se agregan en el editor con la imagen del logo que te doy aparte, porque los generadores de video no reproducen logos reales con fidelidad.)
+
+---
+Crea un video vertical 9:16, cinematográfico, de 24 segundos, sin texto incrustado ni marcas de agua, con esta estética: noche profunda azul-violeta (#0b0716 a #2a1a5e), destellos dorados (#f1d99a), partículas de luz flotando como polvo de estrellas, iluminación suave de velas, cámara lenta y elegante. Sin rostros reconocibles. Estilo: misticismo moderno, lujo tranquilo, no "bruja de caricatura".
+
+Escena 1 (0–8 s): Primer plano de una mano de mujer latina, palma abierta hacia la cámara, sobre un fondo oscuro con bokeh violeta. Un teléfono entra en cuadro y la pantalla muestra un contorno punteado dorado de una mano; la palma real encaja dentro del contorno. Un destello blanco suave simula la foto. Cámara: dolly lento hacia adelante.
+
+Escena 2 (8–16 s): La misma palma llena el cuadro. Sobre ella aparecen, una por una, cuatro líneas de luz que recorren los surcos reales de la mano: una naranja cálida (línea de la vida, rodea la base del pulgar), una azul claro (línea de la cabeza, cruza el centro), una rosa (línea del corazón, bajo los dedos) y una dorada vertical (línea del destino). Cada línea se dibuja como si un pincel de luz la trazara, con partículas que se desprenden. Cámara: ligero movimiento orbital.
+
+Escena 3 (16–24 s): Transición a una tarjeta oscura elegante flotando en el espacio, con texto borroso que se va escribiendo solo, como una carta manuscrita que aparece letra a letra (no debe leerse ninguna palabra concreta). Alrededor, símbolos astrológicos dorados muy tenues aparecen y desaparecen. Al final, un fundido a negro con un resplandor violeta central donde irá el logo.
+
+Ritmo: calmado, hipnótico. Música sugerida (añadir en el editor): ambient con piano suave y campanillas.
+---
+
+TEXTOS PARA SOBREPONER EN EL EDITOR (fuente serif elegante en dorado #f1d99a para títulos, sans blanca para subtítulos):
+- 0–3 s: "Tu mano tiene algo que decirte."
+- Escena 1: "Paso 1 · Fotografía tu palma"
+- Escena 2: "Paso 2 · Arcana lee tus líneas"  (etiquetas: Vida · Cabeza · Corazón · Destino)
+- Escena 3: "Paso 3 · Tu lectura se escribe frente a ti"
+- Cierre (últimos 5 s, sobre el resplandor): logo de Arcana + "miarcana.com" + "3 créditos gratis al crear tu cuenta" + dos líneas con ícono: Instagram "@miarcana.oficial" y TikTok "@miarcana4"
