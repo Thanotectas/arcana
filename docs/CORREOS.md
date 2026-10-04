@@ -22,6 +22,7 @@ Tope por corrida: `CORREOS_MAXIMO` (80). Prioridad cuando hay más candidatos qu
 4. En Vercel → Settings → Environment Variables (Production):
    - `RESEND_API_KEY` = la clave.
    - `CORREO_REMITENTE` = `Sibila de Arcana <sibila@miarcana.com>` (cualquier buzón del dominio verificado; no necesita existir para enviar).
+   - `CORREO_RESPUESTA` = buzón real al que llegan las respuestas (opcional; por defecto `miarcana4@gmail.com`).
    - `CORREOS_MAXIMO` = `80` (opcional).
 5. Redespliega. Sin `RESEND_API_KEY` el cron responde `sin_resend_api_key` y no envía nada.
 
