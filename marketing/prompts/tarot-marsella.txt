@@ -1,0 +1,53 @@
+TAROT DE MARSELLA CON GEMINI — 78 cartas en 13 cuadrículas de 6 (3 columnas × 2 filas, proporción 2:3)
+
+Empieza por los 22 arcanos mayores (cuadrículas 1 a 4: 6+6+6+4). Si el estilo convence, seguimos con los menores
+(9 cuadrículas: pips por palo y figuras). Pide la resolución más alta; si sale texto o cartas de tamaño distinto,
+repite. Adjunta la cuadrícula 1 aprobada como referencia para las siguientes.
+
+==================== ESTILO MAESTRO (va en todos los prompts) ====================
+
+Una sola imagen cuadrada que contiene 6 cartas de tarot ordenadas en 3 columnas y 2 filas. Cada carta es un rectángulo
+vertical en proporción 2:3, todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de fondo negro
+liso de unos 40 píxeles, sin ningún elemento en esas franjas.
+
+Estilo de todas las cartas, idéntico entre sí: Tarot de Marsella tradicional del siglo XVIII reinterpretado con
+limpieza moderna. Grabado en madera (xilografía) con líneas negras gruesas y firmes, coloreado a plantilla con colores
+planos sin degradados ni sombras: rojo bermellón, azul cobalto, amarillo ocre, verde hoja, carne pálida y el blanco
+crema del papel. Figuras frontales o de perfil, hieráticas, de proporciones ligeramente ingenuas como en el Marsella
+de Conver, con ropajes y coronas tradicionales. Fondo de cada carta en crema de papel antiguo con una textura muy
+leve. Marco: una línea negra fina y, dentro, un filete rojo. La ilustración ocupa toda la carta: sin cartela inferior,
+sin título, sin numeral. Sin texto, sin letras, sin números, sin firmas ni marcas de agua.
+
+==================== CUADRÍCULA 1 (mayores 0–5) ====================
+De izquierda a derecha y de arriba abajo:
+1. El Loco: un caminante con atuendo de bufón a rayas rojas y amarillas, un hatillo al hombro sobre un bastón, caminando hacia la derecha mientras un perro pequeño le salta a la pierna.
+2. El Mago: un joven de pie tras una mesa con tres patas visibles, sombrero de ala ancha en forma de lemniscata, una varita en la mano alzada; sobre la mesa copas, monedas, cuchillos y dados.
+3. La Papisa: una mujer sentada con tiara de tres coronas y velo, un libro abierto sobre el regazo, una cortina detrás.
+4. La Emperatriz: una mujer coronada sentada en un trono con un escudo con un águila y un cetro rematado en una cruz.
+5. El Emperador: un hombre coronado, de perfil, con las piernas cruzadas, sentado en un trono con un escudo con un águila, sosteniendo un cetro.
+6. El Papa: un hombre con tiara papal y manto rojo, de frente, bendiciendo con la mano derecha a dos figuras pequeñas tonsuradas vistas de espaldas, con dos columnas azules detrás.
+
+==================== CUADRÍCULA 2 (mayores 6–11) ====================
+1. El Enamorado: un joven entre dos mujeres, una con corona de flores y otra mayor, y arriba un cupido con el arco tensado dentro de un sol radiante.
+2. El Carro: un príncipe coronado, de pie bajo un dosel sostenido por cuatro columnas, en un carro tirado por dos caballos, uno azul y otro rojo, que miran en direcciones opuestas.
+3. La Justicia: una mujer coronada sentada de frente, con una balanza en la mano izquierda y una espada vertical en la derecha.
+4. El Ermitaño: un anciano de barba larga con capa azul y capucha, de perfil, que sostiene en alto una linterna roja y se apoya en un bastón.
+5. La Rueda de la Fortuna: una rueda con manivela sobre un soporte, con dos animales fantásticos subiendo y bajando por los lados y una esfinge coronada con espada sentada arriba.
+6. La Fuerza: una mujer con un sombrero de ala ancha en forma de lemniscata que abre con calma las fauces de un león con las manos.
+
+==================== CUADRÍCULA 3 (mayores 12–17) ====================
+1. El Colgado: un joven colgado por un pie de una viga sostenida por dos troncos podados, con la otra pierna cruzada formando un cuatro y las manos a la espalda, expresión serena.
+2. El Arcano sin nombre: un esqueleto de color carne con una guadaña, segando sobre un campo negro del que brotan cabezas, manos y pies.
+3. La Templanza: un ángel de pie, con alas rojas, vertiendo agua de un cántaro azul a otro rojo.
+4. El Diablo: una figura con cuernos, alas de murciélago y pies con garras, de pie sobre un pedestal al que están atados por el cuello dos diablillos pequeños con cuernos.
+5. La Casa de Dios: una torre de ladrillo rojo con la corona de la cúspide volando por un rayo de fuego multicolor, y dos figuras cayendo de cabeza entre esferas de colores.
+6. La Estrella: una mujer desnuda arrodillada junto a un río vertiendo agua de dos cántaros, bajo una gran estrella de ocho puntas rodeada de siete estrellas más pequeñas, con un pájaro en un árbol.
+
+==================== CUADRÍCULA 4 (mayores 18–21, dos celdas vacías) ====================
+Las cuatro primeras posiciones ocupadas y las dos últimas celdas vacías, solo fondo negro.
+1. La Luna: una luna de perfil con rostro, que deja caer gotas de colores, sobre dos torres y dos perros que aúllan, con un cangrejo en un estanque abajo.
+2. El Sol: un sol con rostro y rayos rectos y ondulados que deja caer gotas, sobre dos niños que se tocan junto a un muro bajo.
+3. El Juicio: un ángel con trompeta entre nubes, arriba, y abajo tres figuras desnudas, una de ellas saliendo de una tumba vista de espaldas, con las manos juntas.
+4. El Mundo: una mujer desnuda con un velo que danza dentro de una corona ovalada de laurel, con los cuatro seres (ángel, águila, león y toro) en las esquinas.
+
+(Las nueve cuadrículas de arcanos menores se escriben cuando se apruebe el estilo de los mayores.)
