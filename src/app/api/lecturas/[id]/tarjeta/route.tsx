@@ -83,6 +83,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     simbolos = ["✦"];
     imagenes = [await monedaComoDataUri("animales", r.pilar.animal)];
     titulo = nombrePilar(r.pilar) + (r.animalHora ? ` · ${FICHA[r.animalHora].nombre}` : "");
+  } else if (tipo === "velas") {
+    simbolos = ["✦"];
+    titulo = t.lecturas.nombres.velas;
   } else if (tipo === "chocolate") {
     simbolos = ["☕"];
     titulo = t.lecturas.nombres.chocolate;

@@ -23,6 +23,7 @@ import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } fr
 import { SiguientePaso } from "@/components/SiguientePaso";
 import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
+import { TONO_COLOR, type EntradaVelas } from "@/lib/velas";
 import type { ResultadoSinastria, Dimension } from "@/lib/astro/sinastria";
 import type { FuenteCruce } from "@/lib/cruce";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -45,7 +46,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
 
   const esQuiromancia = lectura.tipo === "quiromancia";
   const esChocolate = lectura.tipo === "chocolate";
-  const urlFoto = esQuiromancia || esChocolate ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
+  const esVelas = lectura.tipo === "velas";
+  const urlFoto = esQuiromancia || esChocolate || esVelas ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
 
   return (
     <article className="mx-auto max-w-4xl space-y-8">
@@ -74,6 +76,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <img src={urlFoto} alt={t.chocolate.tuTaza} className="mx-auto max-h-96 rounded-xl" />
         </section>
       )}
+      {esVelas && <VistaVelas entrada={lectura.entrada as unknown as EntradaVelas} urlFoto={urlFoto} t={t} />}
       {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} t={t} />}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
@@ -126,6 +129,7 @@ function rutaNueva(tipo: string) {
   if (tipo === "suenos") return "/suenos";
   if (tipo === "sinastria") return "/sinastria";
   if (tipo === "chocolate") return "/chocolate";
+  if (tipo === "velas") return "/velas";
   return "/compatibilidad";
 }
 
@@ -442,6 +446,37 @@ function VistaSinastria({ resultado, t }: { resultado: ResultadoSinastria; t: Di
             <p className="text-sm text-texto-suave">{t.sinastria.sinAspectos}</p>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function VistaVelas({ entrada, urlFoto, t }: { entrada: EntradaVelas; urlFoto: string | null; t: Diccionario }) {
+  const intenciones = t.velas.intenciones as Record<string, { nombre: string }>;
+  const colores = t.velas.colores as Record<string, { nombre: string }>;
+  const senales = t.velas.senales as Record<string, string>;
+  return (
+    <section className="tarjeta grid gap-4 p-4 sm:grid-cols-[minmax(0,320px)_1fr] sm:p-6">
+      {urlFoto && (
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
+          <img src={urlFoto} alt={t.velas.tuVela} className="w-full rounded-xl" />
+        </div>
+      )}
+      <div className="space-y-3">
+        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.velas.tuVela}</p>
+        <p className="flex items-center gap-2 text-sm">
+          <span className="inline-block h-4 w-4 rounded-full border border-white/20" style={{ background: TONO_COLOR[entrada.color] }} aria-hidden />
+          {colores[entrada.color]?.nombre} · {intenciones[entrada.intencion]?.nombre}
+        </p>
+        {entrada.senales?.length > 0 && (
+          <div className="flex flex-wrap gap-2 text-xs">
+            {entrada.senales.map((s) => (
+              <span key={s} className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{senales[s] ?? s}</span>
+            ))}
+          </div>
+        )}
+        {entrada.pregunta && <p className="text-sm text-texto-suave">«{entrada.pregunta}»</p>}
       </div>
     </section>
   );

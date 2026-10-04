@@ -16,6 +16,7 @@ import type { FuenteCruce } from "../cruce";
 import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
 import { resumenChocolate, TRADICION_CHOCOLATE, type EntradaChocolate } from "../chocolate";
+import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -169,6 +170,19 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: ## Lo que veo en tu taza (las figuras que sí se distinguen, dónde están: cerca del borde o del fondo, del lado del asa o enfrente), ## Figura por figura (cada una con su sentido tradicional y lo que puede decir para esta persona, como lista breve), ## Lo que la taza responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ## Un consejo para los próximos días. ` +
         `Extensión: 500 a 700 palabras.`,
       sistemaExtra: TRADICION_CHOCOLATE,
+      opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "velas") {
+    const e = entrada as unknown as EntradaVelas;
+    const imagen = await descargarPalma(e.foto);
+    return {
+      usuario:
+        `Interpreta los restos de esta vela ritual (foto adjunta).\n\n${resumenVelas(e)}\n\n` +
+        `Estructura: ## Lo que veo en los restos (cera, hollín, mecha, figuras, con honestidad), ## Lo que dijo la llama (las señales que la persona observó, leídas una por una), ## Cómo avanza tu intención (síntesis del ritual: qué está fluyendo, qué resiste), ## Qué hacer ahora (un paso concreto para los próximos días y, si conviene, si repetir el ritual y con qué color o fase lunar). ` +
+        `Extensión: 500 a 700 palabras.`,
+      sistemaExtra: TRADICION_VELAS,
       opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }

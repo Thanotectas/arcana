@@ -15,12 +15,15 @@ type Modo = "inicio" | "camara" | "vista";
  * permiso, se puede elegir una imagen de la galería. La foto se recorta al
  * marco, se reduce (máx. 1280 px, JPEG) y queda en un input oculto.
  */
-export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
+export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" | "vela"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
   const { t } = useT();
-  const taza = variante === "taza";
-  const textos = taza
-    ? { alinea: t.chocolate.alineaTaza, guia: t.chocolate.guia, alt: t.chocolate.tuTaza }
-    : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
+  const taza = variante !== "mano";
+  const textos =
+    variante === "taza"
+      ? { alinea: t.chocolate.alineaTaza, guia: t.chocolate.guia, alt: t.chocolate.tuTaza }
+      : variante === "vela"
+        ? { alinea: t.velas.alineaVela, guia: t.velas.guiaFoto, alt: t.velas.tuVela }
+        : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
   const guia = (enVivo = false) => (taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
   const [modo, setModo] = useState<Modo>("inicio");
   const [vista, setVista] = useState<string | null>(null);

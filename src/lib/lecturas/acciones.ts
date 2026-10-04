@@ -20,6 +20,7 @@ import { SUENO_MAX, SUENO_MIN, esEmocion, tituloDeSueno, type EntradaSueno, type
 import { extractoPlano } from "./memoria";
 import { calcularSinastria } from "../astro/sinastria";
 import type { EntradaChocolate } from "../chocolate";
+import { esColor, esIntencion, esSenal, type EntradaVelas, type Senal } from "../velas";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -508,6 +509,50 @@ export async function accionChocolate(_prev: EstadoAccion, formData: FormData): 
     id = await crearLectura({
       tipo: "chocolate",
       titulo: pregunta ? `Lectura del chocolate: ${pregunta}` : "Lectura del chocolate",
+      entrada,
+      resultado: {},
+    });
+  } catch (e) {
+    await admin.storage.from("palmas").remove([ruta]);
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Ritual de velas: foto de los restos + intención, color y señales observadas
+// ---------------------------------------------------------------------------
+export async function accionVelas(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const { user } = await usuarioActual();
+  const foto = formData.get("foto");
+  const intencion = String(formData.get("intencion") ?? "");
+  const color = String(formData.get("color") ?? "");
+  const senales = Array.from(new Set(formData.getAll("senal").map(String).filter(esSenal))) as Senal[];
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+
+  if (!esIntencion(intencion)) return { error: "velas.intencion" };
+  if (!esColor(color)) return { error: "velas.color" };
+  if (!(foto instanceof File) || foto.size === 0) return { error: "velas.foto" };
+  if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
+  if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+  const tipoReal = tipoImagenReal(new Uint8Array(await foto.slice(0, 16).arrayBuffer()));
+  if (!tipoReal || tipoReal !== foto.type) return { error: "FOTO_FORMATO" };
+
+  const admin = getSupabaseAdmin();
+  const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+  const ruta = `${user.id}/vela-${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await admin.storage.from("palmas").upload(ruta, foto, { contentType: foto.type, upsert: false });
+  if (errorSubida) {
+    console.error("[velas] subida fallida", errorSubida);
+    return { error: "FOTO_SUBIR" };
+  }
+
+  let id: string;
+  try {
+    const entrada: EntradaVelas = { foto: ruta, intencion, color, senales, pregunta };
+    id = await crearLectura({
+      tipo: "velas",
+      titulo: pregunta ? `Ritual de velas: ${pregunta}` : `Ritual de velas (${intencion})`,
       entrada,
       resultado: {},
     });

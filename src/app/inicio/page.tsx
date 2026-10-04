@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
@@ -74,6 +74,7 @@ export default async function PaginaInicio() {
     { href: "/compatibilidad", icono: Heart, ...t.inicio.accesos.compatibilidad, costo: COSTOS.compatibilidad },
     { href: "/sinastria", icono: HeartHandshake, ...t.inicio.accesos.sinastria, costo: COSTOS.sinastria },
     { href: "/chocolate", icono: Coffee, ...t.inicio.accesos.chocolate, costo: COSTOS.chocolate },
+    { href: "/velas", icono: FlameKindling, ...t.inicio.accesos.velas, costo: COSTOS.velas },
     { href: "/cruce", icono: Layers, ...t.inicio.accesos.cruce, costo: COSTOS.cruce },
   ];
 

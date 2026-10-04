@@ -16,6 +16,7 @@ export type TipoLectura =
   | "suenos"
   | "sinastria"
   | "chocolate"
+  | "velas"
   | "cruce";
 
 export const COSTOS: Record<TipoLectura, number> = {
@@ -31,6 +32,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   suenos: 2,
   sinastria: 4, // premium: dos cartas completas
   chocolate: 3,
+  velas: 3,
   cruce: 4, // premium: combina dos sistemas con los datos de la persona
 };
 
@@ -47,6 +49,7 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   suenos: "Interpretación de sueños",
   sinastria: "Sinastría",
   chocolate: "Lectura del chocolate",
+  velas: "Ritual de velas",
   cruce: "Lectura cruzada",
 };
 

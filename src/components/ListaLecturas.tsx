@@ -30,6 +30,7 @@ const ICONO: Record<TipoLectura, string> = {
   suenos: "☾",
   sinastria: "☉☽",
   chocolate: "☕",
+  velas: "🕯",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

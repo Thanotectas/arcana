@@ -19,6 +19,7 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     suenos: t.suenos.errores,
     sinastria: t.sinastria.errores,
     chocolate: t.chocolate.errores,
+    velas: t.velas.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }
