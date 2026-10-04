@@ -22,8 +22,20 @@ type PerfilRow = {
   invitacion_premiada: boolean;
   circulo_hasta: string | null;
   bienvenida_dada: boolean;
+  recibe_correos: boolean;
   creado_en: string;
   actualizado_en: string;
+};
+
+type CorreoRow = {
+  id: number;
+  usuario_id: string;
+  tipo: string;
+  asunto: string;
+  estado: string;
+  id_proveedor: string | null;
+  detalle: string | null;
+  creado_en: string;
 };
 
 type MovimientoRow = {
@@ -137,7 +149,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "recibe_correos" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -163,6 +175,12 @@ export type Database = {
         Row: PreguntaRow;
         Insert: Insertable<PreguntaRow, "id" | "respuesta" | "estado" | "creditos_usados" | "creado_en">;
         Update: Partial<PreguntaRow>;
+        Relationships: [];
+      };
+      correos: {
+        Row: CorreoRow;
+        Insert: Insertable<CorreoRow, "id" | "estado" | "id_proveedor" | "detalle" | "creado_en">;
+        Update: Partial<CorreoRow>;
         Relationships: [];
       };
       suscripciones_push: {

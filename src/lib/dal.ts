@@ -21,6 +21,7 @@ export interface Perfil {
   invitado_por: string | null;
   circulo_hasta: string | null;
   idioma: string;
+  recibe_correos: boolean;
   creado_en: string;
 }
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
 import { aplicarInvitacionPendiente } from "../invitaciones";
@@ -127,6 +128,20 @@ export async function accionActualizarPerfil(_prev: EstadoAuth, formData: FormDa
     const { error: e2 } = await supabase.auth.updateUser({ password });
     if (e2) return { error: "noCambiarContrasena" };
   }
+  return { mensaje: "perfilActualizado" };
+}
+
+/** Preferencia de correos de Sibila (campañas: carta del día y regreso). */
+export async function accionCorreos(_prev: EstadoAuth, formData: FormData): Promise<EstadoAuth> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar");
+  const recibe = formData.get("recibe") === "on";
+  const { error } = await supabase.from("perfiles").update({ recibe_correos: recibe }).eq("id", user.id);
+  if (error) return { error: "noGuardar" };
+  revalidatePath("/cuenta");
   return { mensaje: "perfilActualizado" };
 }
 

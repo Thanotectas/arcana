@@ -23,6 +23,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 ## Variables de entorno (en Vercel; nunca en el repositorio)
 
 - Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
+- Correos: `RESEND_API_KEY`, `CORREO_REMITENTE`, `CORREOS_MAXIMO` (ver `docs/CORREOS.md`).
 - Instagram automático: `IG_USER_ID` (cuenta @miarcana.oficial) e `IG_PAGE_TOKEN` (token de la página de Facebook "Mi Arcana", app de Meta "Thanotectas Automation"; no caduca, pero el acceso a datos vence hacia el 30 dic 2026 y entonces hay que renovarlo con el Explorador de la API Graph).
 - CAPTCHA: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (la clave secreta de Turnstile se configura en Supabase Auth, no en Vercel).
 
@@ -40,7 +41,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Base de datos
 
-Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0017_sinastria_y_chocolate.sql` (1 de octubre de 2026). La `0018_velas.sql` (tipo `velas`) y la `0019_aura_y_tabaco.sql` (tipos `aura` y `tabaco`) están pendientes de aplicar; la próxima que se cree es la **0020**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0017_sinastria_y_chocolate.sql` (1 de octubre de 2026). La `0018_velas.sql` (tipo `velas`), la `0019_aura_y_tabaco.sql` (tipos `aura` y `tabaco`) y la `0020_correos.sql` (`perfiles.recibe_correos` y tabla `correos`) están pendientes de aplicar; la próxima que se cree es la **0021**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
@@ -100,6 +101,11 @@ Qué trae:
 - **Tu cielo hoy** (`/hoy`, `src/lib/diario.ts`, `src/lib/astro/transitos.ts`): tránsitos reales del día sobre la carta natal (aspectos de los planetas de hoy con los planetas natales, Ascendente y Medio Cielo; orbes estrechos, ponderados por planeta lento y exactitud). Todo el mundo ve la Luna del día y los tránsitos; el **mensaje escrito** (140–200 palabras, `effort: low`) solo se genera para el Círculo y se guarda en `mensajes_diarios` (una vez por persona, día e idioma). La fecha se toma en la zona horaria de nacimiento. Se transmite con `Suspense` para no bloquear la página. Enlace en la barra (con sesión) y tarjeta destacada en el panel.
 - **Círculo Arcana** (pase de 30 días, 19.900 COP, paquete `circulo` en `PAQUETE_CIRCULO`): mensaje diario, preguntas de seguimiento sin cobro (tope `CIRCULO.preguntasPorDia` = 15 por día, se cuenta en `preguntas_lectura`) y 15 créditos. No se renueva solo: cada compra suma 30 días a `perfiles.circulo_hasta` (`acreditar_orden` en 0009). Tarjeta en `/creditos#circulo` y estado en *Mi cuenta*. `circuloActivo(perfil)` en `dal.ts` (las cuentas ilimitadas cuentan como miembros).
 - Todas las migraciones hasta la 0017 están aplicadas en producción (`ordenes.es_prueba` de la 0010 deja las compras de prueba fuera de las métricas).
+
+## Correos de Sibila y PDF de lecturas (4 oct 2026)
+
+- **Correos de campaña** (`src/lib/correo.ts` con la API HTTP de Resend, `src/lib/correos/plantillas.ts`, cron `GET /api/cron/correos` a las 14:00 UTC): tres segmentos por actividad (activo ≤7 días: carta del día semanal; 7–29 días: "hace días no te vemos" mensual; ≥30 días: "te extrañamos" trimestral), nunca más de uno cada 6 días por persona, tope `CORREOS_MAXIMO` (80), cuentas de menos de 3 días excluidas. La actividad sale de `last_sign_in_at` de Auth (`admin.auth.admin.listUsers`) y de la última lectura. El correo lleva la carta del día de Arcana por URL pública, botón a `/tarot` con `utm_campaign`, enlaces secundarios y baja firmada (`/correos/baja?u=&t=`, HMAC con `CORREO_SECRETO` o la service role). Preferencia `perfiles.recibe_correos` (migración 0020, casilla `PreferenciaCorreos` en Mi cuenta, `accionCorreos`). Registro en la tabla `correos` (tipo, asunto, estado, id del proveedor). Cabeceras `List-Unsubscribe`. Textos en `t.correos` (es/en/pt). Guía de configuración de Resend en `docs/CORREOS.md`.
+- **PDF de lecturas** (`/api/lecturas/[id]/pdf`, botón "Descargar PDF" en `CompartirLectura`): `@react-pdf/renderer` (`serverExternalPackages`) con `src/lib/pdf/documento.tsx`: A4 marfil, Cormorant/Inter/NotoSansSymbols2 desde `src/app/fuentes` (se añadieron Regular, Italic y SemiBold), bloque visual según tipo (cartas con posición, monedas, números, foto del bucket convertida a JPEG con sharp, aura con barras, hexagrama con mutantes), fichas, pregunta, interpretación (Markdown mínimo: títulos, listas, negritas, cursivas) y las preguntas a Sibila respondidas; pie con página n de total. `next.config.ts` traza cartas, signos, animales y marca para esa ruta.
 
 ## Cron diario y avisos push (30 sep 2026)
 
