@@ -35,6 +35,8 @@ const RUTAS: Record<TipoLectura, string> = {
   sinastria: "/sinastria",
   chocolate: "/chocolate",
   velas: "/velas",
+  aura: "/aura",
+  tabaco: "/tabaco",
 };
 
 /** Sistema para el chat: quién es, qué sabe de la persona y de la app. */

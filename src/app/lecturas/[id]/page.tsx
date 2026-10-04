@@ -24,6 +24,8 @@ import { SiguientePaso } from "@/components/SiguientePaso";
 import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
 import { TONO_COLOR, type EntradaVelas } from "@/lib/velas";
+import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
+import { Aura } from "@/components/Aura";
 import type { ResultadoSinastria, Dimension } from "@/lib/astro/sinastria";
 import type { FuenteCruce } from "@/lib/cruce";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -47,7 +49,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
   const esQuiromancia = lectura.tipo === "quiromancia";
   const esChocolate = lectura.tipo === "chocolate";
   const esVelas = lectura.tipo === "velas";
-  const urlFoto = esQuiromancia || esChocolate || esVelas ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
+  const esTabaco = lectura.tipo === "tabaco";
+  const urlFoto = esQuiromancia || esChocolate || esVelas || esTabaco ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
 
   return (
     <article className="mx-auto max-w-4xl space-y-8">
@@ -76,6 +79,14 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <img src={urlFoto} alt={t.chocolate.tuTaza} className="mx-auto max-h-96 rounded-xl" />
         </section>
       )}
+      {esTabaco && urlFoto && (
+        <section className="tarjeta p-4">
+          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.tabaco.tuTabaco}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
+          <img src={urlFoto} alt={t.tabaco.tuTabaco} className="mx-auto max-h-96 rounded-xl" />
+        </section>
+      )}
+      {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
       {esVelas && <VistaVelas entrada={lectura.entrada as unknown as EntradaVelas} urlFoto={urlFoto} t={t} />}
       {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} t={t} />}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
@@ -130,6 +141,8 @@ function rutaNueva(tipo: string) {
   if (tipo === "sinastria") return "/sinastria";
   if (tipo === "chocolate") return "/chocolate";
   if (tipo === "velas") return "/velas";
+  if (tipo === "aura") return "/aura";
+  if (tipo === "tabaco") return "/tabaco";
   return "/compatibilidad";
 }
 
@@ -477,6 +490,32 @@ function VistaVelas({ entrada, urlFoto, t }: { entrada: EntradaVelas; urlFoto: s
           </div>
         )}
         {entrada.pregunta && <p className="text-sm text-texto-suave">«{entrada.pregunta}»</p>}
+      </div>
+    </section>
+  );
+}
+
+function VistaAura({ resultado, t }: { resultado: ResultadoAura; t: Diccionario }) {
+  const nombres = t.aura.colores as Record<string, { nombre: string; rasgos: string }>;
+  const orden = [...COLORES_AURA].sort((a, b) => resultado.puntajes[b] - resultado.puntajes[a]);
+  return (
+    <section className="tarjeta grid gap-6 p-6 md:grid-cols-[260px_1fr]">
+      <Aura principal={resultado.principal} secundario={resultado.secundario} />
+      <div className="space-y-4">
+        <div>
+          <p className="text-xs uppercase tracking-widest text-violeta-suave">{t.aura.tuAura}</p>
+          <p className="font-display text-3xl text-oro-suave">{nombres[resultado.principal]?.nombre} <span className="text-texto-suave">+</span> {nombres[resultado.secundario]?.nombre}</p>
+          <p className="text-sm text-texto-suave">{nombres[resultado.principal]?.rasgos}</p>
+        </div>
+        <ul className="space-y-1.5">
+          {orden.map((c) => (
+            <li key={c} className="flex items-center gap-3 text-sm">
+              <span className="w-20 shrink-0 text-texto-suave">{nombres[c]?.nombre}</span>
+              <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10"><span className="block h-full rounded-full" style={{ width: `${resultado.puntajes[c]}%`, background: `var(--aura-${c})` }} /></span>
+              <span className="w-8 text-right text-xs text-texto-suave">{resultado.puntajes[c]}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

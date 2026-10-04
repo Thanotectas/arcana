@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind } from "lucide-react";
 import { PAQUETES, PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getT } from "@/lib/i18n/servidor";
@@ -22,6 +22,8 @@ export default async function Portada() {
     { icono: HeartHandshake, ...t.portada.modulos.sinastria, href: "/sinastria" },
     { icono: Coffee, ...t.portada.modulos.chocolate, href: "/chocolate" },
     { icono: FlameKindling, ...t.portada.modulos.velas, href: "/velas" },
+    { icono: Wind, ...t.portada.modulos.tabaco, href: "/tabaco" },
+    { icono: Sparkle, ...t.portada.modulos.aura, href: "/aura" },
     { icono: Moon, ...t.portada.modulos.horoscopo, href: "/horoscopo" },
     { icono: Orbit, ...t.portada.modulos.luna, href: "/luna" },
   ];

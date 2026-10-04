@@ -13,6 +13,16 @@
   --violeta-suave: #b7a5ff;
   --peligro: #ff7b7b;
   --exito: #7fd6a4;
+  /* Colores del aura (test de aura) */
+  --aura-rojo: #e5484d;
+  --aura-naranja: #f28c28;
+  --aura-amarillo: #f5d547;
+  --aura-verde: #3fb27f;
+  --aura-azul: #3b82f6;
+  --aura-indigo: #4f46e5;
+  --aura-violeta: #9b5cf6;
+  --aura-rosa: #f472b6;
+  --aura-dorado: #e2bd63;
 }
 
 @theme inline {
@@ -604,4 +614,15 @@ body {
 }
 .animal-violeta {
   filter: hue-rotate(215deg) saturate(1.4) brightness(1.1) drop-shadow(0 0 8px rgba(139, 108, 246, 0.5));
+}
+
+/* Aura: halos que respiran */
+@keyframes respirar {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+.aura-respira { animation: respirar 6s ease-in-out infinite; }
+.aura-respira-lenta { animation: respirar 9s ease-in-out infinite reverse; }
+@media (prefers-reduced-motion: reduce) {
+  .aura-respira, .aura-respira-lenta { animation: none; }
 }

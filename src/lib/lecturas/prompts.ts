@@ -17,6 +17,8 @@ import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
 import { resumenChocolate, TRADICION_CHOCOLATE, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
+import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
+import { resumenTabaco, TRADICION_TABACO, type EntradaTabaco } from "../tabaco";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -166,11 +168,13 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const imagen = await descargarPalma(e.foto);
     return {
       usuario:
-        `Lee la taza de chocolate de la foto adjunta.\n\n${resumenChocolate(e)}\n\n` +
-        `Estructura: ## Lo que veo en tu taza (las figuras que sí se distinguen, dónde están: cerca del borde o del fondo, del lado del asa o enfrente), ## Figura por figura (cada una con su sentido tradicional y lo que puede decir para esta persona, como lista breve), ## Lo que la taza responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ## Un consejo para los próximos días. ` +
-        `Extensión: 500 a 700 palabras.`,
+        `Lee la taza de chocolate de la foto adjunta. Mira la imagen con calma y detalle antes de escribir.\n\n${resumenChocolate(e)}\n\n` +
+        `Estructura: ## Lo que veo en tu taza (un recorrido descriptivo y concreto por la taza: cómo quedó la espuma y el poso, zonas densas y zonas limpias, y cada mancha o figura que sí se distingue, con su posición exacta: cerca del borde o del fondo, del lado del asa, enfrente, a la derecha o a la izquierda; su tamaño, su nitidez y a qué se parece; nombra al menos cinco elementos si la foto lo permite), ` +
+        `## Figura por figura (cada figura con su sentido tradicional, por qué su posición importa y lo que puede decir para esta persona; una entrada por figura), ## Cómo se relacionan (qué historia cuentan juntas las figuras: de dónde viene, qué está pasando, hacia dónde va), ` +
+        `## Lo que la taza responde (si hubo pregunta, la respuesta clara; si no, el mensaje del momento), ## Un consejo para los próximos días. ` +
+        `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer cada cosa que nombras. Extensión: 800 a 1100 palabras.`,
       sistemaExtra: TRADICION_CHOCOLATE,
-      opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 
@@ -184,6 +188,32 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Extensión: 500 a 700 palabras.`,
       sistemaExtra: TRADICION_VELAS,
       opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "aura") {
+    const r = resultado as unknown as ResultadoAura;
+    const nombre = datoDeUsuario(String(entrada.nombre ?? ""), 80) || "la persona";
+    return {
+      usuario:
+        `Interpreta el aura de esta persona a partir de su test y su Sol natal.\n\n${resumenAura(r, nombre)}\n\n` +
+        `Estructura: ## Tu color (el principal: cómo se ve y se siente tu energía hoy, con ejemplos de la vida diaria), ## El matiz (el secundario: cómo acompaña o equilibra al principal), ## Lo que te nutre y lo que te drena (ambientes, personas, hábitos, según tus colores), ## Lo que tienes apagado (los colores de puntaje bajo, como invitación, no como falta), ## Cómo cuidar tu aura esta semana (tres gestos concretos: un color para vestir o rodearte, un lugar, una práctica breve), ## Síntesis en una frase que la persona pueda compartir. ` +
+        `Usa el nombre de la persona. Extensión: 650 a 850 palabras.`,
+      sistemaExtra: TRADICION_AURA,
+      opciones: { idioma, effort: "medium", maxTokens: 3200 },
+    };
+  }
+
+  if (l.tipo === "tabaco") {
+    const e = entrada as unknown as EntradaTabaco;
+    const imagen = await descargarPalma(e.foto);
+    return {
+      usuario:
+        `Lee el tabaco de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenTabaco(e)}\n\n` +
+        `Estructura: ## Lo que veo en tu tabaco (descripción concreta: color y forma de la ceniza, cómo va la quema, marcas de la capa, la punta, el humo si se ve; dónde está cada cosa), ## Señal por señal (cada una con su sentido tradicional y lo que puede decir para esta persona), ## Lo que el tabaco responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ## Un consejo para los próximos días. ` +
+        `Extensión: 600 a 850 palabras.`,
+      sistemaExtra: TRADICION_TABACO,
+      opciones: { idioma, effort: "medium", maxTokens: 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 

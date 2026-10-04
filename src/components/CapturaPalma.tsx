@@ -15,7 +15,7 @@ type Modo = "inicio" | "camara" | "vista";
  * permiso, se puede elegir una imagen de la galería. La foto se recorta al
  * marco, se reduce (máx. 1280 px, JPEG) y queda en un input oculto.
  */
-export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" | "vela"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
+export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" | "vela" | "tabaco"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
   const { t } = useT();
   const taza = variante !== "mano";
   const textos =
@@ -23,8 +23,10 @@ export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "
       ? { alinea: t.chocolate.alineaTaza, guia: t.chocolate.guia, alt: t.chocolate.tuTaza }
       : variante === "vela"
         ? { alinea: t.velas.alineaVela, guia: t.velas.guiaFoto, alt: t.velas.tuVela }
-        : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
-  const guia = (enVivo = false) => (taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
+        : variante === "tabaco"
+          ? { alinea: t.tabaco.alinea, guia: t.tabaco.guiaFoto, alt: t.tabaco.tuTabaco }
+          : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
+  const guia = (enVivo = false) => (variante === "tabaco" ? <GuiaTabaco enVivo={enVivo} /> : taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
   const [modo, setModo] = useState<Modo>("inicio");
   const [vista, setVista] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -319,6 +321,27 @@ function GuiaTaza({ enVivo = false }: { enVivo?: boolean }) {
       <circle cx="140" cy="200" r="118" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
       <circle cx="140" cy="200" r="70" fill="none" stroke="rgba(241,217,154,0.35)" strokeWidth="1.5" strokeDasharray="3 5" />
       <path d="M258 165c28 0 36 20 36 35s-8 35-36 35" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" />
+    </svg>
+  );
+}
+
+/** Contorno de un tabaco en diagonal, con la ceniza hacia arriba a la derecha. */
+function GuiaTabaco({ enVivo = false }: { enVivo?: boolean }) {
+  const color = enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)";
+  return (
+    <svg viewBox="0 0 300 400" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <defs>
+        <mask id="fueraTabaco">
+          <rect width="300" height="400" fill="white" />
+          <rect x="-20" y="-24" width="330" height="48" rx="24" fill="black" transform="translate(150 200) rotate(-35)" />
+        </mask>
+      </defs>
+      {enVivo && <rect width="300" height="400" fill="rgba(11,7,22,0.55)" mask="url(#fueraTabaco)" />}
+      <g transform="translate(150 200) rotate(-35)">
+        <rect x="-150" y="-24" width="300" height="48" rx="24" fill={enVivo ? "none" : "rgba(217,180,90,0.12)"} stroke={color} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
+        <line x1="90" y1="-24" x2="90" y2="24" stroke={color} strokeWidth="1.5" strokeDasharray="3 4" />
+        <path d="M150 0 c 10 -14, 22 -18, 34 -8 c -8 10, -20 14, -34 8" fill="none" stroke="rgba(236,230,247,0.6)" strokeWidth="1.5" />
+      </g>
     </svg>
   );
 }

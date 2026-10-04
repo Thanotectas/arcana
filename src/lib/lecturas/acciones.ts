@@ -21,6 +21,8 @@ import { extractoPlano } from "./memoria";
 import { calcularSinastria } from "../astro/sinastria";
 import type { EntradaChocolate } from "../chocolate";
 import { esColor, esIntencion, esSenal, type EntradaVelas, type Senal } from "../velas";
+import { calcularAura, esRespuestasValidas, PREGUNTAS } from "../aura";
+import type { EntradaTabaco } from "../tabaco";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -556,6 +558,67 @@ export async function accionVelas(_prev: EstadoAccion, formData: FormData): Prom
       entrada,
       resultado: {},
     });
+  } catch (e) {
+    await admin.storage.from("palmas").remove([ruta]);
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Test de aura: doce respuestas + Sol natal
+// ---------------------------------------------------------------------------
+export async function accionAura(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const respuestas = Array.from({ length: PREGUNTAS }, (_, i) => Number(formData.get(`r${i}`)));
+  if (!esRespuestasValidas(respuestas)) return { error: "aura.incompleto" };
+  const perfil = await getPerfil();
+  const nombre = String(formData.get("nombre") ?? perfil?.nombre ?? "").trim().slice(0, 80);
+  let signoSol = null;
+  if (perfil?.fecha_nacimiento && /^\d{4}-\d{2}-\d{2}$/.test(perfil.fecha_nacimiento)) {
+    const [, m, d] = perfil.fecha_nacimiento.split("-").map(Number);
+    signoSol = signoPorFecha(m, d);
+  }
+  let id: string;
+  try {
+    const r = calcularAura(respuestas, signoSol);
+    id = await crearLectura({
+      tipo: "aura",
+      titulo: `Aura ${r.principal} con ${r.secundario}${nombre ? ` · ${nombre}` : ""}`,
+      entrada: { nombre, respuestas },
+      resultado: r,
+    });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Lectura del tabaco: foto del puro (mismo bucket que las palmas)
+// ---------------------------------------------------------------------------
+export async function accionTabaco(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const { user } = await usuarioActual();
+  const foto = formData.get("foto");
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  if (formData.get("mayor") !== "on") return { error: "tabaco.mayor" };
+  if (!(foto instanceof File) || foto.size === 0) return { error: "tabaco.foto" };
+  if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
+  if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+  const tipoReal = tipoImagenReal(new Uint8Array(await foto.slice(0, 16).arrayBuffer()));
+  if (!tipoReal || tipoReal !== foto.type) return { error: "FOTO_FORMATO" };
+
+  const admin = getSupabaseAdmin();
+  const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+  const ruta = `${user.id}/tabaco-${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await admin.storage.from("palmas").upload(ruta, foto, { contentType: foto.type, upsert: false });
+  if (errorSubida) {
+    console.error("[tabaco] subida fallida", errorSubida);
+    return { error: "FOTO_SUBIR" };
+  }
+  let id: string;
+  try {
+    const entrada: EntradaTabaco = { foto: ruta, pregunta };
+    id = await crearLectura({ tipo: "tabaco", titulo: pregunta ? `Lectura del tabaco: ${pregunta}` : "Lectura del tabaco", entrada, resultado: {} });
   } catch (e) {
     await admin.storage.from("palmas").remove([ruta]);
     return manejarError(e);

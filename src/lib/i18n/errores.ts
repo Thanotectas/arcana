@@ -20,6 +20,8 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     sinastria: t.sinastria.errores,
     chocolate: t.chocolate.errores,
     velas: t.velas.errores,
+    aura: t.aura.errores,
+    tabaco: t.tabaco.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }
