@@ -9,7 +9,9 @@ import { accionReintentarLectura } from "@/lib/lecturas/acciones";
 import { BotonEnviar } from "./BotonEnviar";
 import { useT } from "@/lib/i18n/cliente";
 
-type Fase = "conectando" | "escribiendo" | "lista" | "en_otra_pestana" | "error";
+// "reconectando": se cortó la conexión pero el servidor sigue escribiendo y
+// guarda al terminar; se consulta hasta que la lectura quede lista o falle.
+type Fase = "conectando" | "escribiendo" | "lista" | "en_otra_pestana" | "reconectando" | "error";
 
 /**
  * Pide a /api/lecturas/[id]/generar la interpretación y la muestra a medida
@@ -52,8 +54,12 @@ export function LecturaEnVivo({
           setFase("en_otra_pestana");
           return;
         }
-        if (!res.ok || !res.body) {
+        if (res.status === 410) {
           setFase("error");
+          return;
+        }
+        if (!res.ok || !res.body) {
+          setFase("reconectando");
           return;
         }
         setFase("escribiendo");
@@ -78,12 +84,15 @@ export function LecturaEnVivo({
         setFase("lista");
         router.refresh();
       } catch {
-        setFase("error");
+        // Corte de red (pantalla bloqueada, cambio de wifi a datos…): el
+        // servidor no reembolsa por esto, así que no se anuncia un fallo.
+        setFase("reconectando");
       }
     })();
   }, [id, estadoInicial, router]);
 
-  const esperandoOtra = fase === "en_otra_pestana" && estadoInicial !== "lista" && estadoInicial !== "error";
+  const enEspera = fase === "en_otra_pestana" || fase === "reconectando";
+  const esperandoOtra = enEspera && estadoInicial !== "lista" && estadoInicial !== "error";
   useEffect(() => {
     if (!esperandoOtra) return;
     const tm = setInterval(() => router.refresh(), 4000);
@@ -92,11 +101,11 @@ export function LecturaEnVivo({
 
   const mostrar = (s: string) => (transformar ? transformar(s) : s);
 
-  if (fase === "en_otra_pestana" && estadoInicial === "lista" && textoInicial) {
+  if (enEspera && estadoInicial === "lista" && textoInicial) {
     return <Markdown texto={mostrar(textoInicial)} />;
   }
 
-  if (fase === "error" || (fase === "en_otra_pestana" && estadoInicial === "error")) {
+  if (fase === "error" || (enEspera && estadoInicial === "error")) {
     return (
       <div className="space-y-4 text-center">
         <p className="text-peligro">{t.lecturas.detalle.fallo}</p>
@@ -112,12 +121,16 @@ export function LecturaEnVivo({
     );
   }
 
-  if (!texto) {
+  if (!texto || fase === "reconectando") {
     return (
       <div className="flex flex-col items-center gap-4 py-10 text-center" role="status">
         <div className="orbe-carga" aria-hidden />
         <p className="font-display text-xl text-oro-suave">
-          {fase === "en_otra_pestana" ? t.lecturas.detalle.otraPestana : t.lecturas.detalle.escribiendo}
+          {fase === "en_otra_pestana"
+            ? t.lecturas.detalle.otraPestana
+            : fase === "reconectando"
+              ? t.lecturas.detalle.reconectando
+              : t.lecturas.detalle.escribiendo}
         </p>
         <p className="text-sm text-texto-suave">{t.lecturas.detalle.aparecera}</p>
       </div>

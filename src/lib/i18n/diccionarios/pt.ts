@@ -99,6 +99,7 @@ export const pt: Diccionario = {
       escribiendo: "Sibila está lendo sua consulta…",
       aparecera: "O texto aparecerá aqui enquanto é escrito.",
       otraPestana: "Sua leitura está sendo escrita em outra aba…",
+      reconectando: "A conexão caiu, mas sua leitura continua sendo escrita. Ela aparecerá aqui em alguns segundos…",
       fallo: "Não conseguimos escrever esta leitura. Devolvemos seus créditos.",
       reintentar: "Tentar a leitura novamente",
       reintentando: "Tentando novamente…",

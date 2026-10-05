@@ -102,6 +102,7 @@ export const en: Diccionario = {
       escribiendo: "Sibila is reading your question…",
       aparecera: "The text will appear here as it is written.",
       otraPestana: "Your reading is being written in another tab…",
+      reconectando: "The connection dropped, but your reading is still being written. It will appear here in a few seconds…",
       fallo: "We couldn't write this reading. Your credits have been refunded.",
       reintentar: "Retry the reading",
       reintentando: "Retrying…",
