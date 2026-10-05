@@ -7,7 +7,7 @@ Todas las piezas de comunicación de Arcana (miarcana.com), acumuladas en un sol
 | Carpeta | Qué hay |
 |---|---|
 | `logos/` | Logotipo e iconos de la marca (SVG y PNG 192/512, versión maskable para Android). |
-| `videos/` | Incluye `05-por-que-arcana.mp4` (comparativo, 27 s). | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral. |
+| `videos/` | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral, 04 sueños, 05 "Por qué Arcana" (comparativo, 27 s). |
 | `textos/` | Textos de publicación de cada video (TikTok e Instagram) con hashtags. |
 | `prompts/` | Prompts usados con Gemini: videos (Veo), monedas del zodíaco, Tarot Arcana (22 umbrales). Sirven para repetir el estilo. |
 | `play-store/` | Ficha de Google Play: icono 512, gráfico destacado 1024×500 y seis capturas. Los textos de la ficha están en `docs/GOOGLE-PLAY.md`. |
