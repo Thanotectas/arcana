@@ -1,9 +1,9 @@
 /**
  * Cartas del Tarot de Marsella que ya tienen ilustración propia en
- * public/cartas/marsella/<id>.webp (500×750, generadas con Gemini y
- * recortadas con scripts/… del cuaderno de trabajo). Las demás usan la cara
- * dibujada en SVG hasta que se completen. Actualizar esta lista al añadir
- * archivos.
+ * public/cartas/marsella/<id>.webp (500×750, generadas con Gemini en
+ * cuadrículas y recortadas con el script del cuaderno de trabajo). Desde el
+ * 5 oct 2026 están las 78; la lista se conserva por si alguna se retira o se
+ * rehace. Las que no estén aquí usan la cara dibujada en SVG.
  */
 export const CON_IMAGEN_MARSELLA: ReadonlySet<string> = new Set([
   "el-loco",
@@ -42,6 +42,10 @@ export const CON_IMAGEN_MARSELLA: ReadonlySet<string> = new Set([
   "caballero-de-bastos",
   "reina-de-bastos",
   "rey-de-bastos",
+  "as-de-copas",
+  "dos-de-copas",
+  "tres-de-copas",
+  "cuatro-de-copas",
   "cinco-de-copas",
   "seis-de-copas",
   "siete-de-copas",
@@ -78,4 +82,6 @@ export const CON_IMAGEN_MARSELLA: ReadonlySet<string> = new Set([
   "diez-de-oros",
   "sota-de-oros",
   "caballero-de-oros",
+  "reina-de-oros",
+  "rey-de-oros",
 ]);

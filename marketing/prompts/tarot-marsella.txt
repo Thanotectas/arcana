@@ -53,9 +53,9 @@ Las cuatro primeras posiciones ocupadas y las dos últimas celdas vacías, solo 
 
 
 ==================== ESTADO (5 oct 2026) ====================
-Listas y recortadas en la app (72 cartas): todo salvo Reina y Rey de Oros y Copas As a Cuatro. Gemini puso cartelas con título
+MAZO COMPLETO (78 cartas) desde el 5 oct 2026. Pendiente opcional: el Cuatro de Copas salió con tres copas en vez de cuatro (dos en el suelo y una ofrecida); si se repite, basta con esa carta. Gemini puso cartelas con título
 (en inglés o español): se recortan y se vuelve a montar el marco, así que no importa que salgan.
-FALTA (6 cartas, una cuadrícula): Reina y Rey de Oros + Copas 1–4 (OROS 3 + COPAS 1). Los menores de Oros salieron
+ Los menores de Oros salieron
 con escenas (estilo pictórico, no solo pips): seguimos así, es más claro para leer.
 
 ==================== CUADRÍCULA 3 (ya generada el 5 oct; se deja por si hay que repetirla) ====================

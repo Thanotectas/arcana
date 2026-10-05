@@ -13,7 +13,7 @@ const EPOCA = Date.UTC(2026, 0, 1);
 const DELICADO = /salud|enferm|crisis|ruina|p[ée]rdida|traici|duelo|depresi|ansiedad|suicid|violen/i;
 
 /** Mazos que se alternan día a día (todos con ilustración propia). */
-const MAZOS_REDES: IdMazo[] = ["rider", "arcana"];
+const MAZOS_REDES: IdMazo[] = ["rider", "arcana", "marsella"];
 
 const ROTACION: Record<IdMazo, CartaTarot[]> = Object.fromEntries(
   (Object.keys(MAZOS) as IdMazo[]).map((m) => [m, MAZOS[m].cartas.filter((c) => !DELICADO.test(`${frase(c.significado, 320)} ${c.amor} ${c.trabajo}`))]),
@@ -37,7 +37,7 @@ function diasDesdeEpoca(fecha: string) {
   return Math.round((Date.parse(`${fecha}T00:00:00Z`) - EPOCA) / 864e5);
 }
 
-/** Mazo del día: se alternan los mazos con ilustración (hoy Rider-Waite, mañana Tarot Arcana…). */
+/** Mazo del día: se alternan los mazos con ilustración (Rider-Waite, Tarot Arcana, Marsella…). */
 export function mazoDelDia(fecha: string): IdMazo {
   const d = diasDesdeEpoca(fecha);
   return MAZOS_REDES[((d % MAZOS_REDES.length) + MAZOS_REDES.length) % MAZOS_REDES.length];
