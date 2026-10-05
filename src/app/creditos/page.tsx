@@ -65,7 +65,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           </div>
         </div>
       )}
-      <p className="text-center text-sm text-texto-suave">{plantilla(t.persuasion.anclaAstral, { precio: precioAstral })}</p>
+      <p className="text-center text-sm text-texto-suave">{plantilla(internacional ? t.persuasion.anclaAstralUSD : t.persuasion.anclaAstral, { precio: precioAstral })}</p>
       {!configurado && <Aviso tipo="info">{internacional ? t.creditos.internacional.sinConfigurar : t.creditos.sinConfigurar}</Aviso>}
       <p className="text-center text-sm text-texto-suave">
         {internacional ? t.creditos.internacional.nota : null}{" "}
@@ -147,7 +147,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         </ul>
         <ul className="mt-5 space-y-2 text-sm text-texto-suave">
           <li className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-exito" aria-hidden />{t.persuasion.garantia}</li>
-          <li className="flex items-start gap-2"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-exito" aria-hidden />{t.persuasion.pagoSeguro}</li>
+          <li className="flex items-start gap-2"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-exito" aria-hidden />{internacional ? t.persuasion.pagoSeguroUSD : t.persuasion.pagoSeguro}</li>
         </ul>
       </section>
     </div>

@@ -46,6 +46,17 @@ export default async function PaginaRetorno({
   }
 
   const estados = t.cuenta.estados as Record<string, string>;
+  // Lo acreditado de verdad (paquete + bono de primera compra), según los movimientos de la orden.
+  let acreditados = orden?.creditos ?? 0;
+  let bono = 0;
+  if (orden?.estado === "aprobada") {
+    const { data: movimientos } = await getSupabaseAdmin().from("movimientos_creditos").select("cantidad, motivo").eq("referencia", orden.referencia);
+    if (movimientos?.length) {
+      acreditados = movimientos.reduce((s, m) => s + m.cantidad, 0);
+      bono = movimientos.filter((m) => m.motivo === "compra:bono-primera").reduce((s, m) => s + m.cantidad, 0);
+    }
+  }
+  const nombrePaquete = orden ? ((t.creditos.paquetes as Record<string, { nombre: string }>)[orden.paquete]?.nombre ?? orden.paquete) : "";
 
   return (
     <div className="mx-auto max-w-md space-y-6 text-center">
@@ -53,7 +64,11 @@ export default async function PaginaRetorno({
       {!orden ? (
         <Aviso>{t.creditos.retorno.noEncontrada}</Aviso>
       ) : orden.estado === "aprobada" ? (
-        <Aviso tipo="exito">{plantilla(t.creditos.retorno.aprobada, { n: orden.creditos })}</Aviso>
+        <Aviso tipo="exito">
+          {bono > 0
+            ? plantilla(t.creditos.retorno.aprobadaConBono, { total: acreditados, n: orden.creditos, paquete: nombrePaquete, bono })
+            : plantilla(t.creditos.retorno.aprobada, { n: acreditados })}
+        </Aviso>
       ) : orden.estado === "pendiente" ? (
         <Aviso tipo="info">{t.creditos.retorno.pendiente}</Aviso>
       ) : (
