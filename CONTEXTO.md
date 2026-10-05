@@ -42,7 +42,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Base de datos
 
-Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0021_prueba_y_fundadores.sql` (5 de octubre de 2026); la próxima que se cree es la **0022**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0021_prueba_y_fundadores.sql` (5 de octubre de 2026). La `0022_publicaciones_facebook.sql` (red `facebook` en `publicaciones_redes`) está pendiente; la próxima que se cree es la **0023**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
@@ -111,7 +111,7 @@ Qué trae:
 ## Vista previa gratuita de la carta astral y redes en el pie (5 oct 2026)
 
 - `/carta-astral`: el formulario ya no cobra. `accionVistaPreviaAstral` valida, guarda los datos en el perfil y redirige a `/carta-astral?vista=1&nombre=…&fecha=…&hora=…&lugar=…&lat=…&lon=…&zona=…`; la página calcula la carta sin IA ni créditos y muestra `VistaCartaAstral` (componente extraído de la página de lecturas, `src/components/VistaCartaAstral.tsx`) con un resumen determinista (rasgos de Sol, Luna y Ascendente) y un bloque "bloqueado": texto difuminado decorativo, candado y el botón "Desbloquear mi lectura · 5 créditos", que envía los mismos datos en campos ocultos a `accionCartaAstral` (flujo de cobro intacto). Sin hora, el resumen omite el Ascendente. Textos en `t.astral.vista`.
-- Pie de página (`PiePagina`): enlaces a Instagram y TikTok desde `src/lib/marca/redes.ts` (`REDES`) con `IconoRed`; Facebook se añade ahí cuando haya URL de página.
+- Pie de página (`PiePagina`): enlaces a Instagram y TikTok desde `src/lib/marca/redes.ts` (`REDES`) con `IconoRed`; Facebook: página "Mi Arcana" (id 61594894293890).
 
 ## Paquete de prueba y oferta de fundadores (5 oct 2026)
 
@@ -145,7 +145,7 @@ Qué trae:
 
 ## Instagram automático (1 oct 2026)
 
-- **Cron** (`vercel.json` → `GET /api/cron/instagram`, 12:00 UTC = 07:00 Bogotá) publica en @miarcana.oficial la "Carta del día de Arcana" con la API Graph de Meta (`src/lib/redes/instagram.ts`: contenedor, espera y `media_publish`; el token va en la cabecera). Exige `Authorization: Bearer CRON_SECRET`. Se dispara a mano desde Vercel (Cron Jobs → Run). Reintento automático a las 17:00 UTC (12:00 Bogotá): solo publica si la de la mañana falló o quedó colgada. El 1 oct 2026 la primera corrida falló por el límite de solicitudes de la app de Meta (código 4), que comparte con Thanotectas.
+- **Cron** (`vercel.json` → `GET /api/cron/instagram`, 12:00 UTC = 07:00 Bogotá) publica en @miarcana.oficial y, desde el 5 oct 2026, también en la página de Facebook "Mi Arcana" (`src/lib/redes/facebook.ts`, `POST /{FB_PAGE_ID}/photos` con el token de página; variable `FB_PAGE_ID`, token `FB_PAGE_TOKEN` o el mismo `IG_PAGE_TOKEN` si tiene `pages_manage_posts`; migración 0022 admite `red = 'facebook'`; cada red tiene su propia reserva y reintento) la "Carta del día de Arcana" con la API Graph de Meta (`src/lib/redes/instagram.ts`: contenedor, espera y `media_publish`; el token va en la cabecera). Exige `Authorization: Bearer CRON_SECRET`. Se dispara a mano desde Vercel (Cron Jobs → Run). Reintento automático a las 17:00 UTC (12:00 Bogotá): solo publica si la de la mañana falló o quedó colgada. El 1 oct 2026 la primera corrida falló por el límite de solicitudes de la app de Meta (código 4), que comparte con Thanotectas.
 - **Carta**: `src/lib/redes/carta-dia.ts`. La misma para todos por fecha de Bogotá; recorre la rotación sin repetir. Quedan fuera de la rotación pública las cartas cuyo texto habla de salud, crisis, pérdidas o traiciones.
 - **Imagen**: `/api/redes/carta-dia?fecha=AAAA-MM-DD` (pública, 1080×1350, `imagenTarjeta`); el texto sale del mazo, nunca de la URL.
 - **Una por día**: tabla `publicaciones_redes` (migración `0013_publicaciones_redes.sql`, aplicada el 1 oct 2026) con clave única red + tipo + fecha; si una publicación falla queda en `error` y el siguiente intento la retoma.

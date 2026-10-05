@@ -16,7 +16,7 @@ Todas las piezas de comunicación de Arcana (miarcana.com), acumuladas en un sol
 ## Identidad rápida
 
 - Nombre: **Arcana** · dominio **miarcana.com** · guía: **Sibila**.
-- Redes: Instagram **@miarcana.oficial** · TikTok **@miarcana4**.
+- Redes: Instagram **@miarcana.oficial** · TikTok **@miarcana4** · Facebook **Mi Arcana** (facebook.com/profile.php?id=61594894293890).
 - Paleta: noche `#0b0716`, violeta `#8b6cf6` / `#b7a5ff`, oro `#d9b45a` / `#f1d99a`, texto `#ece6f7`.
 - Tipografías: Cormorant Garamond (títulos) e Inter (texto).
 - Gancho de adquisición: "Tu primera carta del día es gratis" (3 créditos de bienvenida al registrarse).
