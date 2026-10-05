@@ -53,9 +53,9 @@ Las cuatro primeras posiciones ocupadas y las dos últimas celdas vacías, solo 
 
 
 ==================== ESTADO (5 oct 2026) ====================
-Listas y recortadas en la app (66 cartas): los 22 mayores, Bastos completos, Espadas 3 a Rey, Oros As a Caballero y Copas 5 a 10. Gemini puso cartelas con título
+Listas y recortadas en la app (72 cartas): todo salvo Reina y Rey de Oros y Copas As a Cuatro. Gemini puso cartelas con título
 (en inglés o español): se recortan y se vuelve a montar el marco, así que no importa que salgan.
-FALTA (12 cartas, dos cuadrículas): Reina y Rey de Oros + Copas 1–4 (OROS 3 + COPAS 1) y Copas Sota a Rey + As y Dos de Espadas (COPAS 3 + ESPADAS 1). Los menores de Oros salieron
+FALTA (6 cartas, una cuadrícula): Reina y Rey de Oros + Copas 1–4 (OROS 3 + COPAS 1). Los menores de Oros salieron
 con escenas (estilo pictórico, no solo pips): seguimos así, es más claro para leer.
 
 ==================== CUADRÍCULA 3 (ya generada el 5 oct; se deja por si hay que repetirla) ====================
