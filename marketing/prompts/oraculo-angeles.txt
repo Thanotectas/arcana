@@ -1,0 +1,90 @@
+ORÁCULO DE LOS ÁNGELES CON GEMINI — 44 cartas en 8 cuadrículas de 6 (3 columnas × 2 filas, proporción 2:3)
+
+Son 44 mensajes, no tarot: cada carta es un ángel con un gesto y un objeto que resumen su mensaje. Buscamos un mazo
+muy bello y coherente: luz, serenidad, emoción contenida. Pide la resolución más alta; si sale texto o cartas de
+tamaño distinto, repite. Adjunta la cuadrícula 1 aprobada como referencia en las siguientes (y, si ayuda, una carta
+del Tarot Arcana para la paleta de Arcana).
+
+==================== ESTILO MAESTRO (va en todos los prompts) ====================
+
+Una sola imagen cuadrada que contiene 6 cartas de oráculo ordenadas en 3 columnas y 2 filas. Cada carta es un
+rectángulo vertical en proporción 2:3, todas del mismo tamaño exacto, separadas entre sí y del borde por franjas de
+fondo negro liso de unos 40 píxeles, sin ningún elemento en esas franjas.
+
+Estilo de todas las cartas, idéntico entre sí: pintura digital luminosa de arte sacro contemporáneo, suave y
+detallada, con pinceladas visibles y luz volumétrica, sin aspecto de 3D ni de fotografía. Paleta de Arcana: fondo
+nocturno de índigo profundo y violeta que se aclara detrás del ángel hacia una luz dorada, rosada o blanca según la
+carta; estrellas diminutas y partículas de luz flotando. Cada ángel es una figura humana real y expresiva, con alas
+grandes hechas de luz y plumas translúcidas, un halo fino de oro y ropa sencilla de telas vaporosas; los ángeles son
+diversos entre sí (edades, tonos de piel, cabellos, géneros variados, ninguno repetido), de rostro sereno y mirada
+amable, nunca maniquíes ni figuras rígidas. La composición es vertical, con el ángel de cuerpo entero o de tres
+cuartos ocupando el centro y un solo objeto o escena simbólica que resume el mensaje. Marco de cada carta: un borde
+fino dorado con un segundo filete interior aún más fino y pequeños adornos en las cuatro esquinas, sobre el fondo
+índigo. Sin cartela, sin título, sin texto, sin letras, sin números, sin firmas ni marcas de agua.
+
+==================== CUADRÍCULA 1 (ángeles 1–6) ====================
+De izquierda a derecha y de arriba abajo:
+1. Ángel de la Confianza: ángel sereno con los ojos cerrados y las palmas abiertas hacia arriba, de pie sobre un puente de luz que se va formando bajo sus pies paso a paso sobre un abismo; luz azul y dorada.
+2. Ángel de los Nuevos Comienzos: ángel joven que abre una puerta de luz en la oscuridad; detrás de la puerta, un amanecer; a sus pies brotan los primeros tallos verdes; luz dorada y naranja.
+3. Ángel de la Sanación: ángel inclinado con ambas manos sobre un corazón de luz verde y dorada que flota, junto a un manantial de agua clara y hojas nuevas; luz verde y blanca.
+4. Ángel de la Abundancia: ángel con los brazos abiertos del que caen frutas, espigas de trigo y monedas de luz hacia un cesto que rebosa; luz ámbar y oro.
+5. Ángel del Perdón: ángel que suelta una cadena que al caer se convierte en pétalos blancos; rostro aliviado, un suspiro; luz rosa pálido y blanca.
+6. Ángel de la Claridad: ángel que levanta una linterna de cristal cuya luz despeja la niebla; el cielo se abre tras ella; luz azul clara y blanca.
+
+==================== CUADRÍCULA 2 (ángeles 7–12) ====================
+1. Ángel de la Paciencia: ángel sentado con calma junto a un gran reloj de arena dentro del cual crece una flor; luna creciente arriba; luz azul noche y plata.
+2. Ángel de la Protección: ángel con alas enormes que envuelven a una figura pequeña dormida; un escudo de luz suave delante; luz azul profunda y dorada.
+3. Ángel de la Gratitud: ángel con las manos sobre el pecho que contempla un regalo pequeño y luminoso sobre una mesa con pan y flores silvestres; luz cálida color miel.
+4. Ángel de la Valentía: ángel con una armadura ligera de luz, de pie y firme frente a una tormenta, con la espada bajada y la mirada tranquila; luz roja y dorada.
+5. Ángel del Amor Propio: ángel que se abraza a sí mismo frente a un espejo que devuelve luz en vez de reflejo; corona de flores; luz rosa y oro.
+6. Ángel de la Liberación: ángel con las alas completamente desplegadas que rompe cuerdas en sus muñecas mientras pájaros salen volando; cielo abierto; luz celeste y blanca.
+
+==================== CUADRÍCULA 3 (ángeles 13–18) ====================
+1. Ángel de la Intuición: ángel con los ojos cerrados y un punto de luz en la frente, que sostiene una luna creciente entre las manos; luz índigo y violeta.
+2. Ángel del Equilibrio: ángel de pie sobre una piedra en medio de un lago quieto, con una esfera de luz en cada mano a la misma altura; composición simétrica; luz azul y dorada.
+3. Ángel de la Comunicación: ángel que sopla y de sus labios salen palomas de luz y cartas que vuelan; luz amarilla y azul.
+4. Ángel de la Fe: ángel que sube escalones de luz que aparecen uno a uno en la oscuridad, siguiendo una estrella; luz azul oscura y oro.
+5. Ángel de la Creatividad: ángel que dibuja con el dedo trazos de colores en el aire, rodeado de pinceles, notas musicales y hojas de papel que flotan; arcoíris suave.
+6. Ángel del Descanso: ángel dormido entre nubes blandas, cubierto con una manta de estrellas; luz lavanda.
+
+==================== CUADRÍCULA 4 (ángeles 19–24) ====================
+1. Ángel de la Familia: ángel que abraza un árbol de raíces profundas con pequeñas luces en las ramas, como ventanas de hogares; luz verde y ámbar.
+2. Ángel de los Milagros: ángel con las manos elevadas bajo una lluvia de estrellas fugaces, mientras una flor se abre sobre una piedra; luz dorada brillante.
+3. Ángel de los Límites: ángel firme y sereno que traza con la mano un círculo de luz en el suelo a su alrededor; luz azul firme.
+4. Ángel de la Alegría: ángel que ríe y gira con cintas de colores y burbujas de luz; luz cálida y viva.
+5. Ángel del Propósito: ángel con una brújula de luz en la mano, mirando un camino que sube hacia una montaña con un faro encendido; luz dorada y azul.
+6. Ángel del Silencio: ángel con un dedo sobre los labios en un bosque nevado, con nieve cayendo despacio; luz blanca y azul pálida.
+
+==================== CUADRÍCULA 5 (ángeles 25–30) ====================
+1. Ángel del Cambio: ángel entre hojas de otoño que al caer se convierten en mariposas; luz naranja y violeta.
+2. Ángel de la Reconciliación: ángel que une con delicadeza dos manos sobre un puente pequeño; luz rosa y oro.
+3. Ángel de la Verdad: ángel que sostiene en alto una pluma blanca que brilla, con un espejo claro a sus pies; luz blanca pura y azul.
+4. Ángel de la Compasión: ángel arrodillado que sostiene con ternura un pájaro herido entre las manos; luz rosa suave y verde.
+5. Ángel de la Prosperidad: ángel que riega con luz un campo de trigo dorado bajo el sol, con un granero al fondo; luz oro.
+6. Ángel de la Guía: ángel con un farol que señala un sendero de piedras luminosas en la noche; luz azul y amarilla.
+
+==================== CUADRÍCULA 6 (ángeles 31–36) ====================
+1. Ángel de la Esperanza: ángel que mira el primer rayo del amanecer sobre un mar en calma, con una pequeña llama protegida entre las manos; luz rosa dorada.
+2. Ángel de la Disciplina: ángel que escribe con calma en un libro grande a la luz de una vela, con una pila de piedras bien apiladas al lado; luz azul sobria y oro.
+3. Ángel de la Ternura: ángel que acuna una luz pequeña como si fuera un bebé; luz melocotón.
+4. Ángel de la Aceptación: ángel sentado con las manos en el regazo frente a un río tranquilo, dejando que una hoja se aleje en el agua; luz azul serena.
+5. Ángel de la Justicia: ángel de frente, firme, con una balanza de luz perfectamente equilibrada; luz blanca y dorada.
+6. Ángel del Renacimiento: ángel que surge de un fuego suave que se convierte en flores, como un fénix de luz; luz naranja y oro.
+
+==================== CUADRÍCULA 7 (ángeles 37–42) ====================
+1. Ángel de la Amistad: dos ángeles sentados de espaldas, apoyados uno en el otro, riendo bajo las estrellas; luz cálida.
+2. Ángel del Desapego: ángel que suelta un globo de luz hacia el cielo con una sonrisa serena; luz violeta clara.
+3. Ángel de la Celebración: ángel que alza una copa entre guirnaldas y confeti de luz; luz oro y rosa.
+4. Ángel de la Sabiduría: ángel anciano, de cabello blanco, con un libro abierto del que salen constelaciones, y un búho a su lado; luz índigo y oro.
+5. Ángel de la Fortaleza: ángel inmóvil de pie sobre una roca en medio del mar bajo la tormenta, con las alas firmes contra el viento; luz gris azulada y oro.
+6. Ángel de la Presencia: ángel sentado en meditación con un círculo de luz en el pecho, entre flores de loto; luz oro y blanca.
+
+==================== CUADRÍCULA 8 (ángeles 43–44, cuatro celdas vacías) ====================
+Dos cartas ocupadas y las otras cuatro celdas vacías, solo fondo negro.
+1. Ángel de la Unión: ángel que sostiene por encima de un círculo de manos de luz entrelazadas, de personas distintas; luz cálida.
+2. Ángel de la Luz: ángel que sostiene una esfera de luz blanca que ilumina por completo una cueva oscura; luz blanca y oro.
+
+==================== REVERSO (una sola imagen vertical 2:3) ====================
+Una sola carta vertical en proporción 2:3 vista por el reverso, sobre fondo negro. Diseño simétrico: fondo índigo
+profundo con estrellas diminutas, un par de alas de luz dorada desplegadas en el centro alrededor de una estrella de
+ocho puntas, y el mismo marco dorado doble con adornos en las esquinas que las cartas. Elegante, sobrio, sin texto.
