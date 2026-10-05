@@ -41,7 +41,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Base de datos
 
-Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0017_sinastria_y_chocolate.sql` (1 de octubre de 2026). La `0018_velas.sql` (tipo `velas`), la `0019_aura_y_tabaco.sql` (tipos `aura` y `tabaco`) y la `0020_correos.sql` (`perfiles.recibe_correos` y tabla `correos`) están pendientes de aplicar; la próxima que se cree es la **0021**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0020_correos.sql` (5 de octubre de 2026); la próxima que se cree es la **0021**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
@@ -100,7 +100,7 @@ Qué trae:
 - **Memoria** (`src/lib/lecturas/memoria.ts`): el perfil guarda los datos de nacimiento (se llenan solos al calcular una carta astral, o desde *Mi cuenta → Datos de nacimiento*, `accionGuardarNacimiento`). Al escribir cualquier lectura o responder una pregunta, el modelo recibe el nombre, el nacimiento y un extracto de las últimas 3 consultas para hablar con continuidad (instruido a no repetirlas). La carta astral se precarga con esos datos.
 - **Tu cielo hoy** (`/hoy`, `src/lib/diario.ts`, `src/lib/astro/transitos.ts`): tránsitos reales del día sobre la carta natal (aspectos de los planetas de hoy con los planetas natales, Ascendente y Medio Cielo; orbes estrechos, ponderados por planeta lento y exactitud). Todo el mundo ve la Luna del día y los tránsitos; el **mensaje escrito** (140–200 palabras, `effort: low`) solo se genera para el Círculo y se guarda en `mensajes_diarios` (una vez por persona, día e idioma). La fecha se toma en la zona horaria de nacimiento. Se transmite con `Suspense` para no bloquear la página. Enlace en la barra (con sesión) y tarjeta destacada en el panel.
 - **Círculo Arcana** (pase de 30 días, 19.900 COP, paquete `circulo` en `PAQUETE_CIRCULO`): mensaje diario, preguntas de seguimiento sin cobro (tope `CIRCULO.preguntasPorDia` = 15 por día, se cuenta en `preguntas_lectura`) y 15 créditos. No se renueva solo: cada compra suma 30 días a `perfiles.circulo_hasta` (`acreditar_orden` en 0009). Tarjeta en `/creditos#circulo` y estado en *Mi cuenta*. `circuloActivo(perfil)` en `dal.ts` (las cuentas ilimitadas cuentan como miembros).
-- Todas las migraciones hasta la 0017 están aplicadas en producción (`ordenes.es_prueba` de la 0010 deja las compras de prueba fuera de las métricas).
+- Todas las migraciones hasta la 0020 están aplicadas en producción (`ordenes.es_prueba` de la 0010 deja las compras de prueba fuera de las métricas).
 
 ## Tarot de Marsella ilustrado (5 oct 2026, parcial)
 
