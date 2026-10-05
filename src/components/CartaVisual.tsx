@@ -2,18 +2,20 @@ import type { CartaTarot, Palo } from "@/lib/tarot/deck";
 import type { IdMazo } from "@/lib/tarot/mazos";
 import { CaraDibujada } from "./CaraDibujada";
 import { CON_IMAGEN_MARSELLA } from "@/lib/tarot/imagenes-marsella";
+import { CON_IMAGEN_ANGELES } from "@/lib/tarot/imagenes-angeles";
 
 const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
 const SIMBOLO_PALO: Record<string, string> = { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" };
 const PALO_POR_SIMBOLO: Record<string, Palo | undefined> = { "🜂": "bastos", "🜄": "copas", "🜁": "espadas", "🜃": "oros" };
 const NOMBRE_CORTE: Record<number, string> = { 11: "Sota", 12: "Caballero", 13: "Reina", 14: "Rey" };
 
-/** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). Marsella la tiene parcial. */
-export const MAZOS_CON_IMAGEN: ReadonlySet<IdMazo> = new Set<IdMazo>(["rider", "arcana", "marsella"]);
+/** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). Los Ángeles la tienen parcial. */
+export const MAZOS_CON_IMAGEN: ReadonlySet<IdMazo> = new Set<IdMazo>(["rider", "arcana", "marsella", "angeles"]);
 
 /** ¿Existe la ilustración de esta carta en este mazo? */
 export function tieneImagen(mazo: IdMazo, id: string) {
   if (mazo === "marsella") return CON_IMAGEN_MARSELLA.has(id);
+  if (mazo === "angeles") return CON_IMAGEN_ANGELES.has(id);
   return MAZOS_CON_IMAGEN.has(mazo);
 }
 

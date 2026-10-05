@@ -29,5 +29,5 @@ Clips generados con Gemini (Veo) a partir de los prompts de `prompts/`, escalado
 
 - Regenerar la cuadrícula 2 del Tarot Arcana sin títulos dentro de la imagen (ver `imagenes/fuentes-gemini/tarot-arcana-cuadricula-2-con-titulos.jpg`).
 - Tarot de Marsella: completo (78 cartas); opcional rehacer el Cuatro de Copas (salió con tres copas).
-- Oráculo de los Ángeles: generar las 8 cuadrículas y el reverso con `prompts/oraculo-angeles.txt`; prompts en `prompts/tarot-marsella.txt`, hoja de contacto en `imagenes/tarot-marsella-contacto.png`.
+- Oráculo de los Ángeles: 24 de 44 listas (cuadrículas 1–4); faltan las cuadrículas 5–8 y el reverso (`prompts/oraculo-angeles.txt`); prompts en `prompts/tarot-marsella.txt`, hoja de contacto en `imagenes/tarot-marsella-contacto.png`.
 - Clip 3 del video 03 (la protagonista leyendo en el teléfono), opcional.

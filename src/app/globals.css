@@ -630,6 +630,8 @@ body {
 /* Marsella: las ilustraciones propias son 500×750; todo el mazo (y su dorso) usa esa proporción para que
    las cartas con imagen y las aún dibujadas midan lo mismo en una tirada. */
 .carta-tarot.estilo-marsella,
-.dorso-carta.estilo-marsella {
+.dorso-carta.estilo-marsella,
+.carta-tarot.estilo-angeles,
+.dorso-carta.estilo-angeles {
   aspect-ratio: 2 / 3;
 }
