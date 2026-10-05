@@ -110,7 +110,7 @@ Qué trae:
 ## Oráculo de los Ángeles ilustrado (5 oct 2026, parcial)
 
 - Pintura luminosa generada con Gemini en cuadrículas de 6 sobre fondo blanco (`marketing/prompts/oraculo-angeles.txt`; fuentes en `marketing/imagenes/fuentes-gemini/oraculo-angeles-cuadricula-*.jpg`). El marco índigo con filete dorado viene en la imagen: el script del cuaderno (`angeles/cortar.mjs`) detecta cada carta como bloque no blanco, afina el borde y la lleva a 500×750 con `fit: cover` → `public/cartas/angeles/<id>.webp`.
-- Cobertura: 24 de 44 (cuadrículas 1–4). Lista en `src/lib/tarot/imagenes-angeles.ts` (`CON_IMAGEN_ANGELES`), `tieneImagen` en `CartaVisual`; el mazo y su dorso pasan a 2:3 y el SVG dibujado usa `meet`. Faltan las cuadrículas 5–8 (con indicaciones de diversidad por carta) y el reverso, que reemplazará el dorso CSS.
+- Cobertura: las 44 cartas y el dorso (`public/cartas/angeles/dorso.webp`, usado por `.dorso-carta.estilo-angeles`) desde el 5 oct 2026. Lista en `src/lib/tarot/imagenes-angeles.ts` (`CON_IMAGEN_ANGELES`), `tieneImagen` en `CartaVisual`; el mazo y su dorso en 2:3. Los Ángeles entran en la rotación de la carta del día (`MAZOS_REDES`: rider, arcana, marsella, angeles). Los cuatro mazos tienen ilustración completa.
 
 ## Correos de Sibila y PDF de lecturas (4 oct 2026)
 

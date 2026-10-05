@@ -381,11 +381,8 @@ body {
   border-color: rgba(217, 180, 90, 0.7);
 }
 .dorso-carta.estilo-angeles {
-  background:
-    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.35) 0 6%, transparent 7%),
-    radial-gradient(circle at 50% 35%, transparent 0 14%, rgba(255, 255, 255, 0.18) 15% 16%, transparent 17%),
-    linear-gradient(180deg, #2b3a7a, #141a3d);
-  border-color: rgba(191, 210, 255, 0.7);
+  background: #1c1540 url("/cartas/angeles/dorso.webp") center / cover no-repeat;
+  border-color: rgba(217, 180, 90, 0.7);
 }
 .dorso-carta.estilo-arcana {
   background: #1a0f33 url("/cartas/arcana/dorso.webp") center / cover no-repeat;
