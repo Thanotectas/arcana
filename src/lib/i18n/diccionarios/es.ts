@@ -101,6 +101,7 @@ export const es = {
       escribiendo: "Sibila está leyendo tu consulta…",
       aparecera: "El texto aparecerá aquí mientras se escribe.",
       otraPestana: "Tu lectura se está escribiendo en otra pestaña…",
+      reconectando: "Se cortó la conexión, pero tu lectura se sigue escribiendo. Aparecerá aquí en unos segundos…",
       fallo: "No pudimos escribir esta lectura. Te devolvimos los créditos.",
       reintentar: "Reintentar la lectura",
       reintentando: "Reintentando…",
