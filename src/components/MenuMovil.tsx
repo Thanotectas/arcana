@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
+import { accionSalir } from "@/lib/auth/acciones";
 import { IconoCatalogo } from "./IconoCatalogo";
 import { GRUPOS_CATALOGO, type GrupoCatalogo, type ItemCatalogoTexto } from "@/lib/catalogo";
 
@@ -15,6 +16,7 @@ export function MenuMovil({
   grupos,
   items,
   enlaces,
+  salir,
 }: {
   etiquetaAbrir: string;
   etiquetaCerrar: string;
@@ -22,6 +24,8 @@ export function MenuMovil({
   items: ItemCatalogoTexto[];
   /** Enlaces extra al final (mi cuenta, invitar, créditos…). */
   enlaces: { href: string; etiqueta: string }[];
+  /** Texto del botón de cerrar sesión; si no viene, no se muestra (sin sesión). */
+  salir?: string;
 }) {
   const [abierto, setAbierto] = useState(false);
   const ruta = usePathname();
@@ -72,13 +76,23 @@ export function MenuMovil({
                 </section>
               ))}
             </div>
-            {enlaces.length > 0 && (
+            {(enlaces.length > 0 || salir) && (
               <ul className="mt-8 flex flex-wrap gap-2 border-t border-borde pt-5">
                 {enlaces.map((e) => (
                   <li key={e.href}>
                     <Link href={e.href} className="boton boton-secundario px-3 py-1.5 text-sm">{e.etiqueta}</Link>
                   </li>
                 ))}
+                {salir && (
+                  <li>
+                    <form action={accionSalir}>
+                      <button type="submit" className="boton boton-fantasma px-3 py-1.5 text-sm">
+                        <LogOut className="h-4 w-4" aria-hidden />
+                        {salir}
+                      </button>
+                    </form>
+                  </li>
+                )}
               </ul>
             )}
           </div>

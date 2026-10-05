@@ -3,7 +3,7 @@ import { FormularioPerfil } from "@/components/FormularioAuth";
 import { FormularioNacimiento } from "@/components/FormularioNacimiento";
 import { AvisoDiario } from "@/components/AvisoDiario";
 import { PreferenciaCorreos } from "@/components/PreferenciaCorreos";
-import { accionActualizarPerfil, accionGuardarNacimiento } from "@/lib/auth/acciones";
+import { accionActualizarPerfil, accionGuardarNacimiento, accionSalir } from "@/lib/auth/acciones";
 import { getOrdenes, getPerfil, requerirUsuario, lugarDePerfil, horaDePerfil, circuloActivo } from "@/lib/dal";
 import { formatoCOP } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -82,6 +82,10 @@ export default async function PaginaCuenta() {
           </ul>
         )}
       </section>
+
+      <form action={accionSalir} className="flex justify-end">
+        <button type="submit" className="boton boton-fantasma">{t.comun.salir}</button>
+      </form>
     </div>
   );
 }

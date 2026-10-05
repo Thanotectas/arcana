@@ -21,7 +21,7 @@ export async function Encabezado() {
   ];
   const enlacesCuenta = perfil
     ? [
-        { href: compras ? "/creditos" : "/cuenta", etiqueta: compras ? t.nav.creditos : t.comun.miCuenta },
+        ...(compras ? [{ href: "/creditos", etiqueta: t.nav.creditos }] : []),
         { href: "/invitar", etiqueta: t.invitar.seccion },
         { href: "/cuenta", etiqueta: t.comun.miCuenta },
       ]
@@ -81,7 +81,7 @@ export async function Encabezado() {
               </Link>
             </div>
           )}
-          <MenuMovil etiquetaAbrir={t.nav.menu} etiquetaCerrar={t.comun.cerrar} grupos={grupos} items={items} enlaces={[...directos, ...enlacesCuenta]} />
+          <MenuMovil etiquetaAbrir={t.nav.menu} etiquetaCerrar={t.comun.cerrar} grupos={grupos} items={items} enlaces={[...directos, ...enlacesCuenta]} salir={perfil ? t.comun.salir : undefined} />
         </div>
       </div>
     </header>
