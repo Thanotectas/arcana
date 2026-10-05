@@ -5,7 +5,9 @@ import { createHmac, timingSafeEqual } from "crypto";
  * Correos transaccionales y de campaña con Resend (API HTTP, sin SDK).
  * Variables: RESEND_API_KEY (si falta, no se envía nada), CORREO_REMITENTE
  * ("Sibila de Arcana <sibila@miarcana.com>", el dominio debe estar verificado
- * en Resend) y, opcional, CORREO_SECRETO para firmar los enlaces de baja.
+ * en Resend), CORREO_RESPUESTA (buzón real que recibe las respuestas; el
+ * remitente no necesita existir) y, opcional, CORREO_SECRETO para firmar los
+ * enlaces de baja.
  */
 export function correoConfigurado() {
   return Boolean(process.env.RESEND_API_KEY);
@@ -13,6 +15,11 @@ export function correoConfigurado() {
 
 function remitente() {
   return process.env.CORREO_REMITENTE ?? "Sibila de Arcana <sibila@miarcana.com>";
+}
+
+/** A dónde llegan las respuestas: sibila@ es solo el remitente y no tiene buzón. */
+function respuesta() {
+  return process.env.CORREO_RESPUESTA ?? "miarcana4@gmail.com";
 }
 
 export function sitio() {
@@ -41,6 +48,7 @@ export async function enviarCorreo(c: Correo): Promise<ResultadoEnvio> {
       headers: { Authorization: `Bearer ${clave}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from: remitente(),
+        reply_to: respuesta(),
         to: [c.para],
         subject: c.asunto,
         html: c.html,
