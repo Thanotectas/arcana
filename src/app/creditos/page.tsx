@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { requerirUsuario, getPerfil, getHaComprado, circuloActivo } from "@/lib/dal";
 import { Gift, ShieldCheck, Lock, Sparkles, Sunrise } from "lucide-react";
-import { PAQUETES, PAQUETE_CIRCULO, CIRCULO, COSTOS, formatoCOP, formatoUSD, BONO_PRIMERA_COMPRA, precioCirculoPorDia, type TipoLectura } from "@/lib/creditos";
+import { PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, OFERTA_FUNDADORES, CIRCULO, COSTOS, formatoCOP, formatoUSD, BONO_PRIMERA_COMPRA, precioCirculoPorDia, type TipoLectura } from "@/lib/creditos";
+import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
+import { CuentaRegresiva } from "@/components/CuentaRegresiva";
+import { Coffee, Timer } from "lucide-react";
 import { accionComprar, accionComprarInternacional } from "@/lib/pagos/acciones";
 import { pagosInternacionalesConfigurados } from "@/lib/pagos/lemon";
 import { headers } from "next/headers";
@@ -21,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string; moneda?: string }> }) {
   await requerirUsuario();
-  const [{ error, moneda }, perfil, t, haComprado, idioma, h] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers()]);
+  const [{ error, moneda }, perfil, t, haComprado, idioma, h, oferta] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores()]);
   // Fuera de Colombia (país según Vercel) se cobra en dólares con Lemon Squeezy; la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
   const internacionalDisponible = pagosInternacionalesConfigurados();
@@ -105,8 +108,31 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         })}
       </div>
 
+      <form action={accion} className="tarjeta flex flex-wrap items-center justify-between gap-4 border-borde p-5">
+        <input type="hidden" name="paquete" value={PAQUETE_PRUEBA.id} />
+        <div className="flex items-center gap-4">
+          <Coffee className="h-8 w-8 shrink-0 text-oro" aria-hidden />
+          <div>
+            <p className="font-display text-2xl">{t.creditos.prueba.titulo}</p>
+            <p className="text-sm text-texto-suave">{t.creditos.prueba.texto}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <p className="text-2xl font-semibold text-oro-suave">{precio(PAQUETE_PRUEBA)}</p>
+          <BotonEnviar className="boton boton-secundario px-4 py-2 text-sm" cargando={t.creditos.preparando}>{t.creditos.prueba.boton}</BotonEnviar>
+        </div>
+      </form>
+
       <form id="circulo" action={accion} className="tarjeta aparecer scroll-mt-24 border-oro/50 bg-gradient-to-br from-oro/10 via-transparent to-violeta/10 p-6 sm:p-8">
-        <input type="hidden" name="paquete" value={PAQUETE_CIRCULO.id} />
+        <input type="hidden" name="paquete" value={oferta.activa ? OFERTA_FUNDADORES.id : PAQUETE_CIRCULO.id} />
+        {oferta.activa && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-oro/60 bg-oro/15 px-4 py-3">
+            <p className="flex items-center gap-2 text-sm font-medium text-oro-suave"><Timer className="h-4 w-4" aria-hidden />{plantilla(t.creditos.fundadores.etiqueta, { cupo: OFERTA_FUNDADORES.cupo })}</p>
+            <p className="text-sm text-texto-suave">
+              {plantilla(t.creditos.fundadores.quedan, { n: oferta.restantes })} · <CuentaRegresiva hasta={OFERTA_FUNDADORES.hasta} plantillaDias={t.creditos.fundadores.terminaDias} plantillaHoras={t.creditos.fundadores.terminaHoras} />
+            </p>
+          </div>
+        )}
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-lg">
             <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-oro"><Sunrise className="h-4 w-4" aria-hidden /> {t.circulo.etiqueta}</p>
@@ -120,9 +146,16 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
             <p className="mt-3 text-xs text-texto-suave">{plantilla(t.circulo.letraPequena, { n: CIRCULO.preguntasPorDia, dias: CIRCULO.diasPorCompra })}</p>
           </div>
           <div className="w-full text-center sm:w-56">
-            <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}</p>
+            {oferta.activa ? (
+              <>
+                <p className="text-lg text-texto-suave line-through">{precio(PAQUETE_CIRCULO)}</p>
+                <p className="text-4xl font-semibold text-oro-suave">{internacional ? formatoUSD(OFERTA_FUNDADORES.precioUSDCentavos) : formatoCOP(OFERTA_FUNDADORES.precioCOP)}</p>
+              </>
+            ) : (
+              <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}</p>
+            )}
             <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
-            {!internacional && <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>}
+            {!internacional && !oferta.activa && <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>}
             <p className="mt-1 text-xs text-texto-suave">{plantilla(t.circulo.incluyeCreditos, { n: PAQUETE_CIRCULO.creditos })}</p>
             <BotonEnviar className="boton boton-primario mt-4 w-full" cargando={t.creditos.preparando}>
               {miembro ? t.circulo.extender : t.circulo.unirme}

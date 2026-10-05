@@ -118,6 +118,28 @@ export const PAQUETES: Paquete[] = [
   },
 ];
 
+/** Paquete de prueba: la primera compra más pequeña posible ("por menos que un café"). */
+export const PAQUETE_PRUEBA: Paquete = {
+  id: "prueba",
+  nombre: "Prueba",
+  creditos: 1,
+  precioCOP: 1900,
+  precioUSDCentavos: 99,
+  descripcion: "Un crédito para probar una lectura sencilla.",
+};
+
+/**
+ * Oferta de fundadores: el Círculo a mitad de precio para las primeras
+ * personas, hasta una fecha. Se vende como paquete 'circulo' con otro monto.
+ */
+export const OFERTA_FUNDADORES = {
+  id: "fundadores",
+  cupo: 50,
+  hasta: "2026-10-31T23:59:59-05:00",
+  precioCOP: 9900,
+  precioUSDCentavos: 249,
+} as const;
+
 export const PAQUETE_CIRCULO: Paquete = {
   id: "circulo",
   nombre: "Círculo Arcana",
@@ -135,6 +157,8 @@ export function precioCirculoPorDia() {
 
 export function paquetePorId(id: string) {
   if (id === PAQUETE_CIRCULO.id) return PAQUETE_CIRCULO;
+  if (id === PAQUETE_PRUEBA.id) return PAQUETE_PRUEBA;
+  if (id === OFERTA_FUNDADORES.id) return { ...PAQUETE_CIRCULO, precioCOP: OFERTA_FUNDADORES.precioCOP, precioUSDCentavos: OFERTA_FUNDADORES.precioUSDCentavos };
   return PAQUETES.find((p) => p.id === id);
 }
 

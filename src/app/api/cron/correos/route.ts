@@ -4,6 +4,10 @@ import { correoConfigurado, enviarCorreo, urlBaja } from "@/lib/correo";
 import { correoCampana, type TipoCorreo } from "@/lib/correos/plantillas";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
+import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
+import { diccionario } from "@/lib/i18n/diccionarios";
+import { plantilla } from "@/lib/i18n/formato";
+import { OFERTA_FUNDADORES, formatoCOP } from "@/lib/creditos";
 
 export const maxDuration = 300;
 
@@ -96,13 +100,15 @@ export async function GET(request: Request) {
 
   // 5. Envío (en serie: Resend limita a 2 peticiones por segundo).
   const fecha = fechaBogota();
+  const oferta = await estadoOfertaFundadores();
   const resumen: Record<TipoCorreo, number> = { carta_activo: 0, regreso_7: 0, regreso_30: 0 };
   let enviados = 0;
   let fallidos = 0;
   for (const c of lote) {
     const idioma = esIdioma(c.idioma) ? c.idioma : IDIOMA_PREDETERMINADO;
     const baja = urlBaja(c.id);
-    const correo = correoCampana({ tipo: c.tipo, nombre: c.nombre, idioma, fecha, urlBaja: baja });
+    const textoOferta = oferta.activa ? plantilla(diccionario(idioma).creditos.fundadores.correo, { precio: formatoCOP(OFERTA_FUNDADORES.precioCOP), n: oferta.restantes }) : undefined;
+    const correo = correoCampana({ tipo: c.tipo, nombre: c.nombre, idioma, fecha, urlBaja: baja, oferta: textoOferta });
     const r = await enviarCorreo({
       para: c.correo,
       asunto: correo.asunto,

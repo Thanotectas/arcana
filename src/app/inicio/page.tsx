@@ -7,7 +7,9 @@ import { datosNacimientoDePerfil } from "@/lib/diario";
 import { cieloDeHoy } from "@/lib/astro/transitos";
 import { signoPorId } from "@/lib/zodiaco";
 import { comprasVisibles } from "@/lib/plataforma";
-import { COSTOS } from "@/lib/creditos";
+import { COSTOS, OFERTA_FUNDADORES, formatoCOP } from "@/lib/creditos";
+import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
+import { Timer } from "lucide-react";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
@@ -41,7 +43,7 @@ export default async function PaginaInicio() {
     getIdioma(),
     getResumenInvitaciones().catch(() => ({ invitados: 0, premiadas: 0, creditos_ganados: 0 })),
   ]);
-  const compras = await comprasVisibles();
+  const [compras, oferta] = await Promise.all([comprasVisibles(), estadoOfertaFundadores()]);
   const diasSeguidos = racha(lecturas.map((l) => l.creado_en));
   const datosNatales = datosNacimientoDePerfil(perfil);
   const cielo = datosNatales ? cieloDeHoy(datosNatales) : null;
@@ -104,6 +106,12 @@ export default async function PaginaInicio() {
         </div>
       </section>
 
+      {compras && oferta.activa && !circuloActivo(perfil) && (
+        <Link href="/creditos#circulo" className="tarjeta tarjeta-modulo aparecer flex flex-wrap items-center justify-between gap-3 border-oro/60 bg-oro/10 p-4">
+          <p className="flex items-center gap-2 text-sm"><Timer className="h-4 w-4 text-oro" aria-hidden />{plantilla(t.creditos.fundadores.aviso, { precio: formatoCOP(OFERTA_FUNDADORES.precioCOP), n: oferta.restantes })}</p>
+          <span className="boton boton-primario px-4 py-1.5 text-sm">{t.creditos.fundadores.verOferta}</span>
+        </Link>
+      )}
       {compras && !perfil?.ilimitado && (perfil?.creditos ?? 0) <= 1 && (
         <div className="tarjeta aparecer flex flex-wrap items-center justify-between gap-3 border-oro/40 bg-oro/5 p-4">
           <p className="text-sm">{(perfil?.creditos ?? 0) === 0 ? t.persuasion.saldoCero : t.persuasion.saldoUno}</p>

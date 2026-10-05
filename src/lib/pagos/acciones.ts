@@ -2,16 +2,19 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "../supabase/server";
-import { paquetePorId } from "../creditos";
+import { paquetePorId, OFERTA_FUNDADORES } from "../creditos";
+import { estadoOfertaFundadores } from "./fundadores";
 import { nuevaReferencia, pagosConfigurados } from "./bold";
 import { crearCheckout, pagosInternacionalesConfigurados } from "./lemon";
 import { getSupabaseAdmin } from "../supabase/admin";
 
 /** Crea la orden pendiente y lleva a la página que abre el checkout de Bold. */
 export async function accionComprar(formData: FormData) {
-  const paquete = paquetePorId(String(formData.get("paquete") ?? ""));
+  const idPaquete = String(formData.get("paquete") ?? "");
+  const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?error=paquete");
   if (!pagosConfigurados()) redirect("/creditos?error=config");
+  if (idPaquete === OFERTA_FUNDADORES.id && !(await estadoOfertaFundadores()).activa) redirect("/creditos?error=oferta");
 
   const supabase = await createClient();
   const {
@@ -43,9 +46,11 @@ export async function accionComprar(formData: FormData) {
  * servidor y checkout alojado de Lemon Squeezy. El webhook acredita.
  */
 export async function accionComprarInternacional(formData: FormData) {
-  const paquete = paquetePorId(String(formData.get("paquete") ?? ""));
+  const idPaquete = String(formData.get("paquete") ?? "");
+  const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?moneda=usd&error=paquete");
   if (!pagosInternacionalesConfigurados()) redirect("/creditos?moneda=usd&error=config");
+  if (idPaquete === OFERTA_FUNDADORES.id && !(await estadoOfertaFundadores()).activa) redirect("/creditos?moneda=usd&error=oferta");
 
   const supabase = await createClient();
   const {
@@ -71,7 +76,7 @@ export async function accionComprarInternacional(formData: FormData) {
 
   const { data: perfil } = await supabase.from("perfiles").select("nombre").eq("id", user.id).maybeSingle();
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
-  const url = await crearCheckout({ paquete: paquete.id, referencia, email: user.email, nombre: perfil?.nombre, urlRetorno: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}` });
+  const url = await crearCheckout({ paquete: idPaquete, referencia, email: user.email, nombre: perfil?.nombre, urlRetorno: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}` });
   if (!url) {
     await admin.from("ordenes").update({ estado: "error" }).eq("referencia", referencia);
     redirect("/creditos?moneda=usd&error=checkout");

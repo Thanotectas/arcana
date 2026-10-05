@@ -42,7 +42,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Base de datos
 
-Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0020_correos.sql` (5 de octubre de 2026); la próxima que se cree es la **0021**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0020_correos.sql` (5 de octubre de 2026). La `0021_prueba_y_fundadores.sql` (paquete `prueba` y Círculo a precio de fundadores en la política de órdenes) está pendiente de aplicar; la próxima que se cree es la **0022**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
@@ -107,6 +107,11 @@ Qué trae:
 
 - Gemini generó cuadrículas de 6 cartas en estilo xilografía (`marketing/prompts/tarot-marsella.txt`, fuentes en `marketing/imagenes/fuentes-gemini/marsella-*.jpg`). El script del cuaderno de trabajo detecta las líneas del marco, descarta la cartela con el título (venía en inglés o español) y monta la ilustración en un marco de Marsella propio (línea negra + filete rojo sobre crema) a 500×750 → `public/cartas/marsella/<id>.webp`.
 - Cobertura: las 78 cartas desde el 5 oct 2026 (fuentes en `marketing/imagenes/fuentes-gemini/marsella-*.jpg`). Marsella entra en la rotación de la carta del día de redes y correos (`MAZOS_REDES`: rider, arcana, marsella). Detalle pendiente: el Cuatro de Copas muestra tres copas. El script del cuaderno (`cortar.mjs`) tiene configuración por cuadrícula (`cartela: true/false`): las cuadrículas sin cartela recortan hasta el marco inferior; si una línea del marco se funde con el dibujo se asume un grosor de 14 px. La lista de cartas con imagen vive en `src/lib/tarot/imagenes-marsella.ts` (`CON_IMAGEN_MARSELLA`); `tieneImagen(mazo, id)` en `CartaVisual` decide por carta, y las que faltan siguen con `CaraDibujada`. Todo el mazo (y el dorso) pasa a proporción 2:3 para que las cartas con imagen y las dibujadas midan lo mismo; el SVG dibujado usa `meet` en Marsella. Al añadir archivos hay que actualizar esa lista. Prompts de los 50 menores restantes ya escritos (escenas, no solo pips).
+
+## Paquete de prueba y oferta de fundadores (5 oct 2026)
+
+- **Paquete `prueba`** (`PAQUETE_PRUEBA`: 1 crédito, $1.900 / 0,99 USD) como tarjeta compacta bajo la cuadrícula de `/creditos`; no está en `PAQUETES` para no alterar el cálculo de ahorro. El bono de primera compra (2) también aplica, así que la primera compra mínima entrega 3 créditos.
+- **Oferta de fundadores** (`OFERTA_FUNDADORES`: id `fundadores`, Círculo a $9.900 / 2,49 USD, 50 cupos, hasta el 31 oct 2026 23:59 Bogotá). Se vende como paquete `circulo` con otro monto, así `acreditar_orden` y los 30 días funcionan sin cambios; `paquetePorId("fundadores")` devuelve el Círculo con el precio de la oferta. `estadoOfertaFundadores()` (`src/lib/pagos/fundadores.ts`, cliente admin) cuenta las órdenes aprobadas a ese monto; las acciones de compra rechazan `fundadores` si ya no está activa (`error=oferta`). En `/creditos` el bloque del Círculo muestra precio tachado, cupos y `CuentaRegresiva` (cliente, `useSyncExternalStore`, actualiza cada minuto); `/inicio` muestra un aviso a quien no es miembro; el cron de correos añade una línea con la oferta mientras esté vigente. Migración 0021 añade los dos montos a la política de órdenes. En Lemon hay que crear los productos `prueba` (0,99) y `fundadores` (2,49) y sumarlos a `LEMON_VARIANTES`.
 
 ## Pagos internacionales con Lemon Squeezy (5 oct 2026, listo sin activar)
 

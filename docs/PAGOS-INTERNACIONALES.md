@@ -8,10 +8,12 @@ El código ya está listo. Mientras no existan las variables de entorno, la pág
 
 | Paquete | Créditos | USD |
 | --- | --- | --- |
+| Prueba | 1 | 0,99 |
 | Inicial | 5 | 2,49 |
 | Buscador | 15 | 5,99 |
 | Iniciado | 40 | 12,99 |
 | Círculo Arcana (30 días) | 15 + pase | 4,99 |
+| Círculo, precio de fundadores (hasta el 31 oct 2026, 50 cupos) | 15 + pase | 2,49 |
 
 Se definen en `src/lib/creditos.ts` (`precioUSDCentavos`). Los precios de los productos en Lemon Squeezy deben coincidir exactamente: el webhook rechaza la venta si el total no es igual al de la orden.
 
@@ -25,7 +27,7 @@ Se definen en `src/lib/creditos.ts` (`precioUSDCentavos`). Los precios de los pr
    - `LEMON_API_KEY` = la clave del paso 3.
    - `LEMON_STORE_ID` = el id numérico de la tienda (Settings → Stores).
    - `LEMON_WEBHOOK_SECRET` = el secreto del paso 4.
-   - `LEMON_VARIANTES` = `inicial:<id>,buscador:<id>,iniciado:<id>,circulo:<id>` con los Variant ID del paso 2.
+   - `LEMON_VARIANTES` = `prueba:<id>,inicial:<id>,buscador:<id>,iniciado:<id>,circulo:<id>,fundadores:<id>` con los Variant ID del paso 2 (seis productos).
 6. Redespliega. Pásame las claves solo en un archivo privado, nunca por el chat.
 
 ## Cómo funciona para la persona
