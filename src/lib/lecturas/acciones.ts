@@ -144,6 +144,29 @@ export async function accionTarot(_prev: EstadoAccion, formData: FormData): Prom
 // ---------------------------------------------------------------------------
 // Carta astral
 // ---------------------------------------------------------------------------
+/**
+ * Vista previa gratuita de la carta astral: valida los datos, los guarda en el
+ * perfil y lleva a /carta-astral?vista=1&… donde se calcula sin cobrar. La
+ * lectura escrita por Sibila se desbloquea después con accionCartaAstral.
+ */
+export async function accionVistaPreviaAstral(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const d = leerNacimiento(formData, "");
+  const error = errorNacimiento(d, "astral");
+  if (error) return { error };
+  await guardarNacimiento(d);
+  const q = new URLSearchParams({
+    vista: "1",
+    nombre: d.nombre,
+    fecha: d.fecha,
+    hora: d.horaDesconocida ? "" : d.hora,
+    lugar: d.lugar,
+    lat: String(d.latitud),
+    lon: String(d.longitud),
+    zona: d.zonaHoraria,
+  });
+  redirect(`/carta-astral?${q.toString()}#vista`);
+}
+
 export async function accionCartaAstral(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
   const datos: DatosNacimiento = {
     nombre: String(formData.get("nombre") ?? "").trim().slice(0, 80),

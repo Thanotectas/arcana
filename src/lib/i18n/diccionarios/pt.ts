@@ -66,6 +66,7 @@ export const pt: Diccionario = {
     terminos: "Termos",
     privacidad: "Privacidade",
     precios: "Preços",
+    siguenos: "Siga-nos",
   },
   lecturas: {
     nombres: {
@@ -331,6 +332,17 @@ export const pt: Diccionario = {
     aspectos: "Aspectos",
     elementos: "Elementos",
     casaN: "casa {n}",
+    vista: {
+      calcularGratis: "Calcular meu mapa grátis",
+      nota: "Calcular seu mapa é grátis. A leitura escrita da Sibila custa {n} créditos e se desbloqueia depois, se você quiser.",
+      titulo: "Seu céu natal, {nombre}",
+      resumen: "Seu Sol em {sol} fala de {rasgosSol}; sua Lua em {luna}, de {rasgosLuna}.",
+      resumenAsc: " Seu Ascendente em {asc} mostra {rasgosAsc}.",
+      bloqueadaTitulo: "A leitura da Sibila está pronta para ser escrita",
+      bloqueadaTexto: "Cerca de 1.200 palavras sobre sua personalidade, suas emoções, seu jeito de amar, seu trabalho e seu caminho, planeta por planeta e casa por casa, escritas para você.",
+      desbloquear: "Desbloquear minha leitura · {n} créditos",
+      editar: "Mudar os dados",
+    },
     errores: {
       nombre: "Digite seu nome.",
       fecha: "Data de nascimento inválida.",

@@ -69,6 +69,7 @@ export const en: Diccionario = {
     terminos: "Terms",
     privacidad: "Privacy",
     precios: "Pricing",
+    siguenos: "Follow us",
   },
   lecturas: {
     nombres: {
@@ -334,6 +335,17 @@ export const en: Diccionario = {
     aspectos: "Aspects",
     elementos: "Elements",
     casaN: "house {n}",
+    vista: {
+      calcularGratis: "Calculate my chart for free",
+      nota: "Calculating your chart is free. Sibila's written reading costs {n} credits and unlocks afterwards, if you want it.",
+      titulo: "Your natal sky, {nombre}",
+      resumen: "Your Sun in {sol} speaks of {rasgosSol}; your Moon in {luna}, of {rasgosLuna}.",
+      resumenAsc: " Your Ascendant in {asc} shows {rasgosAsc}.",
+      bloqueadaTitulo: "Sibila's reading is ready to be written",
+      bloqueadaTexto: "About 1,200 words on your personality, your emotions, the way you love, your work and your path, planet by planet and house by house, written for you.",
+      desbloquear: "Unlock my reading · {n} credits",
+      editar: "Change the data",
+    },
     errores: {
       nombre: "Enter your name.",
       fecha: "Invalid date of birth.",

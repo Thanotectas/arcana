@@ -68,6 +68,7 @@ export const es = {
     terminos: "Términos",
     privacidad: "Privacidad",
     precios: "Precios",
+    siguenos: "Síguenos",
   },
   lecturas: {
     nombres: {
@@ -333,6 +334,17 @@ export const es = {
     aspectos: "Aspectos",
     elementos: "Elementos",
     casaN: "casa {n}",
+    vista: {
+      calcularGratis: "Calcular mi carta gratis",
+      nota: "Calcular tu carta es gratis. La lectura escrita de Sibila cuesta {n} créditos y se desbloquea después, si quieres.",
+      titulo: "Tu cielo natal, {nombre}",
+      resumen: "Tu Sol en {sol} habla de {rasgosSol}; tu Luna en {luna}, de {rasgosLuna}.",
+      resumenAsc: " Tu Ascendente en {asc} muestra {rasgosAsc}.",
+      bloqueadaTitulo: "La lectura de Sibila está lista para escribirse",
+      bloqueadaTexto: "Unas 1.200 palabras sobre tu personalidad, tus emociones, tu forma de amar, tu trabajo y tu camino, planeta por planeta y casa por casa, escritas para ti.",
+      desbloquear: "Desbloquear mi lectura · {n} créditos",
+      editar: "Cambiar los datos",
+    },
     errores: {
       nombre: "Escribe tu nombre.",
       fecha: "Fecha de nacimiento no válida.",
