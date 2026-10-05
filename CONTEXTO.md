@@ -24,6 +24,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 - Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
 - Correos: `RESEND_API_KEY`, `CORREO_REMITENTE`, `CORREOS_MAXIMO` (ver `docs/CORREOS.md`).
+- Pagos internacionales: `LEMON_API_KEY`, `LEMON_STORE_ID`, `LEMON_WEBHOOK_SECRET`, `LEMON_VARIANTES` (ver `docs/PAGOS-INTERNACIONALES.md`).
 - Instagram automático: `IG_USER_ID` (cuenta @miarcana.oficial) e `IG_PAGE_TOKEN` (token de la página de Facebook "Mi Arcana", app de Meta "Thanotectas Automation"; no caduca, pero el acceso a datos vence hacia el 30 dic 2026 y entonces hay que renovarlo con el Explorador de la API Graph).
 - CAPTCHA: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (la clave secreta de Turnstile se configura en Supabase Auth, no en Vercel).
 
@@ -106,6 +107,11 @@ Qué trae:
 
 - Gemini generó cuadrículas de 6 cartas en estilo xilografía (`marketing/prompts/tarot-marsella.txt`, fuentes en `marketing/imagenes/fuentes-gemini/marsella-*.jpg`). El script del cuaderno de trabajo detecta las líneas del marco, descarta la cartela con el título (venía en inglés o español) y monta la ilustración en un marco de Marsella propio (línea negra + filete rojo sobre crema) a 500×750 → `public/cartas/marsella/<id>.webp`.
 - Cobertura: las 78 cartas desde el 5 oct 2026 (fuentes en `marketing/imagenes/fuentes-gemini/marsella-*.jpg`). Marsella entra en la rotación de la carta del día de redes y correos (`MAZOS_REDES`: rider, arcana, marsella). Detalle pendiente: el Cuatro de Copas muestra tres copas. El script del cuaderno (`cortar.mjs`) tiene configuración por cuadrícula (`cartela: true/false`): las cuadrículas sin cartela recortan hasta el marco inferior; si una línea del marco se funde con el dibujo se asume un grosor de 14 px. La lista de cartas con imagen vive en `src/lib/tarot/imagenes-marsella.ts` (`CON_IMAGEN_MARSELLA`); `tieneImagen(mazo, id)` en `CartaVisual` decide por carta, y las que faltan siguen con `CaraDibujada`. Todo el mazo (y el dorso) pasa a proporción 2:3 para que las cartas con imagen y las dibujadas midan lo mismo; el SVG dibujado usa `meet` en Marsella. Al añadir archivos hay que actualizar esa lista. Prompts de los 50 menores restantes ya escritos (escenas, no solo pips).
+
+## Pagos internacionales con Lemon Squeezy (5 oct 2026, listo sin activar)
+
+- `src/lib/pagos/lemon.ts` (API de checkouts alojados, verificación `X-Signature` HMAC-SHA256 del cuerpo crudo), `accionComprarInternacional` en `src/lib/pagos/acciones.ts` (orden en USD creada con el cliente admin, porque la política RLS de `ordenes` solo admite COP), webhook `/api/webhooks/lemon` (`order_created` pagado → `acreditar_orden` con método `lemonsqueezy`; `order_refunded` → anulada; verifica monto y moneda). Precios en `precioUSDCentavos` de cada paquete (2,49 / 5,99 / 12,99 / Círculo 4,99).
+- `/creditos` decide la moneda por `x-vercel-ip-country` (fuera de Colombia → USD si Lemon está configurado) con enlace para cambiar (`?moneda=usd|cop`); la página de retorno solo consulta a Bold para órdenes en COP. Variables `LEMON_API_KEY`, `LEMON_STORE_ID`, `LEMON_WEBHOOK_SECRET`, `LEMON_VARIANTES`; guía en `docs/PAGOS-INTERNACIONALES.md`. Sin variables, todo sigue con Bold.
 
 ## Oráculo de los Ángeles ilustrado (5 oct 2026, parcial)
 

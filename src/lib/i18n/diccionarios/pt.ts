@@ -461,10 +461,17 @@ export const pt: Diccionario = {
       paquete: "O pacote selecionado não existe.",
       config: "Os pagamentos ainda não estão configurados. Entre em contato com o administrador.",
       orden: "Não foi possível criar o pedido. Tente novamente.",
+      checkout: "Não foi possível abrir a página de pagamento internacional. Tente de novo ou escreva para nós.",
       generico: "Ocorreu um erro.",
     },
     sinConfigurar: "Pagamentos em modo de configuração: falta a chave de identidade ou a chave secreta da Bold.",
     noDisponibleApp: "A recarga de créditos não está disponível nesta versão do app.",
+    internacional: {
+      nota: "Pagamento internacional em dólares com cartão ou PayPal pela Lemon Squeezy; o imposto do seu país é calculado ao pagar.",
+      enlaceFuera: "Está fora da Colômbia? Pague em dólares",
+      enlaceColombia: "Está na Colômbia? Pague em pesos",
+      sinConfigurar: "O pagamento internacional ainda não está ativo. Escreva para nós e resolvemos manualmente.",
+    },
     paquetes: {
       inicial: { nombre: "Inicial", descripcion: "Para experimentar: cinco leituras simples ou um mapa astral." },
       buscador: { nombre: "Buscador", descripcion: "O mais escolhido. Dá para um mês de consultas." },

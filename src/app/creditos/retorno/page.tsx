@@ -26,7 +26,7 @@ export default async function PaginaRetorno({
   const ref = params.ref ?? params["bold-order-id"];
   let orden = ref ? await getOrdenPorReferencia(ref) : null;
 
-  if (orden && orden.estado === "pendiente") {
+  if (orden && orden.estado === "pendiente" && orden.moneda === "COP") {
     const venta = await consultarVenta(orden.referencia);
     const montoPesos = Number(orden.monto_centavos) / 100;
     if (venta?.estado === "APPROVED" && venta.total === montoPesos) {

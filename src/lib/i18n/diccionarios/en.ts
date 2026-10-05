@@ -464,10 +464,17 @@ export const en: Diccionario = {
       paquete: "The selected pack does not exist.",
       config: "Payments are not set up yet. Contact the administrator.",
       orden: "The order could not be created. Please try again.",
+      checkout: "We could not open the international checkout. Try again or write to us.",
       generico: "An error occurred.",
     },
     sinConfigurar: "Payments in setup mode: the Bold identity key or secret key is missing.",
     noDisponibleApp: "Credit top-ups are not available in this version of the app.",
+    internacional: {
+      nota: "International payment in US dollars by card or PayPal through Lemon Squeezy; your country's tax is calculated at checkout.",
+      enlaceFuera: "Outside Colombia? Pay in dollars",
+      enlaceColombia: "In Colombia? Pay in pesos",
+      sinConfigurar: "International payment is not active yet. Write to us and we will sort it out by hand.",
+    },
     paquetes: {
       inicial: { nombre: "Starter", descripcion: "To try it out: five simple readings or one birth chart." },
       buscador: { nombre: "Seeker", descripcion: "The most popular. Enough for a month of readings." },

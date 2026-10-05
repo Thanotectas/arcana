@@ -463,10 +463,17 @@ export const es = {
       paquete: "El paquete seleccionado no existe.",
       config: "Los pagos aún no están configurados. Contacta al administrador.",
       orden: "No se pudo crear la orden. Intenta de nuevo.",
+      checkout: "No pudimos abrir la página de pago internacional. Intenta de nuevo o escríbenos.",
       generico: "Ocurrió un error.",
     },
     sinConfigurar: "Pagos en modo de configuración: falta la llave de identidad o la llave secreta de Bold.",
     noDisponibleApp: "La recarga de créditos no está disponible en esta versión de la app.",
+    internacional: {
+      nota: "Pago internacional en dólares con tarjeta o PayPal a través de Lemon Squeezy; el impuesto de tu país se calcula al pagar.",
+      enlaceFuera: "¿Estás fuera de Colombia? Paga en dólares",
+      enlaceColombia: "¿Estás en Colombia? Paga en pesos",
+      sinConfigurar: "El pago internacional todavía no está activo. Escríbenos y lo resolvemos a mano.",
+    },
     paquetes: {
       inicial: { nombre: "Inicial", descripcion: "Para probar: cinco lecturas sencillas o una carta astral." },
       buscador: { nombre: "Buscador", descripcion: "El más elegido. Alcanza para un mes de consultas." },

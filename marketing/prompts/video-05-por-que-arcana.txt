@@ -1,0 +1,43 @@
+VIDEO 05 — "POR QUÉ ARCANA" (comparativo): 3 clips de 8 s en Gemini (Veo), vertical 9:16, se unen con ffmpeg
+y se les agregan los textos. Mismo flujo que los videos 03 y 04. Sin texto dentro de los clips.
+
+Idea: en tres cortes se muestra lo que las apps de tarot normales NO hacen y lo que Arcana sí hace.
+Técnica de persuasión: contraste (framing de pérdida/ganancia), prueba visual, nudge final con la carta gratis.
+
+==================== CLIP 1 · "Las otras" (8 s) ====================
+Plano cenital de una mano que toca la pantalla de un celular sobre una mesa gris y fría. En la pantalla, una app
+genérica de tarot: una carta aparece volteada sola, sin que la mano la elija, y debajo un bloque de texto corto e
+idéntico se repite tres veces como si fuera copiado. La luz es plana y azulada, de oficina. La mano se detiene,
+duda, y baja el celular despacio. Cámara fija, ritmo lento, atmósfera impersonal. Sin texto.
+
+==================== CLIP 2 · "Arcana" (8 s) ====================
+La misma mano, ahora sobre una mesa de madera cálida con una vela encendida y luz dorada. En la pantalla de un
+celular, un abanico de cartas de tarot ilustradas al estilo Rider-Waite con bordes dorados; la mano desliza el
+abanico, elige una carta con el dedo, la carta gira con brillo y se revela. Junto a ella aparece, línea por línea,
+un texto largo que se va escribiendo solo, como una carta personal. Cámara con un leve acercamiento, partículas de
+luz, atmósfera íntima y cálida. Sin texto legible: el escrito se ve como líneas difusas.
+
+==================== CLIP 3 · "Tu mesa" (8 s) ====================
+Plano medio de una mujer joven latina sentada en su cama por la noche, con luz cálida de una lámpara, sosteniendo
+el celular con las dos manos. Lee despacio, sonríe con sorpresa, se lleva una mano al pecho y mira hacia arriba
+pensativa, como si lo que leyó le hablara a ella. La cámara se acerca lentamente a su rostro. Emoción genuina,
+sin exageración. Sin texto.
+
+==================== TEXTOS EN PANTALLA (los pone ffmpeg) ====================
+Clip 1 (0–8 s):   "La mayoría de apps te dan una carta al azar…"  /  "…y el mismo texto para todos."
+Clip 2 (8–16 s):  "En Arcana tú barajas y eliges."  /  "Sibila escribe para ti, con tu nombre y tu historia."
+Clip 3 (16–24 s): "16 lecturas. 4 mazos ilustrados. Una guía que te recuerda."
+Cierre (24–28 s): logo + "Tu primera carta es gratis, hoy."  /  miarcana.com
+
+==================== TEXTOS PARA REDES ====================
+TikTok / Reels:
+¿Tu app de tarot te da la misma carta que a todo el mundo? 👀 En Arcana tú barajas, tú eliges y Sibila escribe
+una lectura solo para ti: con tu nombre, tu carta astral y lo que le contaste antes. Tarot, carta astral,
+sueños, velas, mano, chocolate y más en un solo lugar. Tu primera carta de hoy es gratis 🔮
+#tarot #tarotonline #cartaastral #sibila #arcana #miarcana #tarotcolombia #astrologia #lecturadetarot
+
+Facebook:
+La mayoría de las apps de tarot voltean una carta al azar y te muestran el mismo párrafo que a todos. Arcana
+es distinto: barajas con tus manos, eliges tus cartas y Sibila, nuestra guía, escribe una lectura larga y
+personal que recuerda tus consultas anteriores. Dieciséis tipos de lectura, cuatro mazos ilustrados y una carta
+gratis cada día. Pruébala en miarcana.com.

@@ -75,6 +75,8 @@ export interface Paquete {
   nombre: string;
   creditos: number;
   precioCOP: number; // pesos, sin centavos
+  /** Precio internacional en centavos de dólar (Lemon Squeezy). */
+  precioUSDCentavos: number;
   destacado?: boolean;
   descripcion: string;
   /** Días de Círculo Arcana que incluye (pase mensual). */
@@ -94,6 +96,7 @@ export const PAQUETES: Paquete[] = [
     nombre: "Inicial",
     creditos: 5,
     precioCOP: 9900,
+    precioUSDCentavos: 249,
     descripcion: "Para probar: cinco lecturas sencillas o una carta astral.",
   },
   {
@@ -101,6 +104,7 @@ export const PAQUETES: Paquete[] = [
     nombre: "Buscador",
     creditos: 15,
     precioCOP: 24900,
+    precioUSDCentavos: 599,
     destacado: true,
     descripcion: "El más elegido. Alcanza para un mes de consultas.",
   },
@@ -109,6 +113,7 @@ export const PAQUETES: Paquete[] = [
     nombre: "Iniciado",
     creditos: 40,
     precioCOP: 54900,
+    precioUSDCentavos: 1299,
     descripcion: "Para quien consulta a diario y comparte con otros.",
   },
 ];
@@ -118,6 +123,7 @@ export const PAQUETE_CIRCULO: Paquete = {
   nombre: "Círculo Arcana",
   creditos: 15,
   precioCOP: 19900,
+  precioUSDCentavos: 499,
   diasCirculo: 30,
   descripcion: "30 días con tu cielo personal cada mañana, preguntas sin cobro y 15 créditos.",
 };
@@ -130,6 +136,10 @@ export function precioCirculoPorDia() {
 export function paquetePorId(id: string) {
   if (id === PAQUETE_CIRCULO.id) return PAQUETE_CIRCULO;
   return PAQUETES.find((p) => p.id === id);
+}
+
+export function formatoUSD(centavos: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(centavos / 100);
 }
 
 export function formatoCOP(pesos: number) {
