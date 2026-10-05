@@ -1,0 +1,48 @@
+IMAGEN PARA REDES — "TODO LO QUE PUEDES CONSULTAR EN ARCANA"
+Objetivo: una sola imagen que muestre de un vistazo los 16 productos. Se genera en Gemini SIN texto (Gemini escribe
+mal el español) y luego se agregan los rótulos y el logo con nuestras herramientas, como en la carta del día.
+
+Pedir dos formatos: cuadrado 1:1 (Instagram y Facebook) y vertical 9:16 (historias y TikTok). Resolución máxima.
+Si algún objeto sale repetido o con letras, repetir.
+
+==================== PROMPT · FORMATO CUADRADO 1:1 ====================
+
+Una ilustración cuadrada, estilo pintura digital luminosa y detallada, vista cenital de una mesa de ritual de
+madera oscura cubierta por un paño de terciopelo índigo profundo, iluminada por velas y un brillo dorado suave.
+Sobre la mesa, ordenados en una cuadrícula de 4 × 4 con espacio generoso entre ellos y sin que ninguno se
+superponga, dieciséis objetos que representan dieciséis consultas distintas, cada uno pequeño, nítido y
+reconocible, todos con la misma escala y la misma luz cálida:
+
+Fila 1: (1) una sola carta de tarot boca arriba con una estrella dorada; (2) tres cartas de tarot en abanico;
+(3) diez cartas de tarot dispuestas en cruz; (4) una rueda de carta astral dorada con los símbolos de los
+planetas.
+Fila 2: (5) un cuaderno abierto con números dorados escritos a mano; (6) dos monedas doradas con dos signos del
+zodíaco una junto a la otra; (7) dos ruedas astrales entrelazadas como anillos; (8) una mano abierta con la
+palma hacia arriba y líneas luminosas.
+Fila 3: (9) tres monedas chinas antiguas con agujero cuadrado sobre un pergamino; (10) una moneda dorada con
+un dragón chino; (11) una luna creciente con una pluma y nubes pequeñas, como un sueño; (12) una taza de
+chocolate caliente vista desde arriba con figuras en la espuma.
+Fila 4: (13) una vela roja encendida con la cera derramada sobre un plato; (14) una silueta humana pequeña
+rodeada de un aura de colores arcoíris; (15) un tabaco (puro) encendido en un cenicero con ceniza larga y un
+hilo de humo; (16) dos cartas de tarot de mazos distintos cruzadas en X.
+
+En el centro exacto de la composición, entre los objetos, un pequeño espacio vacío de terciopelo para colocar
+luego un logo. Partículas de luz dorada flotando, estrellas diminutas en las sombras, profundidad suave. Paleta:
+índigo, violeta oscuro, dorado y marfil. Sin texto, sin letras, sin números, sin marcas de agua, sin personas
+completas (solo la mano y la silueta indicadas).
+
+==================== PROMPT · FORMATO VERTICAL 9:16 ====================
+
+El mismo prompt, cambiando la primera frase por: "Una ilustración vertical en proporción 9:16…" y la
+disposición por: "ordenados en una cuadrícula de 4 columnas × 4 filas que ocupa el centro de la imagen,
+dejando libre el tercio superior (solo paño de terciopelo con luz de velas) y una franja inferior, para
+colocar luego títulos y el logo".
+
+==================== RÓTULOS QUE SE AGREGAN DESPUÉS (no van en Gemini) ====================
+Título: "Todo lo que puedes consultar en Arcana"
+Bajo cada objeto, en el orden de la cuadrícula:
+Carta del día · Tirada de tres · Cruz Celta · Carta astral
+Numerología · Compatibilidad · Sinastría · Lectura de la mano
+I Ching · Calendario chino · Sueños · Chocolate
+Velas · Aura · Tabaco · Lecturas cruzadas
+Pie: "Tu primera carta es gratis · miarcana.com"
