@@ -7,7 +7,7 @@ Todas las piezas de comunicación de Arcana (miarcana.com), acumuladas en un sol
 | Carpeta | Qué hay |
 |---|---|
 | `logos/` | Logotipo e iconos de la marca (SVG y PNG 192/512, versión maskable para Android). |
-| `videos/` | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral. |
+| `videos/` | Incluye `05-por-que-arcana.mp4` (comparativo, 27 s). | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral. |
 | `textos/` | Textos de publicación de cada video (TikTok e Instagram) con hashtags. |
 | `prompts/` | Prompts usados con Gemini: videos (Veo), monedas del zodíaco, Tarot Arcana (22 umbrales). Sirven para repetir el estilo. |
 | `play-store/` | Ficha de Google Play: icono 512, gráfico destacado 1024×500 y seis capturas. Los textos de la ficha están en `docs/GOOGLE-PLAY.md`. |
@@ -29,6 +29,5 @@ Clips generados con Gemini (Veo) a partir de los prompts de `prompts/`, escalado
 
 - Regenerar la cuadrícula 2 del Tarot Arcana sin títulos dentro de la imagen (ver `imagenes/fuentes-gemini/tarot-arcana-cuadricula-2-con-titulos.jpg`).
 - Tarot de Marsella: completo (78 cartas); opcional rehacer el Cuatro de Copas (salió con tres copas).
-- Video 05 "Por qué Arcana": generar los 3 clips con `prompts/video-05-por-que-arcana.txt` y pasarlos para montarlos.
 - Oráculo de los Ángeles: completo (44 cartas y reverso); opcional regenerar cartas sueltas con más diversidad de ángeles (`prompts/oraculo-angeles.txt`); prompts en `prompts/tarot-marsella.txt`, hoja de contacto en `imagenes/tarot-marsella-contacto.png`.
 - Clip 3 del video 03 (la protagonista leyendo en el teléfono), opcional.
