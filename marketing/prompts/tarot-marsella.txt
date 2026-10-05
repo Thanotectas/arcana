@@ -50,4 +50,94 @@ Las cuatro primeras posiciones ocupadas y las dos últimas celdas vacías, solo 
 3. El Juicio: un ángel con trompeta entre nubes, arriba, y abajo tres figuras desnudas, una de ellas saliendo de una tumba vista de espaldas, con las manos juntas.
 4. El Mundo: una mujer desnuda con un velo que danza dentro de una corona ovalada de laurel, con los cuatro seres (ángel, águila, león y toro) en las esquinas.
 
-(Las nueve cuadrículas de arcanos menores se escriben cuando se apruebe el estilo de los mayores.)
+
+
+==================== ESTADO (5 oct 2026) ====================
+Listas y recortadas en la app: cuadrículas 1, 2 y 4 (17 mayores) y Oros 1–6. Gemini puso cartelas con título
+(en inglés o español): se recortan y se vuelve a montar el marco, así que no importa que salgan.
+FALTA: la cuadrícula 3 (salió sin generar) y los 50 arcanos menores restantes. Los menores de Oros salieron
+con escenas (estilo pictórico, no solo pips): seguimos así, es más claro para leer.
+
+==================== CUADRÍCULA 3 (REPETIR: mayores 12–16, una celda vacía) ====================
+Cinco cartas ocupadas y la sexta celda vacía, solo fondo negro.
+1. El Colgado: un joven colgado por un pie de una viga sostenida por dos troncos podados, con la otra pierna cruzada formando un cuatro y las manos a la espalda, expresión serena.
+2. El Arcano sin nombre: un esqueleto de color carne con una guadaña, segando sobre un campo negro del que brotan cabezas, manos y pies.
+3. La Templanza: un ángel de pie, con alas rojas, vertiendo agua de un cántaro azul a otro rojo.
+4. El Diablo: una figura con cuernos, alas de murciélago y pies con garras, de pie sobre un pedestal al que están atados por el cuello dos diablillos pequeños con cuernos.
+5. La Casa de Dios: una torre de ladrillo rojo con la corona de la cúspide volando por un rayo de fuego multicolor, y dos figuras cayendo de cabeza entre esferas de colores.
+
+==================== ARCANOS MENORES: NOTA DE ESTILO (añadir al estilo maestro) ====================
+Mismo grabado y mismos colores planos que las cartas ya aprobadas (adjuntar la cuadrícula de Oros 1–6 como
+referencia). Cada carta muestra una escena sencilla con el número exacto de símbolos del palo bien visibles:
+oros = monedas doradas con una estrella de cinco puntas; copas = cálices dorados; espadas = espadas rectas de
+hoja gris; bastos = varas de madera con brotes verdes. Cuenta los símbolos con cuidado: deben ser exactamente
+los que se indican.
+
+==================== OROS 2 (7–10 y Sota, Caballero) ====================
+1. Siete de Oros: un campesino apoyado en su azada contempla una planta con siete monedas colgando como frutos.
+2. Ocho de Oros: un artesano sentado en un banco cincela una moneda; otras siete, terminadas, cuelgan en fila de un poste.
+3. Nueve de Oros: una dama con vestido largo en un viñedo, un halcón en la mano enguantada y nueve monedas entre las vides.
+4. Diez de Oros: un anciano sentado con dos perros a la entrada de un arco, una pareja y un niño detrás; diez monedas repartidas por la escena.
+5. Sota de Oros: un joven de pie en un prado sostiene una sola moneda en alto, mirándola con atención.
+6. Caballero de Oros: un jinete con armadura sobre un caballo negro quieto, sosteniendo una moneda delante de un campo labrado.
+
+==================== OROS 3 (Reina y Rey; luego Copas 1–4) ====================
+1. Reina de Oros: una reina sentada en un trono tallado con frutos, una moneda en el regazo, un conejo a sus pies.
+2. Rey de Oros: un rey en un trono con cabezas de toro, un cetro y una moneda sobre la rodilla, con vides y un castillo detrás.
+3. As de Copas: una mano que sale de una nube sostiene un cáliz del que brotan cinco chorros de agua sobre un estanque con nenúfares; una paloma desciende.
+4. Dos de Copas: un joven y una joven de pie frente a frente se entregan dos cálices; sobre ellos un caduceo con un león alado.
+5. Tres de Copas: tres mujeres con guirnaldas alzan tres cálices en un brindis entre frutos del campo.
+6. Cuatro de Copas: un joven sentado bajo un árbol con los brazos cruzados mira tres cálices en el suelo mientras una mano en una nube le ofrece un cuarto.
+
+==================== COPAS 2 (5–10) ====================
+1. Cinco de Copas: una figura con capa negra, de espaldas, mira tres cálices volcados; dos siguen de pie detrás; un río y un puente al fondo.
+2. Seis de Copas: en un jardín, un niño ofrece a una niña un cáliz con una flor blanca; seis cálices con flores en total.
+3. Siete de Copas: una silueta oscura frente a siete cálices que flotan en una nube, cada uno con algo distinto: un rostro, una torre, joyas, una corona de laurel, un dragón, una serpiente, una figura velada.
+4. Ocho de Copas: una figura con bastón se aleja de noche hacia unas montañas bajo una luna; deja atrás ocho cálices apilados.
+5. Nueve de Copas: un hombre satisfecho sentado con los brazos cruzados ante un banco en arco con nueve cálices alineados.
+6. Diez de Copas: una pareja abrazada con los brazos alzados y dos niños que bailan, bajo un arcoíris con diez cálices; una casa a lo lejos.
+
+==================== COPAS 3 (Sota a Rey; luego Espadas 1–2) ====================
+1. Sota de Copas: un joven con gorro y túnica de flores sostiene un cáliz del que asoma un pez; el mar al fondo.
+2. Caballero de Copas: un jinete con armadura y alas en el casco avanza al paso en un caballo blanco, llevando un cáliz en alto; un río y montañas.
+3. Reina de Copas: una reina sentada en un trono a la orilla del mar contempla un cáliz cerrado y ornamentado.
+4. Rey de Copas: un rey sentado en un trono de piedra sobre el mar, con un cáliz y un cetro; un pez salta a un lado y un barco al fondo.
+5. As de Espadas: una mano que sale de una nube sostiene una espada vertical coronada con una corona de la que cuelgan ramas de laurel y palma; montañas abajo.
+6. Dos de Espadas: una mujer con los ojos vendados, sentada de espaldas al mar, cruza dos espadas sobre el pecho bajo una luna creciente.
+
+==================== ESPADAS 2 (3–8) ====================
+1. Tres de Espadas: un corazón rojo atravesado por tres espadas bajo nubes de lluvia.
+2. Cuatro de Espadas: una figura yacente, como la estatua de una tumba, con las manos juntas; una espada bajo el lecho y tres colgadas en la pared, junto a una vidriera.
+3. Cinco de Espadas: un hombre sonriente recoge tres espadas mientras dos figuras se alejan derrotadas; dos espadas más en el suelo; cielo con nubes rotas.
+4. Seis de Espadas: un barquero lleva en una barca a una mujer encapuchada y un niño; seis espadas clavadas en la proa; agua tranquila adelante.
+5. Siete de Espadas: un hombre se escabulle de puntillas de un campamento de tiendas llevando cinco espadas; otras dos quedan clavadas en la tierra.
+6. Ocho de Espadas: una mujer atada y con los ojos vendados, de pie entre ocho espadas clavadas a su alrededor, en un terreno pantanoso con un castillo lejano.
+
+==================== ESPADAS 3 (9–10, Sota a Rey) ====================
+1. Nueve de Espadas: una persona sentada en la cama se cubre el rostro con las manos; nueve espadas horizontales en la pared oscura; la colcha con rosas y signos del zodiaco.
+2. Diez de Espadas: una figura tendida boca abajo con diez espadas clavadas en la espalda, bajo un cielo negro que aclara en el horizonte.
+3. Sota de Espadas: un joven de pie en una colina ventosa sostiene una espada en alto con las dos manos, mirando a un lado; nubes rápidas.
+4. Caballero de Espadas: un jinete con armadura carga a galope con la espada en alto, el caballo con los ojos desorbitados, árboles doblados por el viento.
+5. Reina de Espadas: una reina de perfil en un trono con mariposas talladas, la espada vertical en la mano derecha y la izquierda extendida; nubes bajas.
+6. Rey de Espadas: un rey de frente en un trono con mariposas, la espada ligeramente inclinada, cielo con pocas nubes y dos pájaros.
+
+==================== BASTOS 1 (1–6) ====================
+1. As de Bastos: una mano que sale de una nube sostiene una vara con brotes; un castillo sobre una colina al fondo.
+2. Dos de Bastos: un hombre de espaldas sobre la terraza de un castillo sostiene un globo terráqueo y una vara; otra vara fija a la pared; el mar al fondo.
+3. Tres de Bastos: un hombre de espaldas sobre un acantilado mira barcos en el mar; tres varas clavadas junto a él.
+4. Cuatro de Bastos: cuatro varas sostienen una guirnalda de flores como un arco; detrás, dos personas celebran con ramos frente a un castillo.
+5. Cinco de Bastos: cinco jóvenes blanden varas en una pelea desordenada, sin herirse.
+6. Seis de Bastos: un jinete con corona de laurel y una vara con otra corona de laurel avanza entre gente que alza cinco varas más.
+
+==================== BASTOS 2 (7–10, Sota, Caballero) ====================
+1. Siete de Bastos: un hombre en lo alto de una colina se defiende con una vara de seis varas que suben desde abajo.
+2. Ocho de Bastos: ocho varas volando en diagonal por el cielo sobre un paisaje con un río; sin personas.
+3. Nueve de Bastos: un hombre vendado, en guardia, se apoya en una vara ante una fila de ocho varas clavadas detrás.
+4. Diez de Bastos: un hombre encorvado carga un haz de diez varas hacia una casa lejana.
+5. Sota de Bastos: un joven con túnica de salamandras sostiene una vara alta mirándola; pirámides al fondo.
+6. Caballero de Bastos: un jinete con armadura y penacho sobre un caballo rojo encabritado, vara en mano, en un paisaje desértico.
+
+==================== BASTOS 3 (Reina y Rey, cuatro celdas vacías) ====================
+Dos cartas ocupadas y las otras cuatro celdas vacías, solo fondo negro.
+1. Reina de Bastos: una reina en un trono con leones tallados sostiene una vara y un girasol; un gato negro sentado a sus pies.
+2. Rey de Bastos: un rey sentado de perfil en un trono con leones y salamandras, una vara en la mano y una salamandra pequeña a su lado.

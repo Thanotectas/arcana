@@ -1,18 +1,25 @@
 import type { CartaTarot, Palo } from "@/lib/tarot/deck";
 import type { IdMazo } from "@/lib/tarot/mazos";
 import { CaraDibujada } from "./CaraDibujada";
+import { CON_IMAGEN_MARSELLA } from "@/lib/tarot/imagenes-marsella";
 
 const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
 const SIMBOLO_PALO: Record<string, string> = { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" };
 const PALO_POR_SIMBOLO: Record<string, Palo | undefined> = { "🜂": "bastos", "🜄": "copas", "🜁": "espadas", "🜃": "oros" };
 const NOMBRE_CORTE: Record<number, string> = { 11: "Sota", 12: "Caballero", 13: "Reina", 14: "Rey" };
 
-/** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). */
-export const MAZOS_CON_IMAGEN: ReadonlySet<IdMazo> = new Set<IdMazo>(["rider", "arcana"]);
+/** Mazos con ilustración propia por carta (public/cartas/<mazo>/<id>.webp). Marsella la tiene parcial. */
+export const MAZOS_CON_IMAGEN: ReadonlySet<IdMazo> = new Set<IdMazo>(["rider", "arcana", "marsella"]);
+
+/** ¿Existe la ilustración de esta carta en este mazo? */
+export function tieneImagen(mazo: IdMazo, id: string) {
+  if (mazo === "marsella") return CON_IMAGEN_MARSELLA.has(id);
+  return MAZOS_CON_IMAGEN.has(mazo);
+}
 
 /** Ruta de la ilustración real de la carta, si el mazo la tiene. */
 export function imagenCarta(carta: CartaTarot, mazo: IdMazo = "rider") {
-  return MAZOS_CON_IMAGEN.has(mazo) ? `/cartas/${mazo}/${carta.id}.webp` : undefined;
+  return tieneImagen(mazo, carta.id) ? `/cartas/${mazo}/${carta.id}.webp` : undefined;
 }
 
 /** Número o rango que va arriba de la carta y símbolo central. */

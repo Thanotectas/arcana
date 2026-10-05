@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   // para que Turbopack no busque node_modules en directorios superiores.
   turbopack: { root: __dirname },
   // Las fuentes de las imágenes de vista previa se leen en tiempo de ejecución.
-  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/signos/**", "./public/animales/**"], "/api/redes/carta-dia": ["./public/cartas/rider/**", "./public/cartas/arcana/**"], "/api/lecturas/[id]/pdf": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/signos/**", "./public/animales/**", "./public/marca/**"] },
+  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/signos/**", "./public/animales/**"], "/api/redes/carta-dia": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**"], "/api/lecturas/[id]/pdf": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/signos/**", "./public/animales/**", "./public/marca/**"] },
   // El generador de PDF trae sus propios binarios de fuentes: mejor sin empaquetar.
   serverExternalPackages: ["@react-pdf/renderer"],
   async headers() {
