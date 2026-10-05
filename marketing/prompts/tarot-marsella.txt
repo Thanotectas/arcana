@@ -53,13 +53,12 @@ Las cuatro primeras posiciones ocupadas y las dos últimas celdas vacías, solo 
 
 
 ==================== ESTADO (5 oct 2026) ====================
-Listas y recortadas en la app: cuadrículas 1, 2 y 4 (17 mayores) y Oros 1–6. Gemini puso cartelas con título
+Listas y recortadas en la app: los 22 arcanos mayores (cuadrículas 1 a 4) y Oros 1–6. Gemini puso cartelas con título
 (en inglés o español): se recortan y se vuelve a montar el marco, así que no importa que salgan.
-FALTA: la cuadrícula 3 (salió sin generar) y los 50 arcanos menores restantes. Los menores de Oros salieron
+FALTA: los 50 arcanos menores restantes (Oros 7–Rey, Copas, Espadas y Bastos). Los menores de Oros salieron
 con escenas (estilo pictórico, no solo pips): seguimos así, es más claro para leer.
 
-==================== CUADRÍCULA 3 (REPETIR: mayores 12–16, una celda vacía) ====================
-Cinco cartas ocupadas y la sexta celda vacía, solo fondo negro.
+==================== CUADRÍCULA 3 (ya generada el 5 oct; se deja por si hay que repetirla) ====================
 1. El Colgado: un joven colgado por un pie de una viga sostenida por dos troncos podados, con la otra pierna cruzada formando un cuatro y las manos a la espalda, expresión serena.
 2. El Arcano sin nombre: un esqueleto de color carne con una guadaña, segando sobre un campo negro del que brotan cabezas, manos y pies.
 3. La Templanza: un ángel de pie, con alas rojas, vertiendo agua de un cántaro azul a otro rojo.

@@ -28,5 +28,5 @@ Clips generados con Gemini (Veo) a partir de los prompts de `prompts/`, escalado
 ## Pendientes
 
 - Regenerar la cuadrícula 2 del Tarot Arcana sin títulos dentro de la imagen (ver `imagenes/fuentes-gemini/tarot-arcana-cuadricula-2-con-titulos.jpg`).
-- Tarot de Marsella: faltan la cuadrícula 3 (mayores 12–16) y los menores salvo Oros 1–6; prompts en `prompts/tarot-marsella.txt`, hoja de contacto en `imagenes/tarot-marsella-contacto.png`.
+- Tarot de Marsella: los 22 mayores están; faltan los menores salvo Oros 1–6; prompts en `prompts/tarot-marsella.txt`, hoja de contacto en `imagenes/tarot-marsella-contacto.png`.
 - Clip 3 del video 03 (la protagonista leyendo en el teléfono), opcional.

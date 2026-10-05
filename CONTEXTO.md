@@ -105,7 +105,7 @@ Qué trae:
 ## Tarot de Marsella ilustrado (5 oct 2026, parcial)
 
 - Gemini generó cuadrículas de 6 cartas en estilo xilografía (`marketing/prompts/tarot-marsella.txt`, fuentes en `marketing/imagenes/fuentes-gemini/marsella-*.jpg`). El script del cuaderno de trabajo detecta las líneas del marco, descarta la cartela con el título (venía en inglés o español) y monta la ilustración en un marco de Marsella propio (línea negra + filete rojo sobre crema) a 500×750 → `public/cartas/marsella/<id>.webp`.
-- Cobertura actual: 17 mayores (faltan El Colgado, El Arcano sin nombre, La Templanza, El Diablo y La Casa de Dios) y Oros 1–6. La lista de cartas con imagen vive en `src/lib/tarot/imagenes-marsella.ts` (`CON_IMAGEN_MARSELLA`); `tieneImagen(mazo, id)` en `CartaVisual` decide por carta, y las que faltan siguen con `CaraDibujada`. Todo el mazo (y el dorso) pasa a proporción 2:3 para que las cartas con imagen y las dibujadas midan lo mismo; el SVG dibujado usa `meet` en Marsella. Al añadir archivos hay que actualizar esa lista. Prompts de la cuadrícula 3 y de los 50 menores restantes ya escritos (escenas, no solo pips).
+- Cobertura actual: los 22 mayores y Oros 1–6 (faltan 50 menores). La lista de cartas con imagen vive en `src/lib/tarot/imagenes-marsella.ts` (`CON_IMAGEN_MARSELLA`); `tieneImagen(mazo, id)` en `CartaVisual` decide por carta, y las que faltan siguen con `CaraDibujada`. Todo el mazo (y el dorso) pasa a proporción 2:3 para que las cartas con imagen y las dibujadas midan lo mismo; el SVG dibujado usa `meet` en Marsella. Al añadir archivos hay que actualizar esa lista. Prompts de los 50 menores restantes ya escritos (escenas, no solo pips).
 
 ## Correos de Sibila y PDF de lecturas (4 oct 2026)
 
