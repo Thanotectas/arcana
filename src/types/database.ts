@@ -130,6 +130,28 @@ type SuscripcionPushRow = {
   creado_en: string;
 };
 
+type PublicacionProgramadaRow = {
+  id: string;
+  semana: string;
+  fecha: string;
+  tipo: "guia" | "pregunta" | "producto" | "oferta" | "luna" | "signo" | "reflexion";
+  redes: string[];
+  etiqueta: string;
+  titulo: string;
+  extracto: string;
+  texto: string;
+  simbolos: string[];
+  carta: string | null;
+  enlace: string;
+  pie: string;
+  estado: "borrador" | "aprobada" | "publicando" | "publicada" | "descartada" | "error";
+  resultados: Record<string, { id?: string; error?: string }>;
+  detalle: string | null;
+  creado_en: string;
+  actualizado_en: string;
+  publicado_en: string | null;
+};
+
 type PublicacionRedRow = {
   id: number;
   red: string;
@@ -211,6 +233,12 @@ export type Database = {
         Row: PublicacionRedRow;
         Insert: Insertable<PublicacionRedRow, "id" | "estado" | "referencia" | "detalle" | "creado_en">;
         Update: Partial<PublicacionRedRow>;
+        Relationships: [];
+      };
+      publicaciones_programadas: {
+        Row: PublicacionProgramadaRow;
+        Insert: Insertable<PublicacionProgramadaRow, "id" | "redes" | "simbolos" | "carta" | "enlace" | "pie" | "estado" | "resultados" | "detalle" | "creado_en" | "actualizado_en" | "publicado_en">;
+        Update: Partial<PublicacionProgramadaRow>;
         Relationships: [];
       };
       horoscopos: {

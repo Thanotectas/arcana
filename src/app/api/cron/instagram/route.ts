@@ -5,6 +5,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { instagramConfigurado, publicarImagen } from "@/lib/redes/instagram";
 import { facebookConfigurado, publicarFotoFacebook } from "@/lib/redes/facebook";
 import { cartaDelDia, fechaBogota, textoCartaDelDia } from "@/lib/redes/carta-dia";
+import { publicarVencidas, type ResultadoPublicacion } from "@/lib/redes/publicar";
+import { asegurarBorradores } from "@/lib/redes/agente";
 
 // Meta procesa la imagen antes de publicarla: puede tardar un minuto.
 export const maxDuration = 120;
@@ -56,7 +58,8 @@ async function publicarEn(admin: SupabaseClient<Database>, red: Red, fecha: stri
 /**
  * Cron diario (vercel.json, 12:00 UTC = 07:00 Bogotá): publica la carta del día
  * de Arcana en Instagram y en la página de Facebook. Una segunda corrida (17:00
- * UTC) solo actúa en la red que falló. Vercel manda `Authorization: Bearer CRON_SECRET`.
+ * UTC) solo actúa en la red que falló y, además, publica las publicaciones
+ * aprobadas del agente de redes. Vercel manda `Authorization: Bearer CRON_SECRET`.
  */
 export async function GET(request: Request) {
   const secreto = process.env.CRON_SECRET;
@@ -76,6 +79,18 @@ export async function GET(request: Request) {
   const instagram: Resultado = instagramConfigurado() ? await publicarEn(admin, "instagram", fecha, () => publicarImagen(imagen, texto)) : { omitida: "sin_configurar" };
   const facebook: Resultado = facebookConfigurado() ? await publicarEn(admin, "facebook", fecha, () => publicarFotoFacebook(imagen, texto)) : { omitida: "sin_configurar" };
 
-  const fallo = "error" in instagram || "error" in facebook;
-  return Response.json({ fecha, carta: carta.nombre, instagram, facebook }, { status: fallo ? 502 : 200 });
+  // Agente de redes: la corrida de la tarde (17:00 UTC = mediodía en Bogotá)
+  // publica lo aprobado; cualquier corrida redacta los borradores que falten.
+  let programadas: ResultadoPublicacion[] = [];
+  let agente: unknown = null;
+  try {
+    if (new Date().getUTCHours() >= 15) programadas = await publicarVencidas(admin, fecha);
+    agente = await asegurarBorradores(admin, fecha);
+  } catch (e) {
+    agente = { error: e instanceof Error ? e.message : String(e) };
+    console.error("[cron agente redes]", agente);
+  }
+
+  const fallo = "error" in instagram || "error" in facebook || programadas.some((p) => p.estado === "error");
+  return Response.json({ fecha, carta: carta.nombre, instagram, facebook, programadas, agente }, { status: fallo ? 502 : 200 });
 }
