@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Coins } from "lucide-react";
+import { Coins, ShieldCheck } from "lucide-react";
 import { Logotipo } from "./Logo";
-import { getPerfil } from "@/lib/dal";
+import { getPerfil, getUsuarioOpcional } from "@/lib/dal";
+import { esAdmin } from "@/lib/admin";
 import { accionSalir } from "@/lib/auth/acciones";
 import { getT } from "@/lib/i18n/servidor";
 import { SelectorIdioma } from "./SelectorIdioma";
@@ -11,7 +12,9 @@ import { MenuLecturas } from "./MenuLecturas";
 import { MenuMovil } from "./MenuMovil";
 
 export async function Encabezado() {
-  const [perfil, t, compras] = await Promise.all([getPerfil(), getT(), comprasVisibles()]);
+  const [perfil, t, compras, usuario] = await Promise.all([getPerfil(), getT(), comprasVisibles(), getUsuarioOpcional()]);
+  // Acceso visible a /admin solo para las cuentas administradoras.
+  const admin = Boolean(perfil) && esAdmin(usuario?.email);
   const items = catalogoConTextos(t, { conCuenta: Boolean(perfil) });
   const grupos = t.nav.grupos as Record<GrupoCatalogo, string>;
   const directos = [
@@ -21,6 +24,7 @@ export async function Encabezado() {
   ];
   const enlacesCuenta = perfil
     ? [
+        ...(admin ? [{ href: "/admin", etiqueta: "Administración" }] : []),
         ...(compras ? [{ href: "/creditos", etiqueta: t.nav.creditos }] : []),
         { href: "/invitar", etiqueta: t.invitar.seccion },
         { href: "/cuenta", etiqueta: t.comun.miCuenta },
@@ -51,6 +55,17 @@ export async function Encabezado() {
           <SelectorIdioma />
           {perfil ? (
             <>
+              {admin && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-1.5 rounded-full border border-exito/50 bg-exito/10 px-3 py-1.5 text-sm font-medium text-exito transition hover:bg-exito/20"
+                  title="Administración"
+                >
+                  <ShieldCheck className="h-4 w-4" aria-hidden />
+                  <span className="hidden sm:inline">Admin</span>
+                  <span className="sr-only sm:hidden">Administración</span>
+                </Link>
+              )}
               <Link
                 href={compras ? "/creditos" : "/cuenta"}
                 className="flex items-center gap-1.5 rounded-full border border-oro/40 bg-oro/10 px-3 py-1.5 text-sm font-medium text-oro-suave transition hover:bg-oro/20"
