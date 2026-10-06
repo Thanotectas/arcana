@@ -152,6 +152,18 @@ type PublicacionProgramadaRow = {
   publicado_en: string | null;
 };
 
+type MensajeWhatsappRow = {
+  id: number;
+  telefono: string;
+  nombre: string | null;
+  rol: "persona" | "asistente";
+  contenido: string;
+  id_meta: string | null;
+  tipo: string;
+  humano: boolean;
+  creado_en: string;
+};
+
 type PublicacionRedRow = {
   id: number;
   red: string;
@@ -233,6 +245,12 @@ export type Database = {
         Row: PublicacionRedRow;
         Insert: Insertable<PublicacionRedRow, "id" | "estado" | "referencia" | "detalle" | "creado_en">;
         Update: Partial<PublicacionRedRow>;
+        Relationships: [];
+      };
+      mensajes_whatsapp: {
+        Row: MensajeWhatsappRow;
+        Insert: Insertable<MensajeWhatsappRow, "id" | "nombre" | "id_meta" | "tipo" | "humano" | "creado_en">;
+        Update: Partial<MensajeWhatsappRow>;
         Relationships: [];
       };
       publicaciones_programadas: {

@@ -1,0 +1,96 @@
+import "server-only";
+import { createHmac, timingSafeEqual } from "crypto";
+
+/**
+ * API de WhatsApp Business (Meta Cloud API) para la línea de atención de
+ * Arcana. Variables: WA_PHONE_NUMBER_ID (id del número en Meta), WA_TOKEN
+ * (token permanente de usuario del sistema con whatsapp_business_messaging),
+ * WA_VERIFY_TOKEN (palabra que se escribe al registrar el webhook) y
+ * WA_APP_SECRET (secreto de la app, para verificar la firma de cada aviso).
+ */
+const API = "https://graph.facebook.com/v25.0";
+
+export function whatsappConfigurado() {
+  return Boolean(process.env.WA_PHONE_NUMBER_ID && process.env.WA_TOKEN && process.env.WA_VERIFY_TOKEN);
+}
+
+/** Firma X-Hub-Signature-256 de Meta: HMAC-SHA256 del cuerpo con el secreto de la app. */
+export function firmaValida(cuerpo: string, cabecera: string | null) {
+  const secreto = process.env.WA_APP_SECRET;
+  if (!secreto) return true; // sin secreto configurado no se exige firma (solo para pruebas)
+  if (!cabecera?.startsWith("sha256=")) return false;
+  const esperada = createHmac("sha256", secreto).update(cuerpo).digest("hex");
+  const recibida = cabecera.slice(7);
+  return esperada.length === recibida.length && timingSafeEqual(Buffer.from(esperada), Buffer.from(recibida));
+}
+
+async function llamar(cuerpo: Record<string, unknown>) {
+  const res = await fetch(`${API}/${process.env.WA_PHONE_NUMBER_ID}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.WA_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo }),
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as { messages?: { id: string }[]; error?: { message?: string; code?: number } };
+  if (!res.ok || datos.error) {
+    const e = datos.error;
+    throw new Error(`WhatsApp: ${e?.message ?? res.status}${e?.code ? ` (código ${e.code})` : ""}`);
+  }
+  return datos.messages?.[0]?.id ?? "";
+}
+
+export function enviarTexto(para: string, texto: string) {
+  return llamar({ to: para, type: "text", text: { body: texto.slice(0, 4000), preview_url: true } });
+}
+
+export function enviarImagen(para: string, url: string, pie?: string) {
+  return llamar({ to: para, type: "image", image: { link: url, caption: pie?.slice(0, 1024) } });
+}
+
+/** Marca el mensaje como leído (los dos chulos azules) para que la persona sepa que llegó. */
+export async function marcarLeido(idMensaje: string) {
+  try {
+    await llamar({ status: "read", message_id: idMensaje });
+  } catch {
+    // No importa si falla.
+  }
+}
+
+// --- Forma del aviso que manda Meta --------------------------------------
+export interface MensajeEntrante {
+  id: string;
+  from: string;
+  timestamp: string;
+  type: string;
+  text?: { body: string };
+}
+
+export interface AvisoWhatsapp {
+  object?: string;
+  entry?: {
+    changes?: {
+      field?: string;
+      value?: {
+        metadata?: { phone_number_id?: string };
+        contacts?: { wa_id: string; profile?: { name?: string } }[];
+        messages?: MensajeEntrante[];
+        statuses?: unknown[];
+      };
+    }[];
+  }[];
+}
+
+/** Mensajes dirigidos a nuestro número, con el nombre del contacto. */
+export function extraerMensajes(aviso: AvisoWhatsapp): { mensaje: MensajeEntrante; nombre: string | null }[] {
+  const propio = process.env.WA_PHONE_NUMBER_ID;
+  const lista: { mensaje: MensajeEntrante; nombre: string | null }[] = [];
+  for (const entrada of aviso.entry ?? []) {
+    for (const cambio of entrada.changes ?? []) {
+      const v = cambio.value;
+      if (!v?.messages || (propio && v.metadata?.phone_number_id && v.metadata.phone_number_id !== propio)) continue;
+      const nombres = new Map((v.contacts ?? []).map((c) => [c.wa_id, c.profile?.name ?? null]));
+      for (const m of v.messages) lista.push({ mensaje: m, nombre: nombres.get(m.from) ?? null });
+    }
+  }
+  return lista;
+}
