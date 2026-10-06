@@ -42,7 +42,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 ## Base de datos
 
-Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0021_prueba_y_fundadores.sql` (5 de octubre de 2026). Pendientes: `0022_publicaciones_facebook.sql` (red `facebook` en `publicaciones_redes`), `0023_correos_probadores.sql` (tipo `probadores` en `correos`) y `0024_publicaciones_programadas.sql` (agente de redes); la próxima que se cree es la **0025**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, todas aplicadas en producción hasta la `0024_publicaciones_programadas.sql` (6 de octubre de 2026); no hay ninguna pendiente y la próxima que se cree es la **0025**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
