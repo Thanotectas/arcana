@@ -65,3 +65,27 @@ se guarda con `tipo = 'humano'` y se muestra como "Tú"); Meta solo admite
 texto libre dentro de las 24 horas siguientes al último mensaje de la persona.
 Sibila sigue respondiendo a los mensajes nuevos. El panel también muestra el
 estado del número según Meta y permite registrarlo por API con el PIN.
+
+## Estado (6 oct 2026)
+
+En producción y respondiendo. App de Meta "Thanotectas Automation"
+(728785650291159), portafolio thanotectas, cuenta de WhatsApp Business
+"Arcana" (1570178747677729), número +57 300 127 7552 con identificador
+1332584673277088, registrado en la API de la nube. El número ya no existe
+en la app del celular: las conversaciones se atienden en `/admin/whatsapp`.
+Token permanente del usuario del sistema `arcana-api`.
+
+## Problemas que aparecieron al configurarlo
+
+- **"Este número ya está registrado con una cuenta de WhatsApp"**: hubo que
+  eliminar la cuenta en la app del celular y esperar unos minutos.
+- **"No se pudo registrar" / cuenta en "Pending review"**: Meta revisa la
+  cuenta nueva y el nombre; el registro se habilitó solo al terminar.
+- **Webhook con 401 "firma inválida" en el log**: `WA_APP_SECRET` no era la
+  clave secreta de la app. Es la de Configuración de la app → Básica (32
+  caracteres hexadecimales), no el token de cliente ni el id de la app.
+  Meta pide la contraseña de la cuenta personal de Facebook para mostrarla.
+- **Dos chulos grises sin respuesta**: el mensaje llegó a WhatsApp pero no a
+  Arcana (o Arcana lo rechazó). Mirar Vercel → Logs filtrando `whatsapp`:
+  sin líneas = Meta no envía (app sin publicar, webhook sin suscribir);
+  401 = firma; "aviso recibido" + error = fallo al responder.
