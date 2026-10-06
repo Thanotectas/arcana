@@ -94,3 +94,44 @@ export function extraerMensajes(aviso: AvisoWhatsapp): { mensaje: MensajeEntrant
   }
   return lista;
 }
+
+// --- Registro y estado del número (para /admin/whatsapp) -------------------
+export interface EstadoNumero {
+  verified_name?: string;
+  display_phone_number?: string;
+  code_verification_status?: string;
+  status?: string;
+  quality_rating?: string;
+  name_status?: string;
+  platform_type?: string;
+}
+
+/** Estado del número según Meta: nombre verificado, verificación, calidad, plataforma. */
+export async function estadoNumero(): Promise<EstadoNumero> {
+  const res = await fetch(`${API}/${process.env.WA_PHONE_NUMBER_ID}?fields=verified_name,display_phone_number,code_verification_status,status,quality_rating,name_status,platform_type`, {
+    headers: { Authorization: `Bearer ${process.env.WA_TOKEN}` },
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as EstadoNumero & { error?: { message?: string; code?: number } };
+  if (!res.ok || datos.error) throw new Error(`WhatsApp: ${datos.error?.message ?? res.status}${datos.error?.code ? ` (código ${datos.error.code})` : ""}`);
+  return datos;
+}
+
+/**
+ * Registra el número en la API de la nube con un PIN de seis dígitos
+ * (verificación en dos pasos). Equivale al botón "Registrar" del panel de
+ * Meta, que a veces falla sin explicación.
+ */
+export async function registrarNumero(pin: string): Promise<void> {
+  const res = await fetch(`${API}/${process.env.WA_PHONE_NUMBER_ID}/register`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.WA_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messaging_product: "whatsapp", pin }),
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as { success?: boolean; error?: { message?: string; code?: number; error_subcode?: number } };
+  if (!res.ok || datos.error) {
+    const e = datos.error;
+    throw new Error(`WhatsApp register: ${e?.message ?? res.status}${e?.code ? ` (código ${e.code}${e.error_subcode ? `/${e.error_subcode}` : ""})` : ""}`);
+  }
+}

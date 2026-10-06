@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { whatsappConfigurado } from "@/lib/whatsapp/api";
+import { estadoNumero, whatsappConfigurado, type EstadoNumero } from "@/lib/whatsapp/api";
+import { RegistroWhatsapp } from "@/components/admin/RegistroWhatsapp";
 
 export const metadata: Metadata = { title: "WhatsApp", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -23,6 +24,15 @@ function hora(iso: string) {
 /** Conversaciones recientes de la línea de WhatsApp atendida por Sibila. Solo administración. */
 export default async function PaginaWhatsapp() {
   await requerirAdmin();
+  let numero: EstadoNumero | null = null;
+  let errorNumero: string | null = null;
+  if (whatsappConfigurado()) {
+    try {
+      numero = await estadoNumero();
+    } catch (e) {
+      errorNumero = e instanceof Error ? e.message : String(e);
+    }
+  }
   const { data } = await getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, humano, creado_en").order("creado_en", { ascending: false }).limit(400);
   const mensajes = (data ?? []) as Mensaje[];
   const porTelefono = new Map<string, Mensaje[]>();
@@ -39,6 +49,24 @@ export default async function PaginaWhatsapp() {
           {whatsappConfigurado() ? "La línea está conectada." : <span className="text-peligro">Falta configurar WA_PHONE_NUMBER_ID, WA_TOKEN y WA_VERIFY_TOKEN.</span>}
         </p>
       </div>
+
+      {whatsappConfigurado() && (
+        <section className="tarjeta space-y-4 p-5">
+          <h2 className="font-display text-2xl font-semibold">Estado del número</h2>
+          {errorNumero && <p className="text-sm text-peligro">{errorNumero}</p>}
+          {numero && (
+            <dl className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+              <dt className="text-texto-suave">Número</dt><dd>{numero.display_phone_number ?? "—"}</dd>
+              <dt className="text-texto-suave">Nombre verificado</dt><dd>{numero.verified_name ?? "—"} {numero.name_status ? <span className="text-texto-suave">({numero.name_status})</span> : null}</dd>
+              <dt className="text-texto-suave">Verificación del código</dt><dd>{numero.code_verification_status ?? "—"}</dd>
+              <dt className="text-texto-suave">Estado</dt><dd className={numero.status === "CONNECTED" ? "text-exito" : "text-oro-suave"}>{numero.status ?? "—"}</dd>
+              <dt className="text-texto-suave">Plataforma</dt><dd>{numero.platform_type ?? "—"}</dd>
+              <dt className="text-texto-suave">Calidad</dt><dd>{numero.quality_rating ?? "—"}</dd>
+            </dl>
+          )}
+          {numero?.status !== "CONNECTED" && <RegistroWhatsapp />}
+        </section>
+      )}
 
       {conversaciones.length === 0 && <p className="text-sm text-texto-suave">Todavía no ha escrito nadie.</p>}
 
