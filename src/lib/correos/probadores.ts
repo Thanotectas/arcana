@@ -2,12 +2,6 @@ import "server-only";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { escaparHtml, sitio } from "@/lib/correo";
 
-/** Correos con acceso a /correos/probadores (separados por comas). */
-export function esAdministrador(correo: string | null | undefined) {
-  const lista = (process.env.ARCANA_ADMINS ?? "lualzaja@gmail.com").split(",").map((c) => c.trim().toLowerCase());
-  return Boolean(correo) && lista.includes(correo!.toLowerCase());
-}
-
 export interface Probador {
   id: string;
   correo: string;

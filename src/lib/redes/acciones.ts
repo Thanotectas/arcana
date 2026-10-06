@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { requerirAdmin } from "./admin";
+import { requerirAdmin } from "@/lib/admin";
 import { generarSemana, lunesDe, sumarDias } from "./calendario";
 import { publicarProgramada } from "./publicar";
 import { fechaBogota } from "./carta-dia";

@@ -1,16 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { requerirUsuario } from "@/lib/dal";
+import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo, urlBaja } from "@/lib/correo";
-import { correoProbador, esAdministrador, probadores } from "@/lib/correos/probadores";
+import { correoProbador, probadores } from "@/lib/correos/probadores";
 
 /** Envía el agradecimiento a los probadores que aún no lo recibieron. */
 export async function accionEnviarProbadores() {
-  const usuario = await requerirUsuario();
-  if (!esAdministrador(usuario.email)) redirect("/inicio");
-  if (!correoConfigurado()) redirect("/correos/probadores?error=sin_resend");
+  await requerirAdmin();
+  if (!correoConfigurado()) redirect("/admin/probadores?error=sin_resend");
 
   const admin = getSupabaseAdmin();
   const pendientes = (await probadores()).filter((p) => p.recibeCorreos && !p.yaEnviado);
@@ -44,5 +43,5 @@ export async function accionEnviarProbadores() {
     // Resend admite 2 peticiones por segundo.
     await new Promise((res) => setTimeout(res, 600));
   }
-  redirect(`/correos/probadores?enviados=${enviados}&fallidos=${fallidos}`);
+  redirect(`/admin/probadores?enviados=${enviados}&fallidos=${fallidos}`);
 }

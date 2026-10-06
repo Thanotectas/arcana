@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { requerirUsuario } from "@/lib/dal";
-import { esAdministrador, probadores } from "@/lib/correos/probadores";
+import { requerirAdmin } from "@/lib/admin";
+import { probadores } from "@/lib/correos/probadores";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { accionEnviarProbadores } from "./acciones";
 
@@ -10,14 +9,16 @@ export const dynamic = "force-dynamic";
 
 /** Solo administración: agradecimiento a los probadores de Google Play por Resend. */
 export default async function PaginaCorreoProbadores({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const usuario = await requerirUsuario();
-  if (!esAdministrador(usuario.email)) notFound();
+  await requerirAdmin();
   const [lista, q] = await Promise.all([probadores(), searchParams]);
   const pendientes = lista.filter((p) => p.recibeCorreos && !p.yaEnviado);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="font-display text-4xl font-semibold">Correo a probadores</h1>
+      <div>
+        <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Administración</p>
+        <h1 className="font-display text-4xl font-semibold">Correo a probadores</h1>
+      </div>
       <p className="text-texto-suave">
         Agradecimiento con los créditos de cada persona, enviado por Resend como Sibila de Arcana. Las respuestas llegan al buzón de
         respuesta configurado. Cada persona lo recibe una sola vez.

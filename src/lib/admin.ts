@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { requerirUsuario } from "@/lib/dal";
 
 /**
- * Personas administradoras: correos en ADMIN_CORREOS (separados por coma).
- * Quien no lo sea recibe un 404 (la página no existe para el resto).
+ * Personas administradoras (acceso a /admin/*): correos en ADMIN_CORREOS
+ * (separados por coma; también se acepta ARCANA_ADMINS). Si no hay variable,
+ * solo la cuenta del dueño. Quien no lo sea recibe un 404.
  */
 export function correosAdmin() {
-  return (process.env.ADMIN_CORREOS ?? "")
+  return (process.env.ADMIN_CORREOS ?? process.env.ARCANA_ADMINS ?? "lualzaja@gmail.com")
     .split(",")
     .map((c) => c.trim().toLowerCase())
     .filter(Boolean);

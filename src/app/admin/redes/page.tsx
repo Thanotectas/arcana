@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requerirAdmin } from "@/lib/redes/admin";
+import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { NOMBRE_TIPO, fechaLargaEs, lunesDe, sumarDias, type PublicacionProgramada } from "@/lib/redes/calendario";
 import { urlImagenPublicacion } from "@/lib/redes/publicar";

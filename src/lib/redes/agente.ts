@@ -2,7 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
-import { correosAdmin } from "./admin";
+import { correosAdmin } from "@/lib/admin";
 import { fechaLargaEs, generarSemana, lunesDe, sumarDias, NOMBRE_TIPO, type ResultadoGeneracion } from "./calendario";
 
 /**

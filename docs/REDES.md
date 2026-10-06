@@ -46,7 +46,7 @@ publicando, publicada, descartada, error), `resultados` (id o error por red),
 
 ## Variables
 
-- `ADMIN_CORREOS`: correos administradores separados por coma.
+- `ADMIN_CORREOS`: correos administradores separados por coma (sin la variable, solo la cuenta del dueño). Vale para todo `/admin/*`.
 - Las mismas de la carta del día: `IG_USER_ID`, `IG_PAGE_TOKEN`, `FB_PAGE_ID`,
   `FB_PAGE_TOKEN` (opcional), `CRON_SECRET`, `RESEND_API_KEY` para el aviso.
 
