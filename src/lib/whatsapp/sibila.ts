@@ -100,7 +100,8 @@ export async function atender(admin: SupabaseClient<Database>, telefono: string,
   const { error } = await admin.from("mensajes_whatsapp").insert({ telefono, nombre, rol: "persona", contenido: texto.slice(0, 4000), id_meta: idMeta });
   if (error) {
     if (error.code === "23505") return "duplicado";
-    throw new Error(`guardar: ${error.message}`);
+    // Si la tabla falla (p. ej. migración sin aplicar), Sibila responde igual, sin historial.
+    console.error("[whatsapp] no se pudo guardar el mensaje:", error.message);
   }
 
   if ((await mensajesHoy(admin, telefono)) > MAXIMO_POR_DIA) {
@@ -126,7 +127,8 @@ export async function atender(admin: SupabaseClient<Database>, telefono: string,
   if (!respuesta) respuesta = "Aquí estoy 🌙 ¿En qué te ayudo con Arcana?";
 
   await enviarTexto(telefono, respuesta);
-  await admin.from("mensajes_whatsapp").insert({ telefono, nombre, rol: "asistente", contenido: respuesta, humano: pideHumano });
+  const { error: errorRespuesta } = await admin.from("mensajes_whatsapp").insert({ telefono, nombre, rol: "asistente", contenido: respuesta, humano: pideHumano });
+  if (errorRespuesta) console.error("[whatsapp] no se pudo guardar la respuesta:", errorRespuesta.message);
 
   if (mandaCarta) {
     const fecha = fechaBogota();

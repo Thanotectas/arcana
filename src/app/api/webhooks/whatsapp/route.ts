@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, motivo: "json" });
   }
   const mensajes = extraerMensajes(aviso);
+  console.info(`[whatsapp] aviso recibido: ${mensajes.length} mensaje(s)`);
   if (!mensajes.length) return NextResponse.json({ ok: true, ignorado: "sin_mensajes" });
 
   // Respondemos a Meta de inmediato y atendemos después (reintentaría si tardamos).
