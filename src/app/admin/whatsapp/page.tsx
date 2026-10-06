@@ -66,7 +66,7 @@ export default async function PaginaWhatsapp() {
               <dt className="text-texto-suave">Calidad</dt><dd>{numero.quality_rating ?? "—"}</dd>
             </dl>
           )}
-          {numero?.status !== "CONNECTED" && <RegistroWhatsapp />}
+          {numero?.status !== "CONNECTED" && <RegistroWhatsapp verificado={numero?.code_verification_status === "VERIFIED"} />}
         </section>
       )}
 

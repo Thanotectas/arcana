@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requerirAdmin } from "@/lib/admin";
-import { enviarTexto, registrarNumero, whatsappConfigurado } from "./api";
+import { enviarTexto, pedirCodigo, registrarNumero, verificarCodigo, whatsappConfigurado } from "./api";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export interface EstadoRegistro {
@@ -44,5 +44,33 @@ export async function accionResponder(_prev: EstadoRegistro, formData: FormData)
   } catch (e) {
     const detalle = e instanceof Error ? e.message : "No se pudo enviar.";
     return { error: /131047|24 ?h|re-engagement/i.test(detalle) ? "Pasaron más de 24 horas desde su último mensaje: WhatsApp ya no permite texto libre. Espera a que vuelva a escribir." : detalle };
+  }
+}
+
+/** Pide un nuevo código de verificación por SMS o llamada. */
+export async function accionPedirCodigo(_prev: EstadoRegistro, formData: FormData): Promise<EstadoRegistro> {
+  await requerirAdmin();
+  if (!whatsappConfigurado()) return { error: "Faltan las variables WA_* en Vercel." };
+  const metodo = formData.get("metodo") === "VOICE" ? "VOICE" : "SMS";
+  try {
+    await pedirCodigo(metodo);
+    return { mensaje: metodo === "SMS" ? "Código enviado por SMS al número. Escríbelo abajo." : "Te llamarán al número con el código. Escríbelo abajo." };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo pedir el código." };
+  }
+}
+
+/** Confirma el código recibido. */
+export async function accionVerificarCodigo(_prev: EstadoRegistro, formData: FormData): Promise<EstadoRegistro> {
+  await requerirAdmin();
+  if (!whatsappConfigurado()) return { error: "Faltan las variables WA_* en Vercel." };
+  const codigo = String(formData.get("codigo") ?? "").replace(/\D/g, "");
+  if (!/^\d{6}$/.test(codigo)) return { error: "El código tiene seis dígitos." };
+  try {
+    await verificarCodigo(codigo);
+    revalidatePath("/admin/whatsapp");
+    return { mensaje: "Número verificado. Ahora pulsa «Registrar número» con tu PIN." };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo verificar." };
   }
 }

@@ -135,3 +135,27 @@ export async function registrarNumero(pin: string): Promise<void> {
     throw new Error(`WhatsApp register: ${e?.message ?? res.status}${e?.code ? ` (código ${e.code}${e.error_subcode ? `/${e.error_subcode}` : ""})` : ""}`);
   }
 }
+
+async function llamarNumero(ruta: string, cuerpo: Record<string, unknown>) {
+  const res = await fetch(`${API}/${process.env.WA_PHONE_NUMBER_ID}/${ruta}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.WA_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify(cuerpo),
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as { success?: boolean; error?: { message?: string; code?: number; error_subcode?: number; error_user_msg?: string } };
+  if (!res.ok || datos.error) {
+    const e = datos.error;
+    throw new Error(`WhatsApp ${ruta}: ${e?.error_user_msg ?? e?.message ?? res.status}${e?.code ? ` (código ${e.code}${e.error_subcode ? `/${e.error_subcode}` : ""})` : ""}`);
+  }
+}
+
+/** Pide a Meta un nuevo código de verificación del número por SMS o llamada. */
+export function pedirCodigo(metodo: "SMS" | "VOICE" = "SMS") {
+  return llamarNumero("request_code", { code_method: metodo, language: "es" });
+}
+
+/** Confirma el código recibido: el número vuelve a quedar verificado. */
+export function verificarCodigo(codigo: string) {
+  return llamarNumero("verify_code", { code: codigo });
+}
