@@ -6,7 +6,7 @@ import { requerirAdmin } from "@/lib/admin";
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
 
 const HERRAMIENTAS = [
-  { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes." },
+  { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes a las 7:00." },
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },
   { href: "/admin/probadores", icono: Mail, titulo: "Correo a probadores", texto: "Agradecimiento a quienes prueban Arcana en Google Play, con sus créditos." },
 ];

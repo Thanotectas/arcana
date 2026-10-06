@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "crypto";
+import { cronAutorizado } from "@/lib/cron";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getMensajeDeHoy, cieloDeHoyDePerfil } from "@/lib/diario";
 import { circuloActivo, type Perfil } from "@/lib/dal";
@@ -21,11 +21,8 @@ const MAXIMO_MENSAJES = 60;
  * `Authorization: Bearer CRON_SECRET`.
  */
 export async function GET(request: Request) {
-  const secreto = process.env.CRON_SECRET;
-  if (!secreto) return Response.json({ error: "sin_cron_secret" }, { status: 503 });
-  const recibido = Buffer.from(request.headers.get("authorization") ?? "");
-  const esperado = Buffer.from(`Bearer ${secreto}`);
-  if (recibido.length !== esperado.length || !timingSafeEqual(recibido, esperado)) return Response.json({ error: "no_autorizado" }, { status: 401 });
+  const rechazo = cronAutorizado(request);
+  if (rechazo) return rechazo;
 
   const admin = getSupabaseAdmin();
   const { data: filas, error } = await admin

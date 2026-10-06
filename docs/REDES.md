@@ -22,7 +22,7 @@ inserta los borradores que falten (unicidad por fecha y tipo).
 
 ## Flujo
 
-1. **Generación**: el cron `/api/cron/instagram` llama a `asegurarBorradores`
+1. **Generación**: la ruta `/api/cron/instagram` (la llaman los orquestadores `/api/cron/manana` y `/api/cron/tarde`; Vercel Hobby solo admite dos cron) llama a `asegurarBorradores`
    en cada corrida: crea la semana en curso si está vacía (primer arranque) y,
    de viernes a domingo, la próxima. Envía un correo a `ADMIN_CORREOS` con la
    lista y el botón "Revisar y aprobar". También se puede generar desde el panel.

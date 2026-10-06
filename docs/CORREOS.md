@@ -2,7 +2,7 @@
 
 ## Qué hace
 
-Un cron diario (`/api/cron/correos`, 14:00 UTC = 09:00 Bogotá) escribe a las personas con cuenta según su actividad:
+Un cron diario (`/api/cron/correos`, que el orquestador `/api/cron/manana` llama a las 12:00 UTC = 07:00 Bogotá) escribe a las personas con cuenta según su actividad:
 
 | Segmento | Condición | Correo | Repite |
 | --- | --- | --- | --- |
@@ -36,7 +36,7 @@ Botón "Descargar PDF" en cada lectura terminada (`/api/lecturas/[id]/pdf`, solo
 
 ## Resumen semanal a la administración
 
-Cada lunes a las 08:00 (Bogotá) el cron `/api/cron/resumen` envía a los correos
+Cada lunes a las 07:00 (Bogotá) el orquestador de la mañana llama a `/api/cron/resumen`, que envía a los correos
 de `ADMIN_CORREOS` el estado del negocio de la semana (`src/lib/resumen/semanal.ts`),
 con etiqueta `resumen_semanal` en Resend. La misma información se ve en
 `/admin/resumen`, donde también se puede enviar al instante.

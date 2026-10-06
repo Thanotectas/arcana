@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "crypto";
+import { cronAutorizado } from "@/lib/cron";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo, urlBaja } from "@/lib/correo";
 import { correoCampana, type TipoCorreo } from "@/lib/correos/plantillas";
@@ -38,11 +38,8 @@ interface Candidato {
  * (CORREOS_MAXIMO, 80 por defecto: el plan gratuito de Resend permite 100 al día).
  */
 export async function GET(request: Request) {
-  const secreto = process.env.CRON_SECRET;
-  if (!secreto) return Response.json({ error: "sin_cron_secret" }, { status: 503 });
-  const recibido = Buffer.from(request.headers.get("authorization") ?? "");
-  const esperado = Buffer.from(`Bearer ${secreto}`);
-  if (recibido.length !== esperado.length || !timingSafeEqual(recibido, esperado)) return Response.json({ error: "no_autorizado" }, { status: 401 });
+  const rechazo = cronAutorizado(request);
+  if (rechazo) return rechazo;
   if (!correoConfigurado()) return Response.json({ error: "sin_resend_api_key" }, { status: 503 });
 
   const admin = getSupabaseAdmin();

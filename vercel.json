@@ -1,24 +1,6 @@
 {
   "crons": [
-    {
-      "path": "/api/cron/diario",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/instagram",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/instagram",
-      "schedule": "0 17 * * *"
-    },
-    {
-      "path": "/api/cron/correos",
-      "schedule": "0 14 * * *"
-    },
-    {
-      "path": "/api/cron/resumen",
-      "schedule": "0 13 * * 1"
-    }
+    { "path": "/api/cron/manana", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/tarde", "schedule": "0 17 * * *" }
   ]
 }

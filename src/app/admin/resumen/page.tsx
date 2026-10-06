@@ -20,7 +20,7 @@ export default async function PaginaResumen() {
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Administración</p>
         <h1 className="font-display text-4xl font-semibold">Estado del negocio</h1>
         <p className="mt-2 text-texto-suave">
-          Del {fechaLargaEs(r.desde)} al {fechaLargaEs(sumarDias(r.hasta, -1))}, comparado con los siete días anteriores. Cada lunes a las 8:00 llega por correo.
+          Del {fechaLargaEs(r.desde)} al {fechaLargaEs(sumarDias(r.hasta, -1))}, comparado con los siete días anteriores. Cada lunes a las 7:00 llega por correo.
         </p>
         <div className="mt-4">
           <BotonResumen />
