@@ -16,12 +16,19 @@ export function whatsappConfigurado() {
 
 /** Firma X-Hub-Signature-256 de Meta: HMAC-SHA256 del cuerpo con el secreto de la app. */
 export function firmaValida(cuerpo: string, cabecera: string | null) {
-  const secreto = process.env.WA_APP_SECRET;
+  // Tolera espacios, saltos de línea o comillas pegados por error al copiar la clave.
+  const secreto = (process.env.WA_APP_SECRET ?? "").trim().replace(/^["']|["']$/g, "");
   if (!secreto) return true; // sin secreto configurado no se exige firma (solo para pruebas)
   if (!cabecera?.startsWith("sha256=")) return false;
   const esperada = createHmac("sha256", secreto).update(cuerpo).digest("hex");
   const recibida = cabecera.slice(7);
-  return esperada.length === recibida.length && timingSafeEqual(Buffer.from(esperada), Buffer.from(recibida));
+  const valida = esperada.length === recibida.length && timingSafeEqual(Buffer.from(esperada), Buffer.from(recibida));
+  if (!valida) {
+    // Pista sin revelar la clave: la clave secreta de una app de Meta son 32 caracteres hexadecimales.
+    const forma = /^[0-9a-f]{32}$/i.test(secreto) ? "tiene la forma de una clave secreta (32 hex): es de otra app o fue regenerada" : `no tiene la forma de una clave secreta (longitud ${secreto.length}, se esperan 32 caracteres hexadecimales): quizá se copió otro valor`;
+    console.warn(`[whatsapp] WA_APP_SECRET ${forma}`);
+  }
+  return valida;
 }
 
 async function llamar(cuerpo: Record<string, unknown>) {
