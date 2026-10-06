@@ -80,13 +80,13 @@ async function mensajesHoy(admin: SupabaseClient<Database>, telefono: string) {
 async function avisarHumano(telefono: string, nombre: string | null, ultimos: { rol: string; contenido: string }[]) {
   const [para] = correosAdmin();
   if (!para) return;
-  const url = `https://wa.me/${telefono}`;
+  const url = `${sitio()}/admin/whatsapp`;
   const hilo = ultimos.map((m) => `${m.rol === "persona" ? nombre ?? telefono : "Sibila"}: ${m.contenido}`).join("\n");
   const html = `<div style="font-family:Georgia,serif;color:#ece6f7;background:#0b0716;padding:28px;border-radius:16px">
 <p style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#b7a5ff;margin:0 0 8px">WhatsApp</p>
 <h1 style="font-size:22px;color:#f1d99a;margin:0 0 12px">${escaparHtml(nombre ?? telefono)} quiere hablar con una persona</h1>
 <pre style="white-space:pre-wrap;font-family:inherit;color:#d9d2ea;line-height:1.5">${escaparHtml(hilo)}</pre>
-<p style="margin:20px 0 0"><a href="${url}" style="display:inline-block;background:#d9b45a;color:#0b0716;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Abrir el chat</a></p>
+<p style="margin:20px 0 0"><a href="${url}" style="display:inline-block;background:#d9b45a;color:#0b0716;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Responder desde el panel</a></p>
 </div>`;
   await enviarCorreo({ para, asunto: `WhatsApp: ${nombre ?? telefono} pide hablar con alguien`, html, texto: `${nombre ?? telefono} pide hablar con alguien.\n\n${hilo}\n\n${url}`, etiqueta: "whatsapp_humano" });
 }

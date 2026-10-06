@@ -59,6 +59,9 @@ fracciones de centavo por respuesta.
 
 Cuando la persona pide hablar con alguien, tiene un problema de pago o se
 molesta, Sibila lo dice, marca el mensaje y se envía un correo a
-`ADMIN_CORREOS` con el hilo y un enlace para abrir el chat. La respuesta
-humana se da desde el panel de Meta o desde la app de WhatsApp Business si
-hay coexistencia; Sibila sigue respondiendo a los mensajes nuevos.
+`ADMIN_CORREOS` con el hilo y un enlace al panel. La respuesta humana se
+escribe en `/admin/whatsapp`, en la caja de cada conversación (`accionResponder`,
+se guarda con `tipo = 'humano'` y se muestra como "Tú"); Meta solo admite
+texto libre dentro de las 24 horas siguientes al último mensaje de la persona.
+Sibila sigue respondiendo a los mensajes nuevos. El panel también muestra el
+estado del número según Meta y permite registrarlo por API con el PIN.
