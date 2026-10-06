@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
@@ -23,6 +24,7 @@ export default async function PaginaTabaco() {
           {t.tabaco.intro} {plantilla(t.comun.cuesta, { n: COSTOS.tabaco, unidad: t.comun.creditos })}{" "}
           {perfil?.ilimitado ? t.comun.tuCuentaIlimitada : plantilla(t.comun.tienesCreditos, { n: perfil?.creditos ?? 0 })}
         </p>
+        <p className="mt-1 text-sm"><Link href="/rituales#tabaco" className="text-oro-suave underline">{t.rituales.verGuia}</Link></p>
       </div>
 
       <details className="tarjeta p-5">
