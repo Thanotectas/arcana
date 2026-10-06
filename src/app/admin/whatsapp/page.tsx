@@ -3,6 +3,7 @@ import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { estadoNumero, whatsappConfigurado, type EstadoNumero } from "@/lib/whatsapp/api";
 import { RegistroWhatsapp } from "@/components/admin/RegistroWhatsapp";
+import { RespuestaWhatsapp } from "@/components/admin/RespuestaWhatsapp";
 
 export const metadata: Metadata = { title: "WhatsApp", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ interface Mensaje {
   nombre: string | null;
   rol: "persona" | "asistente";
   contenido: string;
+  tipo: string;
   humano: boolean;
   creado_en: string;
 }
@@ -33,7 +35,7 @@ export default async function PaginaWhatsapp() {
       errorNumero = e instanceof Error ? e.message : String(e);
     }
   }
-  const { data } = await getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, humano, creado_en").order("creado_en", { ascending: false }).limit(400);
+  const { data } = await getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, tipo, humano, creado_en").order("creado_en", { ascending: false }).limit(400);
   const mensajes = (data ?? []) as Mensaje[];
   const porTelefono = new Map<string, Mensaje[]>();
   for (const m of mensajes) porTelefono.set(m.telefono, [...(porTelefono.get(m.telefono) ?? []), m]);
@@ -82,14 +84,12 @@ export default async function PaginaWhatsapp() {
           </summary>
           <div className="mt-4 space-y-2">
             {c.mensajes.map((m) => (
-              <div key={m.id} className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${m.rol === "persona" ? "bg-violeta/20" : "ml-auto border border-oro/30 bg-superficie"}`}>
+              <div key={m.id} className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${m.rol === "persona" ? "bg-violeta/20" : m.tipo === "humano" ? "ml-auto border border-exito/40 bg-superficie" : "ml-auto border border-oro/30 bg-superficie"}`}>
                 <p className="whitespace-pre-wrap">{m.contenido}</p>
-                <p className="mt-1 text-[11px] text-texto-suave">{m.rol === "persona" ? c.nombre ?? "Persona" : "Sibila"} · {hora(m.creado_en)}</p>
+                <p className="mt-1 text-[11px] text-texto-suave">{m.rol === "persona" ? c.nombre ?? "Persona" : m.tipo === "humano" ? "Tú" : "Sibila"} · {hora(m.creado_en)}</p>
               </div>
             ))}
-            <p className="pt-2 text-xs">
-              <a href={`https://wa.me/${c.telefono}`} className="text-oro-suave underline" target="_blank" rel="noreferrer">Abrir el chat en WhatsApp</a>
-            </p>
+            <RespuestaWhatsapp telefono={c.telefono} />
           </div>
         </details>
       ))}
