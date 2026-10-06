@@ -1,5 +1,8 @@
 # Línea de WhatsApp atendida por Sibila
 
+Número definitivo: **+57 300 127 7552** (`WHATSAPP` en `src/lib/marca/redes.ts`;
+el pie de página enlaza a wa.me con un saludo precargado).
+
 Sibila responde en WhatsApp las dudas sobre Arcana (qué es, precios, cómo
 entrar, cómo pagar), manda la carta del día si se la piden y avisa por correo
 a la administración cuando alguien pide hablar con una persona. No hace

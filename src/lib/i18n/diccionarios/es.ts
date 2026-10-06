@@ -70,6 +70,7 @@ export const es = {
     privacidad: "Privacidad",
     precios: "Precios",
     siguenos: "Síguenos",
+    whatsapp: "Escríbenos",
   },
   lecturas: {
     nombres: {

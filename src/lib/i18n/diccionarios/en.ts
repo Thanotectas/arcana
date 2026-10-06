@@ -71,6 +71,7 @@ export const en: Diccionario = {
     privacidad: "Privacy",
     precios: "Pricing",
     siguenos: "Follow us",
+    whatsapp: "Chat with us",
   },
   lecturas: {
     nombres: {
