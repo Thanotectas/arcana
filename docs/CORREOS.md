@@ -33,3 +33,10 @@ Si el dominio aún no está verificado, Resend permite enviar solo a tu propio c
 ## PDF de lecturas
 
 Botón "Descargar PDF" en cada lectura terminada (`/api/lecturas/[id]/pdf`, solo la dueña o dueño). Hoja A4 marfil con la marca, el bloque visual de la lectura (cartas con sus posiciones, monedas de signos o animales, foto, aura, hexagrama o números), la pregunta, la interpretación de Sibila y las preguntas posteriores con sus respuestas. Generado con `@react-pdf/renderer` (`src/lib/pdf/documento.tsx`); fuentes en `src/app/fuentes`.
+
+## Resumen semanal a la administración
+
+Cada lunes a las 08:00 (Bogotá) el cron `/api/cron/resumen` envía a los correos
+de `ADMIN_CORREOS` el estado del negocio de la semana (`src/lib/resumen/semanal.ts`),
+con etiqueta `resumen_semanal` en Resend. La misma información se ve en
+`/admin/resumen`, donde también se puede enviar al instante.
