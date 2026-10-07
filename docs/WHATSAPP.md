@@ -89,3 +89,14 @@ Token permanente del usuario del sistema `arcana-api`.
   Arcana (o Arcana lo rechazó). Mirar Vercel → Logs filtrando `whatsapp`:
   sin líneas = Meta no envía (app sin publicar, webhook sin suscribir);
   401 = firma; "aviso recibido" + error = fallo al responder.
+
+## Perfil de empresa
+
+Foto, Info, descripción, correo, sitios web, dirección y categoría están en
+`src/lib/whatsapp/perfil.ts` (`PERFIL_EMPRESA`). El botón "Aplicar perfil de
+Arcana" de `/admin/whatsapp` los envía a Meta (`whatsapp_business_profile`);
+la foto (`public/marca/whatsapp-perfil.jpg`, 640×640) se sube con la API de
+subida reanudable de la app (`WA_APP_ID`, por defecto 728785650291159) y su
+"handle". Si la subida falla, los textos se aplican igual y la foto se sube a
+mano en WhatsApp Manager. El nombre visible ("Arcana") lo aprueba Meta; hasta
+entonces el chat muestra el número.

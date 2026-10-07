@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requerirAdmin } from "@/lib/admin";
 import { enviarTexto, pedirCodigo, registrarNumero, verificarCodigo, whatsappConfigurado } from "./api";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { aplicarPerfil } from "./perfil";
 
 export interface EstadoRegistro {
   error?: string;
@@ -72,5 +73,20 @@ export async function accionVerificarCodigo(_prev: EstadoRegistro, formData: For
     return { mensaje: "Número verificado. Ahora pulsa «Registrar número» con tu PIN." };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo verificar." };
+  }
+}
+
+/** Aplica el perfil de empresa (foto, Info, descripción, correo, sitios, categoría). */
+export async function accionAplicarPerfil(): Promise<EstadoRegistro> {
+  await requerirAdmin();
+  if (!whatsappConfigurado()) return { error: "Faltan las variables WA_* en Vercel." };
+  try {
+    const r = await aplicarPerfil();
+    revalidatePath("/admin/whatsapp");
+    return r.foto
+      ? { mensaje: "Perfil aplicado con foto. En el celular puede tardar unos minutos en verse." }
+      : { error: `Textos aplicados, pero la foto no: ${r.avisoFoto}. Puedes subirla a mano en WhatsApp Manager → Teléfonos → Perfil.` };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo aplicar el perfil." };
   }
 }

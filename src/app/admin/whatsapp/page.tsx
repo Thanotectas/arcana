@@ -4,6 +4,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { estadoNumero, whatsappConfigurado, type EstadoNumero } from "@/lib/whatsapp/api";
 import { RegistroWhatsapp } from "@/components/admin/RegistroWhatsapp";
 import { RespuestaWhatsapp } from "@/components/admin/RespuestaWhatsapp";
+import { PerfilWhatsapp } from "@/components/admin/PerfilWhatsapp";
+import { PERFIL_EMPRESA, leerPerfil, type PerfilActual } from "@/lib/whatsapp/perfil";
 
 export const metadata: Metadata = { title: "WhatsApp", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -28,12 +30,14 @@ export default async function PaginaWhatsapp() {
   await requerirAdmin();
   let numero: EstadoNumero | null = null;
   let errorNumero: string | null = null;
+  let perfil: PerfilActual | null = null;
   if (whatsappConfigurado()) {
     try {
       numero = await estadoNumero();
     } catch (e) {
       errorNumero = e instanceof Error ? e.message : String(e);
     }
+    perfil = await leerPerfil().catch(() => null);
   }
   const { data } = await getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, tipo, humano, creado_en").order("creado_en", { ascending: false }).limit(400);
   const mensajes = (data ?? []) as Mensaje[];
@@ -67,6 +71,27 @@ export default async function PaginaWhatsapp() {
             </dl>
           )}
           {numero?.status !== "CONNECTED" && <RegistroWhatsapp verificado={numero?.code_verification_status === "VERIFIED"} />}
+        </section>
+      )}
+
+      {whatsappConfigurado() && (
+        <section className="tarjeta space-y-4 p-5">
+          <h2 className="font-display text-2xl font-semibold">Perfil de empresa</h2>
+          <p className="text-sm text-texto-suave">Lo que ve la gente al tocar «Arcana» en el chat. Los textos están en src/lib/whatsapp/perfil.ts.</p>
+          <div className="grid gap-5 sm:grid-cols-[120px_1fr]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- foto servida por Meta o desde /public */}
+            <img src={perfil?.profile_picture_url ?? PERFIL_EMPRESA.foto} alt="" width={120} height={120} className="h-[120px] w-[120px] rounded-full border border-borde object-cover" />
+            <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[110px_1fr]">
+              <dt className="text-texto-suave">Info</dt><dd>{perfil?.about || <span className="text-peligro">vacío</span>}</dd>
+              <dt className="text-texto-suave">Descripción</dt><dd>{perfil?.description || <span className="text-peligro">vacía</span>}</dd>
+              <dt className="text-texto-suave">Correo</dt><dd>{perfil?.email || "—"}</dd>
+              <dt className="text-texto-suave">Sitios web</dt><dd>{perfil?.websites?.join(" · ") || "—"}</dd>
+              <dt className="text-texto-suave">Dirección</dt><dd>{perfil?.address || "—"}</dd>
+              <dt className="text-texto-suave">Categoría</dt><dd>{perfil?.vertical || "—"}</dd>
+              <dt className="text-texto-suave">Foto</dt><dd>{perfil?.profile_picture_url ? "aplicada" : <span className="text-peligro">sin foto</span>}</dd>
+            </dl>
+          </div>
+          <PerfilWhatsapp />
         </section>
       )}
 
