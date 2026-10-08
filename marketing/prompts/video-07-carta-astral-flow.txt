@@ -1,0 +1,46 @@
+VIDEO 07 — "TU CARTA ASTRAL" para Gemini / Google Flow (Veo). Se pega cada prompt completo; la línea de
+"CONTINUIDAD" le pide conservar la escena del primer clip en los siguientes. Tres clips de 8 s, vertical 9:16,
+sin texto en pantalla (los rótulos y el cierre los agregamos en el montaje, como en los videos 03 a 06).
+
+==================== CLIP 1 · "El instante" ====================
+Video vertical 9:16 de 8 segundos, pintura cinematográfica realista, de noche, atmósfera íntima y mística,
+paleta índigo, violeta y dorado. Una mujer joven latina, de cabello oscuro recogido, está sentada junto a una
+ventana grande abierta a un cielo nocturno lleno de estrellas sobre las luces lejanas de una ciudad entre
+montañas. Sobre una mesa de madera oscura hay una foto antigua de un bebé, una vela encendida y un celular.
+Ella mira la foto con ternura y luego escribe en el celular (pantalla oscura con una rueda dorada, sin texto
+legible). La cámara avanza lentamente desde atrás de su hombro hacia la ventana y las estrellas parpadean.
+Luz cálida de vela en su rostro, luz azul de luna desde la ventana. Sin texto, sin letras, sin logos.
+CONTINUIDAD: este es el primer clip de una serie de tres; conserva exactamente esta mujer, esta ventana, esta
+mesa, esta luz y esta paleta en los clips siguientes.
+
+==================== CLIP 2 · "El cielo se ordena" ====================
+Video vertical 9:16 de 8 segundos. Misma mujer, misma ventana, misma mesa y misma luz del clip anterior
+(conservar continuidad). Las estrellas del cielo empiezan a moverse y a bajar suavemente por la ventana hasta
+formar, flotando sobre la mesa, una gran rueda circular dorada y translúcida dividida en doce secciones, con
+pequeños planetas luminosos (un sol dorado, una luna plateada y esferas de colores) que giran y se acomodan
+cada uno en su lugar, unidos por finas líneas de luz. Ella levanta la mirada, asombrada; la luz dorada de la
+rueda ilumina su cara. La cámara rodea despacio la rueda. Partículas doradas en el aire. Sin texto, sin
+letras, sin números, sin logos.
+CONTINUIDAD: segundo clip de la serie; misma mujer, escenario, luz y paleta que el primero.
+
+==================== CLIP 3 · "La lectura" ====================
+Video vertical 9:16 de 8 segundos. Misma mujer, misma ventana, misma mesa y misma luz de los clips anteriores
+(conservar continuidad). La rueda dorada se encoge y entra suavemente en la pantalla del celular que ella
+sostiene; en la pantalla queda la rueda pequeña y, debajo, líneas de texto difusas que se van escribiendo
+solas, como una carta. Ella lee, sonríe con calma, se lleva una mano al pecho y mira por la ventana hacia las
+estrellas. La cámara se aleja lentamente hasta mostrar la ventana, el cielo estrellado y su silueta. Sin
+texto legible, sin letras, sin logos.
+CONTINUIDAD: tercer y último clip de la serie; misma mujer, escenario, luz y paleta que los anteriores.
+
+==================== RÓTULOS QUE AGREGAMOS DESPUÉS ====================
+Clip 1: "El día que naciste, el cielo tenía una forma…"  /  "…y quedó escrita."
+Clip 2: "Planetas, casas y aspectos."  /  "Calculados con tu fecha, hora y lugar."
+Clip 3: "Sibila la convierte en tu lectura."  /  "Tu signo es solo el comienzo."
+Cierre: logo + "Tu carta astral: la rueda es gratis" + miarcana.com
+
+==================== SI ALGÚN CLIP SALE MAL ====================
+- Si aparece texto o números en la rueda: agregar al final "La rueda no tiene ningún símbolo escrito ni números."
+- Si cambia la mujer entre clips: repetir la descripción completa de ella (cabello oscuro recogido, blusa
+  violeta oscuro, aretes pequeños dorados) en los tres prompts.
+- Si la rueda sale plana o fea: "rueda astrológica tridimensional de anillos dorados concéntricos, como un
+  astrolabio antiguo de luz".
