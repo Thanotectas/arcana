@@ -1,0 +1,57 @@
+RESPUESTAS PARA "SOLICITAR ACCESO A PRODUCCIÓN" — Google Play Console
+(Ajustar con lo que realmente pasó en la prueba: número de probadores activos, comentarios recibidos y cambios hechos.
+Google valora respuestas concretas y honestas; no exagerar.)
+
+---------------------------------------------------------------------------------------------------
+SOBRE LA PRUEBA CERRADA
+
+1. ¿Cómo reclutaste a los probadores?
+Invité por WhatsApp y correo a personas de mi círculo cercano y a conocidos interesados en el tarot y la
+astrología, que es el público de la app. Cada uno aceptó la invitación de Google Play con su cuenta de Gmail,
+instaló la app y creó su cuenta en Arcana con ese mismo correo. Para que pudieran probar todas las funciones
+sin pagar, les cargué créditos de prueba.
+
+2. ¿Qué tan fácil fue reclutarlos?
+Moderadamente fácil: el tema despierta curiosidad y la invitación incluía créditos gratis. Lo más difícil fue
+que algunos usaran el mismo Gmail de la invitación al registrarse; lo resolví con una guía de tres pasos.
+
+3. Describe la participación de los probadores durante la prueba.
+Los probadores usaron la carta del día gratuita, tiradas de tarot de tres cartas, la carta astral, la
+interpretación de sueños, la lectura de la mano por foto y el horóscopo. Varios volvieron varios días seguidos
+a sacar su carta del día. Revisé sus lecturas y su uso de créditos desde el panel de administración.
+[Completar con datos reales de /admin/probadores: cuántos hicieron lecturas y cuántas en total.]
+
+4. Resume los comentarios que recibiste y cómo los recopilaste.
+Recibí comentarios por WhatsApp y por los comentarios privados de Google Play. Lo más mencionado: [completar,
+por ejemplo: que las lecturas se sienten personales, que la carga de la lectura de la mano tardaba, que no
+encontraban dónde cerrar sesión, que querían descargar sus lecturas].
+
+---------------------------------------------------------------------------------------------------
+SOBRE LA APP
+
+5. ¿Quién es el público de la app?
+Personas adultas de habla hispana, inglesa y portuguesa interesadas en el tarot, la astrología y el
+autoconocimiento. Las lecturas son de entretenimiento y reflexión personal; la app lo indica en cada
+pantalla y en los términos.
+
+6. ¿Qué ofrece la app y en qué se diferencia?
+Arcana reúne en un solo lugar tarot (cuatro mazos ilustrados, incluido uno propio), carta astral calculada con
+efemérides reales, numerología, sueños, lectura de la mano por foto, rituales y calendario lunar. Cada lectura
+la escribe una guía virtual, Sibila, a partir de la pregunta y los datos de la persona, en lugar de textos
+genéricos. Hay contenido gratis todos los días y créditos de pago para lecturas más profundas.
+
+7. ¿Qué cambios hiciste a partir de la prueba?
+[Completar con los cambios reales. Durante la prueba se hicieron, entre otros: botón de cerrar sesión visible
+en el menú, descarga de lecturas en PDF, lectura de la mano más rápida y con guía en pantalla, más mazos con
+ilustraciones, guías gratuitas de rituales, mejoras de textos y traducciones.]
+
+8. ¿Cómo sabes que la app está lista para producción?
+Los probadores completaron los flujos principales (registro, carta del día, lecturas, compra de créditos de
+prueba y descarga en PDF) sin errores bloqueantes, corregí los problemas que reportaron y la app ya funciona en
+la web con usuarios reales. Tengo monitoreo de errores en el servidor, soporte por WhatsApp y correo, y una
+política de privacidad y términos publicados.
+
+---------------------------------------------------------------------------------------------------
+DATOS ÚTILES
+- Sitio y política de privacidad: https://miarcana.com · https://miarcana.com/privacidad
+- Soporte: miarcana4@gmail.com · WhatsApp +57 300 127 7552

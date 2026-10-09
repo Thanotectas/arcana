@@ -123,3 +123,10 @@ group by u.email order by gastados desc;
 ```
 
 Costo de la IA durante la prueba: con el reparto de modelos (Opus solo en carta astral, Cruz Celta, quiromancia y cruces; Sonnet en el resto), 12 probadores con 30 créditos cuestan entre 5 y 8 USD en total. Para abaratar aún más, definir `ARCANA_IA_MODEL=claude-sonnet-5-5` en Vercel fuerza Sonnet en todo.
+
+## Estado de la prueba cerrada (9 oct 2026)
+
+12 probadores aceptaron; el 9 de octubre llevaba 4 días consecutivos de los 14 exigidos, así que el botón
+"Solicitar acceso a producción" se habilita hacia el 19 de octubre si el número no baja de 12 (si baja, el
+contador se reinicia). Respuestas preparadas para el cuestionario de Google en
+`marketing/play-store/respuestas-acceso-produccion.txt`.
