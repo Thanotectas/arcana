@@ -5,7 +5,7 @@ import { NOMBRE_TIPO, fechaLargaEs, lunesDe, sumarDias, type PublicacionPrograma
 import { urlImagenPublicacion } from "@/lib/redes/publicar";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { instagramConfigurado } from "@/lib/redes/instagram";
-import { facebookConfigurado } from "@/lib/redes/facebook";
+import { diagnosticoFacebook, facebookConfigurado } from "@/lib/redes/facebook";
 import { TarjetaPublicacion, type PublicacionVista } from "@/components/admin/TarjetaPublicacion";
 import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
 import { VistaReel } from "@/components/admin/VistaReel";
@@ -49,6 +49,10 @@ export default async function PaginaAdminRedes() {
   const porAprobar = todas.filter((p) => p.estado === "borrador" && p.fecha >= hoy);
   const programadas = todas.filter((p) => (p.estado === "aprobada" || p.estado === "publicando") && p.fecha >= sumarDias(hoy, -2));
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
+  const [{ data: cartaDia }, diagnostico] = await Promise.all([
+    getSupabaseAdmin().from("publicaciones_redes").select("red, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -6)).order("fecha", { ascending: false }).limit(20),
+    diagnosticoFacebook().catch((e) => ({ pagina: null, fuenteToken: null, esTokenDePagina: false, error: e instanceof Error ? e.message : String(e) }) as Awaited<ReturnType<typeof diagnosticoFacebook>>),
+  ]);
   const lunes = lunesDe(hoy);
   const semanaActualCompleta = todas.some((p) => p.semana === lunes);
   const proximaLista = todas.some((p) => p.semana === sumarDias(lunes, 7));
@@ -74,6 +78,35 @@ export default async function PaginaAdminRedes() {
           Cada mañana la carta del día sale como reel de 10 segundos en Instagram y como video en Facebook, con la invitación a una tirada de tres cartas. Si el video falla, se publica la imagen de siempre.
         </p>
         <VistaReel />
+
+        <h3 className="pt-4 font-semibold">Últimos 7 días</h3>
+        {cartaDia?.length ? (
+          <ul className="space-y-1 text-sm">
+            {cartaDia.map((p) => (
+              <li key={`${p.red}-${p.fecha}`} className="flex flex-wrap gap-x-3">
+                <span className="w-24 text-texto-suave">{p.fecha}</span>
+                <span className="w-24">{p.red === "instagram" ? "Instagram" : "Facebook"}</span>
+                <span className={p.estado === "publicada" ? "text-exito" : p.estado === "error" ? "text-peligro" : "text-oro-suave"}>{p.estado}</span>
+                {p.detalle && <span className="basis-full pl-[12.5rem] text-xs text-peligro">{p.detalle}</span>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-texto-suave">Aún no hay publicaciones registradas.</p>
+        )}
+
+        <h3 className="pt-4 font-semibold">Diagnóstico de Facebook</h3>
+        <div className="space-y-1 text-sm">
+          <p>Página configurada: {diagnostico.pagina ?? <span className="text-peligro">falta FB_PAGE_ID</span>}{diagnostico.nombrePagina ? ` · ${diagnostico.nombrePagina}` : ""}</p>
+          <p>Token usado: {diagnostico.fuenteToken ?? <span className="text-peligro">ninguno</span>}{diagnostico.identidad ? ` · pertenece a «${diagnostico.identidad.name ?? diagnostico.identidad.id}»` : ""}</p>
+          {diagnostico.error ? (
+            <p className="text-peligro">{diagnostico.error}</p>
+          ) : diagnostico.esTokenDePagina ? (
+            <p className="text-exito">El token es el de la página: Arcana puede publicar en ella.</p>
+          ) : (
+            <p className="text-peligro">El token no es el de la página (es de un usuario o de otra página). Para publicar como «Mi Arcana» hace falta el token de acceso de la página en FB_PAGE_TOKEN, con el permiso pages_manage_posts.</p>
+          )}
+        </div>
       </section>
 
       <section className="space-y-4">

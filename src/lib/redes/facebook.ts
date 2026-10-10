@@ -47,3 +47,37 @@ export async function publicarVideoFacebook(urlVideo: string, texto: string): Pr
   }
   return String(datos.id ?? "");
 }
+
+export interface DiagnosticoFacebook {
+  pagina: string | null;
+  fuenteToken: "FB_PAGE_TOKEN" | "IG_PAGE_TOKEN" | null;
+  /** A quién representa el token según Meta (/me). */
+  identidad?: { id: string; name?: string };
+  /** El token es el de la propia página (requisito para publicar como la página). */
+  esTokenDePagina: boolean;
+  nombrePagina?: string;
+  error?: string;
+}
+
+/** Revisa con qué identidad publicaría Arcana en la página, sin publicar nada. */
+export async function diagnosticoFacebook(): Promise<DiagnosticoFacebook> {
+  const pagina = process.env.FB_PAGE_ID ?? null;
+  const fuenteToken = process.env.FB_PAGE_TOKEN ? "FB_PAGE_TOKEN" : process.env.IG_PAGE_TOKEN ? "IG_PAGE_TOKEN" : null;
+  const token = process.env.FB_PAGE_TOKEN ?? process.env.IG_PAGE_TOKEN;
+  if (!pagina || !token) return { pagina, fuenteToken, esTokenDePagina: false, error: !pagina ? "Falta FB_PAGE_ID en Vercel." : "No hay token: falta FB_PAGE_TOKEN (o IG_PAGE_TOKEN)." };
+  const consultar = async (ruta: string) => {
+    const res = await fetch(`${API}/${ruta}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+    return (await res.json().catch(() => ({}))) as { id?: string; name?: string; error?: { message?: string; code?: number } };
+  };
+  const yo = await consultar("me?fields=id,name");
+  if (yo.error) return { pagina, fuenteToken, esTokenDePagina: false, error: `El token no sirve: ${yo.error.message ?? "error"}${yo.error.code ? ` (código ${yo.error.code})` : ""}` };
+  const pag = await consultar(`${pagina}?fields=name`);
+  return {
+    pagina,
+    fuenteToken,
+    identidad: { id: String(yo.id ?? ""), name: yo.name },
+    esTokenDePagina: String(yo.id ?? "") === pagina,
+    nombrePagina: pag.name,
+    error: pag.error ? `No se pudo leer la página ${pagina}: ${pag.error.message ?? "error"}` : undefined,
+  };
+}
