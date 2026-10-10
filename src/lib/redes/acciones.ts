@@ -6,6 +6,7 @@ import { requerirAdmin } from "@/lib/admin";
 import { generarSemana, lunesDe, sumarDias } from "./calendario";
 import { publicarProgramada } from "./publicar";
 import { fechaBogota } from "./carta-dia";
+import { reelCartaDelDia } from "./reel";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -77,5 +78,21 @@ export async function accionGenerarSemana(_prev: EstadoAdminRedes, formData: For
     return r.creadas ? { mensaje: `${r.creadas} borradores nuevos para la semana del ${lunes}.` } : { mensaje: "Esa semana ya tiene sus publicaciones." };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo generar." };
+  }
+}
+
+export interface EstadoReel {
+  error?: string;
+  url?: string;
+}
+
+/** Genera (o reutiliza) el reel de la carta del día de hoy para verlo antes de que salga. */
+export async function accionVistaReel(_prev: EstadoReel, formData: FormData): Promise<EstadoReel> {
+  await requerirAdmin();
+  try {
+    const url = await reelCartaDelDia(getSupabaseAdmin(), fechaBogota(), { regenerar: formData.get("regenerar") === "1" });
+    return { url: `${url}?v=${Date.now()}` };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo generar el reel." };
   }
 }

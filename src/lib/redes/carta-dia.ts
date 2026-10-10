@@ -1,5 +1,6 @@
 import type { CartaTarot } from "@/lib/tarot/deck";
 import { MAZOS, type IdMazo } from "@/lib/tarot/mazos";
+import { PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
 
 /**
  * "Carta del día de Arcana" para redes: la misma carta para todos en una
@@ -89,6 +90,7 @@ export function textoCartaDelDia(fecha: string) {
     `Palabras clave: ${c.palabrasClave.slice(0, 3).join(" · ")}`,
     "",
     "🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en miarcana.com (enlace en la biografía).",
+    `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)} en miarcana.com.`,
     "",
     mazo === "arcana" ? "#tarot #tarotarcana #cartadeldia #tarotdiario #espiritualidad #miarcana" : "#tarot #tarotenespañol #cartadeldia #tarotdiario #espiritualidad #miarcana",
   ]

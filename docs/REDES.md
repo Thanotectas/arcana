@@ -54,3 +54,19 @@ publicando, publicada, descartada, error), `resultados` (id o error por red),
 
 - TikTok: su API de publicación exige revisión de la app; el agente no publica ahí.
 - Respuestas a comentarios y mensajes: requieren más permisos de Meta.
+
+## Carta del día en video (reel)
+
+Desde el 10 oct 2026 la carta del día sale como **reel de 10 s** en Instagram
+(`publicarReel`: contenedor `REELS`, espera de procesamiento hasta ~3 min) y como
+video en la página de Facebook (`publicarVideoFacebook`, `/{page}/videos`).
+`src/lib/redes/reel.tsx` dibuja cinco capas con `ImageResponse` (cielo con la
+carta, cabecera con fecha y mazo, nombre y frase, invitación final y estrellas
+que suben) y las anima con ffmpeg (`@ffmpeg-installer/ffmpeg`, incluido en el
+paquete de `/api/cron/instagram` y `/admin/redes` por `outputFileTracingIncludes`;
+~25 s por video). El MP4 se guarda en el bucket público `redes` de Supabase
+(`reels/carta-dia-AAAA-MM-DD.mp4`, se crea solo) y se reutiliza en la corrida
+de la tarde. Si el reel falla en cualquier paso, se publica la imagen de siempre.
+`REDES_REEL=0` vuelve a la imagen fija. El texto de la publicación termina con la
+invitación "Sibila te lee tres cartas sobre tu pregunta por $1.900" (precio del
+paquete de prueba). Vista previa en `/admin/redes` → "Ver el reel de hoy".

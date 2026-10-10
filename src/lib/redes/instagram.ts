@@ -52,3 +52,27 @@ export async function publicarImagen(urlImagen: string, texto: string): Promise<
   const publicada = await llamar(`${ig}/media_publish`, { creation_id: id });
   return String(publicada.id ?? "");
 }
+
+/**
+ * Publica un Reel (video MP4 en una URL pública). Meta procesa el video antes
+ * de publicarlo: puede tardar de 30 segundos a un par de minutos.
+ */
+export async function publicarReel(urlVideo: string, texto: string): Promise<string> {
+  const ig = process.env.IG_USER_ID!;
+  const contenedor = await llamar(`${ig}/media`, { media_type: "REELS", video_url: urlVideo, caption: texto, share_to_feed: "true", thumb_offset: "3000" });
+  const id = String(contenedor.id ?? "");
+  if (!id) throw new Error("Instagram media: sin id de contenedor del reel");
+  let listo = false;
+  for (let i = 0; i < 36; i++) {
+    await esperar(5000);
+    const estado = await llamar(id, { fields: "status_code" }, "GET");
+    if (estado.status_code === "FINISHED") {
+      listo = true;
+      break;
+    }
+    if (estado.status_code === "ERROR" || estado.status_code === "EXPIRED") throw new Error(`Instagram: el reel quedó en ${estado.status_code}`);
+  }
+  if (!listo) throw new Error("Instagram: el reel no terminó de procesarse a tiempo");
+  const publicada = await llamar(`${ig}/media_publish`, { creation_id: id });
+  return String(publicada.id ?? "");
+}

@@ -2,14 +2,15 @@ import { cronAutorizado } from "@/lib/cron";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { instagramConfigurado, publicarImagen } from "@/lib/redes/instagram";
-import { facebookConfigurado, publicarFotoFacebook } from "@/lib/redes/facebook";
+import { instagramConfigurado, publicarImagen, publicarReel } from "@/lib/redes/instagram";
+import { facebookConfigurado, publicarFotoFacebook, publicarVideoFacebook } from "@/lib/redes/facebook";
+import { reelCartaDelDia } from "@/lib/redes/reel";
 import { cartaDelDia, fechaBogota, textoCartaDelDia } from "@/lib/redes/carta-dia";
 import { publicarVencidas, type ResultadoPublicacion } from "@/lib/redes/publicar";
 import { asegurarBorradores } from "@/lib/redes/agente";
 
-// Meta procesa la imagen antes de publicarla: puede tardar un minuto.
-export const maxDuration = 120;
+// Generar el reel (~30 s) y que Meta lo procese (hasta ~3 min) toma tiempo.
+export const maxDuration = 300;
 
 type Red = "instagram" | "facebook";
 type Resultado = { publicada: string } | { omitida: string } | { error: string };
@@ -73,8 +74,28 @@ export async function GET(request: Request) {
   const texto = textoCartaDelDia(fecha);
   const admin = getSupabaseAdmin();
 
-  const instagram: Resultado = instagramConfigurado() ? await publicarEn(admin, "instagram", fecha, () => publicarImagen(imagen, texto)) : { omitida: "sin_configurar" };
-  const facebook: Resultado = facebookConfigurado() ? await publicarEn(admin, "facebook", fecha, () => publicarFotoFacebook(imagen, texto)) : { omitida: "sin_configurar" };
+  // La carta del día sale como reel (video corto). Se genera una sola vez, solo
+  // si alguna red lo necesita, y si algo falla se publica la imagen de siempre.
+  // REDES_REEL=0 vuelve a la imagen fija.
+  let reel: Promise<string> | null = null;
+  const obtenerReel = () => (reel ??= reelCartaDelDia(admin, fecha));
+  const conRespaldo = async (red: string, video: (url: string) => Promise<string>, foto: () => Promise<string>) => {
+    if (process.env.REDES_REEL !== "0") {
+      try {
+        return await video(await obtenerReel());
+      } catch (e) {
+        console.error(`[cron ${red}] reel falló, se publica la imagen:`, e instanceof Error ? e.message : e);
+      }
+    }
+    return foto();
+  };
+
+  const instagram: Resultado = instagramConfigurado()
+    ? await publicarEn(admin, "instagram", fecha, () => conRespaldo("instagram", (url) => publicarReel(url, texto), () => publicarImagen(imagen, texto)))
+    : { omitida: "sin_configurar" };
+  const facebook: Resultado = facebookConfigurado()
+    ? await publicarEn(admin, "facebook", fecha, () => conRespaldo("facebook", (url) => publicarVideoFacebook(url, texto), () => publicarFotoFacebook(imagen, texto)))
+    : { omitida: "sin_configurar" };
 
   // Agente de redes: la corrida de la tarde (17:00 UTC = mediodía en Bogotá)
   // publica lo aprobado; cualquier corrida redacta los borradores que falten.

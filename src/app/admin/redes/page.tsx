@@ -8,9 +8,10 @@ import { instagramConfigurado } from "@/lib/redes/instagram";
 import { facebookConfigurado } from "@/lib/redes/facebook";
 import { TarjetaPublicacion, type PublicacionVista } from "@/components/admin/TarjetaPublicacion";
 import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
+import { VistaReel } from "@/components/admin/VistaReel";
 
-// Generar una semana pide los textos a Sibila: puede tardar medio minuto.
-export const maxDuration = 120;
+// Generar una semana (Sibila) o el reel de la carta del día puede tardar medio minuto o más.
+export const maxDuration = 300;
 
 export const metadata: Metadata = { title: "Agente de redes", robots: { index: false, follow: false } };
 
@@ -66,6 +67,14 @@ export default async function PaginaAdminRedes() {
           <FormularioGenerar semanaActual={!semanaActualCompleta} proxima={!proximaLista} />
         </div>
       </div>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Carta del día en video</h2>
+        <p className="text-sm text-texto-suave">
+          Cada mañana la carta del día sale como reel de 10 segundos en Instagram y como video en Facebook, con la invitación a una tirada de tres cartas. Si el video falla, se publica la imagen de siempre.
+        </p>
+        <VistaReel />
+      </section>
 
       <section className="space-y-4">
         <h2 className="font-display text-2xl font-semibold">Por aprobar <span className="text-base text-texto-suave">({porAprobar.length})</span></h2>

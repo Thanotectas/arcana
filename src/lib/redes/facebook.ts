@@ -29,3 +29,21 @@ export async function publicarFotoFacebook(urlImagen: string, texto: string): Pr
   }
   return String(datos.post_id ?? datos.id ?? "");
 }
+
+/** Publica un video (MP4 en una URL pública) con texto en la página y devuelve su id. */
+export async function publicarVideoFacebook(urlVideo: string, texto: string): Promise<string> {
+  const pagina = process.env.FB_PAGE_ID!;
+  const token = process.env.FB_PAGE_TOKEN ?? process.env.IG_PAGE_TOKEN!;
+  const res = await fetch(`${API}/${pagina}/videos`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: new URLSearchParams({ file_url: urlVideo, description: texto, published: "true" }),
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as { id?: string; error?: { message?: string; code?: number } };
+  if (!res.ok || datos.error) {
+    const e = datos.error;
+    throw new Error(`Facebook videos: ${e?.message ?? res.status}${e?.code ? ` (código ${e.code})` : ""}`);
+  }
+  return String(datos.id ?? "");
+}

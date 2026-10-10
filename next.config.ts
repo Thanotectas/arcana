@@ -12,9 +12,9 @@ const nextConfig: NextConfig = {
   // para que Turbopack no busque node_modules en directorios superiores.
   turbopack: { root: __dirname },
   // Las fuentes de las imágenes de vista previa se leen en tiempo de ejecución.
-  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./public/signos/**", "./public/animales/**"], "/api/redes/carta-dia": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**"], "/api/lecturas/[id]/pdf": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./public/signos/**", "./public/animales/**", "./public/marca/**"] },
-  // El generador de PDF trae sus propios binarios de fuentes: mejor sin empaquetar.
-  serverExternalPackages: ["@react-pdf/renderer"],
+  outputFileTracingIncludes: { "/**": ["./src/app/fuentes/**"], "/api/lecturas/[id]/tarjeta": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./public/signos/**", "./public/animales/**"], "/api/redes/carta-dia": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**"], "/api/cron/instagram": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./node_modules/@ffmpeg-installer/linux-x64/ffmpeg", "./node_modules/@ffmpeg-installer/linux-x64/package.json", "./node_modules/@ffmpeg-installer/ffmpeg/*.js*", "./node_modules/@ffmpeg-installer/ffmpeg/lib/**"], "/admin/redes": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./node_modules/@ffmpeg-installer/linux-x64/ffmpeg", "./node_modules/@ffmpeg-installer/linux-x64/package.json", "./node_modules/@ffmpeg-installer/ffmpeg/*.js*", "./node_modules/@ffmpeg-installer/ffmpeg/lib/**"], "/api/lecturas/[id]/pdf": ["./public/cartas/rider/**", "./public/cartas/arcana/**", "./public/cartas/marsella/**", "./public/cartas/angeles/**", "./public/signos/**", "./public/animales/**", "./public/marca/**"] },
+  // El generador de PDF y ffmpeg (reel de la carta del día) traen sus propios binarios: mejor sin empaquetar.
+  serverExternalPackages: ["@react-pdf/renderer", "@ffmpeg-installer/ffmpeg"],
   async headers() {
     return [
       {
