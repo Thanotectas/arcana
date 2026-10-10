@@ -164,6 +164,44 @@ type MensajeWhatsappRow = {
   creado_en: string;
 };
 
+type EmbajadorRow = {
+  usuario_id: string;
+  desde: string;
+  estado: "activo" | "suspendido";
+  metodo_pago: "nequi" | "daviplata" | "banco" | "paypal" | null;
+  datos_pago: string | null;
+  titular: string | null;
+  actualizado_en: string;
+};
+
+type ComisionRow = {
+  id: number;
+  embajador_id: string;
+  invitado_id: string;
+  orden_id: string;
+  monto_orden_centavos: number;
+  moneda: string;
+  comision_cop: number;
+  estado: "vigente" | "anulada";
+  libera_en: string;
+  creado_en: string;
+};
+
+type RetiroEmbajadorRow = {
+  id: number;
+  embajador_id: string;
+  tipo: "creditos" | "dinero";
+  monto_cop: number;
+  creditos: number | null;
+  estado: "solicitado" | "pagado" | "rechazado";
+  metodo_pago: string | null;
+  datos_pago: string | null;
+  titular: string | null;
+  nota: string | null;
+  creado_en: string;
+  resuelto_en: string | null;
+};
+
 type PublicacionRedRow = {
   id: number;
   red: string;
@@ -247,6 +285,24 @@ export type Database = {
         Update: Partial<PublicacionRedRow>;
         Relationships: [];
       };
+      embajadores: {
+        Row: EmbajadorRow;
+        Insert: Insertable<EmbajadorRow, "desde" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "actualizado_en">;
+        Update: Partial<EmbajadorRow>;
+        Relationships: [];
+      };
+      comisiones: {
+        Row: ComisionRow;
+        Insert: Insertable<ComisionRow, "id" | "estado" | "creado_en">;
+        Update: Partial<ComisionRow>;
+        Relationships: [];
+      };
+      retiros_embajador: {
+        Row: RetiroEmbajadorRow;
+        Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
+        Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
       mensajes_whatsapp: {
         Row: MensajeWhatsappRow;
         Insert: Insertable<MensajeWhatsappRow, "id" | "nombre" | "id_meta" | "tipo" | "humano" | "creado_en">;
@@ -283,6 +339,41 @@ export type Database = {
       aplicar_invitacion: {
         Args: { p_codigo: string };
         Returns: boolean;
+      };
+      unirme_embajadores: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      guardar_pago_embajador: {
+        Args: { p_metodo: string; p_datos: string; p_titular: string };
+        Returns: boolean;
+      };
+      resumen_embajador: {
+        Args: Record<string, never>;
+        Returns: {
+          es_embajador: boolean;
+          desde: string | null;
+          invitados: number;
+          invitados_pagaron: number;
+          ganado_total: number;
+          pendiente: number;
+          disponible: number;
+          canjeado: number;
+          retirado: number;
+          en_proceso: number;
+        }[];
+      };
+      comisiones_recientes: {
+        Args: Record<string, never>;
+        Returns: { fecha: string; nombre: string; comision_cop: number; estado: "anulada" | "en_espera" | "disponible" }[];
+      };
+      canjear_saldo_creditos: {
+        Args: { p_monto_cop: number };
+        Returns: number;
+      };
+      solicitar_retiro_embajador: {
+        Args: { p_monto_cop: number };
+        Returns: number | null;
       };
       resumen_invitaciones: {
         Args: Record<string, never>;

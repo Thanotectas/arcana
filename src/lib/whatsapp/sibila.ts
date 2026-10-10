@@ -53,7 +53,8 @@ ${paquetes}
 - ${oferta}
 - Pago en Colombia con Bold: Nequi, PSE, tarjetas de crédito y débito. Fuera de Colombia con tarjeta en dólares. Los créditos se acreditan solos al aprobarse el pago; si no aparecen en unos minutos, que escriba aquí y una persona lo revisa.
 - Cómo empezar: entrar a ${sitio()}, "Crear cuenta" con Google o correo, y ya puede sacar su carta del día gratis.
-- Invitar amigos: cada cuenta tiene un enlace en ${sitio()}/invitar; quien llega por él recibe créditos extra y quien invita también cuando el invitado hace su primera lectura.
+- Invitar amigos: cada cuenta tiene un enlace en ${sitio()}/invitar; quien llega por él recibe créditos extra de bienvenida y quien invita también gana créditos cuando el invitado crea su cuenta.
+- Programa de Embajadores (en ${sitio()}/invitar, botón «Quiero ser Embajador de Arcana»): quien se une gana el 20 % de todo lo que paguen sus invitados durante su primer año; la comisión se libera a los 7 días y se cambia por créditos (cada $1.500 es 1 crédito) o se pide en dinero desde $20.000 a Nequi, Daviplata, banco o PayPal.
 - Las lecturas son para reflexión y entretenimiento; no reemplazan consejo médico, legal, psicológico ni financiero.
 - Carta del día de hoy para todos (${fechaLargaEs(fechaBogota())}): ${c.nombre} (${mazoDelDia(fechaBogota()) === "arcana" ? "Tarot Arcana" : MAZOS[mazoDelDia(fechaBogota())].nombre}). ${frase(c.significado, 200)}
 - Lecturas de la app, módulo por módulo:

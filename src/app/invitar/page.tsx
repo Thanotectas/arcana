@@ -6,6 +6,8 @@ import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { BONO_INVITADO, BONO_INVITADOR, enlaceInvitacion } from "@/lib/invitaciones";
 import { InvitarAmigos } from "@/components/InvitarAmigos";
+import { PanelEmbajador } from "@/components/PanelEmbajador";
+import { EMBAJADORES, getComisionesRecientes, getDatosPago, getResumenEmbajador, getRetirosPropios } from "@/lib/embajadores";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -14,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaginaInvitar() {
   await requerirUsuario();
-  const [perfil, resumen, t, h] = await Promise.all([getPerfil(), getResumenInvitaciones(), getT(), headers()]);
+  const [perfil, resumen, t, h, embajador] = await Promise.all([getPerfil(), getResumenInvitaciones(), getT(), headers(), getResumenEmbajador()]);
+  const [comisiones, retiros, datosPago] = embajador.esEmbajador ? await Promise.all([getComisionesRecientes(), getRetirosPropios(), getDatosPago()]) : [[], [], null];
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
   const enlace = enlaceInvitacion(base, perfil?.codigo_invitacion ?? "");
 
@@ -47,6 +50,23 @@ export default async function PaginaInvitar() {
         </div>
       </div>
       <p className="text-xs text-texto-suave">{t.invitar.tope}</p>
+
+      <section id="embajadores" className="tarjeta scroll-mt-24 space-y-4 p-6">
+        <div>
+          <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.embajadores.seccion}</p>
+          <h2 className="font-display text-3xl font-semibold">{embajador.esEmbajador ? t.embajadores.panelTitulo : t.embajadores.titulo}</h2>
+          {!embajador.esEmbajador && <p className="mt-2 text-texto-suave">{plantilla(t.embajadores.intro, { pct: EMBAJADORES.comisionPct })}</p>}
+        </div>
+        <PanelEmbajador
+          datos={{
+            resumen: embajador,
+            comisiones,
+            retiros,
+            datosPago,
+            reglas: { comisionPct: EMBAJADORES.comisionPct, diasEspera: EMBAJADORES.diasEspera, pesosPorCredito: EMBAJADORES.pesosPorCredito, retiroMinimo: EMBAJADORES.retiroMinimo },
+          }}
+        />
+      </section>
     </div>
   );
 }
