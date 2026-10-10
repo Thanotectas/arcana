@@ -39,8 +39,8 @@ CONTINUIDAD: tercer y último clip de la serie; misma protagonista, ropa, luz y 
 
 ==================== RÓTULOS QUE AGREGAMOS DESPUÉS ====================
 Clip 1: "¿Ya les contaste de Arcana?"  /  "Comparte tu enlace con quien quieras."
-Clip 2: "Ellas leen su tarot, su carta astral, sus sueños…"  /  "…y cada pago suma para ti."
-Clip 3: "El 20 % de lo que paguen, durante 12 meses."  /  "En créditos o en dinero."
+Clip 2: "Leen su tarot, su carta, sus sueños…"  /  "…y cada pago suma para ti."
+Clip 3: "El 20 % de cada pago, durante 12 meses."  /  "En créditos o en dinero."
 Cierre: logo + "Programa de Embajadores" + "Actívalo con un clic en miarcana.com/invitar"
 
 ==================== SI ALGÚN CLIP SALE MAL ====================
