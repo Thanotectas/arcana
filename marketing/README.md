@@ -7,11 +7,15 @@ Todas las piezas de comunicación de Arcana (miarcana.com), acumuladas en un sol
 | Carpeta | Qué hay |
 |---|---|
 | `logos/` | Logotipo e iconos de la marca (SVG y PNG 192/512, versión maskable para Android). |
-| `videos/` | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral, 04 sueños, 05 "Por qué Arcana" (comparativo, 27 s), 06 ritual de velas (27 s). |
+| `videos/` | Videos finales para TikTok e Instagram (vertical 1080×1920): 01 lectura de la mano, 02 carta astral, 03 cruce calendario chino × carta astral, 04 sueños, 05 "Por qué Arcana" (comparativo, 27 s), 06 ritual de velas (27 s), 07 carta astral, 08 aura, 09 Programa de Embajadores (27 s). |
 | `textos/` | Textos de publicación de cada video (TikTok e Instagram) con hashtags. |
 | `prompts/` | Prompts usados con Gemini: videos (Veo), monedas del zodíaco, Tarot Arcana (22 umbrales). Sirven para repetir el estilo. |
 | `play-store/` | Ficha de Google Play: icono 512, gráfico destacado 1024×500 y seis capturas. Los textos de la ficha están en `docs/GOOGLE-PLAY.md`. |
 | `imagenes/` | Hojas de contacto de monedas y cartas, ejemplo de la carta del día de Instagram, cartas rediseñadas; en `fuentes-gemini/` las cuadrículas originales generadas con Gemini. |
+
+## Cómo se entregan las piezas
+
+Alejandro guarda todo en su PC en `C:\Users\lualz\Documents\Arcana Marketing`. Cada entrega va en **un zip** listo para extraer ahí, con nombres legibles: `Arcana Marketing - AAAA-MM-DD Tema.zip`, que contiene una carpeta `AAAA-MM-DD Tema/` con las piezas (imágenes, video en versión Instagram/TikTok y versión WhatsApp < 10 MB, prompt y textos). El chat solo deja enviar archivos de hasta 30 MB: si el zip es mayor, se parte en `parte 1 de N`, `parte 2 de N`… con la misma estructura de carpetas. Los archivos se envían desde el scratchpad de la sesión (los que están fuera de la carpeta de trabajo de la sesión no se pueden abrir en la app).
 
 ## Identidad rápida
 
