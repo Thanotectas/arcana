@@ -6,8 +6,11 @@ import { COSTOS, OFERTA_FUNDADORES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, formatoCOP 
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { proximasLunaciones, type FaseClave } from "@/lib/astro/lunaciones";
 import { SIGNOS, signoPorId } from "@/lib/zodiaco";
-import { FICHA_INTENCION, INTENCIONES } from "@/lib/velas";
+import { FICHA_INTENCION, INTENCIONES, type ColorVela } from "@/lib/velas";
 import { diccionario } from "@/lib/i18n/diccionarios";
+import { HEXAGRAMAS } from "@/lib/iching/hexagramas";
+import { ANIMALES } from "@/lib/chino";
+import { COLORES_AURA } from "@/lib/aura";
 import { fechaBogota } from "./carta-dia";
 
 /**
@@ -20,8 +23,15 @@ export type TipoPublicacion = Database["public"]["Tables"]["publicaciones_progra
 export type PublicacionProgramada = Database["public"]["Tables"]["publicaciones_programadas"]["Row"];
 type Insercion = Database["public"]["Tables"]["publicaciones_programadas"]["Insert"];
 
-/** Lunes a domingo (0 = lunes). */
-const TIPO_POR_DIA: TipoPublicacion[] = ["guia", "pregunta", "producto", "oferta", "luna", "signo", "reflexion"];
+/**
+ * Lunes a domingo (0 = lunes). Cuatro días presentan una función de la app
+ * (lectura de pago o guía gratis, recorriendo FUNCIONES sin repetir), el
+ * martes Sibila responde una pregunta, el sábado hay signo y el domingo luna.
+ * Mientras la oferta de fundadores esté activa, el jueves la anuncia.
+ */
+const TIPO_POR_DIA: ("funcion" | TipoPublicacion)[] = ["funcion", "pregunta", "funcion", "funcion", "funcion", "signo", "luna"];
+/** Ranura (0–3) que ocupa cada día de función en el recorrido de FUNCIONES. */
+const RANURAS_POR_SEMANA = 4;
 
 export const NOMBRE_TIPO: Record<TipoPublicacion, string> = {
   guia: "Guía gratis",
@@ -56,14 +66,52 @@ function indiceSemana(lunes: string) {
   return Math.round((Date.parse(`${lunes}T12:00:00Z`) - Date.UTC(2026, 0, 5, 12)) / (7 * DIA));
 }
 
-const GUIAS = [
-  { clave: "chocolate", ruta: "/rituales#chocolate", nombre: "Lectura del chocolate" },
-  { clave: "velas", ruta: "/velas", nombre: "Rituales de velas" },
-  { clave: "mano", ruta: "/rituales#mano", nombre: "Lectura de la mano" },
-  { clave: "luna", ruta: "/luna", nombre: "Calendario lunar" },
-  { clave: "iching", ruta: "/rituales#iching", nombre: "I Ching, el libro de los cambios" },
-  { clave: "tabaco", ruta: "/rituales#tabaco", nombre: "Lectura del tabaco" },
-] as const;
+/**
+ * Las funciones de la app que se presentan en redes, una por día de función.
+ * `visual` describe la imagen principal del reel y de la tarjeta (ver
+ * `src/lib/redes/visual.tsx`): carta de un mazo ("rider/la-estrella"), moneda
+ * ("signos/leo"), rueda de monedas, pareja, cruce, aura, vela, hexagrama,
+ * números, luna o un glifo. Los que dependen de la semana se completan en
+ * `visualDe`.
+ */
+interface Funcion {
+  clave: string;
+  tipo: "producto" | "guia";
+  ruta: string;
+  /** Nombre cuando no está en `portada.modulos`. */
+  nombre?: string;
+  costo?: number;
+  visual: string;
+  simbolos: string[];
+}
+
+const FUNCIONES: Funcion[] = [
+  { clave: "tarot", tipo: "producto", ruta: "/tarot", costo: COSTOS.tarot_tres, visual: "rider/la-estrella", simbolos: ["✦"] },
+  { clave: "astral", tipo: "producto", ruta: "/carta-astral", costo: COSTOS.carta_astral, visual: "rueda/signos", simbolos: ["☉"] },
+  { clave: "chocolate", tipo: "guia", ruta: "/rituales#chocolate", nombre: "Lectura del chocolate", visual: "glifo/☕", simbolos: ["☕"] },
+  { clave: "suenos", tipo: "producto", ruta: "/suenos", costo: COSTOS.suenos, visual: "luna", simbolos: ["✦"] },
+  { clave: "chino", tipo: "producto", ruta: "/calendario-chino", costo: COSTOS.chino, visual: "rueda/animales", simbolos: ["✦"] },
+  { clave: "velas", tipo: "guia", ruta: "/velas", nombre: "Rituales de velas", visual: "vela/blanco", simbolos: ["🕯"] },
+  { clave: "quiromancia", tipo: "producto", ruta: "/quiromancia", costo: COSTOS.quiromancia, visual: "glifo/✋", simbolos: ["✋"] },
+  { clave: "numerologia", tipo: "producto", ruta: "/numerologia", costo: COSTOS.numerologia, visual: "numeros", simbolos: ["✦"] },
+  { clave: "mano", tipo: "guia", ruta: "/rituales#mano", nombre: "Lectura de la mano", visual: "glifo/✋", simbolos: ["✋"] },
+  { clave: "sinastria", tipo: "producto", ruta: "/sinastria", costo: COSTOS.sinastria, visual: "duo", simbolos: ["✦"] },
+  { clave: "iching", tipo: "producto", ruta: "/iching", costo: COSTOS.iching, visual: "hexagrama", simbolos: ["☰"] },
+  { clave: "luna", tipo: "guia", ruta: "/luna", nombre: "Calendario lunar", visual: "luna", simbolos: ["✦"] },
+  { clave: "aura", tipo: "producto", ruta: "/aura", costo: COSTOS.aura, visual: "aura", simbolos: ["✦"] },
+  { clave: "cruce", tipo: "producto", ruta: "/cruce", costo: COSTOS.cruce, visual: "cruce", simbolos: ["✦"] },
+  { clave: "iching-guia", tipo: "guia", ruta: "/rituales#iching", nombre: "I Ching, el libro de los cambios", visual: "hexagrama", simbolos: ["☰"] },
+  { clave: "velas-lectura", tipo: "producto", ruta: "/velas", costo: COSTOS.velas, visual: "vela", simbolos: ["🕯"] },
+  { clave: "compatibilidad", tipo: "producto", ruta: "/compatibilidad", costo: COSTOS.compatibilidad, visual: "duo", simbolos: ["♡"] },
+  { clave: "tabaco", tipo: "guia", ruta: "/rituales#tabaco", nombre: "Lectura del tabaco", visual: "glifo/♨", simbolos: ["♨"] },
+  { clave: "chocolate-lectura", tipo: "producto", ruta: "/chocolate", costo: COSTOS.chocolate, visual: "glifo/☕", simbolos: ["☕"] },
+  { clave: "tabaco-lectura", tipo: "producto", ruta: "/tabaco", costo: COSTOS.tabaco, visual: "glifo/♨", simbolos: ["♨"] },
+];
+
+/** Clave del módulo en `portada.modulos` y en `rituales.guias`. */
+function claveModulo(f: Funcion) {
+  return f.clave.replace(/-(guia|lectura)$/, "");
+}
 
 const PREGUNTAS = [
   "¿Acepto el trabajo nuevo o me quedo donde estoy?",
@@ -76,23 +124,38 @@ const PREGUNTAS = [
   "¿Qué necesito soltar este mes?",
 ];
 
-/** Lecturas que se presentan los miércoles (rotación). */
-const PRODUCTOS: { clave: string; ruta: string; costo: number; glifo: string; carta?: string }[] = [
-  { clave: "tarot", ruta: "/tarot", costo: COSTOS.tarot_tres, glifo: "✦", carta: "rider/la-estrella" },
-  { clave: "astral", ruta: "/carta-astral", costo: COSTOS.carta_astral, glifo: "☉" },
-  { clave: "suenos", ruta: "/suenos", costo: COSTOS.suenos, glifo: "☾" },
-  { clave: "quiromancia", ruta: "/quiromancia", costo: COSTOS.quiromancia, glifo: "✦" },
-  { clave: "chocolate", ruta: "/chocolate", costo: COSTOS.chocolate, glifo: "✦" },
-  { clave: "iching", ruta: "/iching", costo: COSTOS.iching, glifo: "☰" },
-  { clave: "numerologia", ruta: "/numerologia", costo: COSTOS.numerologia, glifo: "✦" },
-  { clave: "velas", ruta: "/velas", costo: COSTOS.velas, glifo: "✦" },
-  { clave: "aura", ruta: "/aura", costo: COSTOS.aura, glifo: "✦" },
-  { clave: "chino", ruta: "/calendario-chino", costo: COSTOS.chino, glifo: "✦" },
-  { clave: "sinastria", ruta: "/sinastria", costo: COSTOS.sinastria, glifo: "☉ ☾" },
-  { clave: "cruce", ruta: "/cruce", costo: COSTOS.cruce, glifo: "✦" },
-  { clave: "tabaco", ruta: "/tabaco", costo: COSTOS.tabaco, glifo: "✦" },
-  { clave: "compatibilidad", ruta: "/compatibilidad", costo: COSTOS.compatibilidad, glifo: "♡" },
-];
+const INTENCION_VELA: ColorVela[] = ["rosa", "verde", "azul", "amarillo", "morado", "naranja"];
+
+/** Completa los visuales que cambian con la semana (pareja de signos, animal, hexagrama, colores). */
+function visualDe(f: Funcion, n: number, fecha: string): string {
+  const signo = (k: number) => SIGNOS[((k % SIGNOS.length) + SIGNOS.length) % SIGNOS.length].id;
+  const animal = (k: number) => ANIMALES[((k % ANIMALES.length) + ANIMALES.length) % ANIMALES.length];
+  switch (f.visual) {
+    case "duo":
+      return `duo/${signo(n)}+${signo(n + 6)}`;
+    case "cruce":
+      return `cruce/${signo(n + 3)}+${animal(n)}`;
+    case "hexagrama":
+      return `hexagrama/${HEXAGRAMAS[((n % 64) + 64) % 64].lineas.join("")}`;
+    case "aura": {
+      const a = COLORES_AURA[((n % COLORES_AURA.length) + COLORES_AURA.length) % COLORES_AURA.length];
+      const b = COLORES_AURA[(((n + 4) % COLORES_AURA.length) + COLORES_AURA.length) % COLORES_AURA.length];
+      return `aura/${a}+${b}`;
+    }
+    case "vela":
+      return `vela/${INTENCION_VELA[((n % INTENCION_VELA.length) + INTENCION_VELA.length) % INTENCION_VELA.length]}`;
+    case "numeros": {
+      const reducir = (v: number) => {
+        while (v > 9 && v !== 11 && v !== 22) v = String(v).split("").reduce((a, c) => a + Number(c), 0);
+        return v;
+      };
+      const [anio, mes, dia] = fecha.split("-").map(Number);
+      return `numeros/${reducir(dia)}·${reducir(mes + dia)}·${reducir(anio + mes + dia)}`;
+    }
+    default:
+      return f.visual;
+  }
+}
 
 const NOMBRE_FASE: Record<FaseClave, string> = { nueva: "Luna nueva", creciente: "Cuarto creciente", llena: "Luna llena", menguante: "Cuarto menguante" };
 const RITUAL_FASE: Record<FaseClave, string> = {
@@ -121,30 +184,40 @@ export async function encargosSemana(lunes: string): Promise<Encargo[]> {
   const n = indiceSemana(lunes);
   const encargos: Encargo[] = [];
 
+  const guias = t.rituales.guias as Record<string, { intro: string; consejo: string } | undefined>;
+  const fundadores = await estadoOfertaFundadores();
+  let ranura = 0;
+
   for (let i = 0; i < 7; i++) {
-    const tipo = TIPO_POR_DIA[i];
     const fecha = sumarDias(lunes, i);
-    switch (tipo) {
-      case "guia": {
-        const g = GUIAS[((n % GUIAS.length) + GUIAS.length) % GUIAS.length];
-        const guia = (t.rituales.guias as Record<string, { intro: string; consejo: string } | undefined>)[g.clave];
-        const detalle = guia ? `Intro de la guía: ${guia.intro} Consejo: ${guia.consejo}` : modulos[g.clave]?.texto ?? "";
-        encargos.push({ tipo, fecha, etiqueta: "Guía gratis", contexto: `Guía gratuita "${g.nombre}" en miarcana.com${g.ruta}. ${detalle} No exige registro.`, enlace: `miarcana.com${g.ruta.split("#")[0]}`, simbolos: g.clave === "luna" ? ["☾"] : ["✦"], carta: null, pie: "Guía gratis, sin registro" });
-        break;
+    let tipo = TIPO_POR_DIA[i];
+    // El jueves anuncia la oferta de fundadores mientras esté activa (y no haya vencido ese día).
+    if (tipo === "funcion" && i === 3 && fundadores.activa && fecha <= OFERTA_FUNDADORES.hasta.slice(0, 10)) tipo = "oferta";
+    if (tipo === "funcion") {
+      const f = FUNCIONES[(((n * RANURAS_POR_SEMANA + ranura) % FUNCIONES.length) + FUNCIONES.length) % FUNCIONES.length];
+      ranura++;
+      const clave = claveModulo(f);
+      const m = modulos[clave];
+      const nombre = m?.titulo ?? f.nombre ?? clave;
+      const visual = visualDe(f, n, fecha);
+      if (f.tipo === "guia") {
+        const guia = guias[clave];
+        const detalle = guia ? `Intro de la guía: ${guia.intro} Consejo: ${guia.consejo}` : m?.texto ?? "";
+        encargos.push({ tipo: "guia", fecha, etiqueta: nombre, contexto: `Guía gratuita "${nombre}" en miarcana.com${f.ruta}. ${detalle} No exige registro.`, enlace: `miarcana.com${f.ruta.split("#")[0]}`, simbolos: f.simbolos, carta: visual, pie: "Guía gratis, sin registro" });
+      } else {
+        const costo = f.costo ?? 1;
+        encargos.push({ tipo: "producto", fecha, etiqueta: nombre, contexto: `Lectura "${nombre}": ${m?.texto ?? ""} Cuesta ${costo} crédito${costo === 1 ? "" : "s"} (un crédito desde ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}). Enlace miarcana.com${f.ruta}.`, enlace: `miarcana.com${f.ruta}`, simbolos: f.simbolos, carta: visual, pie: `${costo} crédito${costo === 1 ? "" : "s"} · 3 de regalo al registrarte` });
       }
+      continue;
+    }
+    switch (tipo) {
       case "pregunta": {
         const p = PREGUNTAS[((n % PREGUNTAS.length) + PREGUNTAS.length) % PREGUNTAS.length];
         encargos.push({ tipo, fecha, etiqueta: "Pregúntale a Sibila", contexto: `Pregunta de ejemplo que alguien le haría a Sibila: «${p}». Sibila responde con tarot (tirada de tres cartas, 1 crédito) o por voz. Al registrarse hay 3 créditos de regalo.`, enlace: "miarcana.com", simbolos: ["✦"], carta: "rider/la-sacerdotisa", pie: "Tres créditos de regalo al entrar" });
         break;
       }
-      case "producto": {
-        const p = PRODUCTOS[((n % PRODUCTOS.length) + PRODUCTOS.length) % PRODUCTOS.length];
-        const m = modulos[p.clave];
-        encargos.push({ tipo, fecha, etiqueta: m?.titulo ?? p.clave, contexto: `Lectura "${m?.titulo ?? p.clave}": ${m?.texto ?? ""} Cuesta ${p.costo} crédito${p.costo === 1 ? "" : "s"} (un crédito desde ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}). Enlace miarcana.com${p.ruta}.`, enlace: `miarcana.com${p.ruta}`, simbolos: p.glifo.split(" "), carta: p.carta ?? null, pie: `${p.costo} crédito${p.costo === 1 ? "" : "s"} · 3 de regalo al registrarte` });
-        break;
-      }
       case "oferta": {
-        const f = await estadoOfertaFundadores();
+        const f = fundadores;
         if (f.activa) {
           const hasta = fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10));
           encargos.push({ tipo, fecha, etiqueta: "Oferta de fundadores", contexto: `Oferta de fundadores: el Círculo Arcana (30 días con el cielo personal cada mañana, preguntas a Sibila sin cobro y 15 créditos) a ${formatoCOP(OFERTA_FUNDADORES.precioCOP)} en lugar de ${formatoCOP(PAQUETE_CIRCULO.precioCOP)}. Solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}. Hasta el ${hasta}. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["✦"], carta: null, pie: `Quedan ${f.restantes} cupos · hasta el ${hasta}` });
@@ -226,8 +299,9 @@ export interface ResultadoGeneracion {
 export async function generarSemana(admin: SupabaseClient<Database>, lunes: string, desde = fechaBogota()): Promise<ResultadoGeneracion> {
   const { data: existentes, error } = await admin.from("publicaciones_programadas").select("fecha, tipo").eq("semana", lunes);
   if (error) throw new Error(`publicaciones: ${error.message}`);
-  const ocupadas = new Set((existentes ?? []).map((e) => `${e.fecha}:${e.tipo}`));
-  const encargos = (await encargosSemana(lunes)).filter((e) => e.fecha >= desde && !ocupadas.has(`${e.fecha}:${e.tipo}`));
+  // Un día ya cubierto no se vuelve a redactar aunque el calendario le asigne otro tipo.
+  const ocupadas = new Set((existentes ?? []).map((e) => e.fecha));
+  const encargos = (await encargosSemana(lunes)).filter((e) => e.fecha >= desde && !ocupadas.has(e.fecha));
   if (!encargos.length) return { semana: lunes, creadas: 0, omitidas: 7 };
 
   const redacciones = await redactar(encargos);

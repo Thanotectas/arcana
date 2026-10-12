@@ -63,7 +63,7 @@ export default async function PaginaAdminRedes() {
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Administración</p>
         <h1 className="font-display text-4xl font-semibold">Agente de redes</h1>
         <p className="mt-2 text-texto-suave">
-          Sibila escribe cada semana una publicación por día; aquí apruebas, editas o descartas. Lo aprobado sale a mediodía (hora de Bogotá) en{" "}
+          Sibila escribe cada semana una publicación por día, cada una sobre una función de la app (lecturas, guías, signo, luna); aquí apruebas, editas o descartas. Lo aprobado sale a mediodía (hora de Bogotá) como reel en{" "}
           {instagramConfigurado() ? "Instagram" : <span className="text-peligro">Instagram (sin configurar)</span>} y{" "}
           {facebookConfigurado() ? "Facebook" : <span className="text-peligro">Facebook (sin configurar)</span>}. La carta del día sigue saliendo sola a las 7:00.
         </p>

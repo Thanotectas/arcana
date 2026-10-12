@@ -21,37 +21,39 @@ import { fechaLargaEs } from "./calendario";
  * ImageResponse (como las tarjetas) y ffmpeg las anima. El video se guarda en
  * el bucket público "redes" de Supabase para que Meta lo descargue.
  */
-const ANCHO = 1080;
-const ALTO = 1920;
-const FPS = 24;
+export const ANCHO = 1080;
+export const ALTO = 1920;
+export const FPS = 24;
 const DURACION = 10;
-const BUCKET = "redes";
+export const BUCKET = "redes";
 
-const ejecutar = promisify(execFile);
+export const ejecutar = promisify(execFile);
 
-function rutaFfmpeg(): string {
+export function rutaFfmpeg(): string {
   if (process.env.FFMPEG_PATH) return process.env.FFMPEG_PATH;
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- el paquete resuelve el binario de la plataforma en tiempo de ejecución
   return (require("@ffmpeg-installer/ffmpeg") as { path: string }).path;
 }
 
-async function fuentes() {
+export async function fuentes() {
   const leer = (f: string) => readFile(join(process.cwd(), "src/app/fuentes", f));
-  const [cormorant, inter, interSemi] = await Promise.all([leer("CormorantGaramond-SemiBold.ttf"), leer("Inter-Medium.ttf"), leer("Inter-SemiBold.ttf")]);
+  const [cormorant, inter, interSemi, simbolos] = await Promise.all([leer("CormorantGaramond-SemiBold.ttf"), leer("Inter-Medium.ttf"), leer("Inter-SemiBold.ttf"), leer("NotoSansSymbols2.ttf")]);
   return [
     { name: "Cormorant", data: cormorant, weight: 600 as const, style: "normal" as const },
     { name: "Inter", data: inter, weight: 500 as const, style: "normal" as const },
     { name: "Inter", data: interSemi, weight: 600 as const, style: "normal" as const },
+    { name: "Simbolos", data: simbolos, weight: 400 as const, style: "normal" as const },
   ];
 }
 
-async function png(nodo: React.ReactElement, alto = ALTO): Promise<Buffer> {
-  const r = new ImageResponse(nodo, { width: ANCHO, height: alto, fonts: await fuentes() });
+/** Una capa del reel (PNG 1080×alto) dibujada con ImageResponse. */
+export async function png(nodo: React.ReactElement, alto = ALTO, ancho = ANCHO): Promise<Buffer> {
+  const r = new ImageResponse(nodo, { width: ancho, height: alto, fonts: await fuentes() });
   return Buffer.from(await r.arrayBuffer());
 }
 
 /** Estrellas deterministas (misma fecha, mismo cielo). */
-function estrellas(semilla: number, cantidad: number, alto: number) {
+export function estrellas(semilla: number, cantidad: number, alto: number) {
   let s = semilla || 1;
   const azar = () => ((s = (s * 16807) % 2147483647) / 2147483647);
   return Array.from({ length: cantidad }, () => ({ x: azar() * ANCHO, y: azar() * alto, r: 1 + azar() * 3, o: 0.25 + azar() * 0.6 }));
@@ -177,7 +179,7 @@ export async function generarReel(fecha: string): Promise<Buffer> {
   }
 }
 
-async function asegurarBucket(admin: SupabaseClient<Database>) {
+export async function asegurarBucket(admin: SupabaseClient<Database>) {
   const { data } = await admin.storage.getBucket(BUCKET);
   if (data) return;
   const { error } = await admin.storage.createBucket(BUCKET, { public: true, fileSizeLimit: "50MB", allowedMimeTypes: ["video/mp4", "image/png", "image/jpeg"] });

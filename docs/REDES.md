@@ -6,19 +6,42 @@ Nada sale sin aprobación. La carta del día sigue siendo automática.
 
 ## Calendario editorial (rotaciones por número de semana)
 
+Cada día presenta una función de la app. Lunes, miércoles, jueves y viernes
+recorren `FUNCIONES` (`src/lib/redes/calendario.ts`): las catorce lecturas de
+pago (tarot, carta astral, sueños, calendario chino, mano, numerología,
+sinastría, I Ching, aura, lecturas cruzadas, velas, compatibilidad, chocolate,
+tabaco) y las seis guías gratis, en una lista única de veinte que se recorre
+de cuatro en cuatro por semana (cinco semanas para dar la vuelta). Cada función
+lleva su visual (ver abajo).
+
 | Día | Tipo | De dónde sale el contexto |
 |---|---|---|
-| Lunes | `guia` | Una de las seis guías gratis (chocolate, velas, mano, luna, I Ching, tabaco). |
+| Lunes | `producto` o `guia` | Función de la lista (costo real de `COSTOS` o guía gratis). |
 | Martes | `pregunta` | Una pregunta de ejemplo para Sibila (lista de ocho). Lleva La Sacerdotisa. |
-| Miércoles | `producto` | Una de las catorce lecturas con su costo real (`COSTOS`). |
-| Jueves | `oferta` | Fundadores mientras esté activa (cupos reales); si no, alterna prueba de 1 crédito y Círculo. |
-| Viernes | `luna` | La próxima lunación real (`proximasLunaciones`) con signo, hora de Bogotá y vela sugerida. |
-| Sábado | `signo` | Un signo (moneda dorada) con sus rasgos. |
-| Domingo | `reflexion` | Cierre de semana e invitación a la carta del día gratis. |
+| Miércoles | `producto` o `guia` | Función de la lista. |
+| Jueves | `oferta` o función | Fundadores mientras esté activa y no haya vencido ese día (cupos reales); si no, función de la lista. |
+| Viernes | `producto` o `guia` | Función de la lista. |
+| Sábado | `signo` | Un signo (moneda dorada) con sus rasgos; horóscopo gratis y carta astral. |
+| Domingo | `luna` | La próxima lunación real (`proximasLunaciones`) con signo, hora de Bogotá y vela sugerida. |
 
-`src/lib/redes/calendario.ts` arma los encargos y pide los textos a Sibila en
+`encargosSemana` arma los encargos y `redactar` pide los textos a Sibila en
 una sola llamada (JSON con `titulo`, `extracto` y `texto`); `generarSemana`
-inserta los borradores que falten (unicidad por fecha y tipo).
+inserta los borradores de los días que aún no tienen ninguna publicación.
+El tipo `reflexion` sigue admitido en la tabla pero ya no se programa.
+
+## Visual de cada publicación (columna `carta`)
+
+`src/lib/redes/visual.tsx` interpreta un texto corto y lo dibuja en el reel
+(`visualParaReel`, en grande) y en la tarjeta fija (`visualParaTarjeta`):
+`rider/la-estrella` (carta), `signos/leo` o `animales/dragon` (moneda),
+`rueda/signos` o `rueda/animales` (las doce monedas girando despacio),
+`duo/tauro+escorpio` (dos signos), `cruce/leo+dragon` (signo y animal),
+`aura/violeta+dorado` (halos), `vela/verde` (vela encendida, SVG),
+`hexagrama/101101` (líneas de abajo arriba), `numeros/3·7·11`, `luna`
+(creciente dorada, SVG) y `glifo/✋` (símbolo grande: ✋ mano, ☕ chocolate,
+♨ tabaco). Las parejas, el animal, el hexagrama y los colores cambian con la
+semana (`visualDe`). Los degradados radiales se dibujan en SVG porque el motor
+de imágenes los pinta planos; un estilo con valor `undefined` lo rompe.
 
 ## Flujo
 
@@ -33,9 +56,17 @@ inserta los borradores que falten (unicidad por fecha y tipo).
    aprobado cuya fecha ya llegó (hasta dos días de atraso) con
    `publicarVencidas`. Cada fila se reserva (`publicando`) para no duplicar; las
    redes que ya tienen id no se repiten, así un reintento solo toca la que falló.
-4. **Imagen**: `/api/redes/publicacion?id=UUID` (1080×1350, `imagenTarjeta`),
-   con carta del mazo o moneda del signo según `carta` ("rider/la-estrella" o
-   "signos/libra"). Meta la descarga por URL pública; `v=` evita cachés viejas.
+4. **Reel**: cada publicación sale como reel de 12 s en Instagram y video en
+   Facebook (`src/lib/redes/reel-publicacion.tsx`: visual sobre el cielo con
+   acercamiento, cabecera con la etiqueta, título y frase de Sibila, y cierre
+   con el enlace y el pie). Se guarda en el bucket `redes` como
+   `reels/pub-<id>-<versión>.mp4` (la versión es la fecha de edición: al editar
+   se fabrica otro) y se reutiliza. Si falla cualquier paso se publica la
+   imagen fija; `REDES_REEL=0` publica solo imágenes. `resultados[red].formato`
+   dice qué salió. Vista previa por publicación en el panel ("Ver el reel").
+5. **Imagen de respaldo**: `/api/redes/publicacion?id=UUID` (1080×1350,
+   `imagenTarjeta`) con el mismo visual. Meta la descarga por URL pública;
+   `v=` evita cachés viejas.
 
 ## Tabla `publicaciones_programadas` (migración 0024)
 

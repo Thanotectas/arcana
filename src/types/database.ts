@@ -145,7 +145,7 @@ type PublicacionProgramadaRow = {
   enlace: string;
   pie: string;
   estado: "borrador" | "aprobada" | "publicando" | "publicada" | "descartada" | "error";
-  resultados: Record<string, { id?: string; error?: string }>;
+  resultados: Record<string, { id?: string; error?: string; formato?: "reel" | "imagen" }>;
   detalle: string | null;
   creado_en: string;
   actualizado_en: string;

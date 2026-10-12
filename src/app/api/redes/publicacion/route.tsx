@@ -1,8 +1,7 @@
 import type { NextRequest } from "next/server";
 import { imagenTarjeta } from "@/lib/marca/tarjeta";
-import { cartaComoDataUri, monedaComoDataUri } from "@/lib/marca/imagenes";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import type { IdMazo } from "@/lib/tarot/mazos";
+import { interpretarVisual, visualParaTarjeta } from "@/lib/redes/visual";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -18,27 +17,16 @@ export async function GET(request: NextRequest) {
   const { data: p } = await getSupabaseAdmin().from("publicaciones_programadas").select("*").eq("id", id).neq("estado", "descartada").maybeSingle();
   if (!p) return new Response("No encontrada", { status: 404 });
 
-  // "carta": "mazo/id" (ilustración de carta) o "signos/id" (moneda del signo).
-  let ilustracion: string | null = null;
-  let monedas = false;
-  if (p.carta) {
-    const [carpeta, nombre] = p.carta.split("/");
-    if (carpeta === "signos" && nombre) {
-      ilustracion = await monedaComoDataUri("signos", nombre);
-      monedas = true;
-    } else if (carpeta && nombre) {
-      ilustracion = await cartaComoDataUri(carpeta as IdMazo, nombre);
-    }
-  }
+  // `carta` describe el visual (carta, moneda, rueda, aura…); ver src/lib/redes/visual.tsx.
+  const visual = await visualParaTarjeta(interpretarVisual(p.carta, p.simbolos));
   const imagen = await imagenTarjeta({
     etiqueta: p.etiqueta,
     titulo: p.titulo,
-    simbolos: p.simbolos.length ? p.simbolos : ["✦"],
-    imagenes: ilustracion ? [ilustracion] : undefined,
-    monedas,
     extracto: p.extracto,
     enlace: p.enlace,
     pie: p.pie,
+    ...visual,
+    simbolos: visual.simbolos?.length ? visual.simbolos : p.simbolos.length ? p.simbolos : ["✦"],
   });
   imagen.headers.set("Cache-Control", "public, max-age=300");
   return imagen;

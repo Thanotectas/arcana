@@ -7,6 +7,7 @@ import { generarSemana, lunesDe, sumarDias } from "./calendario";
 import { publicarProgramada } from "./publicar";
 import { fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
+import { reelPublicacion } from "./reel-publicacion";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -86,11 +87,25 @@ export interface EstadoReel {
   url?: string;
 }
 
-/** Genera (o reutiliza) el reel de la carta del día de hoy para verlo antes de que salga. */
+/**
+ * Genera (o reutiliza) un reel para verlo antes de que salga: el de la carta
+ * del día de hoy o, si viene `id`, el de esa publicación del agente.
+ */
 export async function accionVistaReel(_prev: EstadoReel, formData: FormData): Promise<EstadoReel> {
   await requerirAdmin();
+  const id = texto(formData, "id", 36);
+  const regenerar = formData.get("regenerar") === "1";
   try {
-    const url = await reelCartaDelDia(getSupabaseAdmin(), fechaBogota(), { regenerar: formData.get("regenerar") === "1" });
+    const admin = getSupabaseAdmin();
+    let url: string;
+    if (id) {
+      if (!UUID.test(id)) return { error: "Publicación no válida." };
+      const { data: fila } = await admin.from("publicaciones_programadas").select("*").eq("id", id).neq("estado", "descartada").maybeSingle();
+      if (!fila) return { error: "Publicación no encontrada." };
+      url = await reelPublicacion(admin, fila, { regenerar });
+    } else {
+      url = await reelCartaDelDia(admin, fechaBogota(), { regenerar });
+    }
     return { url: `${url}?v=${Date.now()}` };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo generar el reel." };

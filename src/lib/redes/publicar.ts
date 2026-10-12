@@ -1,9 +1,10 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import { instagramConfigurado, publicarImagen } from "./instagram";
-import { facebookConfigurado, publicarFotoFacebook } from "./facebook";
+import { instagramConfigurado, publicarImagen, publicarReel } from "./instagram";
+import { facebookConfigurado, publicarFotoFacebook, publicarVideoFacebook } from "./facebook";
 import { fechaBogota } from "./carta-dia";
+import { reelPublicacion } from "./reel-publicacion";
 import type { PublicacionProgramada } from "./calendario";
 
 type Red = "instagram" | "facebook";
@@ -24,6 +25,8 @@ export type ResultadoPublicacion = { id: string; estado: "publicada" | "error" |
  * Publica una fila aprobada en sus redes. Reserva la fila (aprobada o error →
  * publicando) para que dos corridas no la publiquen dos veces; las redes que
  * ya tienen id no se repiten, así un reintento solo toca la que falló.
+ * Sale como reel (video de 12 s) y, si el video falla en cualquier paso, como
+ * la imagen fija de siempre; `REDES_REEL=0` publica solo la imagen.
  */
 export async function publicarProgramada(admin: SupabaseClient<Database>, id: string): Promise<ResultadoPublicacion> {
   const { data: fila } = await admin
@@ -38,6 +41,9 @@ export async function publicarProgramada(admin: SupabaseClient<Database>, id: st
   const imagen = urlImagenPublicacion(fila);
   const resultados: PublicacionProgramada["resultados"] = { ...fila.resultados };
   const errores: string[] = [];
+  // El reel se genera una sola vez para ambas redes (y solo si alguna lo necesita).
+  let reel: Promise<string> | null = null;
+  const obtenerReel = () => (reel ??= reelPublicacion(admin, fila));
   for (const red of fila.redes as Red[]) {
     if (resultados[red]?.id) continue;
     const configurada = red === "instagram" ? instagramConfigurado() : facebookConfigurado();
@@ -47,8 +53,20 @@ export async function publicarProgramada(admin: SupabaseClient<Database>, id: st
       continue;
     }
     try {
-      const postId = red === "instagram" ? await publicarImagen(imagen, fila.texto) : await publicarFotoFacebook(imagen, fila.texto);
-      resultados[red] = { id: postId };
+      let postId: string | null = null;
+      if (process.env.REDES_REEL !== "0") {
+        try {
+          const video = await obtenerReel();
+          postId = red === "instagram" ? await publicarReel(video, fila.texto) : await publicarVideoFacebook(video, fila.texto);
+          resultados[red] = { id: postId, formato: "reel" };
+        } catch (e) {
+          console.error(`[redes ${red}] reel falló, se publica la imagen:`, e instanceof Error ? e.message : e);
+        }
+      }
+      if (!postId) {
+        postId = red === "instagram" ? await publicarImagen(imagen, fila.texto) : await publicarFotoFacebook(imagen, fila.texto);
+        resultados[red] = { id: postId, formato: "imagen" };
+      }
     } catch (e) {
       const detalle = e instanceof Error ? e.message : String(e);
       console.error(`[redes ${red}]`, detalle);

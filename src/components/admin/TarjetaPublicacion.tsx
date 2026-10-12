@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
 import { accionPublicacion, type EstadoAdminRedes } from "@/lib/redes/acciones";
 import { Aviso } from "@/components/Aviso";
+import { VistaReel } from "./VistaReel";
 
 /** Botón de envío con nombre y valor: muestra el giro solo en el que se pulsó. */
 function BotonAccion({ valor, className = "boton boton-secundario", children }: { valor: string; className?: string; children: React.ReactNode }) {
@@ -30,7 +31,7 @@ export interface PublicacionVista {
   redes: string[];
   estado: string;
   detalle: string | null;
-  resultados: Record<string, { id?: string; error?: string }>;
+  resultados: Record<string, { id?: string; error?: string; formato?: string }>;
   imagen: string;
 }
 
@@ -61,11 +62,15 @@ export function TarjetaPublicacion({ p }: { p: PublicacionVista }) {
               return (
                 <span key={r} className="mr-2">
                   {r === "instagram" ? "Instagram" : "Facebook"}
-                  {res?.id ? " ✓" : res?.error ? " ✗" : ""}
+                  {res?.id ? ` ✓${res.formato === "reel" ? " reel" : res.formato === "imagen" ? " imagen" : ""}` : res?.error ? " ✗" : ""}
                 </span>
               );
             })}
           </p>
+          <p className="mt-1 text-xs text-texto-suave">Sale como reel de 12 s con este mismo contenido; la imagen es el respaldo.</p>
+          <div className="mt-2">
+            <VistaReel id={p.id} compacto />
+          </div>
         </div>
         <form action={enviar} className="space-y-3">
           <input type="hidden" name="id" value={p.id} />
