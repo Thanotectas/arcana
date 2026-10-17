@@ -116,6 +116,7 @@ export const pt: Diccionario = {
       copiado: "Link copiado",
       whatsapp: "WhatsApp",
       descargar: "Salvar como imagem",
+      historia: "Compartilhar no meu story",
       imagenLista: "Imagem pronta para compartilhar",
       tarjetaPie: "Com meu link você ganha créditos extras",
       nuevaLectura: "Nova leitura",

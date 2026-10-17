@@ -119,6 +119,7 @@ export const en: Diccionario = {
       copiado: "Link copied",
       whatsapp: "WhatsApp",
       descargar: "Save as image",
+      historia: "Share to my story",
       imagenLista: "Image ready to share",
       tarjetaPie: "With my link you get extra credits",
       nuevaLectura: "New reading",

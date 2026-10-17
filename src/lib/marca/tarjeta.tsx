@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { simboloDataUri } from "./simbolo";
 
 export const TAMANO_TARJETA = { width: 1080, height: 1350 };
+/** Historia de Instagram, Facebook o estado de WhatsApp (9:16). */
+export const TAMANO_HISTORIA = { width: 1080, height: 1920 };
 
 async function fuentes() {
   const [cormorant, inter, simbolos] = await Promise.all([
@@ -31,6 +33,8 @@ export interface DatosTarjeta {
   imagenes?: string[];
   /** Las imágenes son monedas redondas (signos, animales): sin marco de carta. */
   monedas?: boolean;
+  /** "historia" = 1080×1920 con márgenes para los controles de Instagram; por defecto publicación 1080×1350. */
+  formato?: "publicacion" | "historia";
 }
 
 /** Recorta el Markdown a una frase limpia para la tarjeta. */
@@ -51,7 +55,14 @@ export function extractoDe(interpretacion: string, max = 230) {
 }
 
 export async function imagenTarjeta(d: DatosTarjeta) {
-  const tamanoTitulo = d.titulo.length > 60 ? 48 : d.titulo.length > 34 ? 60 : 76;
+  const historia = d.formato === "historia";
+  // En la historia todo crece un poco y se deja aire arriba y abajo (ahí van los controles de Instagram).
+  const escala = historia ? 1.18 : 1;
+  const tamanoTitulo = Math.round((d.titulo.length > 60 ? 48 : d.titulo.length > 34 ? 60 : 76) * escala);
+  const unaImagen = d.imagenes?.length === 1;
+  const ladoMoneda = Math.round((unaImagen ? 260 : 220) * escala);
+  const anchoCarta = Math.round((unaImagen ? 300 : 230) * escala);
+  const altoCarta = Math.round((unaImagen ? 527 : 404) * escala);
   return new ImageResponse(
     (
       <div
@@ -61,7 +72,7 @@ export async function imagenTarjeta(d: DatosTarjeta) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "72px 72px 64px",
+          padding: historia ? "200px 72px 250px" : "72px 72px 64px",
           background:
             "radial-gradient(800px 600px at 50% 0%, rgba(139,108,246,0.35), transparent 60%), radial-gradient(700px 500px at 100% 100%, rgba(217,180,90,0.18), transparent 60%), #0b0716",
           color: "#ece6f7",
@@ -96,9 +107,9 @@ export async function imagenTarjeta(d: DatosTarjeta) {
               {/* eslint-disable @next/next/no-img-element -- ImageResponse no usa next/image */}
               {d.imagenes.slice(0, 3).map((src, i) =>
                 d.monedas ? (
-                  <img key={i} src={src} width={d.imagenes!.length === 1 ? 260 : 220} height={d.imagenes!.length === 1 ? 260 : 220} alt="" style={{ filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }} />
+                  <img key={i} src={src} width={ladoMoneda} height={ladoMoneda} alt="" style={{ filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }} />
                 ) : (
-                  <img key={i} src={src} width={d.imagenes!.length === 1 ? 300 : 230} height={d.imagenes!.length === 1 ? 527 : 404} alt="" style={{ borderRadius: 18, border: "4px solid rgba(241,217,154,0.7)", boxShadow: "0 30px 60px rgba(0,0,0,0.6)" }} />
+                  <img key={i} src={src} width={anchoCarta} height={altoCarta} alt="" style={{ borderRadius: 18, border: "4px solid rgba(241,217,154,0.7)", boxShadow: "0 30px 60px rgba(0,0,0,0.6)" }} />
                 ),
               )}
               {/* eslint-enable @next/next/no-img-element */}
@@ -111,15 +122,19 @@ export async function imagenTarjeta(d: DatosTarjeta) {
             </div>
           )}
           <div style={{ fontFamily: "Cormorant", fontSize: tamanoTitulo, lineHeight: 1.1, color: "#ffffff", maxWidth: 900 }}>{d.titulo}</div>
-          <div style={{ fontSize: 30, lineHeight: 1.45, color: "#d9d2ea", maxWidth: 880, fontStyle: "italic" }}>{`“${d.extracto}”`}</div>
+          <div style={{ fontSize: Math.round(30 * escala), lineHeight: 1.45, color: "#d9d2ea", maxWidth: 880, fontStyle: "italic" }}>{`“${d.extracto}”`}</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 28 }}>
-          <span style={{ fontSize: 30, color: "#f1d99a" }}>{d.enlace}</span>
-          <span style={{ fontSize: 22, color: "#a89fc0" }}>{d.pie}</span>
+          {historia ? (
+            <span style={{ fontSize: 38, color: "#0b0716", background: "linear-gradient(135deg, #f1d99a, #d9b45a)", padding: "16px 44px", borderRadius: 999 }}>{d.enlace}</span>
+          ) : (
+            <span style={{ fontSize: 30, color: "#f1d99a" }}>{d.enlace}</span>
+          )}
+          <span style={{ fontSize: historia ? 28 : 22, color: "#a89fc0", marginTop: historia ? 8 : 0 }}>{d.pie}</span>
         </div>
       </div>
     ),
-    { ...TAMANO_TARJETA, fonts: await fuentes() },
+    { ...(historia ? TAMANO_HISTORIA : TAMANO_TARJETA), fonts: await fuentes() },
   );
 }

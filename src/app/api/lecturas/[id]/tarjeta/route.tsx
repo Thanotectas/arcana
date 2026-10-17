@@ -15,11 +15,13 @@ import type { TipoLectura } from "@/lib/creditos";
 import type { PerfilNumerologico } from "@/lib/numerologia";
 
 /**
- * Tarjeta vertical (1080×1350) para compartir una lectura en redes y
- * WhatsApp. Incluye el enlace de invitación de la persona: cada lectura
- * compartida es una invitación.
+ * Tarjeta vertical para compartir una lectura en redes y WhatsApp: 1080×1350
+ * (publicación) o, con ?formato=historia, 1080×1920 para historias y estados.
+ * Incluye el enlace de invitación de la persona: cada lectura compartida es
+ * una invitación.
  */
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const formato = new URL(req.url).searchParams.get("formato") === "historia" ? "historia" : "publicacion";
   const { id } = await params;
   const supabase = await createClient();
   const {
@@ -128,8 +130,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     hexagrama,
     imagenes: imagenes?.filter(Boolean),
     monedas: tipo === "carta_astral" || tipo === "compatibilidad" || tipo === "chino" || tipo === "sinastria" || tipo === "aura",
+    formato,
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
-  respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}.png"`);
+  respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}${formato === "historia" ? "-historia" : ""}.png"`);
   return respuesta;
 }

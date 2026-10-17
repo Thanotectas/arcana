@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check, MessageCircle, ImageDown, FileDown, Loader2 } from "lucide-react";
+import { Share2, Check, MessageCircle, ImageDown, FileDown, Loader2, Smartphone } from "lucide-react";
 import { useT } from "@/lib/i18n/cliente";
 
 /**
- * Compartir una lectura: WhatsApp, enlace, o la tarjeta como imagen (se
- * comparte como archivo en el celular; en escritorio se descarga).
+ * Compartir una lectura: en la historia (imagen 9:16 con el enlace de
+ * invitación; en el celular abre el menú de compartir con Instagram,
+ * Facebook y WhatsApp), como imagen de publicación, PDF, WhatsApp o enlace.
+ * En escritorio las imágenes se descargan.
  */
 export function CompartirLectura({ titulo, id, lista }: { titulo: string; id: string; lista: boolean }) {
   const { t } = useT();
   const [copiado, setCopiado] = useState(false);
-  const [generando, setGenerando] = useState(false);
+  const [generando, setGenerando] = useState<"publicacion" | "historia" | null>(null);
   const [generandoPdf, setGenerandoPdf] = useState(false);
 
   async function compartir() {
@@ -38,13 +40,13 @@ export function CompartirLectura({ titulo, id, lista }: { titulo: string; id: st
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  async function imagen() {
-    setGenerando(true);
+  async function imagen(formato: "publicacion" | "historia") {
+    setGenerando(formato);
     try {
-      const res = await fetch(`/api/lecturas/${id}/tarjeta`);
+      const res = await fetch(`/api/lecturas/${id}/tarjeta${formato === "historia" ? "?formato=historia" : ""}`);
       if (!res.ok) return;
       const blob = await res.blob();
-      const archivo = new File([blob], `arcana-${id.slice(0, 8)}.png`, { type: "image/png" });
+      const archivo = new File([blob], `arcana-${id.slice(0, 8)}${formato === "historia" ? "-historia" : ""}.png`, { type: "image/png" });
       if (navigator.canShare?.({ files: [archivo] })) {
         try {
           await navigator.share({ files: [archivo], title: titulo });
@@ -59,7 +61,7 @@ export function CompartirLectura({ titulo, id, lista }: { titulo: string; id: st
       enlace.click();
       URL.revokeObjectURL(enlace.href);
     } finally {
-      setGenerando(false);
+      setGenerando(null);
     }
   }
 
@@ -91,8 +93,14 @@ export function CompartirLectura({ titulo, id, lista }: { titulo: string; id: st
   return (
     <div className="flex flex-wrap gap-2">
       {lista && (
-        <button type="button" onClick={imagen} disabled={generando} className="boton boton-primario px-3 py-1.5 text-sm">
-          {generando ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <ImageDown className="h-4 w-4" aria-hidden />}
+        <button type="button" onClick={() => imagen("historia")} disabled={generando !== null} className="boton boton-primario px-3 py-1.5 text-sm">
+          {generando === "historia" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Smartphone className="h-4 w-4" aria-hidden />}
+          {t.lecturas.detalle.historia}
+        </button>
+      )}
+      {lista && (
+        <button type="button" onClick={() => imagen("publicacion")} disabled={generando !== null} className="boton boton-secundario px-3 py-1.5 text-sm">
+          {generando === "publicacion" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <ImageDown className="h-4 w-4" aria-hidden />}
           {t.lecturas.detalle.descargar}
         </button>
       )}

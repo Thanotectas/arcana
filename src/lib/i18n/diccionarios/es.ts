@@ -118,6 +118,7 @@ export const es = {
       copiado: "Enlace copiado",
       whatsapp: "WhatsApp",
       descargar: "Guardar como imagen",
+      historia: "Compartir en mi historia",
       imagenLista: "Imagen lista para compartir",
       tarjetaPie: "Con mi enlace recibes créditos extra",
       nuevaLectura: "Nueva lectura",
