@@ -1062,6 +1062,18 @@ export const en: Diccionario = {
     circuloRestantes: "Circle: {n} messages at no charge today",
     cuesta: "Each message costs {n} credit",
     fallo: "I could not answer. If the message was charged, I refunded the credit.",
+    visita: {
+      boton: "Ask Sibila",
+      subtitulo: "I answer your questions about Arcana",
+      bienvenida: "Hi, I'm {nombre}. I can tell you what Arcana is, which reading suits you, what it costs and what's free. What would you like to know?",
+      sugerencias: ["What is Arcana?", "What's free?", "Which reading suits me?", "How do I pay?"],
+      gratis: "Free, no account needed",
+      restantes: "{n} free messages left today",
+      regalo: "Create your account: 3 free credits",
+      limite: "We've talked a lot today. Create your account to continue: it's free and comes with 3 credits.",
+      ocupado: "There are many conversations right now. Please try again in a while.",
+      fallo: "I couldn't answer right now. Please try again in a moment.",
+    },
   },
   persuasion: {
     contadorSemana: "{n} readings written this week",

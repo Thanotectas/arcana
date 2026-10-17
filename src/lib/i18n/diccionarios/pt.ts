@@ -1059,6 +1059,18 @@ export const pt: Diccionario = {
     circuloRestantes: "Círculo: {n} mensagens sem cobrança hoje",
     cuesta: "Cada mensagem custa {n} crédito",
     fallo: "Não consegui responder. Se a mensagem foi cobrada, devolvi o crédito.",
+    visita: {
+      boton: "Pergunte à Sibila",
+      subtitulo: "Tiro suas dúvidas sobre a Arcana",
+      bienvenida: "Olá, sou a {nombre}. Conto o que é a Arcana, qual leitura combina com você, quanto custa e o que é grátis. O que você gostaria de saber?",
+      sugerencias: ["O que é a Arcana?", "O que é grátis?", "Qual leitura combina comigo?", "Como pago?"],
+      gratis: "Grátis, sem conta",
+      restantes: "Restam {n} mensagens grátis hoje",
+      regalo: "Crie sua conta: 3 créditos de presente",
+      limite: "Por hoje já conversamos bastante. Crie sua conta para continuar: é grátis e vem com 3 créditos.",
+      ocupado: "Há muitas conversas ao mesmo tempo. Tente de novo daqui a pouco.",
+      fallo: "Não consegui responder agora. Tente de novo em instantes.",
+    },
   },
   persuasion: {
     contadorSemana: "{n} leituras escritas esta semana",

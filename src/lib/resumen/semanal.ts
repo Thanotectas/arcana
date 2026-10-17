@@ -37,7 +37,7 @@ export interface ResumenSemanal {
     agente: { publicadas: number; errores: number; borradores: number };
     /** Cifras de Meta de lo publicado en la semana (si el cron de métricas ya corrió). */
     rendimiento: { porTipo: PromedioTipo[]; mejor: { tipo: string; red: string; fecha: string; vistas: number | null; interacciones: number } | null; interaccionesTotal: number; vistasTotal: number };
-    sibila: { respondidas: number; humano: number };
+    sibila: { respondidas: number; humano: number; visitantes: number };
   };
   alertas: string[];
 }
@@ -128,6 +128,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   // Las tablas de métricas e interacciones pueden no existir aún (migraciones 0027 y 0028): se ignoran sus errores.
   const { data: metricas } = await admin.from("metricas_redes").select("*").gte("fecha", desde).lt("fecha", hasta).limit(200);
   const { data: interaccionesSibila } = await admin.from("interacciones_redes").select("estado, humano").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const { count: visitantes } = await admin.from("chat_visitas").select("id", { count: "exact", head: true }).gte("creado_en", iso(desde)).lt("creado_en", iso(hasta));
   const mejor = [...(metricas ?? [])].sort((a, b) => interacciones(b) - interacciones(a) || (b.vistas ?? 0) - (a.vistas ?? 0))[0];
   const borradores = (agente ?? []).filter((p) => p.estado === "borrador" && p.fecha >= hoy).length;
 
@@ -160,7 +161,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
         interaccionesTotal: (metricas ?? []).reduce((s, m) => s + interacciones(m), 0),
         vistasTotal: (metricas ?? []).reduce((s, m) => s + (m.vistas ?? 0), 0),
       },
-      sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length },
+      sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length, visitantes: visitantes ?? 0 },
     },
     alertas: [],
   };
@@ -232,6 +233,7 @@ export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [strin
         ["Carta del día en redes", `${r.redes.cartaDia.publicadas} publicadas`, r.redes.cartaDia.errores ? `${r.redes.cartaDia.errores} errores` : undefined],
         ["Agente de redes", `${r.redes.agente.publicadas} publicadas`, `${r.redes.agente.borradores} por aprobar${r.redes.agente.errores ? ` · ${r.redes.agente.errores} errores` : ""}`],
         ["Sibila respondió en redes", String(r.redes.sibila.respondidas), r.redes.sibila.humano ? `${r.redes.sibila.humano} pidieron una persona` : undefined],
+        ["Preguntas en el chat de la página", String(r.redes.sibila.visitantes), "visitantes sin cuenta"],
       ],
     },
     {

@@ -20,7 +20,7 @@ export const ASISTENTE = {
   historial: 14,
 } as const;
 
-const RUTAS: Record<TipoLectura, string> = {
+export const RUTAS: Record<TipoLectura, string> = {
   tarot_carta: "/tarot?tirada=tarot_carta",
   tarot_tres: "/tarot",
   tarot_celta: "/tarot",

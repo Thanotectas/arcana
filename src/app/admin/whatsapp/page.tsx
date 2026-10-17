@@ -39,7 +39,11 @@ export default async function PaginaWhatsapp() {
     }
     perfil = await leerPerfil().catch(() => null);
   }
-  const { data } = await getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, tipo, humano, creado_en").order("creado_en", { ascending: false }).limit(400);
+  const [{ data }, { data: visitas }] = await Promise.all([
+    getSupabaseAdmin().from("mensajes_whatsapp").select("id, telefono, nombre, rol, contenido, tipo, humano, creado_en").order("creado_en", { ascending: false }).limit(400),
+    // Tabla de la migración 0030: si aún no existe, la sección queda vacía.
+    getSupabaseAdmin().from("chat_visitas").select("id, idioma, pregunta, respuesta, estado, creado_en").order("creado_en", { ascending: false }).limit(40),
+  ]);
   const mensajes = (data ?? []) as Mensaje[];
   const porTelefono = new Map<string, Mensaje[]>();
   for (const m of mensajes) porTelefono.set(m.telefono, [...(porTelefono.get(m.telefono) ?? []), m]);
@@ -95,6 +99,30 @@ export default async function PaginaWhatsapp() {
         </section>
       )}
 
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Chat de la página (visitantes)</h2>
+        <p className="text-sm text-texto-suave">
+          La burbuja «Pregúntale a Sibila» para quien no ha entrado a su cuenta: gratis, hasta 12 mensajes por persona al día. Sirve para ver qué dudas tiene la gente antes de registrarse.
+        </p>
+        {visitas?.length ? (
+          <ul className="space-y-2 text-sm">
+            {visitas.map((v) => (
+              <li key={v.id} className="rounded-xl border border-borde p-3">
+                <p className="text-xs text-texto-suave">
+                  {hora(v.creado_en)} · {v.idioma}
+                  {v.estado === "error" ? <span className="text-peligro"> · sin respuesta</span> : null}
+                </p>
+                <p className="mt-1">{v.pregunta}</p>
+                {v.respuesta && <p className="mt-1 line-clamp-3 text-violeta-suave">Sibila: {v.respuesta}</p>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-texto-suave">Aún no hay preguntas de visitantes.</p>
+        )}
+      </section>
+
+      <h2 className="font-display text-2xl font-semibold">Conversaciones de WhatsApp</h2>
       {conversaciones.length === 0 && <p className="text-sm text-texto-suave">Todavía no ha escrito nadie.</p>}
 
       {conversaciones.map((c) => (

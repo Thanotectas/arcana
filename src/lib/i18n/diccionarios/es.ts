@@ -1061,6 +1061,18 @@ export const es = {
     circuloRestantes: "Círculo: {n} mensajes sin cobro hoy",
     cuesta: "Cada mensaje cuesta {n} crédito",
     fallo: "No pude responder. Si se cobró el mensaje, te devolví el crédito.",
+    visita: {
+      boton: "Pregúntale a Sibila",
+      subtitulo: "Resuelvo tus dudas sobre Arcana",
+      bienvenida: "Hola, soy {nombre}. Te cuento qué es Arcana, qué lectura te sirve, cuánto cuesta y qué es gratis. ¿Qué te gustaría saber?",
+      sugerencias: ["¿Qué es Arcana?", "¿Qué es gratis?", "¿Qué lectura me sirve?", "¿Cómo pago?"],
+      gratis: "Gratis, sin cuenta",
+      restantes: "Te quedan {n} mensajes gratis hoy",
+      regalo: "Crea tu cuenta: 3 créditos de regalo",
+      limite: "Por hoy ya conversamos bastante. Crea tu cuenta para seguir: es gratis y trae 3 créditos de regalo.",
+      ocupado: "Hay muchas conversaciones a la vez. Intenta de nuevo en un rato.",
+      fallo: "No pude responder ahora. Intenta de nuevo en un momento.",
+    },
   },
   persuasion: {
     contadorSemana: "{n} lecturas escritas esta semana",

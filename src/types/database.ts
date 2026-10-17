@@ -152,6 +152,16 @@ type PublicacionProgramadaRow = {
   publicado_en: string | null;
 };
 
+type ChatVisitaRow = {
+  id: number;
+  huella: string;
+  idioma: string;
+  pregunta: string;
+  respuesta: string | null;
+  estado: "escribiendo" | "lista" | "error";
+  creado_en: string;
+};
+
 type MetricaRedesRow = {
   id: number;
   red: "instagram" | "facebook";
@@ -338,6 +348,12 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      chat_visitas: {
+        Row: ChatVisitaRow;
+        Insert: Insertable<ChatVisitaRow, "id" | "idioma" | "respuesta" | "estado" | "creado_en">;
+        Update: Partial<ChatVisitaRow>;
         Relationships: [];
       };
       metricas_redes: {

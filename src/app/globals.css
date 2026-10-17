@@ -186,6 +186,11 @@ body {
 .prosa em {
   color: var(--violeta-suave);
 }
+.prosa a {
+  color: var(--oro-suave);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 .carta-tarot {
   aspect-ratio: 5 / 8.5;
