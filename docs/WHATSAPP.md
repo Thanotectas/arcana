@@ -100,3 +100,15 @@ subida reanudable de la app (`WA_APP_ID`, por defecto 728785650291159) y su
 "handle". Si la subida falla, los textos se aplican igual y la foto se sube a
 mano en WhatsApp Manager. El nombre visible ("Arcana") lo aprueba Meta; hasta
 entonces el chat muestra el número.
+
+## Cuenta inhabilitada (12 oct 2026)
+
+Meta desactivó el portfolio comercial «thanotectas» y con él la cuenta de
+WhatsApp «Arcana» (+57 300 127 7552) por «incumplimiento de las Condiciones
+de uso aceptable» (Política de comercio). Sin la cuenta no se reciben ni se
+envían mensajes. El dueño pidió la revisión el 17 oct 2026 (24–48 h).
+Mientras tanto `WHATSAPP.activo = false` en `src/lib/marca/redes.ts`: el
+botón «Escríbenos» del pie lleva a los mensajes de Instagram, que responde
+Sibila (`/api/webhooks/meta`). Al recuperarla, volver a `true`.
+No crear otra cuenta ni otro número para seguir operando mientras la
+revisión está abierta: Meta lo trata como evasión de la restricción.

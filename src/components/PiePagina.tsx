@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getT } from "@/lib/i18n/servidor";
-import { REDES, WHATSAPP } from "@/lib/marca/redes";
+import { MENSAJE_INSTAGRAM, REDES, WHATSAPP } from "@/lib/marca/redes";
 import { IconoRed } from "./IconoRed";
 
 export async function PiePagina() {
@@ -15,10 +15,17 @@ export async function PiePagina() {
             <Link href="/creditos" className="hover:text-texto">{t.pie.precios}</Link>
           </nav>
           <div className="flex flex-wrap items-center gap-3">
-            <a href={WHATSAPP.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-exito/40 px-3 py-1.5 text-exito transition hover:border-exito hover:text-texto" title={`WhatsApp ${WHATSAPP.visible}`}>
-              <IconoRed id="whatsapp" className="h-4 w-4" />
-              <span>{t.pie.whatsapp}</span>
-            </a>
+            {WHATSAPP.activo ? (
+              <a href={WHATSAPP.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-exito/40 px-3 py-1.5 text-exito transition hover:border-exito hover:text-texto" title={`WhatsApp ${WHATSAPP.visible}`}>
+                <IconoRed id="whatsapp" className="h-4 w-4" />
+                <span>{t.pie.whatsapp}</span>
+              </a>
+            ) : (
+              <a href={MENSAJE_INSTAGRAM.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-oro/40 px-3 py-1.5 text-oro-suave transition hover:border-oro hover:text-texto" title={`Instagram ${MENSAJE_INSTAGRAM.usuario}`}>
+                <IconoRed id="instagram" className="h-4 w-4" />
+                <span>{t.pie.whatsapp}</span>
+              </a>
+            )}
             <span className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.pie.siguenos}</span>
             {REDES.map((r) => (
               <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-borde px-3 py-1.5 transition hover:border-oro/50 hover:text-oro-suave" title={`${r.nombre} ${r.usuario}`}>
