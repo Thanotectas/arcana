@@ -2,6 +2,8 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { extraerInteracciones, firmaValidaMeta, metaConfigurado, tokenVerificacionMeta, type AvisoMeta } from "@/lib/redes/meta";
 import { atenderInteraccion } from "@/lib/redes/sibila-redes";
+import { atenderAvisoWhatsapp } from "@/lib/whatsapp/webhook";
+import type { AvisoWhatsapp } from "@/lib/whatsapp/api";
 
 // Sibila tarda unos segundos por respuesta; Meta solo espera el 200.
 export const maxDuration = 60;
@@ -28,14 +30,19 @@ export async function POST(request: Request) {
     console.warn("[meta] firma inválida");
     return NextResponse.json({ ok: false, motivo: "firma" }, { status: 401 });
   }
-  if (!metaConfigurado()) return NextResponse.json({ ok: false, motivo: "sin_configurar" }, { status: 503 });
-
   let aviso: AvisoMeta;
   try {
     aviso = JSON.parse(cuerpo) as AvisoMeta;
   } catch {
     return NextResponse.json({ ok: false, motivo: "json" });
   }
+  // Si el webhook de WhatsApp quedó apuntando aquí (misma app de Meta), se atiende igual.
+  if (aviso.object === "whatsapp_business_account") {
+    console.warn("[meta] llegó un aviso de WhatsApp a /api/webhooks/meta: conviene apuntar el webhook de WhatsApp a /api/webhooks/whatsapp");
+    const r = atenderAvisoWhatsapp(aviso as unknown as AvisoWhatsapp);
+    return NextResponse.json(r.cuerpo, { status: r.status });
+  }
+  if (!metaConfigurado()) return NextResponse.json({ ok: false, motivo: "sin_configurar" }, { status: 503 });
   const interacciones = extraerInteracciones(aviso);
   console.info(`[meta] aviso ${aviso.object ?? "?"}: ${interacciones.length} interacción(es)`);
   if (!interacciones.length) return NextResponse.json({ ok: true, ignorado: "sin_interacciones" });
