@@ -101,3 +101,52 @@ de la tarde. Si el reel falla en cualquier paso, se publica la imagen de siempre
 `REDES_REEL=0` vuelve a la imagen fija. El texto de la publicación termina con la
 invitación "Sibila te lee tres cartas sobre tu pregunta por $1.900" (precio del
 paquete de prueba). Vista previa en `/admin/redes` → "Ver el reel de hoy".
+
+## Sibila responde comentarios y mensajes (17 oct 2026)
+
+Cuando alguien comenta una publicación de Instagram o Facebook, o escribe por
+mensaje directo, Sibila responde: a los comentarios con una línea personal (si
+mencionan su signo, apoyada en el horóscopo de hoy de `horoscopoDelDia`) y la
+invitación a la carta del día gratis; a los mensajes como en WhatsApp, con los
+hechos de Arcana (`hechos()` de `src/lib/whatsapp/sibila.ts`). Nunca hace
+lecturas. Los pies de las publicaciones y de la carta del día invitan a
+«comentar tu signo».
+
+- **Webhook** `/api/webhooks/meta` (`src/app/api/webhooks/meta/route.ts`):
+  verificación GET con `META_VERIFY_TOKEN` (o `WA_VERIFY_TOKEN`), firma
+  `X-Hub-Signature-256` con `META_APP_SECRET` (o `WA_APP_SECRET`), respuesta
+  inmediata y atención con `after`. `src/lib/redes/meta.ts` normaliza los
+  avisos (`extraerInteracciones`: objeto `instagram` con `comments` y
+  `messaging`; objeto `page` con `feed` item `comment` verb `add` y
+  `messaging`; descarta lo propio y los ecos), responde (`/{comentario}/replies`
+  en Instagram, `/{comentario}/comments` en Facebook, `/{página}/messages` para
+  los directos) y suscribe la página (`/{página}/subscribed_apps` con `feed` y
+  `messages`, botón "Conectar los avisos" en `/admin/redes`).
+- **Sibila** (`src/lib/redes/sibila-redes.ts`, `atenderInteraccion`): guarda
+  la interacción en `interacciones_redes` (migración 0027; `id_meta` único
+  evita responder dos veces en los reintentos de Meta), aplica topes (200
+  comentarios y 150 mensajes por día; 2 respuestas por persona y publicación),
+  pide la respuesta con `generarTexto` (comentarios ≤ 260 caracteres; mensajes
+  ≤ 450 con los 10 mensajes previos como contexto), marca «OMITIR» para spam o
+  insultos y «PASAR_A_PERSONA» para avisar por correo a `correosAdmin()`.
+  `REDES_RESPUESTAS=0` deja de responder sin quitar el webhook (queda
+  registrado como omitida).
+- **Configuración en Meta** (app de Arcana, la misma de WhatsApp):
+  1. Productos: añadir **Webhooks**; objeto *Instagram* → suscribir `comments`
+     y `messages`; objeto *Page* → `feed` y `messages`. URL
+     `https://miarcana.com/api/webhooks/meta`, token de verificación =
+     `META_VERIFY_TOKEN` (o el de WhatsApp).
+  2. Añadir el producto **Instagram** (API con inicio de sesión de Facebook) y
+     **Messenger**; en Messenger → Configuración de Instagram, generar el token
+     de la página "Mi Arcana" con `instagram_basic`,
+     `instagram_manage_comments`, `instagram_manage_messages`,
+     `pages_manage_engagement`, `pages_messaging`, `pages_read_engagement`,
+     `pages_manage_metadata`. Ese token va en `META_PAGE_TOKEN`.
+  3. Como el dueño de la página es administrador de la app, el acceso estándar
+     basta para la página propia (no hace falta revisión de permisos).
+  4. En `/admin/redes` pulsar "Conectar los avisos de la página".
+  5. Instagram: la cuenta debe ser profesional, vinculada a la página, y en
+     Configuración → Mensajes → "Permitir acceso a mensajes" activado.
+- Variables: `META_PAGE_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN` (con
+  respaldo en las de Facebook/WhatsApp), `FB_PAGE_ID`, `IG_USER_ID`,
+  `REDES_RESPUESTAS`.

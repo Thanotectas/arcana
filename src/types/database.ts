@@ -152,6 +152,22 @@ type PublicacionProgramadaRow = {
   publicado_en: string | null;
 };
 
+type InteraccionRedesRow = {
+  id: number;
+  red: "instagram" | "facebook";
+  tipo: "comentario" | "mensaje";
+  id_meta: string;
+  remitente_id: string;
+  remitente: string | null;
+  objeto_id: string | null;
+  texto: string;
+  respuesta: string | null;
+  estado: "pendiente" | "respondida" | "omitida" | "error";
+  humano: boolean;
+  detalle: string | null;
+  creado_en: string;
+};
+
 type MensajeWhatsappRow = {
   id: number;
   telefono: string;
@@ -301,6 +317,12 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      interacciones_redes: {
+        Row: InteraccionRedesRow;
+        Insert: Insertable<InteraccionRedesRow, "id" | "remitente" | "objeto_id" | "respuesta" | "estado" | "humano" | "detalle" | "creado_en">;
+        Update: Partial<InteraccionRedesRow>;
         Relationships: [];
       };
       mensajes_whatsapp: {

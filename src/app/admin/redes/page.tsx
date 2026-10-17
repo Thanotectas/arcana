@@ -9,6 +9,8 @@ import { diagnosticoFacebook, facebookConfigurado } from "@/lib/redes/facebook";
 import { TarjetaPublicacion, type PublicacionVista } from "@/components/admin/TarjetaPublicacion";
 import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
 import { VistaReel } from "@/components/admin/VistaReel";
+import { ConexionMeta } from "@/components/admin/ConexionMeta";
+import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 
 // Generar una semana (Sibila) o el reel de la carta del día puede tardar medio minuto o más.
 export const maxDuration = 300;
@@ -49,10 +51,13 @@ export default async function PaginaAdminRedes() {
   const porAprobar = todas.filter((p) => p.estado === "borrador" && p.fecha >= hoy);
   const programadas = todas.filter((p) => (p.estado === "aprobada" || p.estado === "publicando") && p.fecha >= sumarDias(hoy, -2));
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
-  const [{ data: cartaDia }, diagnostico] = await Promise.all([
+  const [{ data: cartaDia }, diagnostico, { data: interacciones }, suscripcion] = await Promise.all([
     getSupabaseAdmin().from("publicaciones_redes").select("red, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -6)).order("fecha", { ascending: false }).limit(20),
     diagnosticoFacebook().catch((e) => ({ pagina: null, fuenteToken: null, esTokenDePagina: false, error: e instanceof Error ? e.message : String(e) }) as Awaited<ReturnType<typeof diagnosticoFacebook>>),
+    getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
+    metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
   ]);
+  const hora = (iso: string) => new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso));
   const lunes = lunesDe(hoy);
   const semanaActualCompleta = todas.some((p) => p.semana === lunes);
   const proximaLista = todas.some((p) => p.semana === sumarDias(lunes, 7));
@@ -107,6 +112,42 @@ export default async function PaginaAdminRedes() {
             <p className="text-peligro">El token no es el de la página (es de un usuario o de otra página). Para publicar como «Mi Arcana» hace falta el token de acceso de la página en FB_PAGE_TOKEN, con el permiso pages_manage_posts.</p>
           )}
         </div>
+      </section>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Sibila en comentarios y mensajes</h2>
+        <p className="text-sm text-texto-suave">
+          Cuando alguien comenta una publicación (por ejemplo su signo) o escribe por mensaje directo en Instagram o Facebook, Sibila responde con una línea personal y la invitación a la carta del día. Si piden hablar con una persona, llega un correo. Topes: 200 comentarios y 150 mensajes al día.
+        </p>
+        {!metaConfigurado() ? (
+          <p className="text-sm text-peligro">Falta META_PAGE_TOKEN (o FB_PAGE_TOKEN) en Vercel.</p>
+        ) : suscripcion?.error ? (
+          <p className="text-sm text-peligro">No se pudo leer la suscripción: {suscripcion.error}</p>
+        ) : suscripcion?.suscrita ? (
+          <p className="text-sm text-exito">Página conectada: avisos de comentarios y mensajes activos{process.env.REDES_RESPUESTAS === "0" ? " (respuestas apagadas con REDES_RESPUESTAS=0)" : ""}.</p>
+        ) : (
+          <p className="text-sm text-oro-suave">La página aún no está suscrita a los avisos{suscripcion?.campos.length ? ` (campos actuales: ${suscripcion.campos.join(", ")})` : ""}.</p>
+        )}
+        {metaConfigurado() && <ConexionMeta suscrita={Boolean(suscripcion?.suscrita)} />}
+        <h3 className="pt-3 font-semibold">Últimas interacciones</h3>
+        {interacciones?.length ? (
+          <ul className="space-y-2 text-sm">
+            {interacciones.map((i) => (
+              <li key={i.id} className="rounded-xl border border-borde p-3">
+                <p className="text-xs text-texto-suave">
+                  {hora(i.creado_en)} · {i.red === "instagram" ? "Instagram" : "Facebook"} · {i.tipo}{i.remitente ? ` · ${i.remitente}` : ""} ·{" "}
+                  <span className={i.estado === "respondida" ? "text-exito" : i.estado === "error" ? "text-peligro" : "text-oro-suave"}>{i.estado}</span>
+                  {i.humano ? " · pide persona" : ""}
+                </p>
+                <p className="mt-1">{i.texto}</p>
+                {i.respuesta && <p className="mt-1 text-violeta-suave">Sibila: {i.respuesta}</p>}
+                {i.detalle && <p className="mt-1 text-xs text-texto-suave">{i.detalle}</p>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-texto-suave">Aún no hay comentarios ni mensajes registrados.</p>
+        )}
       </section>
 
       <section className="space-y-4">

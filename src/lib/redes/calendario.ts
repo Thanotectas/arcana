@@ -261,7 +261,7 @@ interface Redaccion {
 const INSTRUCCION = `Tarea: redactar publicaciones para Instagram y Facebook de Arcana. Responde SOLO con un arreglo JSON válido, sin texto antes ni después ni marcas de código. Cada elemento: {"fecha": "AAAA-MM-DD", "titulo": "...", "extracto": "...", "texto": "..."}.
 - "titulo": máximo 48 caracteres, es el texto grande de la imagen. Un gancho, no un nombre de producto. Sin comillas ni punto final.
 - "extracto": una sola frase de 80 a 140 caracteres que irá entre comillas en la imagen, con la voz de Sibila.
-- "texto": el pie de la publicación, de 350 a 650 caracteres: 2 o 3 párrafos cortos separados por línea en blanco, una llamada a la acción con el enlace indicado (escríbelo tal cual, sin https) y al final una línea con 5 hashtags en español que incluya #miarcana. Aquí sí puedes usar 1 o 2 emojis con mesura.
+- "texto": el pie de la publicación, de 350 a 650 caracteres: 2 o 3 párrafos cortos separados por línea en blanco, una llamada a la acción con el enlace indicado (escríbelo tal cual, sin https), luego una línea que invite a comentar el signo (por ejemplo «Comenta tu signo y Sibila te responde») y al final una línea con 5 hashtags en español que incluya #miarcana. Aquí sí puedes usar 1 o 2 emojis con mesura.
 - Usa solo los datos del contexto: precios, fechas, cupos y enlaces tal como vienen. No inventes testimonios ni cifras.
 - Tono: cercano, sereno, sin prometer resultados ni predicciones absolutas. Nada de salud, dinero garantizado ni miedo.
 - Escribe en español de Colombia neutro (tú, no vos ni usted).`;

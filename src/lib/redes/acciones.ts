@@ -8,6 +8,7 @@ import { publicarProgramada } from "./publicar";
 import { fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
 import { reelPublicacion } from "./reel-publicacion";
+import { metaConfigurado, suscribirPagina } from "./meta";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -109,5 +110,18 @@ export async function accionVistaReel(_prev: EstadoReel, formData: FormData): Pr
     return { url: `${url}?v=${Date.now()}` };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo generar el reel." };
+  }
+}
+
+/** Suscribe la página de Facebook (y el Instagram vinculado) a los avisos de comentarios y mensajes de la app. */
+export async function accionSuscribirMeta(): Promise<EstadoAdminRedes> {
+  await requerirAdmin();
+  if (!metaConfigurado()) return { error: "Faltan META_PAGE_TOKEN (o FB_PAGE_TOKEN) y FB_PAGE_ID en Vercel." };
+  try {
+    await suscribirPagina();
+    revalidatePath("/admin/redes");
+    return { mensaje: "Página suscrita: Sibila recibirá los comentarios y mensajes." };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo suscribir." };
   }
 }

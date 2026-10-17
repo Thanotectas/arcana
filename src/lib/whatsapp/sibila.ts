@@ -30,8 +30,8 @@ function usd(centavos: number) {
   return `US$ ${(centavos / 100).toFixed(2)}`;
 }
 
-/** Hechos del producto, calculados desde el código para que los precios nunca queden viejos. */
-async function hechos() {
+/** Hechos del producto, calculados desde el código para que los precios nunca queden viejos. También los usa Sibila en redes. */
+export async function hechos() {
   const t = diccionario("es");
   const modulos = t.portada.modulos as Record<string, { titulo: string; texto: string }>;
   const lista = Object.values(modulos).map((m) => `- ${m.titulo}: ${m.texto}`).join("\n");

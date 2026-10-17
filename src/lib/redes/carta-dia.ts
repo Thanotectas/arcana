@@ -92,6 +92,8 @@ export function textoCartaDelDia(fecha: string) {
     "🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en miarcana.com (enlace en la biografía).",
     `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)} en miarcana.com.`,
     "",
+    "💬 Comenta tu signo y Sibila te responde.",
+    "",
     mazo === "arcana" ? "#tarot #tarotarcana #cartadeldia #tarotdiario #espiritualidad #miarcana" : "#tarot #tarotenespañol #cartadeldia #tarotdiario #espiritualidad #miarcana",
   ]
     .join("\n")
