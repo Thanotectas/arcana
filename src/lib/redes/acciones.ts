@@ -116,7 +116,7 @@ export async function accionVistaReel(_prev: EstadoReel, formData: FormData): Pr
 /** Suscribe la página de Facebook (y el Instagram vinculado) a los avisos de comentarios y mensajes de la app. */
 export async function accionSuscribirMeta(): Promise<EstadoAdminRedes> {
   await requerirAdmin();
-  if (!metaConfigurado()) return { error: "Faltan META_PAGE_TOKEN (o FB_PAGE_TOKEN) y FB_PAGE_ID en Vercel." };
+  if (!metaConfigurado()) return { error: "Falta META_PAGE_TOKEN (o FB_PAGE_TOKEN) en Vercel." };
   try {
     await suscribirPagina();
     revalidatePath("/admin/redes");

@@ -53,7 +53,7 @@ export default async function PaginaAdminRedes() {
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
   const [{ data: cartaDia }, diagnostico, { data: interacciones }, suscripcion] = await Promise.all([
     getSupabaseAdmin().from("publicaciones_redes").select("red, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -6)).order("fecha", { ascending: false }).limit(20),
-    diagnosticoFacebook().catch((e) => ({ pagina: null, fuenteToken: null, esTokenDePagina: false, error: e instanceof Error ? e.message : String(e) }) as Awaited<ReturnType<typeof diagnosticoFacebook>>),
+    diagnosticoFacebook(),
     getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
   ]);
@@ -102,15 +102,14 @@ export default async function PaginaAdminRedes() {
 
         <h3 className="pt-4 font-semibold">Diagnóstico de Facebook</h3>
         <div className="space-y-1 text-sm">
-          <p>Página configurada: {diagnostico.pagina ?? <span className="text-peligro">falta FB_PAGE_ID</span>}{diagnostico.nombrePagina ? ` · ${diagnostico.nombrePagina}` : ""}</p>
-          <p>Token usado: {diagnostico.fuenteToken ?? <span className="text-peligro">ninguno</span>}{diagnostico.identidad ? ` · pertenece a «${diagnostico.identidad.name ?? diagnostico.identidad.id}»` : ""}</p>
+          <p>Página: {diagnostico.pagina ? `${diagnostico.nombrePagina ?? ""} (id ${diagnostico.pagina})` : <span className="text-peligro">sin identificar</span>}</p>
+          <p>Token usado: {diagnostico.fuenteToken ?? <span className="text-peligro">ninguno</span>}{diagnostico.origen === "cuentas_del_usuario" ? " · es de usuario; se usa el de la página que administra" : diagnostico.origen === "token_de_pagina" ? " · token de página" : ""}</p>
           {diagnostico.error ? (
             <p className="text-peligro">{diagnostico.error}</p>
-          ) : diagnostico.esTokenDePagina ? (
-            <p className="text-exito">El token es el de la página: Arcana puede publicar en ella.</p>
           ) : (
-            <p className="text-peligro">El token no es el de la página (es de un usuario o de otra página). Para publicar como «Mi Arcana» hace falta el token de acceso de la página en FB_PAGE_TOKEN, con el permiso pages_manage_posts.</p>
+            <p className="text-exito">Arcana puede publicar en la página (si el token tiene pages_manage_posts).</p>
           )}
+          {diagnostico.avisoId && <p className="text-xs text-oro-suave">{diagnostico.avisoId}</p>}
         </div>
       </section>
 
@@ -124,7 +123,9 @@ export default async function PaginaAdminRedes() {
         ) : suscripcion?.error ? (
           <p className="text-sm text-peligro">No se pudo leer la suscripción: {suscripcion.error}</p>
         ) : suscripcion?.suscrita ? (
-          <p className="text-sm text-exito">Página conectada: avisos de comentarios y mensajes activos{process.env.REDES_RESPUESTAS === "0" ? " (respuestas apagadas con REDES_RESPUESTAS=0)" : ""}.</p>
+          <p className="text-sm text-exito">
+            Página conectada{suscripcion.pagina?.nombre ? ` («${suscripcion.pagina.nombre}»` : ""}{suscripcion.pagina?.nombre ? (suscripcion.pagina.instagram ? ", con Instagram vinculado)" : ", sin Instagram vinculado)") : ""}: avisos de comentarios y mensajes activos{process.env.REDES_RESPUESTAS === "0" ? " (respuestas apagadas con REDES_RESPUESTAS=0)" : ""}.
+          </p>
         ) : (
           <p className="text-sm text-oro-suave">La página aún no está suscrita a los avisos{suscripcion?.campos.length ? ` (campos actuales: ${suscripcion.campos.join(", ")})` : ""}.</p>
         )}

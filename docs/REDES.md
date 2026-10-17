@@ -150,3 +150,16 @@ lecturas. Los pies de las publicaciones y de la carta del día invitan a
 - Variables: `META_PAGE_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN` (con
   respaldo en las de Facebook/WhatsApp), `FB_PAGE_ID`, `IG_USER_ID`,
   `REDES_RESPUESTAS`.
+
+### Id de la página (17 oct 2026)
+
+Con la nueva experiencia de páginas de Facebook, el número de la barra del
+navegador (`profile.php?id=61594894293890`) es el del **perfil**, no el de la
+página: la API responde "Object … does not exist" o "nonexisting field
+(subscribed_apps)". Por eso la publicación automática en Facebook fallaba.
+`src/lib/redes/pagina.ts` (`resolverPagina`) deduce la página del token: si es
+de página, `/me` es la página; si es de usuario, toma de `/me/accounts` la de
+Arcana (por `FB_PAGE_ID`, por el Instagram vinculado `IG_USER_ID`, por el nombre
+o la única) con su propio token. Lo usan `facebook.ts` (publicar) y `meta.ts`
+(responder, suscribir). `FB_PAGE_ID` queda opcional; el diagnóstico de
+`/admin/redes` muestra el id real y avisa si la variable no coincide.

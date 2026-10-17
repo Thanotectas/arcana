@@ -1,5 +1,6 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { resolverPagina } from "./pagina";
 
 /**
  * Comentarios y mensajes directos de Instagram y Facebook (API Graph de Meta):
@@ -13,7 +14,9 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *   FB_PAGE_TOKEN o IG_PAGE_TOKEN.
  * - META_APP_SECRET y META_VERIFY_TOKEN: firma y verificación del webhook;
  *   si faltan se usan WA_APP_SECRET y WA_VERIFY_TOKEN (la misma app que WhatsApp).
- * - FB_PAGE_ID e IG_USER_ID: para reconocer los comentarios propios.
+ * - FB_PAGE_ID e IG_USER_ID: opcionales; el id real de la página se deduce
+ *   del token (ver `pagina.ts`), y los comentarios propios se reconocen por el
+ *   id de la entrada del aviso.
  */
 const API = "https://graph.facebook.com/v25.0";
 
@@ -22,7 +25,7 @@ export function tokenMeta() {
 }
 
 export function metaConfigurado() {
-  return Boolean(tokenMeta() && process.env.FB_PAGE_ID);
+  return Boolean(tokenMeta());
 }
 
 export function tokenVerificacionMeta() {
@@ -39,10 +42,16 @@ export function firmaValidaMeta(cuerpo: string, cabecera: string | null) {
   return esperada.length === recibida.length && timingSafeEqual(Buffer.from(esperada), Buffer.from(recibida));
 }
 
+/** Página de Arcana con su token, deducida del token configurado. */
+export function paginaMeta() {
+  return resolverPagina(tokenMeta());
+}
+
 async function llamar<T = Record<string, unknown>>(ruta: string, cuerpo?: Record<string, unknown>, metodo: "GET" | "POST" | "DELETE" = cuerpo ? "POST" : "GET"): Promise<T> {
+  const { token } = await paginaMeta();
   const res = await fetch(`${API}/${ruta}`, {
     method: metodo,
-    headers: { Authorization: `Bearer ${tokenMeta()}`, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
+    headers: { Authorization: `Bearer ${token}`, ...(cuerpo ? { "Content-Type": "application/json" } : {}) },
     body: cuerpo ? JSON.stringify(cuerpo) : undefined,
     cache: "no-store",
   });
@@ -64,22 +73,25 @@ export async function responderComentario(red: RedMeta, idComentario: string, te
 
 /** Envía un mensaje directo (Instagram o Messenger) como respuesta a quien escribió. */
 export async function enviarMensajeDirecto(destinatario: string, texto: string): Promise<string> {
-  const r = await llamar<{ message_id?: string }>(`${process.env.FB_PAGE_ID}/messages`, { recipient: { id: destinatario }, messaging_type: "RESPONSE", message: { text: texto } });
+  const { id } = await paginaMeta();
+  const r = await llamar<{ message_id?: string }>(`${id}/messages`, { recipient: { id: destinatario }, messaging_type: "RESPONSE", message: { text: texto } });
   return String(r.message_id ?? "");
 }
 
 export interface EstadoSuscripcion {
   suscrita: boolean;
   campos: string[];
+  pagina?: { id: string; nombre?: string; instagram?: string };
   error?: string;
 }
 
 /** ¿La página está suscrita a los avisos de esta app (feed y mensajes)? */
 export async function estadoSuscripcion(): Promise<EstadoSuscripcion> {
   try {
-    const r = await llamar<{ data?: { subscribed_fields?: string[] }[] }>(`${process.env.FB_PAGE_ID}/subscribed_apps?fields=subscribed_fields`);
+    const pagina = await paginaMeta();
+    const r = await llamar<{ data?: { subscribed_fields?: string[] }[] }>(`${pagina.id}/subscribed_apps?fields=subscribed_fields`);
     const campos = r.data?.flatMap((a) => a.subscribed_fields ?? []) ?? [];
-    return { suscrita: campos.includes("feed") && campos.includes("messages"), campos };
+    return { suscrita: campos.includes("feed") && campos.includes("messages"), campos, pagina: { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram } };
   } catch (e) {
     return { suscrita: false, campos: [], error: e instanceof Error ? e.message : String(e) };
   }
@@ -87,7 +99,8 @@ export async function estadoSuscripcion(): Promise<EstadoSuscripcion> {
 
 /** Suscribe la página a los avisos de comentarios (feed) y mensajes de esta app. */
 export async function suscribirPagina(): Promise<void> {
-  await llamar(`${process.env.FB_PAGE_ID}/subscribed_apps`, { subscribed_fields: ["feed", "messages"] });
+  const { id } = await paginaMeta();
+  await llamar(`${id}/subscribed_apps`, { subscribed_fields: ["feed", "messages"] });
 }
 
 /** Un comentario o mensaje recibido, ya normalizado. */
