@@ -121,13 +121,19 @@ export default async function PaginaAdminRedes() {
         {!metaConfigurado() ? (
           <p className="text-sm text-peligro">Falta META_PAGE_TOKEN (o FB_PAGE_TOKEN) en Vercel.</p>
         ) : suscripcion?.error ? (
-          <p className="text-sm text-peligro">No se pudo leer la suscripción: {suscripcion.error}</p>
+          <p className="text-sm text-peligro">
+            {suscripcion.pagina ? `Página «${suscripcion.pagina.nombre ?? suscripcion.pagina.id}» encontrada, pero no` : "No"} se pudo leer la suscripción: {suscripcion.error}
+          </p>
         ) : suscripcion?.suscrita ? (
           <p className="text-sm text-exito">
             Página conectada{suscripcion.pagina?.nombre ? ` («${suscripcion.pagina.nombre}»` : ""}{suscripcion.pagina?.nombre ? (suscripcion.pagina.instagram ? ", con Instagram vinculado)" : ", sin Instagram vinculado)") : ""}: avisos de comentarios y mensajes activos{process.env.REDES_RESPUESTAS === "0" ? " (respuestas apagadas con REDES_RESPUESTAS=0)" : ""}.
           </p>
         ) : (
-          <p className="text-sm text-oro-suave">La página aún no está suscrita a los avisos{suscripcion?.campos.length ? ` (campos actuales: ${suscripcion.campos.join(", ")})` : ""}.</p>
+          <p className="text-sm text-oro-suave">
+            {suscripcion?.campos.length
+              ? `Suscrita en parte: ${suscripcion.campos.includes("feed") ? "comentarios ✓" : "comentarios ✗"} · ${suscripcion.campos.includes("messages") ? "mensajes ✓" : "mensajes ✗"}.`
+              : "La página aún no está suscrita a los avisos."}
+          </p>
         )}
         {metaConfigurado() && <ConexionMeta suscrita={Boolean(suscripcion?.suscrita)} />}
         <h3 className="pt-3 font-semibold">Últimas interacciones</h3>

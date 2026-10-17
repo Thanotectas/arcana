@@ -1,6 +1,6 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { resolverPagina } from "./pagina";
+import { resolverPagina, type PaginaResuelta } from "./pagina";
 
 /**
  * Comentarios y mensajes directos de Instagram y Facebook (API Graph de Meta):
@@ -87,20 +87,42 @@ export interface EstadoSuscripcion {
 
 /** ¿La página está suscrita a los avisos de esta app (feed y mensajes)? */
 export async function estadoSuscripcion(): Promise<EstadoSuscripcion> {
+  let pagina: PaginaResuelta | undefined;
   try {
-    const pagina = await paginaMeta();
-    const r = await llamar<{ data?: { subscribed_fields?: string[] }[] }>(`${pagina.id}/subscribed_apps?fields=subscribed_fields`);
+    pagina = await paginaMeta();
+    const r = await llamar<{ data?: { id?: string; subscribed_fields?: string[] }[] }>(`${pagina.id}/subscribed_apps`);
     const campos = r.data?.flatMap((a) => a.subscribed_fields ?? []) ?? [];
     return { suscrita: campos.includes("feed") && campos.includes("messages"), campos, pagina: { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram } };
   } catch (e) {
-    return { suscrita: false, campos: [], error: e instanceof Error ? e.message : String(e) };
+    return { suscrita: false, campos: [], pagina: pagina && { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram }, error: e instanceof Error ? e.message : String(e) };
   }
 }
 
-/** Suscribe la página a los avisos de comentarios (feed) y mensajes de esta app. */
-export async function suscribirPagina(): Promise<void> {
+/**
+ * Suscribe la página a los avisos de esta app. Intenta comentarios (feed) y
+ * mensajes juntos; si el token no tiene el permiso de uno, suscribe el otro
+ * solo para que al menos los comentarios funcionen. Devuelve lo suscrito y
+ * los errores de lo que no se pudo.
+ */
+export async function suscribirPagina(): Promise<{ suscritos: string[]; errores: string[] }> {
   const { id } = await paginaMeta();
-  await llamar(`${id}/subscribed_apps`, { subscribed_fields: ["feed", "messages"] });
+  try {
+    await llamar(`${id}/subscribed_apps`, { subscribed_fields: ["feed", "messages"] });
+    return { suscritos: ["feed", "messages"], errores: [] };
+  } catch {
+    const suscritos: string[] = [];
+    const errores: string[] = [];
+    for (const campo of ["feed", "messages"]) {
+      try {
+        await llamar(`${id}/subscribed_apps`, { subscribed_fields: [...suscritos, campo] });
+        suscritos.push(campo);
+      } catch (e) {
+        errores.push(`${campo === "feed" ? "Comentarios" : "Mensajes"}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+    if (!suscritos.length) throw new Error(errores.join(" · "));
+    return { suscritos, errores };
+  }
 }
 
 /** Un comentario o mensaje recibido, ya normalizado. */

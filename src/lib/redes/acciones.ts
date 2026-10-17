@@ -118,8 +118,11 @@ export async function accionSuscribirMeta(): Promise<EstadoAdminRedes> {
   await requerirAdmin();
   if (!metaConfigurado()) return { error: "Falta META_PAGE_TOKEN (o FB_PAGE_TOKEN) en Vercel." };
   try {
-    await suscribirPagina();
+    const r = await suscribirPagina();
     revalidatePath("/admin/redes");
+    if (r.errores.length) {
+      return { error: `Quedó suscrita solo a ${r.suscritos.map((c) => (c === "feed" ? "comentarios" : "mensajes")).join(" y ")}. Falta: ${r.errores.join(" · ")}` };
+    }
     return { mensaje: "Página suscrita: Sibila recibirá los comentarios y mensajes." };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo suscribir." };
