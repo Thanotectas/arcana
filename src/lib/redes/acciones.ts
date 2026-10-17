@@ -9,6 +9,7 @@ import { fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
 import { reelPublicacion } from "./reel-publicacion";
 import { metaConfigurado, suscribirPagina } from "./meta";
+import { actualizarMetricas } from "./metricas";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -126,5 +127,18 @@ export async function accionSuscribirMeta(): Promise<EstadoAdminRedes> {
     return { mensaje: "Página suscrita: Sibila recibirá los comentarios y mensajes." };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo suscribir." };
+  }
+}
+
+/** Actualiza ya las cifras de las publicaciones de los últimos 14 días (el cron lo hace cada mediodía). */
+export async function accionActualizarMetricas(): Promise<EstadoAdminRedes> {
+  await requerirAdmin();
+  try {
+    const r = await actualizarMetricas(getSupabaseAdmin());
+    revalidatePath("/admin/redes");
+    if (!r.revisadas) return { mensaje: "No hay publicaciones con id de Meta en los últimos 14 días." };
+    return r.errores.length ? { error: `${r.actualizadas} de ${r.revisadas} actualizadas. ${r.errores.slice(0, 3).join(" · ")}` } : { mensaje: `${r.actualizadas} publicaciones actualizadas.` };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudieron leer las cifras." };
   }
 }

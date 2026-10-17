@@ -6,6 +6,7 @@ import { NOMBRES_LECTURA, OFERTA_FUNDADORES, formatoCOP, type TipoLectura } from
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { fechaLargaEs, sumarDias } from "@/lib/redes/calendario";
+import { interacciones, promediosPorTipo, type PromedioTipo } from "@/lib/redes/metricas";
 
 /**
  * Estado del negocio: métricas de los últimos siete días comparadas con los
@@ -31,7 +32,13 @@ export interface ResumenSemanal {
     fundadores: { activa: boolean; vendidos: number; restantes: number; diasRestantes: number };
   };
   correos: { enviados: number; errores: number; porTipo: { tipo: string; n: number }[] };
-  redes: { cartaDia: { publicadas: number; errores: number }; agente: { publicadas: number; errores: number; borradores: number } };
+  redes: {
+    cartaDia: { publicadas: number; errores: number };
+    agente: { publicadas: number; errores: number; borradores: number };
+    /** Cifras de Meta de lo publicado en la semana (si el cron de métricas ya corrió). */
+    rendimiento: { porTipo: PromedioTipo[]; mejor: { tipo: string; red: string; fecha: string; vistas: number | null; interacciones: number } | null; interaccionesTotal: number; vistasTotal: number };
+    sibila: { respondidas: number; humano: number };
+  };
   alertas: string[];
 }
 
@@ -118,6 +125,10 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   const { data: cartaDia } = await admin.from("publicaciones_redes").select("estado").gte("fecha", desde).lt("fecha", hasta).limit(100);
   const { data: agente } = await admin.from("publicaciones_programadas").select("estado, fecha").gte("fecha", desde).limit(100);
   const cuenta = (lista: { estado: string }[] | null, estado: string) => (lista ?? []).filter((x) => x.estado === estado).length;
+  // Las tablas de métricas e interacciones pueden no existir aún (migraciones 0027 y 0028): se ignoran sus errores.
+  const { data: metricas } = await admin.from("metricas_redes").select("*").gte("fecha", desde).lt("fecha", hasta).limit(200);
+  const { data: interaccionesSibila } = await admin.from("interacciones_redes").select("estado, humano").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const mejor = [...(metricas ?? [])].sort((a, b) => interacciones(b) - interacciones(a) || (b.vistas ?? 0) - (a.vistas ?? 0))[0];
   const borradores = (agente ?? []).filter((p) => p.estado === "borrador" && p.fecha >= hoy).length;
 
   const resumen: ResumenSemanal = {
@@ -143,6 +154,13 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
     redes: {
       cartaDia: { publicadas: cuenta(cartaDia, "publicada"), errores: cuenta(cartaDia, "error") },
       agente: { publicadas: cuenta(agente?.filter((p) => p.fecha < hasta) ?? null, "publicada"), errores: cuenta(agente, "error"), borradores },
+      rendimiento: {
+        porTipo: promediosPorTipo(metricas ?? []),
+        mejor: mejor ? { tipo: mejor.tipo, red: mejor.red, fecha: mejor.fecha, vistas: mejor.vistas, interacciones: interacciones(mejor) } : null,
+        interaccionesTotal: (metricas ?? []).reduce((s, m) => s + interacciones(m), 0),
+        vistasTotal: (metricas ?? []).reduce((s, m) => s + (m.vistas ?? 0), 0),
+      },
+      sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length },
     },
     alertas: [],
   };
@@ -213,7 +231,21 @@ export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [strin
         ["Correos con error", String(r.correos.errores)],
         ["Carta del día en redes", `${r.redes.cartaDia.publicadas} publicadas`, r.redes.cartaDia.errores ? `${r.redes.cartaDia.errores} errores` : undefined],
         ["Agente de redes", `${r.redes.agente.publicadas} publicadas`, `${r.redes.agente.borradores} por aprobar${r.redes.agente.errores ? ` · ${r.redes.agente.errores} errores` : ""}`],
+        ["Sibila respondió en redes", String(r.redes.sibila.respondidas), r.redes.sibila.humano ? `${r.redes.sibila.humano} pidieron una persona` : undefined],
       ],
+    },
+    {
+      titulo: "Rendimiento en redes",
+      filas: r.redes.rendimiento.porTipo.length
+        ? [
+            ["Vistas de la semana", r.redes.rendimiento.vistasTotal ? String(r.redes.rendimiento.vistasTotal) : "—", "Instagram, si hay permiso de estadísticas"],
+            ["Interacciones de la semana", String(r.redes.rendimiento.interaccionesTotal), "me gusta, comentarios, guardados y compartidos"],
+            ...(r.redes.rendimiento.mejor
+              ? [["Mejor publicación", r.redes.rendimiento.mejor.tipo, `${r.redes.rendimiento.mejor.red} · ${r.redes.rendimiento.mejor.fecha} · ${r.redes.rendimiento.mejor.interacciones} interacciones${r.redes.rendimiento.mejor.vistas !== null ? ` · ${r.redes.rendimiento.mejor.vistas} vistas` : ""}`] as [string, string, string]]
+              : []),
+            ...r.redes.rendimiento.porTipo.map((t): [string, string, string] => [`  ${t.tipo}`, `${t.interacciones} por publicación`, `${t.publicaciones} publicaciones${t.vistas !== null ? ` · ${t.vistas} vistas en promedio` : ""}`]),
+          ]
+        : [["Sin cifras todavía", "—", "el cron de métricas corre a mediodía"]],
     },
   ];
 }

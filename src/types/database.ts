@@ -152,6 +152,25 @@ type PublicacionProgramadaRow = {
   publicado_en: string | null;
 };
 
+type MetricaRedesRow = {
+  id: number;
+  red: "instagram" | "facebook";
+  media_id: string;
+  origen: "carta_dia" | "programada";
+  referencia: string;
+  fecha: string;
+  tipo: string;
+  formato: string | null;
+  vistas: number | null;
+  alcance: number | null;
+  me_gusta: number | null;
+  comentarios: number | null;
+  guardados: number | null;
+  compartidos: number | null;
+  detalle: string | null;
+  actualizado_en: string;
+};
+
 type InteraccionRedesRow = {
   id: number;
   red: "instagram" | "facebook";
@@ -317,6 +336,12 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      metricas_redes: {
+        Row: MetricaRedesRow;
+        Insert: Insertable<MetricaRedesRow, "id" | "formato" | "vistas" | "alcance" | "me_gusta" | "comentarios" | "guardados" | "compartidos" | "detalle" | "actualizado_en">;
+        Update: Partial<MetricaRedesRow>;
         Relationships: [];
       };
       interacciones_redes: {

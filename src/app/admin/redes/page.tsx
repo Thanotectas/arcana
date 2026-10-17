@@ -10,6 +10,8 @@ import { TarjetaPublicacion, type PublicacionVista } from "@/components/admin/Ta
 import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
 import { VistaReel } from "@/components/admin/VistaReel";
 import { ConexionMeta } from "@/components/admin/ConexionMeta";
+import { BotonMetricas } from "@/components/admin/BotonMetricas";
+import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/metricas";
 import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 
 // Generar una semana (Sibila) o el reel de la carta del día puede tardar medio minuto o más.
@@ -51,12 +53,16 @@ export default async function PaginaAdminRedes() {
   const porAprobar = todas.filter((p) => p.estado === "borrador" && p.fecha >= hoy);
   const programadas = todas.filter((p) => (p.estado === "aprobada" || p.estado === "publicando") && p.fecha >= sumarDias(hoy, -2));
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
-  const [{ data: cartaDia }, diagnostico, { data: interacciones }, suscripcion] = await Promise.all([
+  const [{ data: cartaDia }, diagnostico, { data: ultimasInteracciones }, suscripcion, { data: metricasData }] = await Promise.all([
     getSupabaseAdmin().from("publicaciones_redes").select("red, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -6)).order("fecha", { ascending: false }).limit(20),
     diagnosticoFacebook(),
     getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
+    getSupabaseAdmin().from("metricas_redes").select("*").gte("fecha", sumarDias(hoy, -14)).order("fecha", { ascending: false }).limit(80),
   ]);
+  const metricas = (metricasData ?? []) as MetricaRed[];
+  const porTipo = promediosPorTipo(metricas);
+  const cifra = (n: number | null) => (n === null ? "—" : n.toLocaleString("es-CO"));
   const hora = (iso: string) => new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso));
   const lunes = lunesDe(hoy);
   const semanaActualCompleta = todas.some((p) => p.semana === lunes);
@@ -139,9 +145,9 @@ export default async function PaginaAdminRedes() {
         {suscripcion?.tokenDeUsuario && <p className="text-xs text-oro-suave">META_PAGE_TOKEN es un token de usuario: funciona, pero vence. Cámbialo por el token de la página.</p>}
         {metaConfigurado() && <ConexionMeta suscrita={Boolean(suscripcion?.suscrita)} />}
         <h3 className="pt-3 font-semibold">Últimas interacciones</h3>
-        {interacciones?.length ? (
+        {ultimasInteracciones?.length ? (
           <ul className="space-y-2 text-sm">
-            {interacciones.map((i) => (
+            {ultimasInteracciones.map((i) => (
               <li key={i.id} className="rounded-xl border border-borde p-3">
                 <p className="text-xs text-texto-suave">
                   {hora(i.creado_en)} · {i.red === "instagram" ? "Instagram" : "Facebook"} · {i.tipo}{i.remitente ? ` · ${i.remitente}` : ""} ·{" "}
@@ -156,6 +162,65 @@ export default async function PaginaAdminRedes() {
           </ul>
         ) : (
           <p className="text-sm text-texto-suave">Aún no hay comentarios ni mensajes registrados.</p>
+        )}
+      </section>
+
+      <section className="tarjeta space-y-4 p-5">
+        <h2 className="font-display text-2xl font-semibold">Rendimiento (últimos 14 días)</h2>
+        <p className="text-sm text-texto-suave">
+          Cifras de Meta de cada publicación, actualizadas cada mediodía. Interacciones = me gusta + comentarios + guardados + compartidos. Las vistas, el alcance y los guardados de Instagram necesitan el permiso instagram_manage_insights en el token.
+        </p>
+        <BotonMetricas />
+        {porTipo.length > 0 && (
+          <div>
+            <h3 className="font-semibold">Qué funciona mejor</h3>
+            <ul className="mt-2 space-y-1 text-sm">
+              {porTipo.map((t, i) => (
+                <li key={t.tipo} className="flex flex-wrap gap-x-3">
+                  <span className="w-6 text-texto-suave">{i + 1}.</span>
+                  <span className="min-w-48 font-medium">{t.tipo}</span>
+                  <span className="text-oro-suave">{t.interacciones} interacciones por publicación</span>
+                  <span className="text-texto-suave">{t.vistas !== null ? `${cifra(t.vistas)} vistas en promedio · ` : ""}{t.publicaciones} publicaciones</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {metricas.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-wider text-texto-suave">
+                <tr>
+                  <th className="py-2 pr-3 font-normal">Fecha</th>
+                  <th className="py-2 pr-3 font-normal">Publicación</th>
+                  <th className="py-2 pr-3 font-normal">Red</th>
+                  <th className="py-2 pr-3 text-right font-normal">Vistas</th>
+                  <th className="py-2 pr-3 text-right font-normal">Me gusta</th>
+                  <th className="py-2 pr-3 text-right font-normal">Coment.</th>
+                  <th className="py-2 pr-3 text-right font-normal">Guard.</th>
+                  <th className="py-2 pr-3 text-right font-normal">Compart.</th>
+                  <th className="py-2 text-right font-normal">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metricas.map((m) => (
+                  <tr key={m.id} className="border-t border-borde" title={m.detalle ?? undefined}>
+                    <td className="py-2 pr-3 text-texto-suave">{m.fecha.slice(5)}</td>
+                    <td className="py-2 pr-3">{m.tipo}{m.formato ? <span className="text-texto-suave"> · {m.formato}</span> : null}</td>
+                    <td className="py-2 pr-3">{m.red === "instagram" ? "IG" : "FB"}</td>
+                    <td className="py-2 pr-3 text-right">{cifra(m.vistas)}</td>
+                    <td className="py-2 pr-3 text-right">{cifra(m.me_gusta)}</td>
+                    <td className="py-2 pr-3 text-right">{cifra(m.comentarios)}</td>
+                    <td className="py-2 pr-3 text-right">{cifra(m.guardados)}</td>
+                    <td className="py-2 pr-3 text-right">{cifra(m.compartidos)}</td>
+                    <td className="py-2 text-right font-semibold text-oro-suave">{interacciones(m)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-texto-suave">Aún no hay cifras. Pulsa «Actualizar cifras ahora» o espera al mediodía.</p>
         )}
       </section>
 

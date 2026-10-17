@@ -163,3 +163,22 @@ Arcana (por `FB_PAGE_ID`, por el Instagram vinculado `IG_USER_ID`, por el nombre
 o la única) con su propio token. Lo usan `facebook.ts` (publicar) y `meta.ts`
 (responder, suscribir). `FB_PAGE_ID` queda opcional; el diagnóstico de
 `/admin/redes` muestra el id real y avisa si la variable no coincide.
+
+## Rendimiento de las publicaciones (17 oct 2026)
+
+`src/lib/redes/metricas.ts` toma lo publicado en los últimos 14 días (carta
+del día: `publicaciones_redes.referencia`; agente: `resultados[red].id` de
+`publicaciones_programadas`), pregunta a Meta sus cifras y las guarda en
+`metricas_redes` (migración 0028, única por red + media_id):
+- Instagram (`IG_PAGE_TOKEN`): `like_count` y `comments_count`; con
+  `instagram_manage_insights`, `/insights?metric=views,reach,saved,shares`
+  (si `views` no aplica, `reach,saved,shares`). Sin el permiso queda la nota
+  en `detalle`.
+- Facebook (token de página de `resolverPagina`): reacciones, comentarios y
+  `shares` (los videos no tienen shares).
+El cron `/api/cron/metricas` lo corre el orquestador de la tarde; en
+`/admin/redes` está la tabla, el ranking por tipo ("Qué funciona mejor":
+promedio de interacciones = me gusta + comentarios + guardados + compartidos)
+y el botón "Actualizar cifras ahora". El resumen semanal añade el bloque
+"Rendimiento en redes" (vistas, interacciones, mejor publicación, promedio por
+tipo) y cuántas respuestas dio Sibila en redes.
