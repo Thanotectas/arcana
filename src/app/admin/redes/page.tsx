@@ -110,6 +110,7 @@ export default async function PaginaAdminRedes() {
             <p className="text-exito">Arcana puede publicar en la página (si el token tiene pages_manage_posts).</p>
           )}
           {diagnostico.avisoId && <p className="text-xs text-oro-suave">{diagnostico.avisoId}</p>}
+          {diagnostico.tokenDeUsuario && <p className="text-xs text-oro-suave">{`${diagnostico.fuenteToken} es un token de usuario: funciona, pero vence. Cámbialo por el token de la página (en el Explorador: 1337589612768238?fields=name,access_token).`}</p>}
         </div>
       </section>
 
@@ -135,6 +136,7 @@ export default async function PaginaAdminRedes() {
               : "La página aún no está suscrita a los avisos."}
           </p>
         )}
+        {suscripcion?.tokenDeUsuario && <p className="text-xs text-oro-suave">META_PAGE_TOKEN es un token de usuario: funciona, pero vence. Cámbialo por el token de la página.</p>}
         {metaConfigurado() && <ConexionMeta suscrita={Boolean(suscripcion?.suscrita)} />}
         <h3 className="pt-3 font-semibold">Últimas interacciones</h3>
         {interacciones?.length ? (

@@ -66,6 +66,8 @@ export interface DiagnosticoFacebook {
   origen?: "token_de_pagina" | "cuentas_del_usuario";
   /** FB_PAGE_ID tiene un número distinto del id real (no estorba: ya no se usa). */
   avisoId?: string;
+  /** El token configurado es de usuario: vence y conviene cambiarlo por el de la página. */
+  tokenDeUsuario?: boolean;
   error?: string;
 }
 
@@ -81,6 +83,7 @@ export async function diagnosticoFacebook(): Promise<DiagnosticoFacebook> {
       nombrePagina: p.nombre,
       fuenteToken: fuente,
       origen: p.origen,
+      tokenDeUsuario: p.tokenDeUsuario,
       avisoId: configurado && configurado !== p.id ? `FB_PAGE_ID dice ${configurado} (el número del perfil); el id real de la página es ${p.id}. Ya se usa el real; puedes corregir o borrar FB_PAGE_ID.` : undefined,
     };
   } catch (e) {

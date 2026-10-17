@@ -82,6 +82,8 @@ export interface EstadoSuscripcion {
   suscrita: boolean;
   campos: string[];
   pagina?: { id: string; nombre?: string; instagram?: string };
+  /** El token configurado es de usuario (vence): conviene cambiarlo por el de la página. */
+  tokenDeUsuario?: boolean;
   error?: string;
 }
 
@@ -92,7 +94,7 @@ export async function estadoSuscripcion(): Promise<EstadoSuscripcion> {
     pagina = await paginaMeta();
     const r = await llamar<{ data?: { id?: string; subscribed_fields?: string[] }[] }>(`${pagina.id}/subscribed_apps`);
     const campos = r.data?.flatMap((a) => a.subscribed_fields ?? []) ?? [];
-    return { suscrita: campos.includes("feed") && campos.includes("messages"), campos, pagina: { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram } };
+    return { suscrita: campos.includes("feed") && campos.includes("messages"), campos, pagina: { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram }, tokenDeUsuario: pagina.tokenDeUsuario };
   } catch (e) {
     return { suscrita: false, campos: [], pagina: pagina && { id: pagina.id, nombre: pagina.nombre, instagram: pagina.instagram }, error: e instanceof Error ? e.message : String(e) };
   }

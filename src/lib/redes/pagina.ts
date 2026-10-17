@@ -12,12 +12,17 @@ import "server-only";
  */
 const API = "https://graph.facebook.com/v25.0";
 
+/** Id real de la página "Mi Arcana" en la API (no es secreto): último recurso si el token es de usuario. */
+const PAGINA_ARCANA = "1337589612768238";
+
 export interface PaginaResuelta {
   id: string;
   nombre?: string;
   /** Token de la página (el mismo si ya lo era). */
   token: string;
   origen: "token_de_pagina" | "cuentas_del_usuario";
+  /** El token configurado es de usuario: vence (60 días como mucho) y conviene cambiarlo por el de la página. */
+  tokenDeUsuario?: boolean;
   /** Instagram profesional vinculado, si Meta lo informa. */
   instagram?: string;
 }
@@ -48,10 +53,18 @@ async function resolver(token: string): Promise<PaginaResuelta> {
     paginas.find((p) => process.env.IG_USER_ID && p.instagram_business_account?.id === process.env.IG_USER_ID) ??
     paginas.find((p) => /arcana/i.test(p.name ?? "")) ??
     (paginas.length === 1 ? paginas[0] : undefined);
-  if (!elegida) {
-    throw new Error(`El token es de un usuario${yo.name ? ` («${yo.name}»)` : ""} y no se encontró la página de Arcana entre las que administra (${paginas.length} página${paginas.length === 1 ? "" : "s"} con acceso). Genera el token de la página "Mi Arcana" con pages_show_list.`);
+  if (elegida) return { id: elegida.id, nombre: elegida.name, token: elegida.access_token!, origen: "cuentas_del_usuario", tokenDeUsuario: true, instagram: elegida.instagram_business_account?.id };
+
+  // /me/accounts puede venir vacío aunque el usuario administre la página (concesiones por página o por
+  // portfolio): se pide directamente por su id, como en el Explorador de la API.
+  const candidatos = [...new Set([process.env.FB_PAGE_ID, PAGINA_ARCANA].filter((x): x is string => Boolean(x)))];
+  for (const id of candidatos) {
+    const directa = await consultar<{ id?: string; name?: string; access_token?: string; instagram_business_account?: { id?: string } }>(`${id}?fields=id,name,access_token,instagram_business_account`, token).catch(() => null);
+    if (directa?.id && directa.access_token) {
+      return { id: directa.id, nombre: directa.name, token: directa.access_token, origen: "cuentas_del_usuario", tokenDeUsuario: true, instagram: directa.instagram_business_account?.id };
+    }
   }
-  return { id: elegida.id, nombre: elegida.name, token: elegida.access_token!, origen: "cuentas_del_usuario", instagram: elegida.instagram_business_account?.id };
+  throw new Error(`El token es de un usuario${yo.name ? ` («${yo.name}»)` : ""} y no da acceso a la página de Arcana (${paginas.length} página${paginas.length === 1 ? "" : "s"} en /me/accounts; tampoco respondió la página ${PAGINA_ARCANA}). Pon en Vercel el token de la página: en el Explorador, con este token, consulta ${PAGINA_ARCANA}?fields=name,access_token y copia access_token.`);
 }
 
 /** Página de Arcana para ese token (se calcula una vez por instancia; si falla, se reintenta la próxima vez). */
