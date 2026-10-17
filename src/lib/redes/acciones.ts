@@ -10,6 +10,7 @@ import { reelCartaDelDia } from "./reel";
 import { reelPublicacion } from "./reel-publicacion";
 import { metaConfigurado, suscribirPagina } from "./meta";
 import { actualizarMetricas } from "./metricas";
+import { carruselSemanal, historiaDelDia, kitTiktok } from "./automaticas";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -140,5 +141,46 @@ export async function accionActualizarMetricas(): Promise<EstadoAdminRedes> {
     return r.errores.length ? { error: `${r.actualizadas} de ${r.revisadas} actualizadas. ${r.errores.slice(0, 3).join(" · ")}` } : { mensaje: `${r.actualizadas} publicaciones actualizadas.` };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudieron leer las cifras." };
+  }
+}
+
+function describir(r: unknown) {
+  if (!r || typeof r !== "object") return "";
+  if ("publicada" in r) return "publicada";
+  if ("omitida" in r) return String((r as { omitida: string }).omitida) === "ya_publicada_o_en_curso" ? "ya estaba" : "sin configurar";
+  if ("error" in r) return `error: ${String((r as { error: string }).error).slice(0, 160)}`;
+  return "";
+}
+
+/** Lanza a mano la historia de hoy, el carrusel de la semana o el kit de TikTok (si ya salieron, no se repiten). */
+export async function accionAutomatica(_prev: EstadoAdminRedes, formData: FormData): Promise<EstadoAdminRedes> {
+  await requerirAdmin();
+  const cual = texto(formData, "cual", 20);
+  const admin = getSupabaseAdmin();
+  try {
+    let mensaje: string;
+    let hayError = false;
+    if (cual === "historia") {
+      const r = await historiaDelDia(admin);
+      if ("apagada" in r) return { error: "La historia está apagada (REDES_HISTORIA=0)." };
+      hayError = [r.instagram, r.facebook].some((x) => "error" in x);
+      mensaje = `Historia de hoy · Instagram: ${describir(r.instagram)} · Facebook: ${describir(r.facebook)}`;
+    } else if (cual === "carrusel") {
+      const r = await carruselSemanal(admin);
+      if ("apagado" in r) return { error: "El carrusel está apagado (REDES_CARRUSEL=0)." };
+      hayError = [r.instagram, r.facebook].some((x) => "error" in x);
+      mensaje = `Carrusel «${r.titulo}» (semana del ${r.semana}) · Instagram: ${describir(r.instagram)} · Facebook: ${describir(r.facebook)}`;
+    } else if (cual === "kit") {
+      const r = await kitTiktok(admin);
+      if ("apagado" in r) return { error: "El kit está apagado (REDES_KIT_TIKTOK=0)." };
+      hayError = "error" in r.correo;
+      mensaje = `Kit de TikTok de hoy (${r.piezas} video${r.piezas === 1 ? "" : "s"}): ${describir(r.correo) === "publicada" ? "enviado a tu correo" : describir(r.correo)}`;
+    } else {
+      return { error: "Acción desconocida." };
+    }
+    revalidatePath("/admin/redes");
+    return hayError ? { error: mensaje } : { mensaje };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo." };
   }
 }

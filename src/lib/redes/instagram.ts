@@ -76,3 +76,44 @@ export async function publicarReel(urlVideo: string, texto: string): Promise<str
   const publicada = await llamar(`${ig}/media_publish`, { creation_id: id });
   return String(publicada.id ?? "");
 }
+
+/** Espera a que Meta termine de procesar un contenedor (hasta ~`intentos` × 5 s). */
+async function esperarContenedor(id: string, intentos: number) {
+  for (let i = 0; i < intentos; i++) {
+    const estado = await llamar(id, { fields: "status_code" }, "GET");
+    if (estado.status_code === "FINISHED") return;
+    if (estado.status_code === "ERROR" || estado.status_code === "EXPIRED") throw new Error(`Instagram: el contenedor quedó en ${estado.status_code}`);
+    await esperar(5000);
+  }
+  throw new Error("Instagram: el contenedor no terminó de procesarse a tiempo");
+}
+
+/** Publica una historia con una imagen 9:16 (URL pública). */
+export async function publicarHistoria(urlImagen: string): Promise<string> {
+  const ig = process.env.IG_USER_ID!;
+  const contenedor = await llamar(`${ig}/media`, { media_type: "STORIES", image_url: urlImagen });
+  const id = String(contenedor.id ?? "");
+  if (!id) throw new Error("Instagram media: sin id de contenedor de la historia");
+  await esperarContenedor(id, 12);
+  const publicada = await llamar(`${ig}/media_publish`, { creation_id: id });
+  return String(publicada.id ?? "");
+}
+
+/** Publica un carrusel de 2 a 10 imágenes (URLs públicas) con su texto. */
+export async function publicarCarrusel(urlsImagenes: string[], texto: string): Promise<string> {
+  const ig = process.env.IG_USER_ID!;
+  if (urlsImagenes.length < 2 || urlsImagenes.length > 10) throw new Error("Instagram: un carrusel lleva de 2 a 10 imágenes");
+  const hijos: string[] = [];
+  for (const url of urlsImagenes) {
+    const hijo = await llamar(`${ig}/media`, { image_url: url, is_carousel_item: "true" });
+    if (!hijo.id) throw new Error("Instagram media: sin id de una lámina del carrusel");
+    hijos.push(String(hijo.id));
+  }
+  for (const h of hijos) await esperarContenedor(h, 12);
+  const contenedor = await llamar(`${ig}/media`, { media_type: "CAROUSEL", children: hijos.join(","), caption: texto });
+  const id = String(contenedor.id ?? "");
+  if (!id) throw new Error("Instagram media: sin id del carrusel");
+  await esperarContenedor(id, 24);
+  const publicada = await llamar(`${ig}/media_publish`, { creation_id: id });
+  return String(publicada.id ?? "");
+}

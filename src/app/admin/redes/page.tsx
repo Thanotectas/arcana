@@ -11,6 +11,7 @@ import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
 import { VistaReel } from "@/components/admin/VistaReel";
 import { ConexionMeta } from "@/components/admin/ConexionMeta";
 import { BotonMetricas } from "@/components/admin/BotonMetricas";
+import { BotonesAutomaticas } from "@/components/admin/BotonesAutomaticas";
 import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/metricas";
 import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 
@@ -54,7 +55,7 @@ export default async function PaginaAdminRedes() {
   const programadas = todas.filter((p) => (p.estado === "aprobada" || p.estado === "publicando") && p.fecha >= sumarDias(hoy, -2));
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
   const [{ data: cartaDia }, diagnostico, { data: ultimasInteracciones }, suscripcion, { data: metricasData }] = await Promise.all([
-    getSupabaseAdmin().from("publicaciones_redes").select("red, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -6)).order("fecha", { ascending: false }).limit(20),
+    getSupabaseAdmin().from("publicaciones_redes").select("red, tipo, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -7)).order("fecha", { ascending: false }).order("tipo").limit(40),
     diagnosticoFacebook(),
     getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
@@ -90,15 +91,25 @@ export default async function PaginaAdminRedes() {
         </p>
         <VistaReel />
 
+        <h3 className="pt-4 font-semibold">Automáticas</h3>
+        <p className="text-sm text-texto-suave">
+          Cada mañana sale también la <strong>historia</strong> de la carta del día (Instagram y Facebook) y te llega el <strong>kit de TikTok</strong> con los videos de ayer y el texto para pegar. Los lunes sale el <strong>carrusel «Tu signo esta semana»</strong>, escrito por Sibila. Si algo ya salió, el botón no lo repite.
+        </p>
+        <BotonesAutomaticas />
+
         <h3 className="pt-4 font-semibold">Últimos 7 días</h3>
         {cartaDia?.length ? (
           <ul className="space-y-1 text-sm">
             {cartaDia.map((p) => (
-              <li key={`${p.red}-${p.fecha}`} className="flex flex-wrap gap-x-3">
+              <li key={`${p.red}-${p.tipo}-${p.fecha}`} className="flex flex-wrap gap-x-3">
                 <span className="w-24 text-texto-suave">{p.fecha}</span>
-                <span className="w-24">{p.red === "instagram" ? "Instagram" : "Facebook"}</span>
+                <span className="w-24">{p.red === "instagram" ? "Instagram" : p.red === "facebook" ? "Facebook" : "Correo"}</span>
+                <span className="w-36 text-texto-suave">{({ carta_dia: "Carta del día", historia: "Historia", carrusel: "Carrusel", kit_tiktok: "Kit TikTok" } as Record<string, string>)[p.tipo] ?? p.tipo}</span>
                 <span className={p.estado === "publicada" ? "text-exito" : p.estado === "error" ? "text-peligro" : "text-oro-suave"}>{p.estado}</span>
-                {p.detalle && <span className="basis-full pl-[12.5rem] text-xs text-peligro">{p.detalle}</span>}
+                {p.tipo === "carrusel" && p.estado === "publicada" && p.red === "instagram" ? (
+                  <a href={`/api/redes/carrusel?semana=${p.fecha}&n=0`} target="_blank" rel="noreferrer" className="text-xs text-violeta-suave underline">ver láminas</a>
+                ) : null}
+                {p.detalle && <span className="basis-full text-xs text-peligro">{p.detalle}</span>}
               </li>
             ))}
           </ul>

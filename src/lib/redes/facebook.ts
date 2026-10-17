@@ -57,6 +57,47 @@ export async function publicarVideoFacebook(urlVideo: string, texto: string): Pr
   return String(datos.id ?? "");
 }
 
+async function llamarPagina<T>(ruta: string, cuerpo: Record<string, unknown>): Promise<T> {
+  const { token } = await resolverPagina(tokenFacebook());
+  const res = await fetch(`${API}/${ruta}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(cuerpo),
+    cache: "no-store",
+  });
+  const datos = (await res.json().catch(() => ({}))) as T & { error?: { message?: string; code?: number } };
+  if (!res.ok || datos.error) {
+    const e = datos.error;
+    throw new Error(`Facebook ${ruta.split("/").pop()}: ${e?.message ?? res.status}${e?.code ? ` (código ${e.code})` : ""}`);
+  }
+  return datos;
+}
+
+/** Sube una foto sin publicarla (para historias y publicaciones de varias fotos) y devuelve su id. */
+async function subirFotoSinPublicar(urlImagen: string): Promise<string> {
+  const { id: pagina } = await resolverPagina(tokenFacebook());
+  const r = await llamarPagina<{ id?: string }>(`${pagina}/photos`, { url: urlImagen, published: false });
+  if (!r.id) throw new Error("Facebook photos: sin id de la foto");
+  return r.id;
+}
+
+/** Publica una historia de la página con una imagen 9:16. */
+export async function publicarHistoriaFacebook(urlImagen: string): Promise<string> {
+  const { id: pagina } = await resolverPagina(tokenFacebook());
+  const foto = await subirFotoSinPublicar(urlImagen);
+  const r = await llamarPagina<{ post_id?: string; id?: string }>(`${pagina}/photo_stories`, { photo_id: foto });
+  return String(r.post_id ?? r.id ?? "");
+}
+
+/** Publica en la página varias fotos juntas (el "carrusel" de Facebook) con su texto. */
+export async function publicarVariasFotosFacebook(urlsImagenes: string[], texto: string): Promise<string> {
+  const { id: pagina } = await resolverPagina(tokenFacebook());
+  const ids: string[] = [];
+  for (const url of urlsImagenes) ids.push(await subirFotoSinPublicar(url));
+  const r = await llamarPagina<{ id?: string }>(`${pagina}/feed`, { message: texto, attached_media: ids.map((media_fbid) => ({ media_fbid })) });
+  return String(r.id ?? "");
+}
+
 export interface DiagnosticoFacebook {
   /** Id real de la página (deducido del token). */
   pagina: string | null;

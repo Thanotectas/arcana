@@ -156,7 +156,7 @@ type MetricaRedesRow = {
   id: number;
   red: "instagram" | "facebook";
   media_id: string;
-  origen: "carta_dia" | "programada";
+  origen: "carta_dia" | "programada" | "carrusel";
   referencia: string;
   fecha: string;
   tipo: string;
@@ -245,6 +245,8 @@ type PublicacionRedRow = {
   estado: "pendiente" | "publicada" | "error";
   referencia: string | null;
   detalle: string | null;
+  /** Datos de la publicación (p. ej. los textos del carrusel semanal). */
+  contenido: unknown;
   creado_en: string;
 };
 
@@ -316,7 +318,7 @@ export type Database = {
       };
       publicaciones_redes: {
         Row: PublicacionRedRow;
-        Insert: Insertable<PublicacionRedRow, "id" | "estado" | "referencia" | "detalle" | "creado_en">;
+        Insert: Insertable<PublicacionRedRow, "id" | "estado" | "referencia" | "detalle" | "contenido" | "creado_en">;
         Update: Partial<PublicacionRedRow>;
         Relationships: [];
       };

@@ -122,7 +122,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
     else correosPorTipo.set(c.tipo, (correosPorTipo.get(c.tipo) ?? 0) + 1);
   }
 
-  const { data: cartaDia } = await admin.from("publicaciones_redes").select("estado").gte("fecha", desde).lt("fecha", hasta).limit(100);
+  const { data: cartaDia } = await admin.from("publicaciones_redes").select("estado").eq("tipo", "carta_dia").gte("fecha", desde).lt("fecha", hasta).limit(100);
   const { data: agente } = await admin.from("publicaciones_programadas").select("estado, fecha").gte("fecha", desde).limit(100);
   const cuenta = (lista: { estado: string }[] | null, estado: string) => (lista ?? []).filter((x) => x.estado === estado).length;
   // Las tablas de métricas e interacciones pueden no existir aún (migraciones 0027 y 0028): se ignoran sus errores.

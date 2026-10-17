@@ -182,3 +182,33 @@ promedio de interacciones = me gusta + comentarios + guardados + compartidos)
 y el botón "Actualizar cifras ahora". El resumen semanal añade el bloque
 "Rendimiento en redes" (vistas, interacciones, mejor publicación, promedio por
 tipo) y cuántas respuestas dio Sibila en redes.
+
+## Historia diaria, carrusel semanal y kit de TikTok (17 oct 2026)
+
+`src/lib/redes/automaticas.ts` (sin aprobación; contenido acotado), cada una
+registrada en `publicaciones_redes` (migración 0029: `red` admite `correo`,
+`tipo` admite `historia`, `carrusel` y `kit_tiktok`, columna `contenido`) con
+`publicarUnaVez` de `src/lib/redes/reservas.ts` para no repetirse:
+- **Historia** de la carta del día (cron `/api/cron/historia`, orquestador de
+  la mañana): imagen 9:16 de `/api/redes/historia-dia?fecha=` (formato
+  historia de `imagenTarjeta`); Instagram `media_type=STORIES`
+  (`publicarHistoria`), Facebook `photos` sin publicar + `photo_stories`
+  (`publicarHistoriaFacebook`). `REDES_HISTORIA=0` la apaga.
+- **Carrusel «Tu signo esta semana»** (cron `/api/cron/carrusel`, solo los
+  lunes): Sibila escribe un mensaje por signo, el título y el pie
+  (`redactarCarrusel`, JSON); se guardan en `contenido` y las ocho láminas
+  (portada, seis con dos signos, cierre) se dibujan en
+  `/api/redes/carrusel?semana=&n=0..7` (`src/lib/redes/carrusel.tsx`).
+  Instagram: hijos `is_carousel_item` + contenedor `CAROUSEL`
+  (`publicarCarrusel`); Facebook: fotos sin publicar + `feed` con
+  `attached_media` (`publicarVariasFotosFacebook`). La semana es la actual de
+  lunes a jueves y la siguiente de viernes a domingo (lanzado a mano).
+  `REDES_CARRUSEL=0` lo apaga. Sus cifras entran en `metricas_redes`
+  (origen `carrusel`).
+- **Kit de TikTok** (cron `/api/cron/kit-tiktok`, orquestador de la mañana,
+  con los videos de **ayer**, ya generados): correo a `correosAdmin()` con el
+  enlace de descarga de cada reel (carta del día y agente) y el texto listo
+  para pegar (`src/lib/redes/kit-tiktok.ts`). `REDES_KIT_TIKTOK=0` lo apaga.
+- En `/admin/redes`, sección "Automáticas": botones para lanzar cada una a
+  mano (no repiten lo que ya salió) y el registro de los últimos 7 días por
+  tipo.

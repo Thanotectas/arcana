@@ -84,7 +84,7 @@ function tokenFacebook() {
 interface Pendiente {
   red: "instagram" | "facebook";
   media_id: string;
-  origen: "carta_dia" | "programada";
+  origen: "carta_dia" | "programada" | "carrusel";
   referencia: string;
   fecha: string;
   tipo: string;
@@ -95,12 +95,14 @@ interface Pendiente {
 async function publicadas(admin: SupabaseClient<Database>, hoy: string): Promise<Pendiente[]> {
   const desde = sumarDias(hoy, -DIAS);
   const [{ data: cartas }, { data: programadas }] = await Promise.all([
-    admin.from("publicaciones_redes").select("red, fecha, referencia").eq("estado", "publicada").gte("fecha", desde).not("referencia", "is", null),
+    admin.from("publicaciones_redes").select("red, tipo, fecha, referencia").eq("estado", "publicada").in("tipo", ["carta_dia", "carrusel"]).gte("fecha", desde).not("referencia", "is", null),
     admin.from("publicaciones_programadas").select("id, fecha, tipo, etiqueta, resultados").gte("fecha", desde).in("estado", ["publicada", "error"]),
   ]);
   const lista: Pendiente[] = [];
   for (const c of cartas ?? []) {
-    if (c.referencia && (c.red === "instagram" || c.red === "facebook")) lista.push({ red: c.red, media_id: c.referencia, origen: "carta_dia", referencia: c.fecha, fecha: c.fecha, tipo: "Carta del día", formato: null });
+    if (!c.referencia || (c.red !== "instagram" && c.red !== "facebook")) continue;
+    const carrusel = c.tipo === "carrusel";
+    lista.push({ red: c.red, media_id: c.referencia, origen: carrusel ? "carrusel" : "carta_dia", referencia: c.fecha, fecha: c.fecha, tipo: carrusel ? "Carrusel de signos" : "Carta del día", formato: carrusel ? "carrusel" : null });
   }
   for (const p of (programadas ?? []) as Pick<PublicacionProgramada, "id" | "fecha" | "tipo" | "etiqueta" | "resultados">[]) {
     for (const red of ["instagram", "facebook"] as const) {
