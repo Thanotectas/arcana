@@ -66,17 +66,28 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/entrar";
     url.searchParams.set("volver", pathname);
-    return NextResponse.redirect(url);
+    return redirigir(url, response);
   }
 
   if (user && (pathname === "/entrar" || pathname === "/registro")) {
     const url = request.nextUrl.clone();
     url.pathname = "/inicio";
     url.search = "";
-    return NextResponse.redirect(url);
+    return redirigir(url, response);
   }
 
   return response;
+}
+
+/**
+ * Redirección que conserva las cookies ya puestas en esta petición (la sesión
+ * refrescada y la marca de plataforma): si la app de Android abre un atajo sin
+ * sesión, la marca no se pierde y las compras siguen ocultas.
+ */
+function redirigir(url: URL, base: NextResponse) {
+  const r = NextResponse.redirect(url);
+  base.cookies.getAll().forEach((c) => r.cookies.set(c));
+  return r;
 }
 
 export const config = {

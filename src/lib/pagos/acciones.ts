@@ -7,9 +7,12 @@ import { estadoOfertaFundadores } from "./fundadores";
 import { nuevaReferencia, pagosConfigurados } from "./bold";
 import { crearCheckout, pagosInternacionalesConfigurados } from "./lemon";
 import { getSupabaseAdmin } from "../supabase/admin";
+import { comprasVisibles } from "../plataforma";
 
 /** Crea la orden pendiente y lleva a la página que abre el checkout de Bold. */
 export async function accionComprar(formData: FormData) {
+  // En la app de Google Play no se vende (Play exige su facturación).
+  if (!(await comprasVisibles())) redirect("/creditos");
   const idPaquete = String(formData.get("paquete") ?? "");
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?error=paquete");
@@ -46,6 +49,7 @@ export async function accionComprar(formData: FormData) {
  * servidor y checkout alojado de Lemon Squeezy. El webhook acredita.
  */
 export async function accionComprarInternacional(formData: FormData) {
+  if (!(await comprasVisibles())) redirect("/creditos");
   const idPaquete = String(formData.get("paquete") ?? "");
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?moneda=usd&error=paquete");

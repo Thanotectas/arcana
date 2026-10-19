@@ -8,6 +8,8 @@ import { CheckoutBold } from "@/components/CheckoutBold";
 import { Aviso } from "@/components/Aviso";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
+import { comprasVisibles } from "@/lib/plataforma";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -17,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** Resumen de la orden y botón de pagos de Bold (firma calculada en el servidor). */
 export default async function PaginaPagar({ searchParams }: { searchParams: Promise<{ ref?: string }> }) {
   const user = await requerirUsuario();
+  if (!(await comprasVisibles())) redirect("/creditos");
   const [{ ref }, t] = await Promise.all([searchParams, getT()]);
   const orden = ref ? await getOrdenPorReferencia(ref) : null;
 
