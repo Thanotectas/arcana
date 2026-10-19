@@ -41,7 +41,10 @@ export async function accionComprar(formData: FormData) {
   const referencia = nuevaReferencia(user.id);
   const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
 
-  const { error } = await supabase.from("ordenes").insert({
+  // La orden la crea el servidor (como la internacional): con un código válido
+  // lleva créditos extra, y la política de la tabla solo admite las cantidades
+  // exactas de cada paquete y sin código para inserts de la persona.
+  const { error } = await getSupabaseAdmin().from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
     creditos: paquete.creditos + extra,
