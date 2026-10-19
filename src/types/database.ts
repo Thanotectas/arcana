@@ -152,6 +152,35 @@ type PublicacionProgramadaRow = {
   publicado_en: string | null;
 };
 
+type TiktokCuentaRow = {
+  id: number;
+  open_id: string;
+  nombre: string | null;
+  usuario: string | null;
+  avatar: string | null;
+  access_token: string;
+  refresh_token: string;
+  expira_en: string;
+  refresh_expira_en: string | null;
+  scopes: string | null;
+  conectada_en: string;
+  actualizado_en: string;
+};
+
+type PublicacionTiktokRow = {
+  id: number;
+  publish_id: string | null;
+  modo: "borrador" | "directo";
+  titulo: string | null;
+  video: string;
+  privacidad: string | null;
+  estado: "enviando" | "procesando" | "en_borradores" | "publicada" | "error";
+  post_id: string | null;
+  detalle: string | null;
+  creado_en: string;
+  actualizado_en: string;
+};
+
 type ChatVisitaRow = {
   id: number;
   huella: string;
@@ -348,6 +377,18 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      tiktok_cuenta: {
+        Row: TiktokCuentaRow;
+        Insert: Insertable<TiktokCuentaRow, "id" | "nombre" | "usuario" | "avatar" | "refresh_expira_en" | "scopes" | "conectada_en" | "actualizado_en">;
+        Update: Partial<TiktokCuentaRow>;
+        Relationships: [];
+      };
+      publicaciones_tiktok: {
+        Row: PublicacionTiktokRow;
+        Insert: Insertable<PublicacionTiktokRow, "id" | "publish_id" | "titulo" | "privacidad" | "estado" | "post_id" | "detalle" | "creado_en" | "actualizado_en">;
+        Update: Partial<PublicacionTiktokRow>;
         Relationships: [];
       };
       chat_visitas: {

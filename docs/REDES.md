@@ -83,7 +83,7 @@ publicando, publicada, descartada, error), `resultados` (id o error por red),
 
 ## Fuera del alcance (por ahora)
 
-- TikTok: su API de publicación exige revisión de la app; el agente no publica ahí.
+- TikTok: se envía desde /admin/redes (sección TikTok, ver abajo); el agente no publica solo ahí.
 - Respuestas a comentarios y mensajes: requieren más permisos de Meta.
 
 ## Carta del día en video (reel)
@@ -212,3 +212,31 @@ registrada en `publicaciones_redes` (migración 0029: `red` admite `correo`,
 - En `/admin/redes`, sección "Automáticas": botones para lanzar cada una a
   mano (no repiten lo que ya salió) y el registro de los últimos 7 días por
   tipo.
+
+## TikTok desde el panel (19 oct 2026)
+
+App «Arcana» en developers.tiktok.com (cuenta de desarrollador de la marca), con
+**Login Kit** (Redirect URI `https://miarcana.com/api/tiktok/callback`) y
+**Content Posting API** (Direct Post activado). Scopes: `user.info.basic`,
+`video.upload`, `video.publish`. El dominio se verificó por prefijo de URL con el
+archivo `public/tiktokt534bcLoFgkrcOMyG3mac6DJy05JnFhz.txt` (no borrarlo).
+
+- Variables en Vercel: `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`. Mientras la
+  app no esté aprobada se usan las del **Sandbox**, con @miarcana4 como usuario
+  de prueba; al aprobarse, se cambian por las de Production y se vuelve a conectar.
+- Conexión: botón «Conectar TikTok» → `/api/tiktok/conectar` (estado en cookie)
+  → TikTok → `/api/tiktok/callback`, que guarda la cuenta en `tiktok_cuenta`
+  (migración 0031). El token dura 24 h y se renueva solo; el permiso, un año.
+- Envío (`src/lib/redes/tiktok.ts`): el video se descarga del bucket `redes` y
+  se sube como archivo (FILE_UPLOAD, un solo trozo, hasta 64 MB). «Enviar a mis
+  borradores» usa la bandeja (video.upload); «Publicar en TikTok» publica directo
+  (video.publish). Cada envío queda en `publicaciones_tiktok`; «Actualizar
+  estado» consulta `/post/publish/status/fetch/`.
+- Formulario (`PublicarTiktok`), según las pautas de TikTok para la auditoría:
+  muestra la cuenta de destino, consulta `creator_info` al abrirlo y al
+  publicar, la privacidad se elige cada vez (sin valor por defecto), comentarios,
+  dúo y stitch vienen apagados y respetan lo que la cuenta tenga desactivado,
+  divulgación de contenido comercial («Tu marca» / «Contenido de marca», que no
+  puede ser privado) y la declaración de uso de música.
+- Sin auditoría, TikTok deja lo directo en privado (Solo yo). Para pedirla hay
+  que grabar el video de demostración del flujo completo en el Sandbox.

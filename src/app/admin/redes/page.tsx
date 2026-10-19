@@ -14,6 +14,9 @@ import { BotonMetricas } from "@/components/admin/BotonMetricas";
 import { BotonesAutomaticas } from "@/components/admin/BotonesAutomaticas";
 import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/metricas";
 import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
+import { cuentaTiktok, tiktokConfigurado } from "@/lib/redes/tiktok";
+import { BotonDesconectarTiktok, BotonEstadosTiktok, PublicarTiktok, type FuenteTiktok } from "@/components/admin/PublicarTiktok";
+import { Aviso } from "@/components/Aviso";
 
 // Generar una semana (Sibila) o el reel de la carta del día puede tardar medio minuto o más.
 export const maxDuration = 300;
@@ -39,8 +42,9 @@ function vista(p: PublicacionProgramada): PublicacionVista {
 }
 
 /** Panel del agente de redes: borradores por aprobar, programadas e historial. Solo administración. */
-export default async function PaginaAdminRedes() {
+export default async function PaginaAdminRedes({ searchParams }: { searchParams: Promise<{ tiktok?: string; motivo?: string }> }) {
   await requerirAdmin();
+  const avisoTiktok = await searchParams;
   const hoy = fechaBogota();
   const desde = sumarDias(hoy, -14);
   const { data } = await getSupabaseAdmin()
@@ -61,6 +65,18 @@ export default async function PaginaAdminRedes() {
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
     getSupabaseAdmin().from("metricas_redes").select("*").gte("fecha", sumarDias(hoy, -14)).order("fecha", { ascending: false }).limit(80),
   ]);
+  const [tiktok, { data: enviosTiktok }] = await Promise.all([
+    tiktokConfigurado() ? cuentaTiktok(getSupabaseAdmin()) : Promise.resolve(null),
+    getSupabaseAdmin().from("publicaciones_tiktok").select("id, modo, titulo, privacidad, estado, post_id, detalle, creado_en").order("creado_en", { ascending: false }).limit(10),
+  ]);
+  const fuentesTiktok: FuenteTiktok[] = [
+    { valor: "carta", etiqueta: "Carta del día de hoy" },
+    ...todas
+      .filter((p) => (p.estado === "publicada" || p.estado === "aprobada") && p.fecha >= sumarDias(hoy, -3) && p.fecha <= hoy)
+      .reverse()
+      .map((p) => ({ valor: `pub:${p.id}`, etiqueta: `${fechaLargaEs(p.fecha)} · ${p.etiqueta}: ${p.titulo}`.slice(0, 90) })),
+  ];
+  const ESTADO_TIKTOK: Record<string, string> = { enviando: "Enviando", procesando: "TikTok lo está procesando", en_borradores: "En tus borradores de TikTok", publicada: "Publicado", error: "Error" };
   const metricas = (metricasData ?? []) as MetricaRed[];
   const porTipo = promediosPorTipo(metricas);
   const cifra = (n: number | null) => (n === null ? "—" : n.toLocaleString("es-CO"));
@@ -129,6 +145,61 @@ export default async function PaginaAdminRedes() {
           {diagnostico.avisoId && <p className="text-xs text-oro-suave">{diagnostico.avisoId}</p>}
           {diagnostico.tokenDeUsuario && <p className="text-xs text-oro-suave">{`${diagnostico.fuenteToken} es un token de usuario: funciona, pero vence. Cámbialo por el token de la página (en el Explorador: 1337589612768238?fields=name,access_token).`}</p>}
         </div>
+      </section>
+
+      <section id="tiktok" className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">TikTok</h2>
+        {avisoTiktok.tiktok === "conectada" && <Aviso tipo="exito">TikTok quedó conectado.</Aviso>}
+        {avisoTiktok.tiktok === "error" && <Aviso>{`No se pudo conectar TikTok: ${avisoTiktok.motivo ?? "error desconocido"}`}</Aviso>}
+        {!tiktokConfigurado() ? (
+          <p className="text-sm text-texto-suave">
+            Falta configurar la app de TikTok: agrega <code>TIKTOK_CLIENT_KEY</code> y <code>TIKTOK_CLIENT_SECRET</code> en Vercel (developers.tiktok.com → tu app → Credentials).
+          </p>
+        ) : !tiktok ? (
+          <div className="space-y-2">
+            <p className="text-sm text-texto-suave">Conecta la cuenta de TikTok de Arcana para enviar los videos desde aquí. Entra con la cuenta de la marca cuando TikTok lo pida.</p>
+            <a href="/api/tiktok/conectar" className="boton boton-primario">Conectar TikTok</a>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {tiktok.avatar && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tiktok.avatar} alt="" className="h-10 w-10 rounded-full border border-borde" />
+              )}
+              <p className="text-sm">
+                Conectado: <strong>{tiktok.nombre ?? "cuenta de TikTok"}</strong>
+                {tiktok.usuario && <span className="text-texto-suave"> @{tiktok.usuario}</span>}
+                {tiktok.refresh_expira_en && <span className="block text-xs text-texto-suave">{`El permiso vence el ${hora(tiktok.refresh_expira_en)}; antes de esa fecha, vuelve a conectar.`}</span>}
+              </p>
+              <BotonDesconectarTiktok />
+            </div>
+            <p className="text-sm text-texto-suave">
+              Mientras TikTok no apruebe la app, lo que se publique directo queda en privado (Solo yo): usa «Enviar a mis borradores» y termina de publicarlo en la app con un sonido en tendencia.
+            </p>
+            <PublicarTiktok fuentes={fuentesTiktok} />
+            {(enviosTiktok ?? []).length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-semibold">Envíos recientes</h3>
+                  <BotonEstadosTiktok />
+                </div>
+                <ul className="divide-y divide-borde text-sm">
+                  {(enviosTiktok ?? []).map((e) => (
+                    <li key={e.id} className="flex flex-wrap items-baseline gap-x-3 py-2">
+                      <span className="w-28 text-texto-suave">{hora(e.creado_en)}</span>
+                      <span className="w-24">{e.modo === "borrador" ? "Borrador" : "Directo"}</span>
+                      <span className={e.estado === "error" ? "text-peligro" : e.estado === "publicada" ? "text-exito" : ""}>{ESTADO_TIKTOK[e.estado] ?? e.estado}</span>
+                      {e.privacidad && <span className="text-texto-suave">· {e.privacidad}</span>}
+                      {e.estado === "error" && e.detalle && <span className="basis-full text-xs text-peligro">{e.detalle}</span>}
+                      {e.titulo && <span className="basis-full truncate text-xs text-texto-suave">{e.titulo}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="tarjeta space-y-3 p-5">

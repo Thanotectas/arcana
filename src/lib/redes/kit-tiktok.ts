@@ -10,8 +10,8 @@ import { reelCartaDelDia } from "./reel";
 import { reelPublicacion } from "./reel-publicacion";
 
 /**
- * Kit diario para TikTok: TikTok no deja publicar por API sin una revisión
- * larga, así que cada mañana llega a la administración un correo con los
+ * Kit diario para TikTok: mientras la app de TikTok no pase la auditoría (lo
+ * directo sale privado; ver tiktok.ts), cada mañana llega a la administración un correo con los
  * reels de ayer (carta del día y publicación del agente, ya generados) para
  * descargarlos y el texto listo para pegar. Subirlo a mano permite poner un audio en
  * tendencia, que es lo que más alcance da en TikTok.
@@ -22,7 +22,7 @@ interface Pieza {
   texto: string;
 }
 
-function textoCarta(fecha: string) {
+export function textoCarta(fecha: string) {
   const c = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
   return [
@@ -36,7 +36,7 @@ function textoCarta(fecha: string) {
   ].join("\n");
 }
 
-function textoPublicacion(p: Pick<PublicacionProgramada, "titulo" | "extracto" | "enlace">) {
+export function textoPublicacion(p: Pick<PublicacionProgramada, "titulo" | "extracto" | "enlace">) {
   return [`${p.titulo} ✨`, "", p.extracto, "", `${p.enlace} (link en el perfil)`, "", "#miarcana #tarot #astrologia #espiritualidad #fyp #parati"].join("\n");
 }
 
