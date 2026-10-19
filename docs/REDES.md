@@ -240,5 +240,8 @@ archivo `public/tiktokt534bcLoFgkrcOMyG3mac6DJy05JnFhz.txt` (no borrarlo).
   puede ser privado) y la declaración de uso de música.
 - «Publicar en TikTok» y sus opciones solo aparecen si la cuenta conectada tiene el permiso
   `video.publish`; si la app se aprueba solo con borradores, queda «Enviar a mis borradores».
+- **19 oct 2026: app enviada a revisión (Production) solo con `user.info.basic` y `video.upload`**
+  (Direct Post apagado), con el video de demostración del flujo de borradores. Al aprobarse:
+  cambiar en Vercel las claves del Sandbox por las de Production y volver a «Conectar TikTok».
 - Sin auditoría, TikTok deja lo directo en privado (Solo yo). Para pedirla hay
   que grabar el video de demostración del flujo completo en el Sandbox.
