@@ -40,17 +40,29 @@ export function frases(...partes: (string | null | undefined)[]) {
     .join(" ");
 }
 
-async function sintetizar(texto: string): Promise<Buffer> {
-  const res = await fetch(`${API}/text-to-speech/${encodeURIComponent(voz())}?output_format=mp3_44100_128`, {
+const MODELO_BASE = "eleven_multilingual_v2";
+
+async function pedirAudio(texto: string, modelo: string) {
+  return fetch(`${API}/text-to-speech/${encodeURIComponent(voz())}?output_format=mp3_44100_128`, {
     method: "POST",
     headers: { "xi-api-key": clave(), "Content-Type": "application/json", Accept: "audio/mpeg" },
     body: JSON.stringify({
       text: paraLeer(texto),
-      model_id: (process.env.ELEVENLABS_MODEL ?? "eleven_multilingual_v2").trim(),
+      model_id: modelo,
       voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.25, use_speaker_boost: true },
     }),
     cache: "no-store",
   });
+}
+
+/** Si el modelo de ELEVENLABS_MODEL no sirve (nombre mal escrito, plan que no lo incluye), se usa el clásico. */
+async function sintetizar(texto: string): Promise<Buffer> {
+  const modelo = (process.env.ELEVENLABS_MODEL ?? "").trim() || MODELO_BASE;
+  let res = await pedirAudio(texto, modelo);
+  if (!res.ok && modelo !== MODELO_BASE && res.status >= 400 && res.status < 500 && res.status !== 401) {
+    console.warn(`[voz de Sibila] el modelo ${modelo} respondió ${res.status}; se usa ${MODELO_BASE}`);
+    res = await pedirAudio(texto, MODELO_BASE);
+  }
   if (!res.ok) {
     const detalle = await res.text().catch(() => "");
     throw new Error(`ElevenLabs ${res.status}: ${detalle.slice(0, 200)}`);
