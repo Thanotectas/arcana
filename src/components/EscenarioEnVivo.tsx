@@ -214,6 +214,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
           }
           if (frase) {
             puentes.set(i, frase);
+            setSinVoz(!frase.audio);
             setLectura(null);
             await hablar(frase.texto, frase.audio);
             setSubtitulo("");
