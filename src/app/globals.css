@@ -703,4 +703,32 @@ body {
 .vivo-carta {
   animation: vivo-carta 4.5s ease-in-out infinite;
 }
+@keyframes vivo-parpadeo {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+.vivo-ojos {
+  animation: vivo-parpadeo 5.2s ease-in-out infinite;
+}
+@keyframes vivo-estrella-frente {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+.vivo-estrella-frente {
+  animation: vivo-estrella-frente 3s ease-in-out infinite;
+  transform-origin: center;
+}
 

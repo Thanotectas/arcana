@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Marca } from "./Logo";
 import { CieloEnVivo } from "./CieloEnVivo";
+import { RostroSibila } from "./RostroSibila";
 
 interface Carta {
   id: string;
@@ -286,14 +287,14 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
             <div
               className="flex h-full w-full items-center justify-center rounded-full border-2 border-oro/60 vivo-respirar"
               style={{
-                transform: `scale(${1 + nivel * 0.12})`,
+                transform: `scale(${1 + nivel * 0.05})`,
                 transition: "transform 80ms linear",
                 background: "radial-gradient(circle, rgba(139,108,246,0.55), rgba(26,15,58,0.9) 70%)",
                 boxShadow: `0 0 ${60 + nivel * 140}px rgba(241,217,154,${0.25 + nivel * 0.45}), inset 0 0 80px rgba(0,0,0,0.6)`,
               }}
             >
               <div className="vivo-flotar">
-                <Marca tamano={210} />
+                <RostroSibila tamano={318} nivel={nivel} />
               </div>
             </div>
           </div>
