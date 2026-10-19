@@ -181,6 +181,30 @@ type PublicacionTiktokRow = {
   actualizado_en: string;
 };
 
+type YoutubeCuentaRow = {
+  id: number;
+  canal_id: string;
+  nombre: string | null;
+  usuario: string | null;
+  avatar: string | null;
+  refresh_token: string;
+  access_token: string | null;
+  expira_en: string | null;
+  conectada_en: string;
+  actualizado_en: string;
+};
+
+type PublicacionYoutubeRow = {
+  id: number;
+  video_id: string | null;
+  titulo: string;
+  video: string;
+  privacidad: "public" | "unlisted" | "private";
+  estado: "subiendo" | "subido" | "error";
+  detalle: string | null;
+  creado_en: string;
+};
+
 type ChatVisitaRow = {
   id: number;
   huella: string;
@@ -377,6 +401,18 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      youtube_cuenta: {
+        Row: YoutubeCuentaRow;
+        Insert: Insertable<YoutubeCuentaRow, "id" | "nombre" | "usuario" | "avatar" | "access_token" | "expira_en" | "conectada_en" | "actualizado_en">;
+        Update: Partial<YoutubeCuentaRow>;
+        Relationships: [];
+      };
+      publicaciones_youtube: {
+        Row: PublicacionYoutubeRow;
+        Insert: Insertable<PublicacionYoutubeRow, "id" | "video_id" | "estado" | "detalle" | "creado_en">;
+        Update: Partial<PublicacionYoutubeRow>;
         Relationships: [];
       };
       tiktok_cuenta: {

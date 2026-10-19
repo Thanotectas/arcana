@@ -6,14 +6,17 @@ import { facebookConfigurado, publicarHistoriaFacebook, publicarVariasFotosFaceb
 import { publicarUnaVez, type Resultado } from "./reservas";
 import { contenidoGuardado, redactarCarrusel, semanaDelCarrusel, urlsLaminas } from "./carrusel";
 import { enviarKitTiktok, piezasDelDia } from "./kit-tiktok";
-import { fechaBogota } from "./carta-dia";
+import { cartaDelDia, fechaBogota } from "./carta-dia";
+import { reelCartaDelDia } from "./reel";
+import { textoCarta } from "./kit-tiktok";
+import { privacidadYoutube, subirShort, youtubeConectado } from "./youtube";
 
 /**
  * Publicaciones automáticas que no pasan por aprobación (contenido acotado):
  * historia diaria de la carta del día, carrusel semanal de signos y kit de
- * TikTok por correo. Cada una se registra en `publicaciones_redes` para no
- * repetirse. Variables para apagarlas: REDES_HISTORIA=0, REDES_CARRUSEL=0,
- * REDES_KIT_TIKTOK=0.
+ * TikTok por correo y Short diario en YouTube. Cada una se registra en
+ * `publicaciones_redes` para no repetirse. Variables para apagarlas:
+ * REDES_HISTORIA=0, REDES_CARRUSEL=0, REDES_KIT_TIKTOK=0, REDES_YOUTUBE=0.
  */
 function sitio() {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
@@ -53,4 +56,15 @@ export async function kitTiktok(admin: SupabaseClient<Database>, fecha = fechaBo
   const piezas = await piezasDelDia(admin, fecha);
   const correo = await publicarUnaVez(admin, "correo", "kit_tiktok", fecha, () => enviarKitTiktok(fecha, piezas));
   return { fecha, piezas: piezas.length, correo };
+}
+
+/** Short diario en YouTube con el reel (narrado) de la carta del día. */
+export async function shortDelDia(admin: SupabaseClient<Database>, fecha = fechaBogota()) {
+  if (process.env.REDES_YOUTUBE === "0") return { apagado: true };
+  if (!(await youtubeConectado(admin))) return { fecha, youtube: sinConfigurar };
+  const carta = cartaDelDia(fecha);
+  const youtube = await publicarUnaVez(admin, "youtube", "carta_dia", fecha, async () =>
+    subirShort(admin, await reelCartaDelDia(admin, fecha), { titulo: `Carta del día: ${carta.nombre} ✨ | Tarot`, descripcion: textoCarta(fecha), privacidad: privacidadYoutube() }),
+  );
+  return { fecha, youtube };
 }

@@ -4,14 +4,9 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requerirAdmin } from "@/lib/admin";
-import { fechaBogota } from "./carta-dia";
-import { BUCKET, asegurarBucket, reelCartaDelDia } from "./reel";
-import { reelPublicacion } from "./reel-publicacion";
-import { textoCarta, textoPublicacion } from "./kit-tiktok";
+import { BUCKET, asegurarBucket } from "./reel";
+import { videoDeFuente } from "./fuentes-video";
 import { actualizarEstadoTiktok, desconectarTiktok, enviarVideoTiktok, infoCreador, videoPermitido, type InfoCreador } from "./tiktok";
-import type { PublicacionProgramada } from "./calendario";
-
-const UUID = /^[0-9a-f-]{36}$/i;
 
 export interface EstadoPrepararTiktok {
   error?: string;
@@ -30,26 +25,7 @@ export async function accionPrepararTiktok(_prev: EstadoPrepararTiktok, formData
   const fuente = String(formData.get("fuente") ?? "");
   const admin = getSupabaseAdmin();
   try {
-    let video: string;
-    let texto = "";
-    if (fuente === "carta") {
-      const hoy = fechaBogota();
-      video = await reelCartaDelDia(admin, hoy);
-      texto = textoCarta(hoy);
-    } else if (fuente.startsWith("pub:")) {
-      const id = fuente.slice(4);
-      if (!UUID.test(id)) return { error: "Publicación no válida." };
-      const { data: fila } = await admin.from("publicaciones_programadas").select("*").eq("id", id).maybeSingle();
-      if (!fila) return { error: "Publicación no encontrada." };
-      video = await reelPublicacion(admin, fila as PublicacionProgramada);
-      texto = textoPublicacion(fila as PublicacionProgramada);
-    } else if (fuente.startsWith("subida:")) {
-      const ruta = fuente.slice(7);
-      if (!/^tiktok\/subidas\/[0-9a-f-]{36}\.mp4$/i.test(ruta)) return { error: "Video no válido." };
-      video = admin.storage.from(BUCKET).getPublicUrl(ruta).data.publicUrl;
-    } else {
-      return { error: "Elige un video." };
-    }
+    const { video, texto } = await videoDeFuente(admin, fuente);
     const creador = await infoCreador(admin);
     return { video, texto, creador };
   } catch (e) {

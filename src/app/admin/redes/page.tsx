@@ -17,6 +17,8 @@ import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/me
 import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 import { cuentaTiktok, tiktokConfigurado } from "@/lib/redes/tiktok";
 import { vozConfigurada } from "@/lib/redes/voz";
+import { cuentaYoutube, privacidadYoutube, youtubeConfigurado } from "@/lib/redes/youtube";
+import { BotonDesconectarYoutube, BotonShortDelDia, SubirYoutube } from "@/components/admin/SubirYoutube";
 import { BotonDesconectarTiktok, BotonEstadosTiktok, PublicarTiktok, type FuenteTiktok } from "@/components/admin/PublicarTiktok";
 import { Aviso } from "@/components/Aviso";
 
@@ -44,7 +46,7 @@ function vista(p: PublicacionProgramada): PublicacionVista {
 }
 
 /** Panel del agente de redes: borradores por aprobar, programadas e historial. Solo administración. */
-export default async function PaginaAdminRedes({ searchParams }: { searchParams: Promise<{ tiktok?: string; motivo?: string }> }) {
+export default async function PaginaAdminRedes({ searchParams }: { searchParams: Promise<{ tiktok?: string; youtube?: string; motivo?: string }> }) {
   await requerirAdmin();
   const avisoTiktok = await searchParams;
   const hoy = fechaBogota();
@@ -66,6 +68,10 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
     getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
     getSupabaseAdmin().from("metricas_redes").select("*").gte("fecha", sumarDias(hoy, -14)).order("fecha", { ascending: false }).limit(80),
+  ]);
+  const [youtube, { data: subidasYoutube }] = await Promise.all([
+    youtubeConfigurado() ? cuentaYoutube(getSupabaseAdmin()) : Promise.resolve(null),
+    getSupabaseAdmin().from("publicaciones_youtube").select("id, video_id, titulo, privacidad, estado, detalle, creado_en").order("creado_en", { ascending: false }).limit(8),
   ]);
   const [tiktok, { data: enviosTiktok }] = await Promise.all([
     tiktokConfigurado() ? cuentaTiktok(getSupabaseAdmin()) : Promise.resolve(null),
@@ -129,7 +135,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
             {cartaDia.map((p) => (
               <li key={`${p.red}-${p.tipo}-${p.fecha}`} className="flex flex-wrap gap-x-3">
                 <span className="w-24 text-texto-suave">{p.fecha}</span>
-                <span className="w-24">{p.red === "instagram" ? "Instagram" : p.red === "facebook" ? "Facebook" : "Correo"}</span>
+                <span className="w-24">{({ instagram: "Instagram", facebook: "Facebook", youtube: "YouTube", correo: "Correo" } as Record<string, string>)[p.red] ?? p.red}</span>
                 <span className="w-36 text-texto-suave">{({ carta_dia: "Carta del día", historia: "Historia", carrusel: "Carrusel", kit_tiktok: "Kit TikTok" } as Record<string, string>)[p.tipo] ?? p.tipo}</span>
                 <span className={p.estado === "publicada" ? "text-exito" : p.estado === "error" ? "text-peligro" : "text-oro-suave"}>{p.estado}</span>
                 {p.tipo === "carrusel" && p.estado === "publicada" && p.red === "instagram" ? (
@@ -203,6 +209,61 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
                       {e.privacidad && <span className="text-texto-suave">· {e.privacidad}</span>}
                       {e.estado === "error" && e.detalle && <span className="basis-full text-xs text-peligro">{e.detalle}</span>}
                       {e.titulo && <span className="basis-full truncate text-xs text-texto-suave">{e.titulo}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      <section id="youtube" className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">YouTube Shorts</h2>
+        {avisoTiktok.youtube === "conectada" && <Aviso tipo="exito">YouTube quedó conectado.</Aviso>}
+        {avisoTiktok.youtube === "error" && <Aviso>{`No se pudo conectar YouTube: ${avisoTiktok.motivo ?? "error desconocido"}`}</Aviso>}
+        {!youtubeConfigurado() ? (
+          <p className="text-sm text-texto-suave">
+            Falta configurar Google: agrega <code>YOUTUBE_CLIENT_ID</code> y <code>YOUTUBE_CLIENT_SECRET</code> en Vercel (Google Cloud → Credenciales → cliente OAuth de aplicación web).
+          </p>
+        ) : !youtube ? (
+          <div className="space-y-2">
+            <p className="text-sm text-texto-suave">Conecta el canal de YouTube de Arcana. Entra con la cuenta de Google dueña del canal.</p>
+            <a href="/api/youtube/conectar" className="boton boton-primario">Conectar YouTube</a>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {youtube.avatar && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={youtube.avatar} alt="" className="h-10 w-10 rounded-full border border-borde" />
+              )}
+              <p className="text-sm">
+                Conectado: <strong>{youtube.nombre ?? "canal de YouTube"}</strong>
+                {youtube.usuario && <span className="text-texto-suave"> {youtube.usuario}</span>}
+              </p>
+              <BotonDesconectarYoutube />
+            </div>
+            <p className="text-sm text-texto-suave">
+              Cada día a mediodía se sube solo el Short de la carta del día (privacidad: {privacidadYoutube() === "public" ? "público" : privacidadYoutube() === "unlisted" ? "no listado" : "privado"}). Mientras Google no apruebe la app, YouTube deja privado todo lo que se sube por API: después de subir, cámbialo a público en YouTube Studio.
+            </p>
+            <BotonShortDelDia />
+            <SubirYoutube fuentes={fuentesTiktok} privacidad={privacidadYoutube()} />
+            {(subidasYoutube ?? []).length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Subidos desde el panel</h3>
+                <ul className="divide-y divide-borde text-sm">
+                  {(subidasYoutube ?? []).map((v) => (
+                    <li key={v.id} className="flex flex-wrap items-baseline gap-x-3 py-2">
+                      <span className="w-28 text-texto-suave">{hora(v.creado_en)}</span>
+                      <span className={v.estado === "error" ? "text-peligro" : v.estado === "subido" ? "text-exito" : ""}>{v.estado === "subido" ? "Subido" : v.estado === "error" ? "Error" : "Subiendo"}</span>
+                      {v.video_id && (
+                        <a href={`https://youtube.com/shorts/${v.video_id}`} target="_blank" rel="noreferrer" className="text-oro-suave underline">
+                          Ver en YouTube
+                        </a>
+                      )}
+                      <span className="basis-full truncate text-xs text-texto-suave">{v.titulo}</span>
+                      {v.estado === "error" && v.detalle && <span className="basis-full text-xs text-peligro">{v.detalle}</span>}
                     </li>
                   ))}
                 </ul>

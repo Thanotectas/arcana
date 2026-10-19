@@ -2,18 +2,17 @@
 
 import { useActionState, useState } from "react";
 import { RefreshCw, Send, Unplug, Upload } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import {
   accionDesconectarTiktok,
   accionEnviarTiktok,
   accionEstadosTiktok,
   accionPrepararTiktok,
-  accionSubidaTiktok,
   type EstadoEnvioTiktok,
   type EstadoPrepararTiktok,
 } from "@/lib/redes/acciones-tiktok";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { Aviso } from "@/components/Aviso";
+import { prepararSubida } from "./subir-video";
 
 const PRIVACIDAD: Record<string, string> = {
   PUBLIC_TO_EVERYONE: "Todo el mundo",
@@ -38,23 +37,8 @@ export function PublicarTiktok({ fuentes, directo }: { fuentes: FuenteTiktok[]; 
   const [fuente, setFuente] = useState(fuentes[0]?.valor ?? "subida");
   const [subiendo, setSubiendo] = useState(false);
   const [preparado, preparar] = useActionState<EstadoPrepararTiktok, FormData>(async (prev, fd) => {
-    if (fd.get("fuente") === "subida") {
-      const archivo = fd.get("archivo");
-      if (!(archivo instanceof File) || !archivo.size) return { error: "Elige un video MP4." };
-      if (archivo.type !== "video/mp4") return { error: "El video debe ser MP4." };
-      if (archivo.size > 50 * 1024 * 1024) return { error: "El video pesa más de 50 MB." };
-      setSubiendo(true);
-      try {
-        const permiso = await accionSubidaTiktok();
-        if (!permiso.ruta || !permiso.token) return { error: permiso.error ?? "No se pudo preparar la subida." };
-        const { error } = await createClient().storage.from("redes").uploadToSignedUrl(permiso.ruta, permiso.token, archivo, { contentType: "video/mp4" });
-        if (error) return { error: `Subida: ${error.message}` };
-        fd.set("fuente", `subida:${permiso.ruta}`);
-      } finally {
-        setSubiendo(false);
-      }
-    }
-    fd.delete("archivo");
+    const error = await prepararSubida(fd, setSubiendo);
+    if (error) return { error };
     return accionPrepararTiktok(prev, fd);
   }, {});
 

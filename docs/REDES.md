@@ -271,3 +271,26 @@ instagram_manage_comments, instagram_manage_messages, instagram_manage_insights 
 business_management; marcar la página Arcana y @miarcana.oficial; ampliar el token;
 consultar `1337589612768238?fields=name,access_token` y poner ese token en
 `IG_PAGE_TOKEN`, `META_PAGE_TOKEN` y `FB_PAGE_TOKEN`, y hacer Redeploy.
+
+## YouTube Shorts (20 oct 2026)
+
+Canal @miarcana («Arcana Tarot y Astrología»). Proyecto «Arcana» en Google Cloud con la
+YouTube Data API v3 habilitada, pantalla de consentimiento externa **publicada** (en
+«Prueba» Google corta el permiso a los 7 días) y cliente OAuth «Aplicación web» con la URI
+`https://miarcana.com/api/youtube/callback`. Variables `YOUTUBE_CLIENT_ID`,
+`YOUTUBE_CLIENT_SECRET`; opcional `YOUTUBE_PRIVACIDAD` (public por defecto) y
+`REDES_YOUTUBE=0` para apagar el Short diario.
+
+- Conexión: «Conectar YouTube» → `/api/youtube/conectar` → Google (scopes youtube.upload y
+  youtube.readonly, acceso sin conexión) → `/api/youtube/callback`, que guarda el canal y
+  el refresh token en `youtube_cuenta` (migración 0032).
+- Short diario: el orquestador del mediodía llama `/api/cron/youtube` (`shortDelDia` en
+  automaticas.ts), que sube el reel narrado de la carta del día una vez por día
+  (`publicaciones_redes`, red `youtube`). En el panel: «Subir ya el Short de hoy».
+- Subida manual (`SubirYoutube`): carta del día, reels del agente o un MP4 propio, con
+  título, descripción (se agrega #Shorts) y privacidad; queda en `publicaciones_youtube`.
+- Se declara contenido sintético (`status.containsSyntheticMedia`) porque la voz y las
+  imágenes son generadas; si la API no reconociera el campo, se reintenta sin él.
+- Sin la auditoría de Google (YouTube API Services), lo subido por API queda privado aunque
+  se pida público. Cupo: unas 6 subidas por día (1.600 de 10.000 unidades cada una).
+
