@@ -13,11 +13,13 @@ import { MAZOS } from "@/lib/tarot/mazos";
 import { PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
 import { cartaDelDia, frase, mazoDelDia } from "./carta-dia";
 import { fechaLargaEs } from "./calendario";
+import { filtroAudio, frases, narrar, tiemposConVoz } from "./voz";
 
 /**
  * Reel de la carta del día (1080×1920, 10 s): la carta aparece sobre el cielo
  * con un acercamiento lento, estrellas que suben, el nombre y la frase, y al
- * final la invitación a una tirada de pago. Las capas se dibujan con
+ * final la invitación a una tirada de pago; si hay voz de Sibila (voz.ts), ella
+ * lo narra y el video se alarga lo necesario. Las capas se dibujan con
  * ImageResponse (como las tarjetas) y ffmpeg las anima. El video se guarda en
  * el bucket público "redes" de Supabase para que Meta lo descargue.
  */
@@ -131,6 +133,7 @@ async function capas(fecha: string) {
 /** Genera el MP4 del reel de esa fecha y lo devuelve como Buffer. */
 export async function generarReel(fecha: string): Promise<Buffer> {
   const c = await capas(fecha);
+  const carta = cartaDelDia(fecha);
   const dir = await mkdtemp(join(tmpdir(), "reel-"));
   try {
     await Promise.all([
@@ -140,35 +143,39 @@ export async function generarReel(fecha: string): Promise<Buffer> {
       writeFile(join(dir, "cta.png"), c.cta),
       writeFile(join(dir, "estrellas.png"), c.capaEstrellas),
     ]);
+    const voz = await narrar(dir, [frases(`Hoy tu carta es ${carta.nombre}`, frase(carta.significado, 150)), "¿Quieres tu propia tirada? Te leo tres cartas en miarcana.com. Y tu carta del día es gratis, todos los días."]);
+    const tiempos = tiemposConVoz(voz, { inicio: 0.8, cierreMinimo: 6.9, duracionMinima: DURACION });
+    const duracion = tiempos.duracion;
     const salida = join(dir, "reel.mp4");
-    const marcos = FPS * DURACION;
+    const marcos = FPS * duracion;
     const filtro = [
       // Acercamiento lento sobre el fondo con la carta (se escala al doble para que no tiemble).
       `[0:v]scale=${ANCHO * 2}:${ALTO * 2},zoompan=z='1+0.09*on/${marcos}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${ANCHO}x${ALTO}:fps=${FPS},fade=t=in:st=0:d=0.8[base]`,
       `[1:v]format=rgba,fade=t=in:st=0.5:d=0.7:alpha=1[cab]`,
-      `[2:v]format=rgba,fade=t=in:st=1.6:d=0.7:alpha=1,fade=t=out:st=6.4:d=0.5:alpha=1[txt]`,
-      `[3:v]format=rgba,fade=t=in:st=6.9:d=0.6:alpha=1[cta]`,
+      `[2:v]format=rgba,fade=t=in:st=1.6:d=0.7:alpha=1,fade=t=out:st=${tiempos.cierre - 0.5}:d=0.5:alpha=1[txt]`,
+      `[3:v]format=rgba,fade=t=in:st=${tiempos.cierre}:d=0.6:alpha=1[cta]`,
       `[4:v]format=rgba[est]`,
       `[base][est]overlay=x=0:y='-t*28':eval=frame[b1]`,
       `[b1][cab]overlay=0:0[b2]`,
       `[b2][txt]overlay=0:0[b3]`,
       `[b3][cta]overlay=0:0,format=yuv420p[v]`,
-      // Fondo sonoro suave: acorde en La con eco, entra y sale despacio.
-      `[5:a][6:a][7:a][8:a]amix=inputs=4,volume=4,aecho=0.8:0.6:350|700:0.35|0.2,lowpass=f=1800,afade=t=in:st=0:d=1.5,afade=t=out:st=${DURACION - 2}:d=2[a]`,
+      // Fondo sonoro suave (acorde en La con eco) y, encima, la voz de Sibila.
+      filtroAudio(5, duracion, voz, { inicio: 0.8, vozCierre: tiempos.vozCierre }),
     ].join(";");
-    const imagen = (archivo: string) => ["-loop", "1", "-framerate", String(FPS), "-t", String(DURACION), "-i", join(dir, archivo)];
-    const tono = (f: number) => ["-f", "lavfi", "-t", String(DURACION), "-i", `sine=frequency=${f}:sample_rate=44100`];
+    const imagen = (archivo: string) => ["-loop", "1", "-framerate", String(FPS), "-t", String(duracion), "-i", join(dir, archivo)];
+    const tono = (f: number) => ["-f", "lavfi", "-t", String(duracion), "-i", `sine=frequency=${f}:sample_rate=44100`];
     await ejecutar(
       rutaFfmpeg(),
       [
         "-v", "error", "-y",
         ...imagen("fondo.png"), ...imagen("cabecera.png"), ...imagen("texto.png"), ...imagen("cta.png"), ...imagen("estrellas.png"),
         ...tono(110), ...tono(164.81), ...tono(220), ...tono(277.18),
+        ...(voz ? voz.archivos.flatMap((a) => ["-i", a]) : []),
         "-filter_complex", filtro,
         "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", "-r", String(FPS),
         "-c:a", "aac", "-b:a", "128k", "-ar", "44100",
-        "-t", String(DURACION), "-movflags", "+faststart",
+        "-t", String(duracion), "-movflags", "+faststart",
         salida,
       ],
       { timeout: 240_000, maxBuffer: 10 * 1024 * 1024 },

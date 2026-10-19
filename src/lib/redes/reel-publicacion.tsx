@@ -8,6 +8,7 @@ import { simboloDataUri } from "@/lib/marca/simbolo";
 import { ALTO, ANCHO, BUCKET, FPS, asegurarBucket, ejecutar, estrellas, png, rutaFfmpeg } from "./reel";
 import { CENTRO_REEL, interpretarVisual, visualParaReel } from "./visual";
 import type { PublicacionProgramada } from "./calendario";
+import { filtroAudio, frases, narrar, tiemposConVoz } from "./voz";
 
 /**
  * Reel (1080×1920, 12 s) de una publicación del agente de redes: el visual de
@@ -93,14 +94,17 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
       ...(c.anillo ? ([["anillo.png", c.anillo]] as [string, Buffer][]) : []),
     ];
     await Promise.all(archivos.map(([nombre, datos]) => writeFile(join(dir, nombre), datos)));
+    const voz = await narrar(dir, [frases(p.titulo, p.extracto), frases(p.etiqueta, p.pie, "Te espero en miarcana.com")]);
+    const tiempos = tiemposConVoz(voz, { inicio: 0.9, cierreMinimo: 8.5, duracionMinima: DURACION });
+    const duracion = tiempos.duracion;
     const salida = join(dir, "reel.mp4");
-    const marcos = FPS * DURACION;
+    const marcos = FPS * duracion;
     const indiceAudio = archivos.length;
     const filtro = [
       `[0:v]scale=${ANCHO * 2}:${ALTO * 2},zoompan=z='1+0.08*on/${marcos}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${ANCHO}x${ALTO}:fps=${FPS},fade=t=in:st=0:d=0.8[base]`,
       `[1:v]format=rgba,fade=t=in:st=0.5:d=0.7:alpha=1[cab]`,
-      `[2:v]format=rgba,fade=t=in:st=1.4:d=0.7:alpha=1,fade=t=out:st=8.0:d=0.5:alpha=1[txt]`,
-      `[3:v]format=rgba,fade=t=in:st=8.5:d=0.6:alpha=1[cta]`,
+      `[2:v]format=rgba,fade=t=in:st=1.4:d=0.7:alpha=1,fade=t=out:st=${tiempos.cierre - 0.5}:d=0.5:alpha=1[txt]`,
+      `[3:v]format=rgba,fade=t=in:st=${tiempos.cierre}:d=0.6:alpha=1[cta]`,
       `[4:v]format=rgba[est]`,
       // La rueda gira una vuelta cada 80 s y aparece con el fondo.
       ...(c.anillo ? [`[5:v]format=rgba,rotate=a='t*${(2 * Math.PI) / 80}':c=none:ow=iw:oh=ih,fade=t=in:st=0.3:d=1:alpha=1[ani]`] : []),
@@ -109,21 +113,22 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
       `[${c.anillo ? "b1r" : "b1"}][cab]overlay=0:0[b2]`,
       `[b2][txt]overlay=0:0[b3]`,
       `[b3][cta]overlay=0:0,format=yuv420p[v]`,
-      `[${indiceAudio}:a][${indiceAudio + 1}:a][${indiceAudio + 2}:a][${indiceAudio + 3}:a]amix=inputs=4,volume=4,aecho=0.8:0.6:350|700:0.35|0.2,lowpass=f=1800,afade=t=in:st=0:d=1.5,afade=t=out:st=${DURACION - 2}:d=2[a]`,
+      filtroAudio(indiceAudio, duracion, voz, { inicio: 0.9, vozCierre: tiempos.vozCierre }),
     ].join(";");
-    const imagen = (archivo: string) => ["-loop", "1", "-framerate", String(FPS), "-t", String(DURACION), "-i", join(dir, archivo)];
-    const tono = (f: number) => ["-f", "lavfi", "-t", String(DURACION), "-i", `sine=frequency=${f}:sample_rate=44100`];
+    const imagen = (archivo: string) => ["-loop", "1", "-framerate", String(FPS), "-t", String(duracion), "-i", join(dir, archivo)];
+    const tono = (f: number) => ["-f", "lavfi", "-t", String(duracion), "-i", `sine=frequency=${f}:sample_rate=44100`];
     await ejecutar(
       rutaFfmpeg(),
       [
         "-v", "error", "-y",
         ...archivos.flatMap(([nombre]) => imagen(nombre)),
         ...tono(110), ...tono(164.81), ...tono(220), ...tono(277.18),
+        ...(voz ? voz.archivos.flatMap((a) => ["-i", a]) : []),
         "-filter_complex", filtro,
         "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", "-r", String(FPS),
         "-c:a", "aac", "-b:a", "128k", "-ar", "44100",
-        "-t", String(DURACION), "-movflags", "+faststart",
+        "-t", String(duracion), "-movflags", "+faststart",
         salida,
       ],
       { timeout: 240_000, maxBuffer: 10 * 1024 * 1024 },

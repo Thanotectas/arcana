@@ -15,6 +15,7 @@ import { BotonesAutomaticas } from "@/components/admin/BotonesAutomaticas";
 import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/metricas";
 import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 import { cuentaTiktok, tiktokConfigurado } from "@/lib/redes/tiktok";
+import { vozConfigurada } from "@/lib/redes/voz";
 import { BotonDesconectarTiktok, BotonEstadosTiktok, PublicarTiktok, type FuenteTiktok } from "@/components/admin/PublicarTiktok";
 import { Aviso } from "@/components/Aviso";
 
@@ -104,6 +105,13 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
         <h2 className="font-display text-2xl font-semibold">Carta del día en video</h2>
         <p className="text-sm text-texto-suave">
           Cada mañana la carta del día sale como reel de 10 segundos en Instagram y como video en Facebook, con la invitación a una tirada de tres cartas. Si el video falla, se publica la imagen de siempre.
+        </p>
+        <p className="text-sm text-texto-suave">
+          {vozConfigurada() ? (
+            <span className="text-exito">Voz de Sibila activa: los reels nuevos salen narrados (duran un poco más). Para oír la voz en un reel que ya existía, usa «Volver a generarlo».</span>
+          ) : (
+            <>Voz de Sibila sin configurar: agrega <code>ELEVENLABS_API_KEY</code> y <code>ELEVENLABS_VOICE_ID</code> en Vercel para que los reels salgan narrados.</>
+          )}
         </p>
         <VistaReel />
 

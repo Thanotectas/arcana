@@ -245,3 +245,15 @@ archivo `public/tiktokt534bcLoFgkrcOMyG3mac6DJy05JnFhz.txt` (no borrarlo).
   cambiar en Vercel las claves del Sandbox por las de Production y volver a «Conectar TikTok».
 - Sin auditoría, TikTok deja lo directo en privado (Solo yo). Para pedirla hay
   que grabar el video de demostración del flujo completo en el Sandbox.
+
+## Voz de Sibila en los reels (20 oct 2026)
+
+`src/lib/redes/voz.ts`: con `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID` (opcional
+`ELEVENLABS_MODEL`, por defecto `eleven_multilingual_v2`), el reel de la carta del día y
+los del agente salen narrados. Se piden dos audios por reel: el mensaje (la carta y su
+frase, o el título y el extracto) y la invitación final; el cierre aparece cuando termina
+la primera parte y el video se alarga lo necesario (máximo 25 s). La música baja y la voz
+va encima. «miarcana.com» se escribe «mi arcana punto com» para que se lea bien. Si la API
+falla, el reel sale sin voz (queda en el log `[voz de Sibila]`). `REDES_VOZ=0` la apaga.
+Los reels ya guardados no cambian: «Volver a generarlo» en /admin/redes los rehace con voz.
+Gasto aproximado: 400 a 600 caracteres por día (carta del día y publicación del agente).
