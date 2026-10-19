@@ -119,7 +119,8 @@ export async function cuentaYoutube(admin: Admin) {
   return data;
 }
 
-async function tokenVigente(admin: Admin): Promise<string> {
+/** Acceso vigente al canal (lo renueva si vence en menos de 5 minutos). */
+export async function tokenVigente(admin: Admin): Promise<string> {
   const { data: c } = await admin.from("youtube_cuenta").select("*").eq("id", 1).maybeSingle();
   if (!c) throw new Error("YouTube no está conectado: usa «Conectar YouTube» en /admin/redes.");
   if (c.access_token && c.expira_en && Date.parse(c.expira_en) - Date.now() > 5 * 60_000) return c.access_token;

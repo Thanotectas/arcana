@@ -205,6 +205,34 @@ type PublicacionYoutubeRow = {
   creado_en: string;
 };
 
+type EnVivoPreguntaRow = {
+  id: number;
+  mensaje_id: string | null;
+  origen: "chat" | "manual" | "pagina";
+  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano";
+  imagen: string | null;
+  huella: string | null;
+  autor: string;
+  texto: string;
+  signo: string | null;
+  estado: "pendiente" | "leyendo" | "leida" | "omitida";
+  lectura: string | null;
+  cartas: unknown;
+  detalle: string | null;
+  creado_en: string;
+  leida_en: string | null;
+};
+
+type EnVivoEstadoRow = {
+  id: number;
+  live_chat_id: string | null;
+  page_token: string | null;
+  proxima_consulta: string | null;
+  buscado_en: string | null;
+  latido_en: string | null;
+  actualizado_en: string;
+};
+
 type ChatVisitaRow = {
   id: number;
   huella: string;
@@ -401,6 +429,18 @@ export type Database = {
         Row: RetiroEmbajadorRow;
         Insert: Insertable<RetiroEmbajadorRow, "id" | "creditos" | "estado" | "metodo_pago" | "datos_pago" | "titular" | "nota" | "creado_en" | "resuelto_en">;
         Update: Partial<RetiroEmbajadorRow>;
+        Relationships: [];
+      };
+      en_vivo_preguntas: {
+        Row: EnVivoPreguntaRow;
+        Insert: Insertable<EnVivoPreguntaRow, "id" | "mensaje_id" | "tipo" | "imagen" | "huella" | "signo" | "estado" | "lectura" | "cartas" | "detalle" | "creado_en" | "leida_en">;
+        Update: Partial<EnVivoPreguntaRow>;
+        Relationships: [];
+      };
+      en_vivo_estado: {
+        Row: EnVivoEstadoRow;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "actualizado_en">;
+        Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };
       youtube_cuenta: {

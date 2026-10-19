@@ -294,3 +294,35 @@ YouTube Data API v3 habilitada, pantalla de consentimiento externa **publicada**
 - Sin la auditoría de Google (YouTube API Services), lo subido por API queda privado aunque
   se pida público. Cupo: unas 6 subidas por día (1.600 de 10.000 unidades cada una).
 
+## Sibila en vivo (20 oct 2026)
+
+Directos de YouTube donde Sibila lee en voz alta. Piezas:
+
+- **Escenario** `/en-vivo/escenario?clave=…` (`EscenarioEnVivo`, 1920×1080): OBS lo transmite
+  como fuente de navegador. Pide a `/api/en-vivo/siguiente` la siguiente lectura mientras
+  suena la actual, voltea las tres cartas (o muestra la foto, el color del aura, el número o
+  el signo), reproduce la voz de Sibila con subtítulos y hace latir su símbolo con el
+  volumen. Sin consultas, dice frases de invitación (`PUENTES`). Lleva el QR de /vivo.
+  La clave se deriva de `CRON_SECRET` (`claveEscenario`) y se ve en /admin/en-vivo.
+- **Chat de YouTube** (`sincronizarChat` en `src/lib/en-vivo.ts`): con el canal conectado,
+  busca el directo activo (`liveBroadcasts?broadcastStatus=active`) y lee
+  `liveChat/messages` respetando `pollingIntervalMillis`. Encola los mensajes que parecen
+  consulta (signo, «?», aura, numerología u horóscopo); «taza», «chocolate» o «mano» se
+  ignoran porque van con foto por /vivo.
+- **Fotos** `/vivo` (`FormularioVivo` → `accionFotoEnVivo`): taza de chocolate o mano, solo
+  mientras el escenario late (últimos 3 min), 2 por hora por huella de IP, se limpia con
+  sharp (sin metadatos, 1024 px) al bucket `redes/en-vivo/fotos/` y se borra 10 min después
+  de leída. La persona acepta que su foto y su nombre salgan en el directo.
+- **Lecturas** (`siguienteLectura`): orden manual → página → chat. Tipos: tarot (3 cartas
+  Rider-Waite al azar), aura (Sibila nombra el color), numerología (`calcularPerfil` con la
+  fecha dd/mm/aaaa del mensaje o el número del nombre), horóscopo (`horoscopoDelDia`),
+  chocolate y mano (foto al modelo). Sibila responde OMITIR a lo que no se puede leer
+  (saludos, spam, salud, muerte, menores, apuestas…). Voz con `sintetizar`; sin voz, el
+  escenario simula la duración. Tope diario `EN_VIVO_MAX` (80).
+- **Panel** `/admin/en-vivo`: estado (YouTube, voz, escenario, directo), dirección para OBS,
+  consulta manual (pasa primero), fila, últimas lecturas, vaciar la fila.
+- Tablas `en_vivo_preguntas` y `en_vivo_estado` (migración 0033).
+- Gasto: cada lectura son ~500 caracteres de ElevenLabs; un directo de 30 min con
+  preguntas seguidas gasta 20.000–30.000. YouTube exige verificar el canal con el teléfono
+  (24 h) para emitir en directo.
+
