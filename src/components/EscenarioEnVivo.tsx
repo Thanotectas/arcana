@@ -302,7 +302,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
         </div>
 
         {/* Pregunta */}
-        <div className="absolute left-[700px] right-16 top-[180px] rounded-3xl border border-oro/30 bg-black/35 px-10 py-6">
+        <div key={lectura?.id ?? "espera"} className="absolute left-[700px] right-16 top-[180px] rounded-3xl border border-oro/30 bg-black/35 px-10 py-6 aparecer">
           {lectura ? (
             <>
               <p className="text-2xl text-violeta-suave">
@@ -327,7 +327,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
             return (
               <div key={i} className="flex w-[250px] flex-col items-center">
                 <p className="mb-3 text-xl uppercase tracking-[0.2em] text-violeta-suave">{c.posicion}</p>
-                <div className="relative h-[400px] w-[230px]" style={{ perspective: 1200 }}>
+                <div className="relative h-[400px] w-[230px] vivo-carta" style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
                   <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: visible ? "rotateY(180deg)" : "none" }}>
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
                       <span className="text-8xl text-oro-suave">✦</span>
@@ -380,7 +380,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
 
         {/* Subtítulos */}
         <div className="absolute bottom-[110px] left-16 right-16 flex min-h-[120px] items-center justify-center rounded-3xl bg-black/45 px-12 py-5">
-          <p className="text-center text-[38px] leading-snug text-texto">{subtitulo}</p>
+          <p key={subtitulo} className="text-center text-[38px] leading-snug text-texto aparecer">{subtitulo}</p>
         </div>
 
         {/* Pie */}

@@ -691,4 +691,16 @@ body {
 .vivo-destello {
   animation: vivo-destello 1.4s ease-out 0.5s both;
 }
+@keyframes vivo-carta {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.6deg);
+  }
+}
+.vivo-carta {
+  animation: vivo-carta 4.5s ease-in-out infinite;
+}
 
