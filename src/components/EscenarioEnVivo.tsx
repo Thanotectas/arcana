@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Marca } from "./Logo";
 import { CieloEnVivo } from "./CieloEnVivo";
 import { RostroSibila } from "./RostroSibila";
+import { RetratoSibila } from "./RetratoSibila";
 
 interface Carta {
   id: string;
@@ -68,7 +69,7 @@ function frasesDe(texto: string) {
  * cartas, reproduce la voz de Sibila con subtítulos y hace latir su símbolo con
  * el volumen. Sin preguntas, Sibila dice frases de invitación de vez en cuando.
  */
-export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
+export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: string; retrato: string | null }) {
   const [escala, setEscala] = useState(1);
   const [lectura, setLectura] = useState<Lectura | null>(null);
   const [volteadas, setVolteadas] = useState(0);
@@ -294,7 +295,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
               }}
             >
               <div className="vivo-flotar">
-                <RostroSibila tamano={318} nivel={nivel} />
+                {retrato !== null ? <RetratoSibila tamano={318} nivel={nivel} version={retrato} /> : <RostroSibila tamano={318} nivel={nivel} />}
               </div>
             </div>
           </div>

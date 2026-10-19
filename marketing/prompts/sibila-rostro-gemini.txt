@@ -1,0 +1,29 @@
+RETRATO DE SIBILA — para Gemini (imagen). Tres imágenes de la MISMA cara: la base y dos
+ediciones. Importante: las ediciones se hacen con «editar esta imagen» sobre la base, no
+generando de nuevo, para que la cara, la luz y el encuadre queden idénticos.
+
+==================== 1 · IMAGEN BASE ====================
+Retrato pictórico realista, de busto, de Sibila, una guía esotérica: mujer latina de unos 35
+años, piel canela cálida, rostro sereno y amable, cabello negro ondulado con raya al medio,
+velo de seda violeta profundo que cae sobre los hombros, diadema dorada fina sobre el cabello
+con una pequeña estrella dorada de cuatro puntas colgando en el centro de la frente, aretes de
+media luna dorados, túnica violeta oscura con un ribete dorado en forma de V. Mira directo a
+la cámara con media sonrisa suave y los labios cerrados. Luz cálida dorada desde la izquierda,
+fondo violeta oscuro con un halo suave y destellos de estrellas desenfocados. Estilo pintura
+al óleo digital, muy detallada, colores ricos. Encuadre centrado, cabeza y hombros, formato
+cuadrado 1:1, con aire arriba de la cabeza. Sin texto, sin letras, sin marca de agua.
+
+==================== 2 · EDICIÓN: HABLANDO ====================
+(Abrir la imagen base → Editar) Usa exactamente esta misma imagen y cambia únicamente la
+boca: labios entreabiertos como si estuviera hablando con calma, dejando ver apenas los
+dientes superiores. Todo lo demás idéntico: ojos, pose, cabello, luz, fondo y encuadre.
+
+==================== 3 · EDICIÓN: OJOS CERRADOS ====================
+(Abrir la imagen base → Editar) Usa exactamente esta misma imagen y cambia únicamente los
+ojos: párpados cerrados con suavidad, como en un parpadeo, pestañas visibles. Labios cerrados
+como en la original. Todo lo demás idéntico: pose, cabello, luz, fondo y encuadre.
+
+==================== CÓMO ENTREGARLAS ====================
+Descargar las tres en la mayor calidad (PNG o JPG, cuadradas) y subirlas al chat nombradas:
+sibila-base, sibila-habla, sibila-ojos. Si Gemini cambió la cara o el encuadre en una edición,
+repetir solo esa edición.

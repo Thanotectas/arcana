@@ -731,4 +731,18 @@ body {
   animation: vivo-estrella-frente 3s ease-in-out infinite;
   transform-origin: center;
 }
+@keyframes vivo-parpadeo-retrato {
+  0%,
+  93%,
+  100% {
+    opacity: 0;
+  }
+  95.5%,
+  97% {
+    opacity: 1;
+  }
+}
+.vivo-parpadeo-retrato {
+  animation: vivo-parpadeo-retrato 5.2s linear infinite;
+}
 
