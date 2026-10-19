@@ -1,5 +1,5 @@
 /** Iconos de redes (SVG propio: lucide no incluye marcas). */
-export function IconoRed({ id, className = "h-5 w-5" }: { id: "instagram" | "tiktok" | "facebook" | "whatsapp"; className?: string }) {
+export function IconoRed({ id, className = "h-5 w-5" }: { id: "instagram" | "tiktok" | "facebook" | "whatsapp" | "youtube"; className?: string }) {
   if (id === "instagram") {
     return (
       <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
@@ -11,6 +11,13 @@ export function IconoRed({ id, className = "h-5 w-5" }: { id: "instagram" | "tik
     return (
       <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
         <path d="M16 2c.3 2.6 1.9 4.3 4.5 4.5v3.3c-1.7 0-3.2-.5-4.5-1.4v6.6A6 6 0 1 1 10 9v3.4a2.7 2.7 0 1 0 2.7 2.7V2H16z" />
+      </svg>
+    );
+  }
+  if (id === "youtube") {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+        <path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z" />
       </svg>
     );
   }
