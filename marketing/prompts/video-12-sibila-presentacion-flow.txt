@@ -1,0 +1,36 @@
+VIDEO 12 — "SIBILA" (presentación / anuncio del directo). Para Gemini / Google Flow (Veo),
+usando la opción IMAGEN A VIDEO con la pintura de la escena (marketing/imagenes/sibila-escena.jpg)
+como primer cuadro. Dos clips de 8 s. Luego hago el montaje (rótulos, fecha, QR, voz de Sibila).
+
+NOTA: la pintura es 16:9 (horizontal). Para el reel vertical 9:16 recorto el centro, con Sibila
+en medio; por eso en los prompts se pide que la acción quede centrada en ella.
+
+==================== CLIP 1 · "La mirada" (imagen a video) ====================
+Anima esta pintura al óleo sin cambiar el estilo, los colores ni el encuadre. Sibila, la mujer
+de velo violeta sentada a la mesa, está con la mirada baja hacia las cartas; levanta la vista
+despacio hacia la cámara y sonríe con calma, como si acabara de reconocer a quien la mira. Las
+llamas de las velas titilan, un brillo suave recorre la bola de cristal y unas motas de luz
+dorada flotan en el aire. Movimiento de cámara mínimo, un acercamiento muy lento hacia su
+rostro. Ritmo sereno, 8 segundos. Sin texto, sin letras, sin logos.
+
+==================== CLIP 2 · "La carta" (imagen a video) ====================
+Anima esta misma pintura al óleo sin cambiar el estilo, los colores ni el encuadre. Sibila
+mira a la cámara, toma con la mano derecha la carta de arriba del mazo que tiene sobre la mesa
+y la voltea despacio hacia la cámara; la carta brilla con un destello dorado al voltearse (su
+cara no muestra texto legible, solo una ilustración dorada y violeta). Ella asiente levemente,
+con una media sonrisa cómplice. Las velas titilan y unas partículas doradas suben desde la
+carta. Cámara fija, 8 segundos. Sin texto, sin letras, sin logos.
+
+==================== RÓTULOS QUE AGREGAMOS DESPUÉS ====================
+Clip 1: "Ella es Sibila"  /  "Lee el tarot, tu aura, tu taza de chocolate y tu mano"
+Clip 2: "Pregúntale en vivo"  /  "Domingo 25 de octubre · 8:00 p.m."
+Cierre: logo + "Sibila en vivo" + "YouTube @miarcana" + QR
+Voz (ElevenLabs, Marcela): "Soy Sibila. Este domingo a las ocho te leo en vivo: escribe tu
+signo y tu pregunta, o sube la foto de tu taza. Te espero en el canal de Arcana en YouTube."
+
+==================== SI ALGÚN CLIP SALE MAL ====================
+- Si cambia la cara o el estilo: agregar al inicio "Conserva exactamente el rostro, el velo y
+  la pintura de la imagen de referencia; solo agrega movimiento".
+- Si la carta muestra letras: "la carta volteada muestra solo una figura dorada abstracta".
+- Si Veo no acepta imagen a video: usar el prompt como texto y describir la escena completa
+  (ver marketing/prompts/sibila-rostro-gemini.txt, opción B).
