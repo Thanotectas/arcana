@@ -1,0 +1,38 @@
+VIDEO 10 — "LO QUE DICE TU TAZA" (lectura del chocolate) para Gemini / Google Flow (Veo).
+Solo dos prompts (límite diario): dos clips de 8 s, vertical 9:16, sin texto en pantalla.
+La descripción de la protagonista se repite igual en los dos para que no cambie.
+Montaje: rótulos y cierre de marca (≈21 s en total).
+
+==================== CLIP 1 · "La última gota" ====================
+Video vertical 9:16 de 8 segundos, pintura cinematográfica realista, mañana fría en una cocina colombiana
+acogedora, luz cálida dorada que entra por una ventana con cortinas de encaje, paleta de tonos cálidos con
+acentos violeta y dorado. Una mujer joven latina de unos 30 años, cabello negro liso recogido en una cola
+baja, ruana de lana gris claro sobre una blusa blanca y pequeños aretes dorados, está sentada a una mesa de
+madera con un pocillo de chocolate caliente humeante, un plato con queso y almojábanas. Toma el último
+sorbo despacio, baja el pocillo y mira dentro con curiosidad: en el fondo quedan manchas y figuras de
+espuma de chocolate. Inclina el pocillo hacia la luz y entrecierra los ojos, intrigada, con una media
+sonrisa. El vapor sube lentamente. La cámara se acerca despacio hasta el interior del pocillo, donde la
+espuma forma una figura que recuerda vagamente a un ave. Sin texto, sin letras, sin logos.
+CONTINUIDAD: primer clip de una serie de dos; conserva exactamente esta mujer, su ropa, la cocina, la luz
+y la paleta en el siguiente clip.
+
+==================== CLIP 2 · "Sibila la lee" ====================
+Video vertical 9:16 de 8 segundos. La misma mujer joven latina de cabello negro liso recogido en una cola
+baja, ruana de lana gris claro sobre una blusa blanca y pequeños aretes dorados, en la misma cocina
+colombiana con la misma luz dorada de la mañana (conservar continuidad). Con una mano sostiene el pocillo
+inclinado y con la otra le toma una foto con el celular, desde arriba. Luego mira la pantalla: un brillo
+violeta y dorado suave ilumina su rostro mientras en la pantalla aparecen líneas de texto difusas que se
+escriben solas, como una carta (sin texto legible). Ella se lleva la mano a la boca sorprendida, sonríe y
+asiente despacio, como quien reconoce algo de su vida. Unas partículas doradas flotan en la luz. La cámara
+se aleja despacio. Sin texto legible, sin letras, sin logos.
+CONTINUIDAD: segundo y último clip; misma mujer, ropa, cocina, luz y paleta que el primero.
+
+==================== RÓTULOS QUE AGREGAMOS DESPUÉS ====================
+Clip 1: "¿Qué dejó tu chocolate en la taza?"  /  "Como lo hacían las abuelas…"
+Clip 2: "Tómale una foto."  /  "Sibila lee las figuras de la espuma."
+Cierre: logo + "Lectura del chocolate" + "Fotografía tu taza en miarcana.com"
+
+==================== SI ALGÚN CLIP SALE MAL ====================
+- Si sale café en vez de chocolate: "chocolate caliente espeso, color marrón oscuro, con espuma, servido en pocillo de loza blanca".
+- Si cambia la mujer: repetir al inicio "la misma mujer de cola baja negra y ruana gris claro".
+- Si aparecen letras o números: agregar al final "Ninguna pantalla ni objeto muestra texto, letras ni números".
