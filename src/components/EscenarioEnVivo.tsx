@@ -232,6 +232,9 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
   }, [pedir, hablar]);
 
   const tipo = lectura?.tipo ?? "tarot";
+  // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
+  const escena = retrato !== null;
+  const derecha = escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
   const cartas = lectura?.cartas ?? [
     { id: "", nombre: "", posicion: "Lo que te rodea" },
     { id: "", nombre: "", posicion: "Lo que se mueve" },
@@ -256,7 +259,8 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
-        <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={{ x: 64 + 280, y: 180 + 165 }} nivel={nivel} />
+        {escena && <RetratoSibila nivel={nivel} version={retrato ?? ""} />}
+        <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={escena ? { x: 144, y: 745 } : { x: 64 + 280, y: 180 + 165 }} nivel={nivel} modo={escena ? "escena" : "cielo"} />
         {/* Encabezado */}
         <div className="absolute left-16 right-16 top-10 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -272,14 +276,15 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         </div>
 
         {/* QR para subir la foto de la taza o de la mano */}
-        <div className="absolute bottom-[245px] left-16 flex w-[560px] items-center gap-5 rounded-3xl border border-oro/30 bg-black/35 p-5">
-          <div className="h-[150px] w-[150px] shrink-0 overflow-hidden rounded-xl" dangerouslySetInnerHTML={{ __html: qr }} />
-          <p className="text-2xl leading-snug text-texto">
+        <div className={`absolute flex items-center gap-5 rounded-3xl border border-oro/30 bg-black/45 p-4 ${escena ? "left-[1190px] right-[56px] top-[770px]" : "bottom-[245px] left-16 w-[560px] p-5"}`}>
+          <div className={`shrink-0 overflow-hidden rounded-xl ${escena ? "h-[120px] w-[120px]" : "h-[150px] w-[150px]"}`} dangerouslySetInnerHTML={{ __html: qr }} />
+          <p className={`leading-snug text-texto ${escena ? "text-xl" : "text-2xl"}`}>
             ¿Tu <span className="text-oro-suave">taza de chocolate</span> o tu <span className="text-oro-suave">mano</span>? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span>
           </p>
         </div>
 
-        {/* Sibila */}
+        {/* Sibila (el rostro vectorial; sobre la pintura no hace falta) */}
+        {!escena && (
         <div className="absolute left-16 top-[180px] flex w-[560px] flex-col items-center">
           <div className="relative flex h-[330px] w-[330px] items-center justify-center">
             {/* Anillos que giran en sentidos opuestos */}
@@ -295,41 +300,42 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
               }}
             >
               <div className="vivo-flotar">
-                {retrato !== null ? <RetratoSibila tamano={318} nivel={nivel} version={retrato} /> : <RostroSibila tamano={318} nivel={nivel} />}
+                <RostroSibila tamano={318} nivel={nivel} />
               </div>
             </div>
           </div>
           <p className="mt-5 font-display text-5xl text-oro-suave">Sibila</p>
           <p className="mt-1 text-xl text-texto-suave">Lecturas en vivo · Arcana</p>
         </div>
+        )}
 
         {/* Pregunta */}
-        <div key={lectura?.id ?? "espera"} className="absolute left-[700px] right-16 top-[180px] rounded-3xl border border-oro/30 bg-black/35 px-10 py-6 aparecer">
+        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/45 aparecer ${escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
           {lectura ? (
             <>
               <p className="text-2xl text-violeta-suave">
                 {NOMBRE_TIPO[lectura.tipo]} · {lectura.autor}
                 {lectura.signo ? ` · ${lectura.signo}` : ""}
               </p>
-              <p className="mt-2 line-clamp-2 font-display text-[44px] leading-tight text-oro-suave">{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
+              <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
             </>
           ) : (
             <>
               <p className="text-2xl text-violeta-suave">Tarot · Aura · Numerología · Horóscopo · Chocolate · Mano</p>
-              <p className="mt-2 font-display text-[44px] leading-tight text-oro-suave">Escribe en el chat tu signo y lo que quieres saber</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>Escribe en el chat tu signo y lo que quieres saber</p>
             </>
           )}
         </div>
 
         {/* Lo que se lee: cartas, foto, aura, número o signo */}
         {tipo === "tarot" || !lectura ? (
-        <div className="absolute left-[700px] right-16 top-[400px] flex justify-center gap-12">
+        <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
           {cartas.map((c, i) => {
             const visible = Boolean(lectura && c.id && volteadas > i);
             return (
-              <div key={i} className="flex w-[250px] flex-col items-center">
-                <p className="mb-3 text-xl uppercase tracking-[0.2em] text-violeta-suave">{c.posicion}</p>
-                <div className="relative h-[400px] w-[230px] vivo-carta" style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
+              <div key={i} className={`flex flex-col items-center ${escena ? "w-[210px]" : "w-[250px]"}`}>
+                <p className={`mb-3 uppercase tracking-[0.2em] text-violeta-suave ${escena ? "text-base" : "text-xl"}`}>{c.posicion}</p>
+                <div className={`relative vivo-carta ${escena ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
                   <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: visible ? "rotateY(180deg)" : "none" }}>
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
                       <span className="text-8xl text-oro-suave">✦</span>
@@ -341,13 +347,13 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
                   </div>
                   {visible && <div key={`${lectura?.id}-${i}`} className="pointer-events-none absolute inset-[-30px] rounded-3xl vivo-destello" />}
                 </div>
-                <p className="mt-3 h-9 font-display text-3xl text-oro-suave">{visible ? c.nombre : ""}</p>
+                <p className={`mt-3 h-9 font-display text-oro-suave ${escena ? "text-2xl" : "text-3xl"}`}>{visible ? c.nombre : ""}</p>
               </div>
             );
           })}
         </div>
         ) : (
-          <div className="absolute left-[700px] right-16 top-[400px] flex h-[460px] items-center justify-center" style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
+          <div className={`absolute ${derecha} flex items-center justify-center ${escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: escena ? "scale(0.82)" : undefined }}>
             {(tipo === "chocolate" || tipo === "mano") && lectura.imagen && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={lectura.imagen} alt="" className="h-[440px] max-w-[720px] rounded-3xl border-4 border-oro/70 object-cover shadow-[0_30px_80px_rgba(0,0,0,0.6)]" />
@@ -381,17 +387,17 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         )}
 
         {/* Subtítulos */}
-        <div className="absolute bottom-[110px] left-16 right-16 flex min-h-[120px] items-center justify-center rounded-3xl bg-black/45 px-12 py-5">
+        <div className={`absolute bottom-[80px] left-16 flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${escena ? "right-[56px] bg-black/60" : "right-16 bg-black/45"}`}>
           <p key={subtitulo} className="text-center text-[38px] leading-snug text-texto aparecer">{subtitulo}</p>
         </div>
 
         {/* Pie */}
-        <div className="absolute bottom-8 left-0 right-0 text-center text-2xl text-violeta-suave">
+        <div className={`absolute bottom-5 left-0 right-0 text-center text-2xl text-violeta-suave ${escena ? "bg-black/40 py-2" : ""}`}>
           ✦ Escribe en el chat tu signo y tu pregunta ✦ ¿Taza de chocolate o tu mano? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Lecturas de entretenimiento ✦
         </div>
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
-        {sinVoz && <div className="absolute right-16 top-[120px] rounded-full bg-red-900/80 px-5 py-2 text-xl text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
+        {sinVoz && <div className="absolute left-16 top-[130px] rounded-full bg-red-900/80 px-5 py-2 text-lg text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
         {bloqueado && <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-5xl text-oro-suave">Toca la pantalla para activar el sonido</div>}
       </div>
     </div>
