@@ -637,3 +637,58 @@ body {
 .dorso-carta.estilo-angeles {
   aspect-ratio: 2 / 3;
 }
+
+/* Escenario de «Sibila en vivo» */
+@keyframes vivo-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes vivo-respirar {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.18);
+  }
+}
+@keyframes vivo-flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes vivo-destello {
+  0% {
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 217, 154, 0);
+  }
+  30% {
+    opacity: 1;
+    box-shadow: 0 0 70px 20px rgba(241, 217, 154, 0.55);
+  }
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 120px 40px rgba(241, 217, 154, 0);
+  }
+}
+.vivo-girar {
+  animation: vivo-girar 90s linear infinite;
+}
+.vivo-girar-inverso {
+  animation: vivo-girar 60s linear infinite reverse;
+}
+.vivo-respirar {
+  animation: vivo-respirar 4s ease-in-out infinite;
+}
+.vivo-flotar {
+  animation: vivo-flotar 5s ease-in-out infinite;
+}
+.vivo-destello {
+  animation: vivo-destello 1.4s ease-out 0.5s both;
+}
+

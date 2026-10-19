@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Marca } from "./Logo";
+import { CieloEnVivo } from "./CieloEnVivo";
 
 interface Carta {
   id: string;
@@ -250,9 +251,10 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
           width: ANCHO,
           height: ALTO,
           transform: `translate(-50%, -50%) scale(${escala})`,
-          background: "radial-gradient(900px 700px at 22% 45%, rgba(139,108,246,0.35), rgba(11,7,22,0) 70%), radial-gradient(1000px 600px at 70% 50%, rgba(217,180,90,0.10), rgba(11,7,22,0) 70%), linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
+          background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
+        <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={{ x: 64 + 280, y: 180 + 165 }} nivel={nivel} />
         {/* Encabezado */}
         <div className="absolute left-16 right-16 top-10 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -277,16 +279,23 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
 
         {/* Sibila */}
         <div className="absolute left-16 top-[180px] flex w-[560px] flex-col items-center">
-          <div
-            className="flex h-[330px] w-[330px] items-center justify-center rounded-full border-2 border-oro/60"
-            style={{
-              transform: `scale(${1 + nivel * 0.12})`,
-              transition: "transform 80ms linear",
-              background: "radial-gradient(circle, rgba(139,108,246,0.55), rgba(26,15,58,0.9) 70%)",
-              boxShadow: `0 0 ${60 + nivel * 140}px rgba(241,217,154,${0.25 + nivel * 0.45}), inset 0 0 80px rgba(0,0,0,0.6)`,
-            }}
-          >
-            <Marca tamano={210} />
+          <div className="relative flex h-[330px] w-[330px] items-center justify-center">
+            {/* Anillos que giran en sentidos opuestos */}
+            <div className="absolute inset-[-28px] rounded-full border border-dashed border-oro/30 vivo-girar" />
+            <div className="absolute inset-[-10px] rounded-full border border-violeta/40 vivo-girar-inverso" />
+            <div
+              className="flex h-full w-full items-center justify-center rounded-full border-2 border-oro/60 vivo-respirar"
+              style={{
+                transform: `scale(${1 + nivel * 0.12})`,
+                transition: "transform 80ms linear",
+                background: "radial-gradient(circle, rgba(139,108,246,0.55), rgba(26,15,58,0.9) 70%)",
+                boxShadow: `0 0 ${60 + nivel * 140}px rgba(241,217,154,${0.25 + nivel * 0.45}), inset 0 0 80px rgba(0,0,0,0.6)`,
+              }}
+            >
+              <div className="vivo-flotar">
+                <Marca tamano={210} />
+              </div>
+            </div>
           </div>
           <p className="mt-5 font-display text-5xl text-oro-suave">Sibila</p>
           <p className="mt-1 text-xl text-texto-suave">Lecturas en vivo · Arcana</p>
@@ -328,6 +337,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
                       <img src={`/cartas/rider/${c.id}.webp`} alt={c.nombre} className="absolute inset-0 h-full w-full rounded-2xl border-4 border-oro/80 object-cover" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }} />
                     )}
                   </div>
+                  {visible && <div key={`${lectura?.id}-${i}`} className="pointer-events-none absolute inset-[-30px] rounded-3xl vivo-destello" />}
                 </div>
                 <p className="mt-3 h-9 font-display text-3xl text-oro-suave">{visible ? c.nombre : ""}</p>
               </div>
