@@ -11,6 +11,7 @@ import { reelPublicacion } from "./reel-publicacion";
 import { metaConfigurado, suscribirPagina } from "./meta";
 import { actualizarMetricas } from "./metricas";
 import { carruselSemanal, historiaDelDia, kitTiktok } from "./automaticas";
+import { probarVoz } from "./voz";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -113,6 +114,14 @@ export async function accionVistaReel(_prev: EstadoReel, formData: FormData): Pr
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo generar el reel." };
   }
+}
+
+/** Genera una frase corta con la voz de Sibila para oírla (o ver el error de ElevenLabs). */
+export async function accionProbarVoz(): Promise<EstadoReel> {
+  await requerirAdmin();
+  const r = await probarVoz();
+  if (!r.audio) return { error: r.error ?? "No se pudo generar la voz." };
+  return { url: `data:audio/mpeg;base64,${r.audio.toString("base64")}` };
 }
 
 /** Suscribe la página de Facebook (y el Instagram vinculado) a los avisos de comentarios y mensajes de la app. */

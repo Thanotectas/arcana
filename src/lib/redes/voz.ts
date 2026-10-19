@@ -84,6 +84,17 @@ export interface Narracion {
   segundos: number[];
 }
 
+/** Frase corta para /admin/redes: el audio, o el error de ElevenLabs tal cual. */
+export async function probarVoz(): Promise<{ audio?: Buffer; error?: string }> {
+  if (!clave() || !voz()) return { error: `Falta ${!clave() ? "ELEVENLABS_API_KEY" : "ELEVENLABS_VOICE_ID"} en Vercel (o falta el Redeploy).` };
+  if (process.env.REDES_VOZ === "0") return { error: "La voz está apagada (REDES_VOZ=0)." };
+  try {
+    return { audio: await sintetizar("Hola, soy Sibila. Así sonará mi voz en los videos de Arcana.") };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 /** Narra cada parte con la voz de Sibila y deja los MP3 en `dir`; null si no hay voz. */
 export async function narrar(dir: string, partes: string[]): Promise<Narracion | null> {
   if (!vozConfigurada()) return null;

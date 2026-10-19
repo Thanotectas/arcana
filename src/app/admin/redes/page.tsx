@@ -9,6 +9,7 @@ import { diagnosticoFacebook, facebookConfigurado } from "@/lib/redes/facebook";
 import { TarjetaPublicacion, type PublicacionVista } from "@/components/admin/TarjetaPublicacion";
 import { FormularioGenerar } from "@/components/admin/FormularioGenerar";
 import { VistaReel } from "@/components/admin/VistaReel";
+import { ProbarVoz } from "@/components/admin/ProbarVoz";
 import { ConexionMeta } from "@/components/admin/ConexionMeta";
 import { BotonMetricas } from "@/components/admin/BotonMetricas";
 import { BotonesAutomaticas } from "@/components/admin/BotonesAutomaticas";
@@ -113,6 +114,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
             <>Voz de Sibila sin configurar: agrega <code>ELEVENLABS_API_KEY</code> y <code>ELEVENLABS_VOICE_ID</code> en Vercel para que los reels salgan narrados.</>
           )}
         </p>
+        <ProbarVoz />
         <VistaReel />
 
         <h3 className="pt-4 font-semibold">Automáticas</h3>
