@@ -74,6 +74,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
   const [nivel, setNivel] = useState(0);
   const [bloqueado, setBloqueado] = useState(false);
   const [aviso, setAviso] = useState("");
+  const [sinVoz, setSinVoz] = useState(false);
   const contexto = useRef<AudioContext | null>(null);
   const desbloquear = useRef<(() => void) | null>(null);
 
@@ -133,7 +134,14 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
       analizador.fftSize = 256;
       fuente.connect(analizador);
       analizador.connect(contexto.current.destination);
-      if (contexto.current.state === "suspended") await contexto.current.resume();
+      if (contexto.current.state === "suspended") await contexto.current.resume().catch(() => null);
+      if (contexto.current.state === "suspended") {
+        // El navegador exige un clic antes de sonar (en OBS no pasa).
+        setBloqueado(true);
+        await new Promise<void>((r) => (desbloquear.current = r));
+        setBloqueado(false);
+        await contexto.current.resume().catch(() => null);
+      }
     } catch {
       analizador = null;
     }
@@ -181,6 +189,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
         if (!activo) break;
         if (r?.clase === "lectura") {
           quietos = 0;
+          setSinVoz(!r.audio);
           setLectura(r);
           setVolteadas(0);
           setSubtitulo("");
@@ -226,7 +235,14 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden bg-[#07040f]" onClick={() => desbloquear.current?.()}>
+    <div
+      className="fixed inset-0 z-[100] overflow-hidden bg-[#07040f]"
+      onClick={() => {
+        contexto.current?.resume().catch(() => null);
+        desbloquear.current?.();
+        desbloquear.current = null;
+      }}
+    >
       <div
         className="absolute left-1/2 top-1/2 overflow-hidden text-texto"
         style={{
@@ -362,6 +378,7 @@ export function EscenarioEnVivo({ clave, qr }: { clave: string; qr: string }) {
         </div>
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
+        {sinVoz && <div className="absolute right-16 top-[120px] rounded-full bg-red-900/80 px-5 py-2 text-xl text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
         {bloqueado && <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-5xl text-oro-suave">Toca la pantalla para activar el sonido</div>}
       </div>
     </div>
