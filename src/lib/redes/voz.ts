@@ -47,7 +47,6 @@ async function sintetizar(texto: string): Promise<Buffer> {
     body: JSON.stringify({
       text: paraLeer(texto),
       model_id: (process.env.ELEVENLABS_MODEL ?? "eleven_multilingual_v2").trim(),
-      language_code: "es",
       voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.25, use_speaker_boost: true },
     }),
     cache: "no-store",
