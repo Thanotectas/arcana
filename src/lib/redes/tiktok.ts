@@ -25,8 +25,12 @@ export type CuentaTiktok = Database["public"]["Tables"]["tiktok_cuenta"]["Row"];
 export type PublicacionTiktok = Database["public"]["Tables"]["publicaciones_tiktok"]["Row"];
 type Admin = SupabaseClient<Database>;
 
+// Sin espacios ni saltos de línea: al pegarlas en Vercel suele colarse uno.
+const claveTiktok = () => (process.env.TIKTOK_CLIENT_KEY ?? "").trim();
+const secretoTiktok = () => (process.env.TIKTOK_CLIENT_SECRET ?? "").trim();
+
 export function tiktokConfigurado() {
-  return Boolean(process.env.TIKTOK_CLIENT_KEY && process.env.TIKTOK_CLIENT_SECRET);
+  return Boolean(claveTiktok() && secretoTiktok());
 }
 
 export function redirectTiktok() {
@@ -35,7 +39,7 @@ export function redirectTiktok() {
 
 export function urlAutorizacionTiktok(estado: string) {
   const q = new URLSearchParams({
-    client_key: process.env.TIKTOK_CLIENT_KEY ?? "",
+    client_key: claveTiktok(),
     scope: SCOPES_TIKTOK.join(","),
     response_type: "code",
     redirect_uri: redirectTiktok(),
@@ -59,7 +63,7 @@ async function pedirToken(campos: Record<string, string>): Promise<Required<Pick
   const res = await fetch(`${API}/oauth/token/`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", "Cache-Control": "no-cache" },
-    body: new URLSearchParams({ client_key: process.env.TIKTOK_CLIENT_KEY ?? "", client_secret: process.env.TIKTOK_CLIENT_SECRET ?? "", ...campos }),
+    body: new URLSearchParams({ client_key: claveTiktok(), client_secret: secretoTiktok(), ...campos }),
     cache: "no-store",
   });
   const d = (await res.json().catch(() => ({}))) as RespuestaToken;
@@ -141,7 +145,7 @@ export async function desconectarTiktok(admin: Admin) {
     await fetch(`${API}/oauth/revoke/`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ client_key: process.env.TIKTOK_CLIENT_KEY ?? "", client_secret: process.env.TIKTOK_CLIENT_SECRET ?? "", token: c.access_token }),
+      body: new URLSearchParams({ client_key: claveTiktok(), client_secret: secretoTiktok(), token: c.access_token }),
       cache: "no-store",
     }).catch(() => null);
   }
