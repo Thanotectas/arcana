@@ -44,7 +44,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 **Cron en Vercel (plan Hobby: máximo dos cron jobs, solo diarios).** `vercel.json` registra únicamente dos orquestadores: `/api/cron/manana` (12:00 UTC = 07:00 Bogotá: diario, instagram, correos y, los lunes, resumen) y `/api/cron/tarde` (17:00 UTC = 12:00 Bogotá: instagram, que reintenta la carta del día y publica lo aprobado del agente). Llaman en paralelo a las rutas de siempre con el `CRON_SECRET` (`src/lib/cron.ts`: `cronAutorizado`, `ejecutarRutas`), así cada ruta conserva su `maxDuration` y puede ejecutarse a mano. **No agregar entradas a `vercel.json`**: un tercer cron hace fallar el despliegue (pasó el 6 oct 2026); una tarea nueva se suma a la lista de rutas de un orquestador.
 
-Migraciones en `supabase/migrations/`, aplicadas en producción hasta la `0028_metricas_redes.sql` (17 de octubre de 2026). Pendientes: `0029_redes_historia_carrusel.sql` (historia diaria, carrusel semanal y kit de TikTok) y `0030_chat_visitas.sql` (chat de la página para visitantes); la próxima que se cree es la **0031**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
+Migraciones en `supabase/migrations/`, aplicadas en producción hasta la `0030_chat_visitas.sql` (19 de octubre de 2026). No hay pendientes (0029 y 0030 aplicadas el 19 oct 2026); la próxima que se cree es la **0031**. Las aplica el dueño del proyecto en el SQL Editor de Supabase; el código que dependa de una migración nueva debe avisarlo en el chat.
 
 1. `0001_init.sql`: tablas, RLS, cobro y acreditación.
 2. `0002_lecturas_en_vivo.sql`: estado de la lectura, reclamar y reembolsar.
