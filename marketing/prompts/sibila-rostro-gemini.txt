@@ -27,3 +27,20 @@ como en la original. Todo lo demás idéntico: pose, cabello, luz, fondo y encua
 Descargar las tres en la mayor calidad (PNG o JPG, cuadradas) y subirlas al chat nombradas:
 sibila-base, sibila-habla, sibila-ojos. Si Gemini cambió la cara o el encuadre en una edición,
 repetir solo esa edición.
+
+==================== OPCIÓN B · ESCENA COMPLETA (16:9) ====================
+En vez del busto, Sibila en su escenario: la imagen entera es el fondo del directo y las
+cartas y la pregunta van encima, en la parte derecha. También son tres imágenes (base +
+dos ediciones iguales a las de arriba).
+
+Base: Escena horizontal 16:9 de pintura al óleo digital, muy detallada. Una sala esotérica
+de noche: cortinas de terciopelo violeta, una ventana alta con cielo estrellado, velas
+encendidas y una bola de cristal que brilla suave. A la IZQUIERDA del cuadro, sentada detrás
+de una mesa de madera oscura con un mantel bordado, Sibila: mujer latina de unos 35 años,
+piel canela cálida, rostro sereno, cabello negro ondulado con raya al medio, velo de seda
+violeta sobre los hombros, diadema dorada fina con una estrella dorada de cuatro puntas en la
+frente, aretes de media luna, túnica violeta con ribete dorado en V. Mira a la cámara con
+media sonrisa, labios cerrados, las manos descansando junto a un mazo de tarot boca abajo.
+El TERCIO DERECHO del cuadro queda despejado y en penumbra (solo cortina y estrellas), sin
+objetos, para poner texto encima. Luz cálida de las velas sobre su rostro, tonos violeta,
+dorado y azul noche. Sin texto, sin letras, sin marca de agua.
