@@ -170,7 +170,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
               <p className="text-sm">
                 Conectado: <strong>{tiktok.nombre ?? "cuenta de TikTok"}</strong>
                 {tiktok.usuario && <span className="text-texto-suave"> @{tiktok.usuario}</span>}
-                {tiktok.refresh_expira_en && <span className="block text-xs text-texto-suave">{`El permiso vence el ${hora(tiktok.refresh_expira_en)}; antes de esa fecha, vuelve a conectar.`}</span>}
+                {tiktok.refresh_expira_en && <span className="block text-xs text-texto-suave">{`El permiso vence el ${new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", year: "numeric", timeZone: "America/Bogota" }).format(new Date(tiktok.refresh_expira_en))}; antes de esa fecha, vuelve a conectar.`}</span>}
               </p>
               <BotonDesconectarTiktok />
             </div>
