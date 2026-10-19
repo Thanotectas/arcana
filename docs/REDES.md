@@ -258,3 +258,16 @@ falla, el reel sale sin voz (queda en el log `[voz de Sibila]`). `REDES_VOZ=0` l
 Los reels ya guardados no cambian: «Volver a generarlo» en /admin/redes los rehace con voz.
 Voz elegida (20 oct 2026): «Marcela – Warm & feminine narration», id `zAjVLCYNz6RBmYxLTj17`, modelo `eleven_v4`.
 Gasto aproximado: 400 a 600 caracteres por día (carta del día y publicación del agente).
+
+## Token de la página (20 oct 2026)
+
+Instagram publica con `IG_PAGE_TOKEN` (no usa los otros). Del 18 al 20 de octubre falló con
+«(#10) Requires instagram_content_publish permission» porque el token de página se generó
+sin los permisos de Instagram. Al regenerarlo, en el Explorador de la API Graph (app
+Thanotectas Automation, token de usuario) pedir los 12 permisos: pages_show_list,
+pages_read_engagement, pages_manage_posts, pages_manage_metadata, pages_messaging,
+pages_read_user_content, instagram_basic, instagram_content_publish,
+instagram_manage_comments, instagram_manage_messages, instagram_manage_insights y
+business_management; marcar la página Arcana y @miarcana.oficial; ampliar el token;
+consultar `1337589612768238?fields=name,access_token` y poner ese token en
+`IG_PAGE_TOKEN`, `META_PAGE_TOKEN` y `FB_PAGE_TOKEN`, y hacer Redeploy.
