@@ -238,5 +238,7 @@ archivo `public/tiktokt534bcLoFgkrcOMyG3mac6DJy05JnFhz.txt` (no borrarlo).
   dúo y stitch vienen apagados y respetan lo que la cuenta tenga desactivado,
   divulgación de contenido comercial («Tu marca» / «Contenido de marca», que no
   puede ser privado) y la declaración de uso de música.
+- «Publicar en TikTok» y sus opciones solo aparecen si la cuenta conectada tiene el permiso
+  `video.publish`; si la app se aprueba solo con borradores, queda «Enviar a mis borradores».
 - Sin auditoría, TikTok deja lo directo en privado (Solo yo). Para pedirla hay
   que grabar el video de demostración del flujo completo en el Sandbox.

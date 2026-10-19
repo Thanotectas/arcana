@@ -34,7 +34,7 @@ export interface FuenteTiktok {
  * que la cuenta tenga desactivado, y está la divulgación de contenido
  * comercial con su declaración.
  */
-export function PublicarTiktok({ fuentes }: { fuentes: FuenteTiktok[] }) {
+export function PublicarTiktok({ fuentes, directo }: { fuentes: FuenteTiktok[]; directo: boolean }) {
   const [fuente, setFuente] = useState(fuentes[0]?.valor ?? "subida");
   const [subiendo, setSubiendo] = useState(false);
   const [preparado, preparar] = useActionState<EstadoPrepararTiktok, FormData>(async (prev, fd) => {
@@ -78,12 +78,13 @@ export function PublicarTiktok({ fuentes }: { fuentes: FuenteTiktok[] }) {
         </BotonEnviar>
       </form>
       {preparado.error && <Aviso>{preparado.error}</Aviso>}
-      {preparado.video && preparado.creador && <FormularioTiktok key={preparado.video} video={preparado.video} texto={preparado.texto ?? ""} creador={preparado.creador} />}
+      {preparado.video && preparado.creador && <FormularioTiktok key={preparado.video} video={preparado.video} texto={preparado.texto ?? ""} creador={preparado.creador} directo={directo} />}
     </div>
   );
 }
 
-function FormularioTiktok({ video, texto, creador }: { video: string; texto: string; creador: NonNullable<EstadoPrepararTiktok["creador"]> }) {
+/** Sin el permiso video.publish (app aprobada solo con borradores) queda únicamente «Enviar a mis borradores». */
+function FormularioTiktok({ video, texto, creador, directo }: { video: string; texto: string; creador: NonNullable<EstadoPrepararTiktok["creador"]>; directo: boolean }) {
   const [estado, enviar] = useActionState<EstadoEnvioTiktok, FormData>(accionEnviarTiktok, {});
   const [privacidad, setPrivacidad] = useState("");
   const [divulgar, setDivulgar] = useState(false);
@@ -113,96 +114,102 @@ function FormularioTiktok({ video, texto, creador }: { video: string; texto: str
       <div className="grid gap-4 sm:grid-cols-[220px_1fr]">
         <video src={video} controls playsInline className="w-full max-w-[220px] rounded-xl border border-borde" />
         <div className="space-y-4">
-          <label className="block space-y-1 text-sm">
-            <span className="text-texto-suave">Texto del video</span>
-            <textarea name="titulo" defaultValue={texto} maxLength={2200} rows={7} className="campo w-full text-sm" />
-          </label>
-
-          <label className="block space-y-1 text-sm">
-            <span className="text-texto-suave">¿Quién puede ver este video?</span>
-            <select name="privacidad" required value={privacidad} onChange={(e) => setPrivacidad(e.target.value)} className="campo w-full">
-              <option value="" disabled>
-                Elige una opción
-              </option>
-              {creador.privacy_level_options.map((p) => (
-                <option key={p} value={p} disabled={deMarca && p === "SELF_ONLY"}>
-                  {PRIVACIDAD[p] ?? p}
-                  {deMarca && p === "SELF_ONLY" ? " (no disponible para contenido de marca)" : ""}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <fieldset className="space-y-1 text-sm">
-            {interacciones.map((i) => (
-              <label key={i.nombre} className={`flex items-center gap-2 ${i.apagado ? "text-texto-suave" : ""}`}>
-                <input type="checkbox" name={i.nombre} disabled={i.apagado} />
-                {i.texto}
-                {i.apagado && <span className="text-xs">(desactivado en la configuración de tu cuenta)</span>}
+          {directo && (
+            <>
+              <label className="block space-y-1 text-sm">
+                <span className="text-texto-suave">Texto del video</span>
+                <textarea name="titulo" defaultValue={texto} maxLength={2200} rows={7} className="campo w-full text-sm" />
               </label>
-            ))}
-          </fieldset>
 
-          <fieldset className="space-y-2 rounded-xl border border-borde p-3 text-sm">
-            <label className="flex items-center gap-2 font-medium">
-              <input type="checkbox" name="divulgar" checked={divulgar} onChange={(e) => setDivulgar(e.target.checked)} />
-              Divulgar contenido comercial
-            </label>
-            <p className="text-xs text-texto-suave">Actívalo si el video promociona una marca, un producto o un servicio.</p>
-            {divulgar && (
-              <div className="space-y-2 pl-6">
-                <label className="flex items-start gap-2">
-                  <input type="checkbox" name="tu_marca" checked={tuMarca} onChange={(e) => setTuMarca(e.target.checked)} className="mt-1" />
-                  <span>
-                    Tu marca <span className="block text-xs text-texto-suave">Promocionas tu propio negocio. El video se etiquetará como «Contenido promocional».</span>
-                  </span>
-                </label>
-                <label className="flex items-start gap-2">
-                  <input
-                    type="checkbox"
-                    name="de_marca"
-                    checked={deMarca}
-                    onChange={(e) => {
-                      setDeMarca(e.target.checked);
-                      if (e.target.checked && privacidad === "SELF_ONLY") setPrivacidad("");
-                    }}
-                    className="mt-1"
-                  />
-                  <span>
-                    Contenido de marca <span className="block text-xs text-texto-suave">Promocionas a otra marca o a un tercero. El video se etiquetará como «Colaboración pagada».</span>
-                  </span>
-                </label>
-                {faltaMarca && <p className="text-xs text-peligro">Elige al menos una opción para publicar.</p>}
-              </div>
-            )}
-          </fieldset>
+              <label className="block space-y-1 text-sm">
+                <span className="text-texto-suave">¿Quién puede ver este video?</span>
+                <select name="privacidad" required value={privacidad} onChange={(e) => setPrivacidad(e.target.value)} className="campo w-full">
+                  <option value="" disabled>
+                    Elige una opción
+                  </option>
+                  {creador.privacy_level_options.map((p) => (
+                    <option key={p} value={p} disabled={deMarca && p === "SELF_ONLY"}>
+                      {PRIVACIDAD[p] ?? p}
+                      {deMarca && p === "SELF_ONLY" ? " (no disponible para contenido de marca)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <p className="text-xs text-texto-suave">
-            Al publicar, aceptas{" "}
-            {deMarca && (
-              <>
+              <fieldset className="space-y-1 text-sm">
+                {interacciones.map((i) => (
+                  <label key={i.nombre} className={`flex items-center gap-2 ${i.apagado ? "text-texto-suave" : ""}`}>
+                    <input type="checkbox" name={i.nombre} disabled={i.apagado} />
+                    {i.texto}
+                    {i.apagado && <span className="text-xs">(desactivado en la configuración de tu cuenta)</span>}
+                  </label>
+                ))}
+              </fieldset>
+
+              <fieldset className="space-y-2 rounded-xl border border-borde p-3 text-sm">
+                <label className="flex items-center gap-2 font-medium">
+                  <input type="checkbox" name="divulgar" checked={divulgar} onChange={(e) => setDivulgar(e.target.checked)} />
+                  Divulgar contenido comercial
+                </label>
+                <p className="text-xs text-texto-suave">Actívalo si el video promociona una marca, un producto o un servicio.</p>
+                {divulgar && (
+                  <div className="space-y-2 pl-6">
+                    <label className="flex items-start gap-2">
+                      <input type="checkbox" name="tu_marca" checked={tuMarca} onChange={(e) => setTuMarca(e.target.checked)} className="mt-1" />
+                      <span>
+                        Tu marca <span className="block text-xs text-texto-suave">Promocionas tu propio negocio. El video se etiquetará como «Contenido promocional».</span>
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        name="de_marca"
+                        checked={deMarca}
+                        onChange={(e) => {
+                          setDeMarca(e.target.checked);
+                          if (e.target.checked && privacidad === "SELF_ONLY") setPrivacidad("");
+                        }}
+                        className="mt-1"
+                      />
+                      <span>
+                        Contenido de marca <span className="block text-xs text-texto-suave">Promocionas a otra marca o a un tercero. El video se etiquetará como «Colaboración pagada».</span>
+                      </span>
+                    </label>
+                    {faltaMarca && <p className="text-xs text-peligro">Elige al menos una opción para publicar.</p>}
+                  </div>
+                )}
+              </fieldset>
+
+              <p className="text-xs text-texto-suave">
+                Al publicar, aceptas{" "}
+                {deMarca && (
+                  <>
+                    la{" "}
+                    <a href="https://www.tiktok.com/legal/page/global/bc-policy/es" target="_blank" rel="noreferrer" className="underline">
+                      Política de contenido de marca
+                    </a>{" "}
+                    y{" "}
+                  </>
+                )}
                 la{" "}
-                <a href="https://www.tiktok.com/legal/page/global/bc-policy/es" target="_blank" rel="noreferrer" className="underline">
-                  Política de contenido de marca
+                <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/es" target="_blank" rel="noreferrer" className="underline">
+                  Confirmación de uso de música
                 </a>{" "}
-                y{" "}
-              </>
-            )}
-            la{" "}
-            <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/es" target="_blank" rel="noreferrer" className="underline">
-              Confirmación de uso de música
-            </a>{" "}
-            de TikTok.
-            {creador.max_video_post_duration_sec ? ` Esta cuenta admite videos de hasta ${creador.max_video_post_duration_sec} segundos.` : ""}
-          </p>
+                de TikTok.
+                {creador.max_video_post_duration_sec ? ` Esta cuenta admite videos de hasta ${creador.max_video_post_duration_sec} segundos.` : ""}
+              </p>
+            </>
+          )}
 
           {estado.error && <Aviso>{estado.error}</Aviso>}
           {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
 
           <div className="flex flex-wrap gap-2">
-            <button type="submit" name="modo" value="directo" disabled={faltaMarca || !privacidad} className="boton boton-primario disabled:opacity-40">
-              <Send className="h-4 w-4" aria-hidden /> Publicar en TikTok
-            </button>
+            {directo && (
+              <button type="submit" name="modo" value="directo" disabled={faltaMarca || !privacidad} className="boton boton-primario disabled:opacity-40">
+                <Send className="h-4 w-4" aria-hidden /> Publicar en TikTok
+              </button>
+            )}
             <button type="submit" name="modo" value="borrador" formNoValidate className="boton boton-secundario">
               Enviar a mis borradores
             </button>

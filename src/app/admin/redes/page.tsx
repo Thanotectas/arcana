@@ -177,7 +177,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
             <p className="text-sm text-texto-suave">
               Mientras TikTok no apruebe la app, lo que se publique directo queda en privado (Solo yo): usa «Enviar a mis borradores» y termina de publicarlo en la app con un sonido en tendencia.
             </p>
-            <PublicarTiktok fuentes={fuentesTiktok} />
+            <PublicarTiktok fuentes={fuentesTiktok} directo={(tiktok.scopes ?? "").split(",").includes("video.publish")} />
             {(enviosTiktok ?? []).length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
