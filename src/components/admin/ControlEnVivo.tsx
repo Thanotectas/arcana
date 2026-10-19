@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Copy, Send, Trash2 } from "lucide-react";
-import { accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
+import { Copy, Send, Ticket, Trash2 } from "lucide-react";
+import { accionAlternarCodigo, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { Aviso } from "@/components/Aviso";
 
@@ -63,6 +63,42 @@ export function VaciarCola() {
         <Trash2 className="h-4 w-4" aria-hidden /> Vaciar la fila
       </BotonEnviar>
       {estado.mensaje && <Aviso tipo="info">{estado.mensaje}</Aviso>}
+    </form>
+  );
+}
+
+/** Crear un código de oferta (créditos extra en cualquier compra, sin cambiar el precio). */
+export function CrearCodigo({ venceSugerido }: { venceSugerido: string }) {
+  const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(accionCrearCodigo, {});
+  return (
+    <form action={enviar} className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-[1fr_120px_120px_1fr]">
+        <input name="codigo" placeholder="Código (ej. SIBILA)" maxLength={24} required className="campo uppercase" />
+        <input name="extra" type="number" min={1} max={50} defaultValue={2} required className="campo" title="Créditos extra" />
+        <input name="cupo" type="number" min={0} defaultValue={100} className="campo" title="Cupo (0 = sin tope)" />
+        <input name="vence" type="datetime-local" defaultValue={venceSugerido} className="campo" title="Vence (hora de Bogotá)" />
+      </div>
+      <p className="text-xs text-texto-suave">Código · créditos extra · cupo (0 = sin tope) · vence (hora de Bogotá, vacío = no vence)</p>
+      <input name="nota" placeholder="Nota (ej. directo del 25 de octubre)" maxLength={120} className="campo w-full" />
+      {estado.error && <Aviso>{estado.error}</Aviso>}
+      {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
+      <BotonEnviar className="boton boton-secundario text-sm" cargando="Guardando…">
+        <Ticket className="h-4 w-4" aria-hidden /> Guardar código
+      </BotonEnviar>
+    </form>
+  );
+}
+
+export function AlternarCodigo({ codigo, activo }: { codigo: string; activo: boolean }) {
+  const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(accionAlternarCodigo, {});
+  return (
+    <form action={enviar} className="inline">
+      <input type="hidden" name="codigo" value={codigo} />
+      <input type="hidden" name="activo" value={activo ? "0" : "1"} />
+      <BotonEnviar className="boton boton-fantasma px-3 py-1 text-xs" cargando="…">
+        {activo ? "Apagar" : "Prender"}
+      </BotonEnviar>
+      {estado.error && <span className="ml-2 text-xs text-peligro">{estado.error}</span>}
     </form>
   );
 }

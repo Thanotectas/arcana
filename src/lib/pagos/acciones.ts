@@ -8,6 +8,19 @@ import { nuevaReferencia, pagosConfigurados } from "./bold";
 import { crearCheckout, pagosInternacionalesConfigurados } from "./lemon";
 import { getSupabaseAdmin } from "../supabase/admin";
 import { comprasVisibles } from "../plataforma";
+import { cookies } from "next/headers";
+import { COOKIE_CODIGO, validarCodigo } from "./codigos";
+
+/** Código de oferta del formulario o de la cookie del enlace corto; si vale para el paquete, créditos extra. */
+async function extrasPorCodigo(paquete: string) {
+  const cookie = (await cookies()).get(COOKIE_CODIGO)?.value;
+  return async (formData: FormData) => {
+    const texto = String(formData.get("codigo") ?? "") || cookie || "";
+    if (!texto) return { codigo: null, extra: 0 };
+    const r = await validarCodigo(getSupabaseAdmin(), texto, paquete);
+    return r.valido ? { codigo: r.codigo, extra: r.creditosExtra } : { codigo: null, extra: 0 };
+  };
+}
 
 /** Crea la orden pendiente y lleva a la página que abre el checkout de Bold. */
 export async function accionComprar(formData: FormData) {
@@ -26,15 +39,17 @@ export async function accionComprar(formData: FormData) {
   if (!user) redirect("/entrar?volver=/creditos");
 
   const referencia = nuevaReferencia(user.id);
+  const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
 
   const { error } = await supabase.from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
-    creditos: paquete.creditos,
+    creditos: paquete.creditos + extra,
     monto_centavos: paquete.precioCOP * 100,
     moneda: "COP",
     referencia,
     estado: "pendiente",
+    codigo,
   });
   if (error) {
     console.error("[pagos] no se pudo crear la orden", error);
@@ -64,14 +79,16 @@ export async function accionComprarInternacional(formData: FormData) {
 
   const referencia = nuevaReferencia(user.id);
   const admin = getSupabaseAdmin();
+  const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
   const { error } = await admin.from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
-    creditos: paquete.creditos,
+    creditos: paquete.creditos + extra,
     monto_centavos: paquete.precioUSDCentavos,
     moneda: "USD",
     referencia,
     estado: "pendiente",
+    codigo,
   });
   if (error) {
     console.error("[pagos] no se pudo crear la orden internacional", error);

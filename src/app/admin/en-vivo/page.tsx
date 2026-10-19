@@ -5,7 +5,8 @@ import { sitio } from "@/lib/correo";
 import { claveEscenario, escenarioActivo, maximoDiario } from "@/lib/en-vivo";
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
-import { DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { AlternarCodigo, CrearCodigo, DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
@@ -26,6 +27,9 @@ export default async function PaginaAdminEnVivo() {
     youtubeConectado(admin),
     escenarioActivo(admin),
   ]);
+  const codigos = await listarCodigos(admin);
+  const proximoDomingo = venceSugerido();
+  const fechaHora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "no vence");
   const url = `${sitio()}/en-vivo/escenario?clave=${claveEscenario()}`;
   const hora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "");
   const punto = (ok: boolean) => <span className={`inline-block h-2.5 w-2.5 rounded-full ${ok ? "bg-exito" : "bg-peligro"}`} />;
@@ -62,6 +66,28 @@ export default async function PaginaAdminEnVivo() {
           <li>OBS → Ajustes → Emisión → Servicio YouTube → pega la clave. Luego <strong>Iniciar transmisión</strong>.</li>
           <li>Al minuto, el estado de arriba debe decir «Directo encontrado». Sibila empieza a leer el chat.</li>
         </ol>
+      </section>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Código de oferta</h2>
+        <p className="text-sm text-texto-suave">
+          Créditos extra en cualquier compra, sin cambiar el precio. La gente entra por <strong>miarcana.com/c/CÓDIGO</strong> o lo escribe en /creditos. Sibila dice el código vigente en sus frases del directo.
+        </p>
+        {codigos.length > 0 && (
+          <ul className="divide-y divide-borde text-sm">
+            {codigos.map((c) => (
+              <li key={c.codigo} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
+                <span className={`font-mono font-semibold ${c.activo ? "text-oro-suave" : "text-texto-suave line-through"}`}>{c.codigo}</span>
+                <span>+{c.creditos_extra} créditos</span>
+                <span className="text-texto-suave">{c.usos} uso{c.usos === 1 ? "" : "s"}{c.cupo != null ? ` de ${c.cupo}` : ""}</span>
+                <span className="text-texto-suave">vence: {fechaHora(c.vence_en)}</span>
+                {c.nota && <span className="text-xs text-texto-suave">· {c.nota}</span>}
+                <AlternarCodigo codigo={c.codigo} activo={c.activo} />
+              </li>
+            ))}
+          </ul>
+        )}
+        <CrearCodigo venceSugerido={proximoDomingo} />
       </section>
 
       <section className="tarjeta space-y-3 p-5">

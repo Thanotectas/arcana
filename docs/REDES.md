@@ -326,3 +326,14 @@ Directos de YouTube donde Sibila lee en voz alta. Piezas:
   preguntas seguidas gasta 20.000–30.000. YouTube exige verificar el canal con el teléfono
   (24 h) para emitir en directo.
 
+## Códigos de oferta (20 oct 2026)
+
+`codigos_oferta` (migración 0034): créditos extra en una compra sin cambiar el precio. La
+orden guarda `codigo` y ya suma los extras en `creditos`, así que `acreditar_orden` los
+entrega como siempre (Bold y Lemon). Validación en `src/lib/pagos/codigos.ts` (activo, no
+vencido, cupo = aprobadas + pendientes de 2 h, paquetes permitidos). Llega por
+`/c/CÓDIGO` (cookie `arcana_codigo` de un día y redirección a /creditos), por `?codigo=` o
+escrito en /creditos. Se administran en /admin/en-vivo. El código vigente lo dice Sibila
+en las frases del directo (`frasesPuente`, con el precio de la tirada de prueba en
+palabras). Semilla: `SIBILA` (+2, cupo 100, vence el 25 oct 2026 a medianoche).
+

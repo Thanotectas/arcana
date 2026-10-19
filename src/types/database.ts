@@ -74,8 +74,21 @@ type OrdenRow = {
   metodo_pago: string | null;
   /** Pago real hecho para probar el flujo; fuera de las métricas de ventas. */
   es_prueba: boolean;
+  /** Código de oferta aplicado (créditos extra ya sumados en `creditos`). */
+  codigo: string | null;
   creado_en: string;
   actualizado_en: string;
+};
+
+type CodigoOfertaRow = {
+  codigo: string;
+  creditos_extra: number;
+  paquetes: string[] | null;
+  cupo: number | null;
+  vence_en: string | null;
+  activo: boolean;
+  nota: string | null;
+  creado_en: string;
 };
 
 type PreguntaRow = {
@@ -367,7 +380,7 @@ export type Database = {
       };
       ordenes: {
         Row: OrdenRow;
-        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "es_prueba" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "es_prueba" | "codigo" | "creado_en" | "actualizado_en">;
         Update: Partial<OrdenRow>;
         Relationships: [];
       };
@@ -441,6 +454,12 @@ export type Database = {
         Row: EnVivoEstadoRow;
         Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "actualizado_en">;
         Update: Partial<EnVivoEstadoRow>;
+        Relationships: [];
+      };
+      codigos_oferta: {
+        Row: CodigoOfertaRow;
+        Insert: Insertable<CodigoOfertaRow, "paquetes" | "cupo" | "vence_en" | "activo" | "nota" | "creado_en">;
+        Update: Partial<CodigoOfertaRow>;
         Relationships: [];
       };
       youtube_cuenta: {

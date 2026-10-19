@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const admin = getSupabaseAdmin();
   await latido(admin).catch(() => null);
   if (q.get("modo") === "puente") {
-    return NextResponse.json({ clase: "puente", ...(await audioPuente(Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
   }
   let chat: Awaited<ReturnType<typeof sincronizarChat>> | null = null;
   try {

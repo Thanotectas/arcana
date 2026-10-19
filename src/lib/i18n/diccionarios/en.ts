@@ -488,6 +488,15 @@ export const en: Diccionario = {
     sinConfigurar: "Payments in setup mode: the Bold identity key or secret key is missing.",
     noDisponibleApp: "Credit top-ups are not available in this version of the app.",
     prueba: { titulo: "Just want to try it?", texto: "One credit for less than a coffee: a three-card spread or a numerology profile.", boton: "Buy 1 credit" },
+    codigo: {
+      pregunta: "Have an offer code?",
+      placeholder: "CODE",
+      boton: "Apply",
+      activo: "Code {codigo}: {n} extra credits",
+      activoTexto: "on any pack you buy now.",
+      enPaquete: "+{n} extra credits with your code",
+      errores: { no_existe: "That code doesn't exist.", vencido: "That code has expired.", agotado: "That code has run out.", paquete: "That code doesn't apply to this pack." },
+    },
     fundadores: {
       etiqueta: "Founders price for the first {cupo} people",
       quedan: "{n} spots left",

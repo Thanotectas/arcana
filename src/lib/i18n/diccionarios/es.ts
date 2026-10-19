@@ -487,6 +487,15 @@ export const es = {
     sinConfigurar: "Pagos en modo de configuración: falta la llave de identidad o la llave secreta de Bold.",
     noDisponibleApp: "La recarga de créditos no está disponible en esta versión de la app.",
     prueba: { titulo: "¿Solo quieres probar?", texto: "Un crédito por menos que un café: una tirada de tres cartas o una numerología.", boton: "Comprar 1 crédito" },
+    codigo: {
+      pregunta: "¿Tienes un código de oferta?",
+      placeholder: "CÓDIGO",
+      boton: "Aplicar",
+      activo: "Código {codigo}: {n} créditos extra",
+      activoTexto: "en cualquier paquete que compres ahora.",
+      enPaquete: "+{n} créditos extra con tu código",
+      errores: { no_existe: "Ese código no existe.", vencido: "Ese código ya venció.", agotado: "Ese código ya se agotó.", paquete: "Ese código no aplica a este paquete." },
+    },
     fundadores: {
       etiqueta: "Precio de fundadores para las primeras {cupo} personas",
       quedan: "Quedan {n} cupos",

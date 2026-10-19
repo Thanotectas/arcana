@@ -16,15 +16,22 @@ import { BotonEnviar } from "@/components/BotonEnviar";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaLarga, plantilla } from "@/lib/i18n/formato";
 import { comprasVisibles } from "@/lib/plataforma";
+import { cookies } from "next/headers";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { COOKIE_CODIGO, normalizarCodigo, validarCodigo } from "@/lib/pagos/codigos";
+import { Ticket } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
   return { title: t.creditos.seccion };
 }
 
-export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string; moneda?: string }> }) {
+export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string; moneda?: string; codigo?: string }> }) {
   await requerirUsuario();
-  const [{ error, moneda }, perfil, t, haComprado, idioma, h, oferta] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores()]);
+  const [{ error, moneda, codigo: codigoUrl }, perfil, t, haComprado, idioma, h, oferta, jar] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores(), cookies()]);
+  // Código de oferta: de la URL (?codigo=) o de la cookie del enlace corto /c/CODIGO.
+  const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || "";
+  const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
   // Fuera de Colombia (país según Vercel) se cobra en dólares con Lemon Squeezy; la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
   const internacionalDisponible = pagosInternacionalesConfigurados();
@@ -79,6 +86,25 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         ) : null}
       </p>
 
+      <form method="get" action="/creditos" className={`tarjeta flex flex-wrap items-center gap-3 p-4 ${codigo?.valido ? "border-oro/50" : ""}`}>
+        {moneda && <input type="hidden" name="moneda" value={moneda} />}
+        <Ticket className="h-6 w-6 shrink-0 text-oro" aria-hidden />
+        {codigo?.valido ? (
+          <p className="flex-1 text-sm">
+            <span className="font-semibold text-oro-suave">{plantilla(t.creditos.codigo.activo, { codigo: codigo.codigo, n: codigo.creditosExtra })}</span> {t.creditos.codigo.activoTexto}
+          </p>
+        ) : (
+          <>
+            <label className="flex-1 text-sm text-texto-suave" htmlFor="codigo">
+              {t.creditos.codigo.pregunta}
+              {codigo && !codigo.valido && <span className="block text-peligro">{(t.creditos.codigo.errores as Record<string, string>)[codigo.motivo ?? "no_existe"]}</span>}
+            </label>
+            <input id="codigo" name="codigo" defaultValue={codigo && !codigo.valido ? codigo.codigo : ""} maxLength={24} placeholder={t.creditos.codigo.placeholder} className="campo w-40 uppercase" />
+            <button type="submit" className="boton boton-secundario px-4 py-2 text-sm">{t.creditos.codigo.boton}</button>
+          </>
+        )}
+      </form>
+
       <div className="grid gap-4 sm:grid-cols-3">
         {PAQUETES.map((p) => {
           const textos = t.creditos.paquetes[p.id as keyof typeof t.creditos.paquetes];
@@ -87,6 +113,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           return (
             <form key={p.id} action={accion} className={`tarjeta tarjeta-modulo flex flex-col p-6 ${p.destacado ? "border-oro/50 shadow-[0_0_40px_rgba(217,180,90,0.12)]" : ""}`}>
               <input type="hidden" name="paquete" value={p.id} />
+              {codigo?.valido && <input type="hidden" name="codigo" value={codigo.codigo} />}
+              {codigo?.valido && <p className="mb-1 text-xs font-semibold text-oro-suave">{plantilla(t.creditos.codigo.enPaquete, { n: codigo.creditosExtra })}</p>}
               <div className="flex items-center justify-between">
                 {p.destacado ? <span className="text-xs uppercase tracking-widest text-oro">{t.portada.masElegido}</span> : <span />}
                 {ahorro > 0 && <span className="rounded-full bg-exito/15 px-2 py-0.5 text-xs text-exito">{plantilla(t.creditos.ahorro, { pct: ahorro })}</span>}
@@ -110,6 +138,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
 
       <form action={accion} className="tarjeta flex flex-wrap items-center justify-between gap-4 border-borde p-5">
         <input type="hidden" name="paquete" value={PAQUETE_PRUEBA.id} />
+        {codigo?.valido && <input type="hidden" name="codigo" value={codigo.codigo} />}
         <div className="flex items-center gap-4">
           <Coffee className="h-8 w-8 shrink-0 text-oro" aria-hidden />
           <div>
@@ -125,6 +154,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
 
       <form id="circulo" action={accion} className="tarjeta aparecer scroll-mt-24 border-oro/50 bg-gradient-to-br from-oro/10 via-transparent to-violeta/10 p-6 sm:p-8">
         <input type="hidden" name="paquete" value={oferta.activa ? OFERTA_FUNDADORES.id : PAQUETE_CIRCULO.id} />
+        {codigo?.valido && <input type="hidden" name="codigo" value={codigo.codigo} />}
         {oferta.activa && (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-oro/60 bg-oro/15 px-4 py-3">
             <p className="flex items-center gap-2 text-sm font-medium text-oro-suave"><Timer className="h-4 w-4" aria-hidden />{plantilla(t.creditos.fundadores.etiqueta, { cupo: OFERTA_FUNDADORES.cupo })}</p>

@@ -10,6 +10,8 @@ import { SIGNOS, type Signo } from "@/lib/zodiaco";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
+import { PAQUETE_PRUEBA, PAQUETES } from "@/lib/creditos";
+import { codigoVigente } from "@/lib/pagos/codigos";
 
 /**
  * «Sibila en vivo»: directos de YouTube donde Sibila lee el tarot a quien
@@ -333,17 +335,40 @@ export async function latido(admin: Admin) {
   await admin.from("en_vivo_estado").upsert({ id: 1, latido_en: new Date().toISOString(), actualizado_en: new Date().toISOString() }, { onConflict: "id" });
 }
 
-/** Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez). */
-export const PUENTES = [
-  "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
-  "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene.",
-  "Mientras llega la siguiente pregunta, te recuerdo que tu carta del día es gratis, todos los días, en mi arcana punto com.",
-  "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
-  "Si quieres una lectura más profunda, con más cartas y con calma, te espero en mi arcana punto com.",
-] as const;
+/** Precio dicho en voz alta: «mil novecientos pesos» se lee bien; «$ 1.900» no. */
+function precioHablado(pesos: number) {
+  const miles = Math.floor(pesos / 1000);
+  const resto = pesos % 1000;
+  const unidades = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte"];
+  const centenas: Record<number, string> = { 900: "novecientos", 800: "ochocientos", 700: "setecientos", 600: "seiscientos", 500: "quinientos", 400: "cuatrocientos", 300: "trescientos", 200: "doscientos", 100: "cien" };
+  const m = miles === 0 ? "" : miles === 1 ? "mil" : miles <= 20 ? `${unidades[miles]} mil` : `${miles} mil`;
+  return `${m}${resto ? ` ${centenas[resto] ?? resto}` : ""} pesos`.trim();
+}
 
-export async function audioPuente(i: number) {
-  const texto = PUENTES[((i % PUENTES.length) + PUENTES.length) % PUENTES.length];
+/**
+ * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez).
+ * Incluyen el precio de la tirada de prueba y, si hay un código de oferta
+ * vigente, cómo usarlo.
+ */
+export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
+  const prueba = precioHablado(PAQUETE_PRUEBA.precioCOP);
+  const paquete = PAQUETES[0];
+  const oferta = codigo
+    ? `Y esta noche hay regalo: entra a mi arcana punto com, barra, ce, barra, ${codigo.codigo.toLowerCase().split("").join(" ")}, y cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
+    : "";
+  return [
+    "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
+    "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene.",
+    `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y una tirada completa de tres cartas, con calma y por escrito, cuesta ${prueba}. ${oferta}`.trim(),
+    "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
+    `Si quieres una lectura más profunda, con más cartas y con calma, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
+  ];
+}
+
+export async function audioPuente(admin: Admin, i: number) {
+  const codigo = await codigoVigente(admin).catch(() => null);
+  const frases = frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
+  const texto = frases[((i % frases.length) + frases.length) % frases.length];
   let audio: string | null = null;
   if (vozConfigurada()) {
     try {

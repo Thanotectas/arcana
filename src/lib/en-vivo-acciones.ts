@@ -9,6 +9,7 @@ import { requerirAdmin } from "@/lib/admin";
 import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { BUCKET_FOTOS, escenarioActivo, type TipoLectura } from "@/lib/en-vivo";
+import { normalizarCodigo } from "@/lib/pagos/codigos";
 
 export interface EstadoEnVivo {
   error?: string;
@@ -79,4 +80,36 @@ export async function accionVaciarCola(): Promise<EstadoEnVivo> {
   await admin.from("en_vivo_estado").update({ live_chat_id: null, page_token: null }).eq("id", 1);
   revalidatePath("/admin/en-vivo");
   return { mensaje: `${data?.length ?? 0} consultas fuera de la fila.` };
+}
+
+/** Crea (o reemplaza) un código de oferta desde /admin/en-vivo. */
+export async function accionCrearCodigo(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  const codigo = normalizarCodigo(String(formData.get("codigo") ?? ""));
+  const extra = Number(formData.get("extra") ?? 0);
+  const cupo = Number(formData.get("cupo") ?? 0);
+  const vence = String(formData.get("vence") ?? "").trim();
+  const nota = String(formData.get("nota") ?? "").trim().slice(0, 120);
+  if (codigo.length < 3) return { error: "El código necesita al menos 3 letras o números." };
+  if (!Number.isInteger(extra) || extra < 1 || extra > 50) return { error: "Los créditos extra van de 1 a 50." };
+  // La fecha llega como «AAAA-MM-DDTHH:MM» en hora de Bogotá.
+  const venceEn = vence ? new Date(`${vence}:00-05:00`) : null;
+  if (venceEn && Number.isNaN(venceEn.getTime())) return { error: "La fecha de vencimiento no es válida." };
+  const { error } = await getSupabaseAdmin()
+    .from("codigos_oferta")
+    .upsert({ codigo, creditos_extra: extra, cupo: cupo > 0 ? Math.floor(cupo) : null, vence_en: venceEn?.toISOString() ?? null, activo: true, nota: nota || null }, { onConflict: "codigo" });
+  if (error) return { error: error.message };
+  revalidatePath("/admin/en-vivo");
+  return { mensaje: `Código ${codigo} listo: miarcana.com/c/${codigo}` };
+}
+
+/** Apaga o prende un código. */
+export async function accionAlternarCodigo(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  const codigo = normalizarCodigo(String(formData.get("codigo") ?? ""));
+  const activo = formData.get("activo") === "1";
+  const { error } = await getSupabaseAdmin().from("codigos_oferta").update({ activo }).eq("codigo", codigo);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/en-vivo");
+  return { mensaje: activo ? `Código ${codigo} activo.` : `Código ${codigo} apagado.` };
 }

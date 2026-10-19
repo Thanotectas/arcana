@@ -485,6 +485,15 @@ export const pt: Diccionario = {
     sinConfigurar: "Pagamentos em modo de configuração: falta a chave de identidade ou a chave secreta da Bold.",
     noDisponibleApp: "A recarga de créditos não está disponível nesta versão do app.",
     prueba: { titulo: "Só quer experimentar?", texto: "Um crédito por menos que um café: uma tiragem de três cartas ou uma numerologia.", boton: "Comprar 1 crédito" },
+    codigo: {
+      pregunta: "Tem um código de oferta?",
+      placeholder: "CÓDIGO",
+      boton: "Aplicar",
+      activo: "Código {codigo}: {n} créditos extras",
+      activoTexto: "em qualquer pacote que comprar agora.",
+      enPaquete: "+{n} créditos extras com o seu código",
+      errores: { no_existe: "Esse código não existe.", vencido: "Esse código já venceu.", agotado: "Esse código já se esgotou.", paquete: "Esse código não vale para este pacote." },
+    },
     fundadores: {
       etiqueta: "Preço de fundadores para as primeiras {cupo} pessoas",
       quedan: "Restam {n} vagas",
