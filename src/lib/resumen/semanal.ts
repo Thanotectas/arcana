@@ -137,7 +137,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   const mejor = [...(metricas ?? [])].sort((a, b) => interacciones(b) - interacciones(a) || (b.vistas ?? 0) - (a.vistas ?? 0))[0];
   const borradores = (agente ?? []).filter((p) => p.estado === "borrador" && p.fecha >= hoy).length;
 
-  // Por dónde llegan (migración 0035): origen de las cuentas nuevas y, para los
+  // Por dónde llegan (migración 0036): origen de las cuentas nuevas y, para los
   // pagos, el origen del perfil de quien compró. Si la columna no existe aún, se omite.
   const origenes: ResumenSemanal["origenes"] = { cuentas: [], sinOrigen: 0, pagos: [] };
   try {

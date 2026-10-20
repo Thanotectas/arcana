@@ -14,7 +14,7 @@ export async function origenPendiente(): Promise<Origen | null> {
 /**
  * Deja el origen en el perfil de la persona recién registrada (solo si el
  * perfil es de hoy y aún no tiene origen: quien ya tenía cuenta y vuelve por
- * un enlace de YouTube no cambia de origen). Tolera que la migración 0035 no
+ * un enlace de YouTube no cambia de origen). Tolera que la migración 0036 no
  * esté aplicada.
  */
 export async function registrarOrigenPendiente(usuarioId: string) {
