@@ -146,3 +146,26 @@ export function textoShortYoutube(fecha: string) {
     "#Shorts #tarot #cartadeldia #tarotenespañol #espiritualidad",
   ].join("\n");
 }
+
+/** "miarcana.com/rituales" → "https://miarcana.com/yt/rituales" (el enlace corto registra el origen). */
+export function enlaceYoutube(enlace: string) {
+  const ruta = enlace.replace(/^https?:\/\//, "").replace(/^(www\.)?miarcana\.com/, "").replace(/^\/+|\/+$/g, "");
+  return `https://miarcana.com/yt${ruta ? `/${ruta}` : ""}`;
+}
+
+/** Título y descripción del Short de YouTube de una publicación del agente de redes. */
+export function textoShortPublicacion(p: { titulo: string; etiqueta: string; extracto: string; enlace: string }) {
+  const titulo = `${p.titulo} ✨ | Arcana`.slice(0, 100);
+  const descripcion = [
+    `${p.etiqueta}: ${p.titulo}`,
+    "",
+    p.extracto,
+    "",
+    `🔮 ${enlaceYoutube(p.enlace)}`,
+    "✨ Tu carta del día es gratis, todos los días: https://miarcana.com/yt",
+    "",
+    "Lecturas de entretenimiento y reflexión personal.",
+    "#Shorts #tarot #astrologia #espiritualidad #miarcana",
+  ].join("\n");
+  return { titulo, descripcion };
+}

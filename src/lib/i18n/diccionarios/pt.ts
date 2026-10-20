@@ -883,6 +883,7 @@ export const pt: Diccionario = {
     },
     boton: "Veja sua carta de hoje",
     tambien: "Você também pode",
+    youtube: "Inscreva-se no YouTube: a carta do dia em vídeo e Sibila ao vivo",
     enlaces: { hoy: "Ver seu céu de hoje", suenos: "Interpretar um sonho", explorar: "Explorar as 17 leituras" },
     porque: "Você recebe este e-mail porque tem uma conta em Arcana.",
     baja: "Parar de receber e-mails",

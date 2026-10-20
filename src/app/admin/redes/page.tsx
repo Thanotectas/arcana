@@ -136,7 +136,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
               <li key={`${p.red}-${p.tipo}-${p.fecha}`} className="flex flex-wrap gap-x-3">
                 <span className="w-24 text-texto-suave">{p.fecha}</span>
                 <span className="w-24">{({ instagram: "Instagram", facebook: "Facebook", youtube: "YouTube", correo: "Correo" } as Record<string, string>)[p.red] ?? p.red}</span>
-                <span className="w-36 text-texto-suave">{({ carta_dia: "Carta del día", historia: "Historia", carrusel: "Carrusel", kit_tiktok: "Kit TikTok" } as Record<string, string>)[p.tipo] ?? p.tipo}</span>
+                <span className="w-36 text-texto-suave">{({ carta_dia: "Carta del día", historia: "Historia", carrusel: "Carrusel", kit_tiktok: "Kit TikTok", publicacion: "Publicación" } as Record<string, string>)[p.tipo] ?? p.tipo}</span>
                 <span className={p.estado === "publicada" ? "text-exito" : p.estado === "error" ? "text-peligro" : "text-oro-suave"}>{p.estado}</span>
                 {p.tipo === "carrusel" && p.estado === "publicada" && p.red === "instagram" ? (
                   <a href={`/api/redes/carrusel?semana=${p.fecha}&n=0`} target="_blank" rel="noreferrer" className="text-xs text-violeta-suave underline">ver láminas</a>

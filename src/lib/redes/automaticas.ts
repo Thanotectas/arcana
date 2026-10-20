@@ -8,7 +8,9 @@ import { contenidoGuardado, redactarCarrusel, semanaDelCarrusel, urlsLaminas } f
 import { enviarKitTiktok, piezasDelDia } from "./kit-tiktok";
 import { cartaDelDia, fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
-import { textoShortYoutube } from "./carta-dia";
+import { textoShortPublicacion, textoShortYoutube } from "./carta-dia";
+import { reelPublicacion } from "./reel-publicacion";
+import type { PublicacionProgramada } from "./calendario";
 import { privacidadYoutube, subirShort, youtubeConectado } from "./youtube";
 
 /**
@@ -67,4 +69,27 @@ export async function shortDelDia(admin: SupabaseClient<Database>, fecha = fecha
     subirShort(admin, await reelCartaDelDia(admin, fecha), { titulo: `Carta del día: ${carta.nombre} ✨ | Tarot`, descripcion: textoShortYoutube(fecha), privacidad: privacidadYoutube() }),
   );
   return { fecha, youtube };
+}
+
+/**
+ * Segundo Short del día en YouTube: la publicación del agente de redes de hoy
+ * (guía, luna, signo, oferta…) con su reel narrado. Solo si ya está aprobada;
+ * se sube una vez aunque la rutina corra por la mañana y al mediodía.
+ */
+export async function shortPublicacionDelDia(admin: SupabaseClient<Database>, fecha = fechaBogota()) {
+  if (process.env.REDES_YOUTUBE === "0") return { apagado: true };
+  if (!(await youtubeConectado(admin))) return { fecha, youtube: sinConfigurar };
+  const { data: fila } = await admin
+    .from("publicaciones_programadas")
+    .select("*")
+    .eq("fecha", fecha)
+    .in("estado", ["aprobada", "publicando", "publicada"])
+    .order("creado_en", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (!fila) return { fecha, youtube: { omitida: "sin_publicacion_aprobada" } as Resultado };
+  const p = fila as PublicacionProgramada;
+  const { titulo, descripcion } = textoShortPublicacion(p);
+  const youtube = await publicarUnaVez(admin, "youtube", "publicacion", fecha, async () => subirShort(admin, await reelPublicacion(admin, p), { titulo, descripcion, privacidad: privacidadYoutube() }), { publicacion: p.id });
+  return { fecha, publicacion: p.id, youtube };
 }

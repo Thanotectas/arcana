@@ -294,6 +294,17 @@ YouTube Data API v3 habilitada, pantalla de consentimiento externa **publicada**
 - Sin la auditoría de Google (YouTube API Services), lo subido por API queda privado aunque
   se pida público. Cupo: unas 6 subidas por día (1.600 de 10.000 unidades cada una).
 
+### Dos Shorts al día (20 oct 2026)
+
+Además de la carta del día (mediodía), `/api/cron/youtube?que=publicacion` sube por la mañana la
+publicación del agente de hoy (guía, luna, signo, oferta…) con su reel narrado, si ya está
+aprobada; si se aprueba después, la corrida del mediodía la sube. Registro en `publicaciones_redes`
+(red `youtube`, tipo `publicacion`, migración 0037). Título y descripción: `textoShortPublicacion`,
+con el enlace de la publicación convertido a `https://miarcana.com/yt/...`. El nombre del reel de
+una publicación ahora depende de su contenido (no de `actualizado_en`): aprobar o publicar no lo
+regenera, editarla sí. Los correos de campaña llevan el botón «Suscríbete al canal de YouTube»
+(`/suscribete`, que abre el canal con el aviso de suscripción).
+
 ## Sibila en vivo (20 oct 2026)
 
 Directos de YouTube donde Sibila lee en voz alta. Piezas:

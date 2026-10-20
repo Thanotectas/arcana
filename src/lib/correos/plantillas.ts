@@ -94,6 +94,9 @@ export function correoCampana(d: DatosCorreo): CorreoArmado {
 <tr><td align="center" style="padding:26px 28px 8px;">
   <a href="${urlCarta}" style="display:inline-block;background:${ORO};color:${NOCHE};font:700 15px/1 Inter,Arial,sans-serif;text-decoration:none;padding:15px 30px;border-radius:999px;">${escaparHtml(t.correos.boton)}</a>
 </td></tr>
+<tr><td align="center" style="padding:10px 28px 0;">
+  <a href="${base}/suscribete" style="display:inline-block;border:1px solid rgba(217,180,90,0.6);color:${ORO_SUAVE};font:600 13px/1.3 Inter,Arial,sans-serif;text-decoration:none;padding:11px 22px;border-radius:999px;">▶ ${escaparHtml(t.correos.youtube)}</a>
+</td></tr>
 ${d.oferta ? `<tr><td align="center" style="padding:6px 28px 0;"><p style="margin:0;display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(217,180,90,0.6);font:600 13px/1.4 Inter,Arial,sans-serif;color:${ORO_SUAVE};">${escaparHtml(d.oferta)}</p></td></tr>` : ""}
 <tr><td align="center" style="padding:14px 28px 26px;">
   <p style="margin:0;font:13px/1.8 Inter,Arial,sans-serif;color:${TEXTO_SUAVE};">${escaparHtml(t.correos.tambien)}:
@@ -119,6 +122,7 @@ ${d.oferta ? `<tr><td align="center" style="padding:6px 28px 0;"><p style="margi
     "",
     `${plantilla(t.correos.hoySalio, { carta: carta.nombre })} (${nombreMazo})${significado ? `: ${significado}` : ""}`,
     `${t.correos.boton}: ${urlCarta}`,
+    `${t.correos.youtube}: ${base}/suscribete`,
     ...(d.oferta ? ["", d.oferta] : []),
     "",
     `${t.correos.tambien}:`,

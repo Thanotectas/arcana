@@ -2,6 +2,7 @@ import "server-only";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { simboloDataUri } from "@/lib/marca/simbolo";
@@ -146,7 +147,10 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
  */
 export async function reelPublicacion(admin: SupabaseClient<Database>, p: Datos, opciones: { regenerar?: boolean } = {}): Promise<string> {
   await asegurarBucket(admin);
-  const nombre = `pub-${p.id}-${Math.floor(Date.parse(p.actualizado_en) / 1000)}.mp4`;
+  // El nombre depende del contenido: editar la publicación regenera el video;
+  // cambiar solo su estado (aprobar, publicar) no.
+  const huella = createHash("sha1").update(JSON.stringify([p.etiqueta, p.titulo, p.extracto, p.enlace, p.pie, p.carta, p.simbolos])).digest("hex").slice(0, 10);
+  const nombre = `pub-${p.id}-${huella}.mp4`;
   const ruta = `reels/${nombre}`;
   const { data: url } = admin.storage.from(BUCKET).getPublicUrl(ruta);
   if (!opciones.regenerar) {

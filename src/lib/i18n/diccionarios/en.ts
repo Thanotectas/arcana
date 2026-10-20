@@ -886,6 +886,7 @@ export const en: Diccionario = {
     },
     boton: "See your card of the day",
     tambien: "You can also",
+    youtube: "Subscribe on YouTube: the card of the day on video and Sibila live",
     enlaces: { hoy: "See your sky today", suenos: "Interpret a dream", explorar: "Explore the 17 readings" },
     porque: "You receive this email because you have an Arcana account.",
     baja: "Stop receiving emails",

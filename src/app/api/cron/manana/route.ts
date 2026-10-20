@@ -6,13 +6,14 @@ export const maxDuration = 300;
 /**
  * Orquestador de la mañana (vercel.json, 12:00 UTC = 07:00 Bogotá): mensajes
  * del Círculo y avisos push, carta del día en redes (y borradores del agente),
- * su historia, el kit de TikTok con los videos de ayer, correos de campaña y,
- * los lunes, el estado del negocio y el carrusel semanal de signos.
+ * su historia, el kit de TikTok con los videos de ayer, correos de campaña, el
+ * Short de la publicación del agente en YouTube y, los lunes, el estado del
+ * negocio y el carrusel semanal de signos.
  */
 export async function GET(request: Request) {
   const rechazo = cronAutorizado(request);
   if (rechazo) return rechazo;
   const esLunes = new Date(`${fechaBogota()}T12:00:00Z`).getUTCDay() === 1;
-  const rutas = ["/api/cron/diario", "/api/cron/instagram", "/api/cron/historia", "/api/cron/kit-tiktok", "/api/cron/correos", ...(esLunes ? ["/api/cron/resumen", "/api/cron/carrusel"] : [])];
+  const rutas = ["/api/cron/diario", "/api/cron/instagram", "/api/cron/historia", "/api/cron/kit-tiktok", "/api/cron/correos", "/api/cron/youtube?que=publicacion", ...(esLunes ? ["/api/cron/resumen", "/api/cron/carrusel"] : [])];
   return respuestaOrquestador(await ejecutarRutas(request, rutas));
 }

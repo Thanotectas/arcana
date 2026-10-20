@@ -885,6 +885,7 @@ export const es = {
     },
     boton: "Mira tu carta de hoy",
     tambien: "También puedes",
+    youtube: "Suscríbete al canal de YouTube: la carta del día en video y Sibila en vivo",
     enlaces: { hoy: "Ver tu cielo de hoy", suenos: "Interpretar un sueño", explorar: "Explorar las 17 lecturas" },
     porque: "Recibes este correo porque tienes una cuenta en Arcana.",
     baja: "Dejar de recibir correos",
