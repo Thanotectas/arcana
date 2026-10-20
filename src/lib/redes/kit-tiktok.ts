@@ -30,7 +30,7 @@ export function textoCarta(fecha: string) {
     "",
     frase(c.significado, 160),
     "",
-    "¿Qué carta te salió a ti? Sácala gratis en miarcana.com (link en el perfil)",
+    "¿Qué carta te salió a ti? Sácala gratis en miarcana.com/tt (link en el perfil)",
     "",
     `#tarot #cartadeldia #tarotenespañol #${mazo === "arcana" ? "tarotarcana" : MAZOS[mazo].nombre.toLowerCase().replace(/[^a-z]/g, "")} #espiritualidad #fyp`,
   ].join("\n");

@@ -10,6 +10,7 @@ import { getSupabaseAdmin } from "../supabase/admin";
 import { comprasVisibles } from "../plataforma";
 import { cookies } from "next/headers";
 import { COOKIE_CODIGO, validarCodigo } from "./codigos";
+import { origenPendiente } from "../origen";
 
 /** Código de oferta del formulario o de la cookie del enlace corto; si vale para el paquete, créditos extra. */
 async function extrasPorCodigo(paquete: string) {
@@ -40,6 +41,7 @@ export async function accionComprar(formData: FormData) {
 
   const referencia = nuevaReferencia(user.id);
   const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
+  const origen = (await origenPendiente())?.fuente;
 
   // La orden la crea el servidor (como la internacional): con un código válido
   // lleva créditos extra, y la política de la tabla solo admite las cantidades
@@ -53,6 +55,7 @@ export async function accionComprar(formData: FormData) {
     referencia,
     estado: "pendiente",
     codigo,
+    ...(origen ? { origen } : {}),
   });
   if (error) {
     console.error("[pagos] no se pudo crear la orden", error);
@@ -83,6 +86,7 @@ export async function accionComprarInternacional(formData: FormData) {
   const referencia = nuevaReferencia(user.id);
   const admin = getSupabaseAdmin();
   const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
+  const origen = (await origenPendiente())?.fuente;
   const { error } = await admin.from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
@@ -92,6 +96,7 @@ export async function accionComprarInternacional(formData: FormData) {
     referencia,
     estado: "pendiente",
     codigo,
+    ...(origen ? { origen } : {}),
   });
   if (error) {
     console.error("[pagos] no se pudo crear la orden internacional", error);

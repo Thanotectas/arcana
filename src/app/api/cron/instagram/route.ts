@@ -71,7 +71,8 @@ export async function GET(request: Request) {
   const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
   const imagen = `${sitio}/api/redes/carta-dia?fecha=${fecha}`;
   const carta = cartaDelDia(fecha);
-  const texto = textoCartaDelDia(fecha);
+  const texto = textoCartaDelDia(fecha, "instagram");
+  const textoFacebook = textoCartaDelDia(fecha, "facebook");
   const admin = getSupabaseAdmin();
 
   // La carta del día sale como reel (video corto). Se genera una sola vez, solo
@@ -94,7 +95,7 @@ export async function GET(request: Request) {
     ? await publicarEn(admin, "instagram", fecha, () => conRespaldo("instagram", (url) => publicarReel(url, texto), () => publicarImagen(imagen, texto)))
     : { omitida: "sin_configurar" };
   const facebook: Resultado = facebookConfigurado()
-    ? await publicarEn(admin, "facebook", fecha, () => conRespaldo("facebook", (url) => publicarVideoFacebook(url, texto), () => publicarFotoFacebook(imagen, texto)))
+    ? await publicarEn(admin, "facebook", fecha, () => conRespaldo("facebook", (url) => publicarVideoFacebook(url, textoFacebook), () => publicarFotoFacebook(imagen, textoFacebook)))
     : { omitida: "sin_configurar" };
 
   // Agente de redes: la corrida de la tarde (17:00 UTC = mediodía en Bogotá)

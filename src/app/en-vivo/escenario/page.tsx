@@ -14,7 +14,7 @@ export default async function PaginaEscenario({ searchParams }: { searchParams: 
   if (!claveValida(clave ?? null)) {
     return <p className="p-10 text-center text-texto-suave">Falta la clave del escenario: copia la dirección completa desde /admin/en-vivo.</p>;
   }
-  const qr = await QRCode.toString(`${sitio()}/vivo`, { type: "svg", margin: 1, color: { dark: "#0b0716", light: "#f1d99a" } });
+  const qr = await QRCode.toString(`${sitio()}/yt/vivo`, { type: "svg", margin: 1, color: { dark: "#0b0716", light: "#f1d99a" } });
   // Retrato realista (public/marca/sibila/{base,habla,ojos}.jpg); si falta alguno, el rostro vectorial.
   let retrato: string | null = null;
   try {

@@ -23,6 +23,9 @@ type PerfilRow = {
   circulo_hasta: string | null;
   bienvenida_dada: boolean;
   recibe_correos: boolean;
+  /** Red por la que llegó al registrarse (youtube, instagram, tiktok, …); null si no se supo. */
+  origen: string | null;
+  origen_detalle: string | null;
   creado_en: string;
   actualizado_en: string;
 };
@@ -76,6 +79,8 @@ type OrdenRow = {
   es_prueba: boolean;
   /** Código de oferta aplicado (créditos extra ya sumados en `creditos`). */
   codigo: string | null;
+  /** Red de la cookie de origen al comprar; null si no la había. */
+  origen: string | null;
   creado_en: string;
   actualizado_en: string;
 };
@@ -362,7 +367,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "recibe_correos" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "recibe_correos" | "origen" | "origen_detalle" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -380,7 +385,7 @@ export type Database = {
       };
       ordenes: {
         Row: OrdenRow;
-        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "es_prueba" | "codigo" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<OrdenRow, "id" | "moneda" | "estado" | "transaccion_id" | "metodo_pago" | "es_prueba" | "codigo" | "origen" | "creado_en" | "actualizado_en">;
         Update: Partial<OrdenRow>;
         Relationships: [];
       };

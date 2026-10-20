@@ -99,10 +99,15 @@ function fechaLarga(fecha: string) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-/** Texto de la publicación (Instagram admite hasta 2.200 caracteres). */
-export function textoCartaDelDia(fecha: string) {
+/**
+ * Texto de la publicación (Instagram admite hasta 2.200 caracteres). El enlace
+ * corto de cada red (miarcana.com/ig, /fb) deja registrado por dónde llegó la
+ * persona; en Instagram no es clicable, así que además remite a la biografía.
+ */
+export function textoCartaDelDia(fecha: string, red: "instagram" | "facebook" = "instagram") {
   const c = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
+  const enlace = red === "facebook" ? "https://miarcana.com/fb" : "miarcana.com/ig (enlace en la biografía)";
   return [
     `✨ Carta del día · ${fechaLarga(fecha)}`,
     `${c.nombre}${mazo === "arcana" ? " · Tarot Arcana, nuestro mazo propio" : ` · ${MAZOS[mazo].nombre}`}`,
@@ -114,8 +119,8 @@ export function textoCartaDelDia(fecha: string) {
     "",
     `Palabras clave: ${c.palabrasClave.slice(0, 3).join(" · ")}`,
     "",
-    "🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en miarcana.com (enlace en la biografía).",
-    `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)} en miarcana.com.`,
+    `🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en ${enlace}.`,
+    `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}.`,
     "",
     "💬 Comenta tu signo y Sibila te responde.",
     "",
@@ -123,4 +128,21 @@ export function textoCartaDelDia(fecha: string) {
   ]
     .join("\n")
     .slice(0, 2200);
+}
+
+/** Descripción del Short de YouTube: ahí el enlace sí es clicable, y miarcana.com/yt registra el origen. */
+export function textoShortYoutube(fecha: string) {
+  const c = cartaDelDia(fecha);
+  const mazo = mazoDelDia(fecha);
+  return [
+    `Carta del día · ${fechaLarga(fecha)}: ${c.nombre} (${mazo === "arcana" ? "Tarot Arcana" : MAZOS[mazo].nombre}).`,
+    "",
+    frase(c.significado, 320),
+    "",
+    "🔮 Saca tu carta del día gratis: https://miarcana.com/yt",
+    `✨ Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}: https://miarcana.com/yt/tarot`,
+    "",
+    "Lecturas de entretenimiento y reflexión personal.",
+    "#Shorts #tarot #cartadeldia #tarotenespañol #espiritualidad",
+  ].join("\n");
 }

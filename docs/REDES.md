@@ -337,3 +337,25 @@ escrito en /creditos. Se administran en /admin/en-vivo. El código vigente lo di
 en las frases del directo (`frasesPuente`, con el precio de la tirada de prueba en
 palabras). Semilla: `SIBILA` (+2, cupo 100, vence el 25 oct 2026 a medianoche).
 
+## Por dónde llegan (20 oct 2026)
+
+Las vistas no dicen qué red trae cuentas y pagos; esto sí. Migración `0035_origen.sql`
+(`perfiles.origen`, `perfiles.origen_detalle`, `ordenes.origen`).
+
+- **Cómo se mide.** El proxy (`src/proxy.ts`) guarda la cookie `arcana_origen` (30 días) la
+  primera vez que alguien entra con `utm_source` o con `Referer` de una red conocida
+  (`src/lib/origen/comun.ts`: YouTube, Instagram, TikTok, Facebook, WhatsApp, X, Pinterest,
+  Google, Bing). Los enlaces cortos **miarcana.com/yt, /ig, /tt, /fb, /wa** (y `/yt/rituales`,
+  `/yt/vivo`, etc.) la guardan aunque no haya Referer. El código de oferta (`/c/SIBILA`)
+  marca `youtube · en-vivo` si la persona no traía origen. Siempre gana la primera red
+  (primer contacto): quien ya tenía cuenta no cambia de origen.
+- **Dónde queda.** Al crear la cuenta (registro con correo, Google o enlace de confirmación)
+  `registrarOrigenPendiente` escribe `perfiles.origen` si el perfil es de ese día. Cada orden
+  guarda la cookie del momento en `ordenes.origen`.
+- **Dónde se ve.** Bloque «Por dónde llegan» en `/admin/resumen` y en el correo del lunes:
+  cuentas nuevas y pagos de la semana por red (los pagos se atribuyen al origen del perfil).
+- **Qué enlace usar en cada sitio.** Biografía de Instagram: `miarcana.com/ig`. Perfil de
+  TikTok: `miarcana.com/tt`. Descripción de los Shorts: `https://miarcana.com/yt` (lo pone
+  `textoShortYoutube`). Página de Facebook: `https://miarcana.com/fb`. Estados y mensajes de
+  WhatsApp: `miarcana.com/wa`. El QR del escenario en vivo apunta a `/yt/vivo`. Para campañas
+  puntuales sirve cualquier enlace con `?utm_source=…&utm_medium=…&utm_campaign=…`.

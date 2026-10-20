@@ -39,8 +39,13 @@ export interface ResumenSemanal {
     rendimiento: { porTipo: PromedioTipo[]; mejor: { tipo: string; red: string; fecha: string; vistas: number | null; interacciones: number } | null; interaccionesTotal: number; vistasTotal: number };
     sibila: { respondidas: number; humano: number; visitantes: number };
   };
+  /** Por dónde llegan: origen (red) de las cuentas nuevas y de quienes pagaron en la semana. */
+  origenes: { cuentas: { origen: string; n: number }[]; sinOrigen: number; pagos: { origen: string; n: number; cop: number; usdCentavos: number }[] };
   alertas: string[];
 }
+
+export const NOMBRE_ORIGEN: Record<string, string> = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", whatsapp: "WhatsApp", google: "Google", bing: "Bing", x: "X", pinterest: "Pinterest", desconocido: "Sin origen conocido" };
+export const nombreOrigen = (o: string) => NOMBRE_ORIGEN[o] ?? o.charAt(0).toUpperCase() + o.slice(1);
 
 const DIA = 86_400_000;
 
@@ -98,7 +103,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
 
   const { data: ordenes, error: errorOrdenes } = await admin
     .from("ordenes")
-    .select("paquete, monto_centavos, moneda, creado_en")
+    .select("usuario_id, paquete, monto_centavos, moneda, creado_en")
     .eq("estado", "aprobada")
     .eq("es_prueba", false)
     .gte("creado_en", iso(desdeAnterior))
@@ -132,6 +137,35 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   const mejor = [...(metricas ?? [])].sort((a, b) => interacciones(b) - interacciones(a) || (b.vistas ?? 0) - (a.vistas ?? 0))[0];
   const borradores = (agente ?? []).filter((p) => p.estado === "borrador" && p.fecha >= hoy).length;
 
+  // Por dónde llegan (migración 0035): origen de las cuentas nuevas y, para los
+  // pagos, el origen del perfil de quien compró. Si la columna no existe aún, se omite.
+  const origenes: ResumenSemanal["origenes"] = { cuentas: [], sinOrigen: 0, pagos: [] };
+  try {
+    const { data: nuevasFilas, error: errorOrigen } = await admin.from("perfiles").select("origen").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+    if (errorOrigen) throw new Error(errorOrigen.message);
+    const cuentasMapa = new Map<string, number>();
+    for (const p of nuevasFilas ?? []) {
+      if (p.origen) cuentasMapa.set(p.origen, (cuentasMapa.get(p.origen) ?? 0) + 1);
+      else origenes.sinOrigen++;
+    }
+    origenes.cuentas = [...cuentasMapa.entries()].map(([origen, n]) => ({ origen, n })).sort((a, b) => b.n - a.n);
+    const compradores = [...new Set(ventasSemana.map((o) => o.usuario_id))];
+    const { data: perfilesCompradores } = compradores.length ? await admin.from("perfiles").select("id, origen").in("id", compradores) : { data: [] };
+    const origenDe = new Map((perfilesCompradores ?? []).map((p) => [p.id, p.origen ?? "desconocido"]));
+    const pagosMapa = new Map<string, { n: number; cop: number; usdCentavos: number }>();
+    for (const o of ventasSemana) {
+      const k = origenDe.get(o.usuario_id) ?? "desconocido";
+      const acum = pagosMapa.get(k) ?? { n: 0, cop: 0, usdCentavos: 0 };
+      acum.n++;
+      if (o.moneda === "COP") acum.cop += Math.round(o.monto_centavos / 100);
+      else acum.usdCentavos += o.monto_centavos;
+      pagosMapa.set(k, acum);
+    }
+    origenes.pagos = [...pagosMapa.entries()].map(([origen, v]) => ({ origen, ...v })).sort((a, b) => b.n - a.n);
+  } catch (e) {
+    console.error("[resumen] origenes:", e instanceof Error ? e.message : e);
+  }
+
   const resumen: ResumenSemanal = {
     desde,
     hasta,
@@ -163,6 +197,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
       },
       sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length, visitantes: visitantes ?? 0 },
     },
+    origenes,
     alertas: [],
   };
 
@@ -191,6 +226,19 @@ function usd(centavos: number) {
   return `US$ ${(centavos / 100).toFixed(2)}`;
 }
 
+/** Cuentas nuevas y pagos de la semana por red de origen (enlaces cortos /yt /ig /tt /fb /wa, utm o Referer). */
+function filasOrigenes(r: ResumenSemanal): [string, string, string?][] {
+  const redes = [...new Set([...r.origenes.cuentas.map((c) => c.origen), ...r.origenes.pagos.map((p) => p.origen)])].filter((o) => o !== "desconocido");
+  if (!redes.length && !r.origenes.sinOrigen && !r.origenes.pagos.length) return [["Sin datos todavía", "—", "se mide desde el 20 de octubre"]];
+  const pagoDe = (o: string) => r.origenes.pagos.find((p) => p.origen === o);
+  const detallePago = (p?: { n: number; cop: number; usdCentavos: number }) =>
+    p ? `${p.n} pago${p.n === 1 ? "" : "s"}${p.cop ? ` · ${formatoCOP(p.cop)}` : ""}${p.usdCentavos ? ` · ${usd(p.usdCentavos)}` : ""}` : "sin pagos";
+  const filas: [string, string, string?][] = redes.map((o) => [nombreOrigen(o), `${r.origenes.cuentas.find((c) => c.origen === o)?.n ?? 0} cuentas`, detallePago(pagoDe(o))]);
+  const desconocido = pagoDe("desconocido");
+  filas.push(["Sin origen conocido", `${r.origenes.sinOrigen} cuentas`, desconocido ? detallePago(desconocido) : "entraron directo o antes de medir"]);
+  return filas;
+}
+
 /** Filas (etiqueta, valor, comparación) de cada bloque del resumen. */
 export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [string, string, string?][] }[] {
   return [
@@ -214,6 +262,10 @@ export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [strin
         ...r.ventas.porPaquete.map((p): [string, string] => [`  ${p.paquete}`, String(p.n)]),
         ["Fundadores", r.ventas.fundadores.activa ? `${r.ventas.fundadores.vendidos} de ${OFERTA_FUNDADORES.cupo} vendidos` : "terminada", r.ventas.fundadores.activa ? `${r.ventas.fundadores.diasRestantes} días restantes` : undefined],
       ],
+    },
+    {
+      titulo: "Por dónde llegan",
+      filas: filasOrigenes(r),
     },
     {
       titulo: "Lecturas",

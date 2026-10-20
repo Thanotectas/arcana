@@ -5,6 +5,7 @@
  */
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { COOKIE_ORIGEN, OPCIONES_COOKIE_ORIGEN, detectarOrigen, serializarOrigen } from "@/lib/origen/comun";
 
 const RUTAS_PRIVADAS = [
   "/tarot",
@@ -57,6 +58,12 @@ export async function proxy(request: NextRequest) {
   const app = request.nextUrl.searchParams.get("app");
   if (app === "android" || app === "pwa") {
     response.cookies.set("plataforma", app, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax", httpOnly: true, secure: process.env.NODE_ENV === "production" });
+  }
+  // Por dónde llegó la persona (utm_source o el Referer de una red conocida):
+  // se guarda la primera vez, 30 días, y al registrarse queda en el perfil.
+  if (!request.cookies.get(COOKIE_ORIGEN)?.value) {
+    const origen = detectarOrigen(request.nextUrl.searchParams, request.headers.get("referer"));
+    if (origen) response.cookies.set(COOKIE_ORIGEN, serializarOrigen(origen), { ...OPCIONES_COOKIE_ORIGEN, secure: process.env.NODE_ENV === "production" });
   }
   const esPrivada = RUTAS_PRIVADAS.some(
     (r) => pathname === r || pathname.startsWith(r + "/"),

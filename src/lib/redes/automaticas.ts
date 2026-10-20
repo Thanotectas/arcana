@@ -8,7 +8,7 @@ import { contenidoGuardado, redactarCarrusel, semanaDelCarrusel, urlsLaminas } f
 import { enviarKitTiktok, piezasDelDia } from "./kit-tiktok";
 import { cartaDelDia, fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
-import { textoCarta } from "./kit-tiktok";
+import { textoShortYoutube } from "./carta-dia";
 import { privacidadYoutube, subirShort, youtubeConectado } from "./youtube";
 
 /**
@@ -64,7 +64,7 @@ export async function shortDelDia(admin: SupabaseClient<Database>, fecha = fecha
   if (!(await youtubeConectado(admin))) return { fecha, youtube: sinConfigurar };
   const carta = cartaDelDia(fecha);
   const youtube = await publicarUnaVez(admin, "youtube", "carta_dia", fecha, async () =>
-    subirShort(admin, await reelCartaDelDia(admin, fecha), { titulo: `Carta del día: ${carta.nombre} ✨ | Tarot`, descripcion: textoCarta(fecha), privacidad: privacidadYoutube() }),
+    subirShort(admin, await reelCartaDelDia(admin, fecha), { titulo: `Carta del día: ${carta.nombre} ✨ | Tarot`, descripcion: textoShortYoutube(fecha), privacidad: privacidadYoutube() }),
   );
   return { fecha, youtube };
 }

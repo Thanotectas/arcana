@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { createClient } from "../supabase/server";
 import { aplicarInvitacionPendiente } from "../invitaciones";
+import { registrarOrigenPendiente } from "../origen";
 import { rutaInterna, zonaHorariaValida } from "../seguridad";
 
 export interface EstadoAuth {
@@ -85,6 +86,7 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
   }
   if (data.session) {
     await aplicarInvitacionPendiente();
+    await registrarOrigenPendiente(data.session.user.id);
     redirect("/inicio");
   }
   return { mensaje: "revisaCorreo" };
