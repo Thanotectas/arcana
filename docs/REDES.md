@@ -339,7 +339,7 @@ palabras). Semilla: `SIBILA` (+2, cupo 100, vence el 25 oct 2026 a medianoche).
 
 ## Por dónde llegan (20 oct 2026)
 
-Las vistas no dicen qué red trae cuentas y pagos; esto sí. Migración `0035_origen.sql`
+Las vistas no dicen qué red trae cuentas y pagos; esto sí. Migración `0036_origen.sql`
 (`perfiles.origen`, `perfiles.origen_detalle`, `ordenes.origen`).
 
 - **Cómo se mide.** El proxy (`src/proxy.ts`) guarda la cookie `arcana_origen` (30 días) la
