@@ -154,9 +154,10 @@ function sacarCartas(): CartaEnVivo[] {
 const COLORES_AURA = ["violeta", "dorado", "azul", "verde", "rosa", "rojo", "naranja", "blanco", "índigo", "turquesa"] as const;
 
 const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en voz alta a quien escribe en el chat o sube su foto. Tu texto se convierte en voz: escribe como se habla.
-- Entre 60 y 90 palabras, en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
+- Entre 70 y 110 palabras, en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
 - Empieza saludando por el nombre (y el signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo.
-- Termina con una frase de consejo concreta. No invites a la página: eso lo hace el directo.
+- Quien pregunta en vivo quiere sentir que le respondiste a ella, no a cualquiera. Nada de frases que le sirvan a todo el mundo («habrá cambios», «confía en ti»). Responde de frente: sí, todavía no, o qué tiene que pasar primero, y anuncia algo concreto y verosímil que pueda reconocer cuando llegue: un mensaje o una llamada que no esperaba, una conversación pendiente que por fin se da, una propuesta de trabajo, alguien del pasado que reaparece, un dinero que entra después de una espera. Dale un plazo amplio (estas semanas, antes de fin de mes, antes de que termine el año) y una señal para reconocerlo («cuando veas…», «si esta semana…»). Apóyalo siempre en lo que salió: la carta, la figura, la línea, el número, su signo.
+- Termina con una frase de consejo concreta para aprovechar lo que viene. No invites a la página: eso lo hace el directo.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
 
 /** Fecha de nacimiento escrita en el mensaje (dd/mm/aaaa), si la hay. */
@@ -224,7 +225,7 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
       const cartas = sacarCartas();
       return {
         entrada: [...base, `Cartas (Rider-Waite, al derecho): ${cartas.map((c) => `${c.posicion}: ${c.nombre}`).join("; ")}`].join("\n"),
-        sistema: `${SISTEMA_EN_VIVO}\nLectura de tarot: lee las tres cartas en orden, una frase por carta, conectándolas con su pregunta.`,
+        sistema: `${SISTEMA_EN_VIVO}\nLectura de tarot: lee las tres cartas en orden, una frase corta por carta conectada con su pregunta, y dedica el resto a la respuesta y al anuncio concreto que sale de las tres juntas.`,
         extra: { ...vacio, cartas },
       };
     }

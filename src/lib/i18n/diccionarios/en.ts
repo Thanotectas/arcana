@@ -919,6 +919,95 @@ export const en: Diccionario = {
     hacerLectura: "Get the reading",
     verGuia: "How is it prepared? See the guide",
     otras: "Other guides",
+    atraer: {
+      "titulo": "Rituals to attract",
+      "intro": "The ones people ask for most: love, work, abundance, protection, letting go and calm. Each one with its candle, its day, its moon phase and the steps. When the candle burns out, photograph what is left and Sibila tells you how your intention is going.",
+      "necesitas": "You need",
+      "frase": "Your phrase",
+      "senal": "Sign it is going well",
+      "cuando": "When",
+      "cta": "Do the ritual and read your candle",
+      "temas": {
+        "amor": {
+          "titulo": "Attract love",
+          "para": "To attract a new relationship, rekindle the one you have or reconcile.",
+          "materiales": "Pink (or red) candle, a piece of paper, honey or sugar, rose petals or cinnamon.",
+          "pasos": [
+            "Write how you want to feel in love, in the present tense: \"I live a mutual, peaceful love\". Do not write another person's name: the ritual attracts, it does not bind.",
+            "Anoint the candle from base to wick with a few drops of honey or oil and surround it with petals or cinnamon.",
+            "Light it on the day and phase shown, read your phrase three times and leave the folded paper under the plate.",
+            "When it burns out, keep the paper on your nightstand until the next full moon."
+          ],
+          "fraseTexto": "I open myself to a love that chooses me as clearly as I choose.",
+          "senalTexto": "A tall, lively flame, wax running to one side or a heart shape in the remains."
+        },
+        "trabajo": {
+          "titulo": "Attract work",
+          "para": "To find a job or clients, or for an interview or project to go well.",
+          "materiales": "Orange (or yellow) candle, your résumé or a card with your name, a bay leaf.",
+          "pasos": [
+            "Write the job you want with concrete details: what you do, how you feel, how much you earn.",
+            "Put that page (or your résumé) under the plate and the bay leaf next to the candle.",
+            "Light it on the day and phase shown and read your phrase out loud.",
+            "That same day send an application, a message or a proposal: the ritual opens the way, you take the step."
+          ],
+          "fraseTexto": "The work meant for me finds me, and my doors are open to receive it.",
+          "senalTexto": "A steady flame that rises, an even burn and clean remains. A work message or call in the following days."
+        },
+        "abundancia": {
+          "titulo": "Attract abundance and money",
+          "para": "For money to come in, a payment to get unstuck or your sales to grow.",
+          "materiales": "Green (or yellow) candle, three coins, a plate of rice or coffee beans, cinnamon.",
+          "pasos": [
+            "Set the plate with rice, the three coins on top and the candle in the center.",
+            "Anoint the candle with oil and cinnamon, from base to wick.",
+            "Light it on the day and phase shown, thinking of a concrete amount and what you will use it for.",
+            "When it ends, keep one coin in your wallet, another where you keep your money and give the third to someone who needs it."
+          ],
+          "fraseTexto": "Money comes to me through clear paths and stays because I take care of it.",
+          "senalTexto": "A tall, steady flame, cheerful crackling, wax forming round shapes."
+        },
+        "proteccion": {
+          "titulo": "Protection and home cleansing",
+          "para": "To clear the energy of your home and close the door to envy and bad vibes.",
+          "materiales": "White (or blue) candle, a glass of salt water, a sprig of rosemary or rue, incense.",
+          "pasos": [
+            "Open the windows and sweep from the inside toward the door.",
+            "Place the candle next to the glass of salt water and the rosemary.",
+            "Light it on the day and phase shown and walk through the house with the incense, from the back toward the door.",
+            "The next day pour the salt water out of the house."
+          ],
+          "fraseTexto": "My home is clean; only what does me good comes in.",
+          "senalTexto": "Dark smoke at first that later clears: the heaviness was cleansed. Clean white wax at the end."
+        },
+        "cierre": {
+          "titulo": "Let go and close a cycle",
+          "para": "To let go of a relationship, a habit or a stage that is over.",
+          "materiales": "Black (or purple) candle, a piece of paper, a fireproof container.",
+          "pasos": [
+            "Write what you want to let go of and give thanks for what it left you.",
+            "Light the candle on the day and phase shown.",
+            "Burn the paper with the candle flame, inside the container.",
+            "Throw away or bury the ashes far from home and do not look back."
+          ],
+          "fraseTexto": "I release what has fulfilled its time and make room for the new.",
+          "senalTexto": "The candle burns quickly and without tears: the cycle was ready to close."
+        },
+        "calma": {
+          "titulo": "Peace and calm",
+          "para": "To ease the day's anxiety, sleep better or keep a sadness company. If the sadness does not pass, also talk to a professional.",
+          "materiales": "Blue (or white) candle, a chamomile or lavender tea.",
+          "pasos": [
+            "Make the tea and turn off your screens.",
+            "Light the candle on the day and phase shown and breathe slowly while watching the flame.",
+            "Quietly name what weighs on you and, as you exhale, imagine it leaving with the smoke.",
+            "Put it out with wet fingers before sleeping and light it again the next day until it burns out."
+          ],
+          "fraseTexto": "My body rests and my mind finds its calm.",
+          "senalTexto": "A low, still flame: it asks you to slow down. Wax that spills softly."
+        }
+      }
+    },
     guias: {
       chocolate: {
         titulo: "Chocolate reading",

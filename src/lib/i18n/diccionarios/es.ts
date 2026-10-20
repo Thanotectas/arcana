@@ -918,6 +918,95 @@ export const es = {
     hacerLectura: "Hacer la lectura",
     verGuia: "¿Cómo se prepara? Ver la guía",
     otras: "Otras guías",
+    atraer: {
+      "titulo": "Rituales para atraer",
+      "intro": "Los que más nos piden: amor, trabajo, abundancia, protección, soltar y calma. Cada uno con su vela, su día, su fase lunar y los pasos. Cuando la vela se consuma, fotografía los restos y Sibila te dice cómo va tu intención.",
+      "necesitas": "Necesitas",
+      "frase": "Tu frase",
+      "senal": "Señal de que va bien",
+      "cuando": "Cuándo",
+      "cta": "Haz el ritual y lee tu vela",
+      "temas": {
+        "amor": {
+          "titulo": "Atraer el amor",
+          "para": "Para atraer una relación nueva, avivar la que tienes o reconciliarte.",
+          "materiales": "Vela rosa (o roja), un papel, miel o azúcar, pétalos de rosa o canela.",
+          "pasos": [
+            "Escribe en un papel cómo quieres sentirte en el amor, en presente: «Vivo un amor recíproco y tranquilo». No escribas el nombre de otra persona: el ritual atrae, no ata.",
+            "Unge la vela de la base a la mecha con unas gotas de miel o aceite y rodéala de pétalos o canela.",
+            "Enciéndela el día y la fase indicados, lee tu frase tres veces y deja el papel doblado debajo del plato.",
+            "Cuando se consuma, guarda el papel en tu mesa de noche hasta la próxima luna llena."
+          ],
+          "fraseTexto": "Me abro a un amor que me elige con la misma claridad con que yo elijo.",
+          "senalTexto": "Llama alta y viva, cera que corre hacia un solo lado o una figura de corazón en los restos."
+        },
+        "trabajo": {
+          "titulo": "Atraer trabajo",
+          "para": "Para conseguir empleo o clientes, o para que salga bien una entrevista o un proyecto.",
+          "materiales": "Vela naranja (o amarilla), tu hoja de vida o una tarjeta con tu nombre, una hoja de laurel.",
+          "pasos": [
+            "Escribe el trabajo que buscas con detalles concretos: qué haces, cómo te sientes, cuánto ganas.",
+            "Pon esa hoja (o tu hoja de vida) bajo el plato y el laurel junto a la vela.",
+            "Enciéndela el día y la fase indicados y lee tu frase en voz alta.",
+            "Ese mismo día envía una postulación, un mensaje o una propuesta: el ritual abre el camino, el paso lo das tú."
+          ],
+          "fraseTexto": "El trabajo que es para mí me encuentra, y tengo las puertas abiertas para recibirlo.",
+          "senalTexto": "Llama firme que sube, quema pareja y restos limpios. Un mensaje o una llamada de trabajo en los días siguientes."
+        },
+        "abundancia": {
+          "titulo": "Atraer abundancia y dinero",
+          "para": "Para que entre dinero, se destrabe un cobro o crezcan tus ventas.",
+          "materiales": "Vela verde (o amarilla), tres monedas, un plato con arroz o granos de café, canela.",
+          "pasos": [
+            "Pon el plato con arroz, las tres monedas encima y la vela en el centro.",
+            "Unge la vela con aceite y canela, de la base a la mecha.",
+            "Enciéndela el día y la fase indicados pensando en una cifra concreta y en qué la vas a usar.",
+            "Al terminar, guarda una moneda en tu billetera, otra donde guardas el dinero y regala la tercera a alguien que la necesite."
+          ],
+          "fraseTexto": "El dinero llega a mí por caminos claros y se queda porque lo cuido.",
+          "senalTexto": "Llama alta y estable, chisporroteo alegre, cera que forma figuras redondas."
+        },
+        "proteccion": {
+          "titulo": "Protección y limpieza de la casa",
+          "para": "Para limpiar el ambiente de tu casa y cerrarle la puerta a envidias y malas energías.",
+          "materiales": "Vela blanca (o azul), un vaso de agua con sal, una ramita de romero o ruda, incienso.",
+          "pasos": [
+            "Abre las ventanas y barre de adentro hacia la puerta.",
+            "Pon la vela junto al vaso de agua con sal y el romero.",
+            "Enciéndela el día y la fase indicados y recorre la casa con el incienso, desde el fondo hacia la puerta.",
+            "Al día siguiente bota el agua con sal fuera de la casa."
+          ],
+          "fraseTexto": "Mi casa está limpia; aquí solo entra lo que me hace bien.",
+          "senalTexto": "Humo oscuro al principio que luego se aclara: se limpió lo pesado. Cera blanca y limpia al final."
+        },
+        "cierre": {
+          "titulo": "Soltar y cerrar un ciclo",
+          "para": "Para soltar una relación, un hábito o una etapa que ya terminó.",
+          "materiales": "Vela negra (o morada), un papel, un recipiente que resista el fuego.",
+          "pasos": [
+            "Escribe lo que quieres soltar y agradece lo que te dejó.",
+            "Enciende la vela el día y la fase indicados.",
+            "Quema el papel con la llama de la vela, dentro del recipiente.",
+            "Bota o entierra las cenizas lejos de tu casa y no mires atrás."
+          ],
+          "fraseTexto": "Suelto lo que ya cumplió su tiempo y dejo espacio para lo nuevo.",
+          "senalTexto": "La vela se consume rápido y sin lágrimas: el ciclo estaba listo para cerrarse."
+        },
+        "calma": {
+          "titulo": "Paz y calma",
+          "para": "Para bajar la ansiedad del día, dormir mejor o acompañar una tristeza. Si la tristeza no pasa, habla también con un profesional.",
+          "materiales": "Vela azul (o blanca), una infusión de manzanilla o lavanda.",
+          "pasos": [
+            "Prepara la infusión y apaga las pantallas.",
+            "Enciende la vela el día y la fase indicados y respira lento mirando la llama.",
+            "Nombra en voz baja lo que te pesa y, al exhalar, imagina que se va con el humo.",
+            "Apágala con los dedos húmedos antes de dormir y vuelve a encenderla al día siguiente hasta que se consuma."
+          ],
+          "fraseTexto": "Mi cuerpo descansa y mi mente encuentra su calma.",
+          "senalTexto": "Llama baja y quieta: te pide ir despacio. Cera que se derrama suave."
+        }
+      }
+    },
     guias: {
       chocolate: {
         titulo: "Lectura del chocolate",
