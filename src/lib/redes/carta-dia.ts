@@ -13,8 +13,14 @@ import { PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
 const EPOCA = Date.UTC(2026, 0, 1);
 const DELICADO = /salud|enferm|crisis|ruina|p[ée]rdida|traici|duelo|depresi|ansiedad|suicid|violen/i;
 
-/** Mazos que se alternan día a día (todos con ilustración propia). */
-const MAZOS_REDES: IdMazo[] = ["rider", "arcana", "marsella", "angeles"];
+/**
+ * Mazos que se alternan día a día (todos con ilustración propia). Desde el 21
+ * de octubre de 2026 el Oráculo de los Ángeles sale un día sí y otro no: sus
+ * Shorts traen casi el triple de vistas que los de los otros mazos.
+ */
+const MAZOS_ANTES: IdMazo[] = ["rider", "arcana", "marsella", "angeles"];
+const MAZOS_REDES: IdMazo[] = ["angeles", "rider", "angeles", "arcana", "angeles", "marsella"];
+const CAMBIO = "2026-10-21";
 
 const ROTACION: Record<IdMazo, CartaTarot[]> = Object.fromEntries(
   (Object.keys(MAZOS) as IdMazo[]).map((m) => [m, MAZOS[m].cartas.filter((c) => !DELICADO.test(`${frase(c.significado, 320)} ${c.amor} ${c.trabajo}`))]),
@@ -38,17 +44,36 @@ function diasDesdeEpoca(fecha: string) {
   return Math.round((Date.parse(`${fecha}T00:00:00Z`) - EPOCA) / 864e5);
 }
 
-/** Mazo del día: se alternan los mazos con ilustración (Rider-Waite, Tarot Arcana, Marsella, Ángeles). */
-export function mazoDelDia(fecha: string): IdMazo {
+/**
+ * Mazo del día y su turno (el contador propio de ese mazo: los días en que le
+ * ha tocado a él). Al cambiar la rotación, cada mazo sigue contando desde
+ * donde iba, así no repite cartas recientes.
+ */
+function posicion(fecha: string): { mazo: IdMazo; turno: number } {
   const d = diasDesdeEpoca(fecha);
-  return MAZOS_REDES[((d % MAZOS_REDES.length) + MAZOS_REDES.length) % MAZOS_REDES.length];
+  const cambio = diasDesdeEpoca(CAMBIO);
+  if (d < cambio) {
+    const L = MAZOS_ANTES.length;
+    return { mazo: MAZOS_ANTES[((d % L) + L) % L], turno: Math.floor(d / L) };
+  }
+  const L = MAZOS_REDES.length;
+  const desde = d - cambio;
+  const pos = desde % L;
+  const mazo = MAZOS_REDES[pos];
+  const propios = MAZOS_REDES.flatMap((m, i) => (m === mazo ? [i] : []));
+  const antes = MAZOS_ANTES.indexOf(mazo);
+  const previos = antes < 0 ? 0 : Math.max(0, Math.floor((cambio - 1 - antes) / MAZOS_ANTES.length) + 1);
+  return { mazo, turno: previos + Math.floor(desde / L) * propios.length + propios.indexOf(pos) };
+}
+
+/** Mazo del día: Rider-Waite, Tarot Arcana, Marsella y, un día de cada dos, el Oráculo de los Ángeles. */
+export function mazoDelDia(fecha: string): IdMazo {
+  return posicion(fecha).mazo;
 }
 
 export function cartaDelDia(fecha: string): CartaTarot {
-  const mazo = mazoDelDia(fecha);
+  const { mazo, turno } = posicion(fecha);
   const lista = ROTACION[mazo];
-  // Cada mazo lleva su propio contador: los días en que le toca a él.
-  const turno = Math.floor(diasDesdeEpoca(fecha) / MAZOS_REDES.length);
   const n = lista.length;
   const i = (((turno * pasoPara(n)) % n) + n) % n;
   return lista[i];
