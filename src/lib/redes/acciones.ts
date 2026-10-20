@@ -12,6 +12,7 @@ import { metaConfigurado, suscribirPagina } from "./meta";
 import { actualizarMetricas } from "./metricas";
 import { carruselSemanal, historiaDelDia, kitTiktok } from "./automaticas";
 import { probarVoz } from "./voz";
+import { ejecutarRutas } from "@/lib/cron";
 
 export interface EstadoAdminRedes {
   error?: string;
@@ -161,7 +162,7 @@ function describir(r: unknown) {
   return "";
 }
 
-/** Lanza a mano la historia de hoy, el carrusel de la semana o el kit de TikTok (si ya salieron, no se repiten). */
+/** Lanza a mano la carta de hoy, la historia, el carrusel de la semana o el kit de TikTok (si ya salieron, no se repiten). */
 export async function accionAutomatica(_prev: EstadoAdminRedes, formData: FormData): Promise<EstadoAdminRedes> {
   await requerirAdmin();
   const cual = texto(formData, "cual", 20);
@@ -169,7 +170,16 @@ export async function accionAutomatica(_prev: EstadoAdminRedes, formData: FormDa
   try {
     let mensaje: string;
     let hayError = false;
-    if (cual === "historia") {
+    if (cual === "carta") {
+      // La carta del día vive en su ruta de cron (reserva por red y reintento):
+      // se llama igual que lo hace el orquestador, con el secreto.
+      const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
+      const [r] = await ejecutarRutas(new Request(sitio), ["/api/cron/instagram"]);
+      const cuerpo = (r.cuerpo ?? {}) as { carta?: string; instagram?: unknown; facebook?: unknown; error?: string };
+      if (r.estado === 0 || cuerpo.error) return { error: `Carta del día: ${cuerpo.error ?? "no respondió"}` };
+      hayError = [cuerpo.instagram, cuerpo.facebook].some((x) => describir(x).startsWith("error"));
+      mensaje = `Carta de hoy${cuerpo.carta ? ` (${cuerpo.carta})` : ""} · Instagram: ${describir(cuerpo.instagram)} · Facebook: ${describir(cuerpo.facebook)}`;
+    } else if (cual === "historia") {
       const r = await historiaDelDia(admin);
       if ("apagada" in r) return { error: "La historia está apagada (REDES_HISTORIA=0)." };
       hayError = [r.instagram, r.facebook].some((x) => "error" in x);

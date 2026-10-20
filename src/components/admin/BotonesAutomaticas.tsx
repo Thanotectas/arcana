@@ -17,7 +17,7 @@ function Boton({ valor, children }: { valor: string; children: React.ReactNode }
   );
 }
 
-/** Lanzar a mano la historia de hoy, el carrusel de la semana o el kit de TikTok. */
+/** Lanzar a mano la carta de hoy, la historia, el carrusel de la semana o el kit de TikTok. */
 export function BotonesAutomaticas() {
   const [estado, enviar] = useActionState<EstadoAdminRedes, FormData>(accionAutomatica, {});
   return (
@@ -25,6 +25,7 @@ export function BotonesAutomaticas() {
       {estado.error && <Aviso>{estado.error}</Aviso>}
       {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
       <div className="flex flex-wrap gap-2">
+        <Boton valor="carta">Publicar la carta de hoy</Boton>
         <Boton valor="historia">Publicar la historia de hoy</Boton>
         <Boton valor="carrusel">Publicar el carrusel de la semana</Boton>
         <Boton valor="kit">Enviarme el kit de TikTok de hoy</Boton>
