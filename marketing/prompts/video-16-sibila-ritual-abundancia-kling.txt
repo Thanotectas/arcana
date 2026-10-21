@@ -1,0 +1,56 @@
+VIDEO 16 — "SIBILA HACE EL RITUAL DE LA ABUNDANCIA". Kling 4.0 (usar los créditos ya cobrados).
+Es el ritual "Atraer abundancia y dinero" de miarcana.com/rituales: vela verde, tres monedas,
+plato con arroz (o granos de café), aceite y canela; se enciende un JUEVES en luna CRECIENTE.
+Esta vez la que lo hace es Sibila, en su mesa de siempre (la de la pintura).
+
+Estructura (≈ 25 s): 1) Sibila a cámara presenta el ritual (avatar con voz, 5 s) → 2) Sibila hace
+el ritual (video de 15 s, sin hablar, con la voz de Marcela en off) → 3) cierre con QR (lo pongo yo).
+
+==================== PIEZA 1 · AVATAR "SIBILA" (ya creado) ====================
+Avatar: Sibila · Audio: subir el mp3 de Marcela con esta frase (≈ 5 s):
+"Soy Sibila. Hoy te enseño el ritual para atraer abundancia. Es sencillo y funciona mejor un jueves."
+Interpretación del personaje:
+She speaks warmly and with a knowing smile, looking straight into the camera, as if sharing a
+secret, subtle head movement, soft blinking, candlelight on her face. Keep the exact face, veil,
+gold star and oil-painting style.
+
+==================== PIEZA 2 · VIDEO 15 s (Generación de video · Kling 4.0 · Referencia Omni) ====================
+Referencias (Omni): sibila-escena.jpg (la escena y la mesa) + sibila-retrato.jpg (el rostro).
+Ajustes: 1080p · 15 s · 9:16 · 1 (si 15 s no está, 10 s y luego Extend).
+Prompt:
+Oil-painting style, warm candlelight, the same fortune teller from the reference images (long dark
+hair, violet veil, small gold star on her forehead, purple dress with gold embroidery) sits at her
+wooden table at night, a crystal ball and lit candles beside her, a starry window behind.
+Close and medium shots of her hands performing a prosperity ritual, slow and graceful:
+she places a small white plate filled with rice in front of her, sets three gold coins on the
+rice, then rubs a green candle with oil and sprinkles cinnamon on it from the base up to the wick,
+places the green candle in the center of the plate and lights it with a long match. The flame rises
+tall and steady, tiny golden sparks dance around it and the coins glint. She closes her eyes,
+smiles softly and holds her palms open over the candle. Slow camera push-in from her face to the
+flame. Calm, magical, luminous atmosphere. Preserve her exact face and the painting style.
+No text, no letters, no logos.
+Negative prompt: deformed hands, extra fingers, melted face, text, watermark, flicker, style change,
+modern objects, dark horror.
+
+Si los planos se ven muy saltados, alternativa con KEYFRAMES (Kling 4.0 admite hasta 10):
+- Fotograma 1: Sibila con el plato de arroz y tres monedas, vela verde apagada.
+- Fotograma 2: Sibila espolvoreando canela sobre la vela verde.
+- Fotograma 3: la vela verde encendida en el centro del plato, monedas brillando, Sibila con las
+  manos abiertas sobre la llama.
+(Los fotogramas se pueden generar antes como imágenes en Kling con la misma referencia Omni.)
+
+==================== VOZ EN OFF PARA LA PIEZA 2 (ElevenLabs, Marcela, ≈ 15 s) ====================
+"Un plato con arroz, tres monedas encima y una vela verde untada con aceite y canela, de la base a
+la mecha. Enciéndela pensando en una cifra concreta y en qué la vas a usar. Cuando se consuma,
+guarda una moneda en tu billetera, otra donde guardas el dinero, y regala la tercera."
+
+==================== CIERRE (lo agrego yo en el montaje) ====================
+Rótulos: "El ritual de la abundancia" / "Jueves · luna creciente" / "El dinero llega a mí por
+caminos claros y se queda porque lo cuido." Cierre: "Rituales para atraer" + "Fotografía los
+restos de tu vela y Sibila los lee" + QR a miarcana.com/yt/rituales.
+
+==================== SI ALGO SALE MAL ====================
+- Manos deformes: pedir planos más abiertos ("medium shot, hands partially visible") o bajar la
+  creatividad; Kling 4.0 maneja mejor manos en planos medios que en primerísimos planos.
+- Cara distinta a Sibila: subir también el clip del avatar como referencia de video (Omni).
+- La vela sale negra o roja: repetir "a green candle" y agregar en negativo "red candle, black candle".
