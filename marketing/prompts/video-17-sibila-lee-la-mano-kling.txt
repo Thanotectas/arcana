@@ -1,0 +1,50 @@
+VIDEO 17 — "SIBILA LEE LA MANO". Kling 4.0 (mismo flujo del video 16).
+Es la lectura de la mano de miarcana.com/quiromancia: fotografías tu palma y Sibila lee las
+líneas de vida, cabeza, corazón y destino (3 créditos). Y en el directo del domingo se puede
+subir la foto de la mano en miarcana.com/vivo. Gancho: "¿Qué dice tu mano?".
+
+Estructura (≈ 30 s): 1) Sibila a cámara (avatar, ≈ 6 s) → 2) Sibila lee la mano de una consultante
+(video 15 s, voz en off de Marcela) → 3) cierre con QR (lo pongo yo).
+
+==================== PIEZA 1 · AVATAR "SIBILA" ====================
+Audio (ElevenLabs, Marcela, misma configuración: v4 · velocidad 1.00 · estabilidad 50 · similitud 75):
+"¿Sabías que tu mano cuenta tu historia? Ven, déjame leerla."
+Interpretación del personaje:
+She leans slightly toward the camera with a curious, warm smile, as if inviting the viewer to sit
+at her table, then extends one open hand toward the camera. Soft blinking, candlelight on her
+face. Keep the exact face, veil, gold star and oil-painting style.
+
+==================== PIEZA 2 · VIDEO 15 s (Generación de video · Kling 4.0 · Referencia Omni) ====================
+Referencias (Omni): sibila-escena.jpg + sibila-retrato.jpg (y, si quieres, el clip del avatar).
+Ajustes: 1080p · 15 s · 9:16 · 1.
+Prompt:
+Oil-painting style, warm candlelight, the same fortune teller from the reference images (long dark
+hair, violet veil, small gold star on her forehead, purple dress with gold embroidery) sits at her
+wooden table at night with candles and a crystal ball. A young woman's hand rests palm up on a
+velvet cushion in front of her. Sibila gently holds the hand and slowly traces the lines of the
+palm with her index finger; as her finger passes, each line lights up with a thin glowing golden
+trace: first the curved life line around the thumb, then the head line across the middle, then
+the heart line under the fingers. Close-ups of the glowing palm alternate with her face: she looks
+up with a knowing, kind smile. Tiny golden dust floats in the candlelight. Slow camera movement
+from the palm to her face. Calm, magical, luminous atmosphere. Preserve her exact face and the
+painting style. No text, no letters, no symbols on the palm, no logos.
+Negative prompt: deformed hands, extra fingers, six fingers, fused fingers, melted face, text,
+watermark, flicker, style change, tattoo, dark horror.
+
+==================== VOZ EN OFF PARA LA PIEZA 2 (ElevenLabs, Marcela, ≈ 15 s) ====================
+"La línea de la vida habla de tu energía, no de cuántos años vas a vivir. La de la cabeza, de cómo
+piensas y decides. La del corazón, de cómo amas. Toma una foto de tu palma con buena luz, y yo te
+digo lo que veo."
+
+==================== CIERRE (lo agrego yo) ====================
+Rótulos: "¿Qué dice tu mano?" / "Vida · cabeza · corazón · destino" / "Fotografía tu palma y Sibila
+la lee". Cierre: "Lectura de la mano" + "En miarcana.com y este domingo en vivo" + QR a
+miarcana.com/yt/quiromancia.
+
+==================== SI ALGO SALE MAL ====================
+- Manos raras (lo más probable en este video): pedir "medium close-up" en vez de primerísimo
+  primer plano, y repetir en negativo "six fingers, fused fingers"; si una toma sale bien y otra
+  no, me mandas las dos y uso solo los segundos buenos.
+- Las líneas brillan como letras o símbolos: agregar "the glowing lines follow the natural creases
+  of the palm, no symbols".
+- Cara distinta: subir el clip del avatar como referencia de video (Omni).
