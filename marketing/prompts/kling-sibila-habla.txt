@@ -1,0 +1,61 @@
+KLING 4.0 — "SIBILA HABLA" (anuncio del directo con la boca sincronizada). Usar los créditos del
+periodo ya cobrado. Materiales: marketing/imagenes/sibila-escena.jpg (pintura 1920×1080),
+marketing/imagenes/sibila-retrato.jpg (busto 1600×1600) y el mp3 de ElevenLabs (Marcela) con la
+frase. Flujo en Kling: 1) Image to Video con la pintura → clip base donde Sibila mira a cámara;
+2) Lip Sync sobre ese clip con el audio de ElevenLabs; 3) Extend si hace falta llegar a la
+duración del audio. Relación 9:16 para reel (recortar en el montaje si Kling solo da 16:9).
+
+==================== PASO 1 · IMAGE TO VIDEO (clip base, 10 s) ====================
+Imagen: sibila-escena.jpg (o sibila-retrato.jpg para un plano más cerrado; mejor el retrato para
+lip sync, porque la boca queda grande).
+Prompt:
+A warm oil-painting portrait comes to life. A fortune teller with long dark hair, a violet veil
+and a small gold star on her forehead sits at a table with candles and a crystal ball. She looks
+straight into the camera and speaks calmly and kindly, with natural lip movement and subtle head
+motion, soft blinking, gentle breathing. Candle flames flicker, a faint glow pulses in the
+crystal ball, tiny golden dust particles float in the air. Slow, almost imperceptible push-in.
+Preserve the exact face, painting style and colors of the reference image. No text, no
+subtitles, no logos.
+Negative prompt: deformed face, extra fingers, text, watermark, flicker, style change, cartoon.
+Ajustes: Professional mode, 10 s, camera: static or very slow push-in, creativity/relevance
+hacia "relevance" (fiel a la imagen).
+
+==================== PASO 2 · LIP SYNC ====================
+Sobre el clip del paso 1: Lip Sync → "Upload audio" → el mp3 de ElevenLabs. Kling detecta el
+rostro; elige el de Sibila. Idioma: Spanish.
+Frase del audio (la misma del video 12, 10 s):
+"Soy Sibila. Este domingo a las ocho te leo en vivo: escribe tu signo y tu pregunta, o sube la
+foto de tu taza. Te espero en el canal de Arcana en YouTube."
+Si el audio dura más que el clip, primero EXTEND el clip (paso 3) y luego Lip Sync.
+
+==================== PASO 3 · EXTEND (solo si hace falta) ====================
+Prompt del extend: "She keeps speaking to the camera with the same calm expression, same light,
+candles flickering, no camera movement."
+
+==================== VARIANTES PARA OTROS VIDEOS (mismo flujo) ====================
+Ritual de octubre (video 13), 17 s de audio:
+"La Luna llena de octubre llega el lunes veintiséis. Escribe lo que ya cumplió su tiempo, quémalo
+con una vela morada y suelta. Cuando la vela se consuma, fotografía los restos: yo te digo cómo
+va tu intención. Soy Sibila, en mi arcana punto com."
+Atraer trabajo (video 14), 24 s de audio:
+"Si buscas trabajo, enciende una vela naranja con una hoja de laurel y pon debajo del plato lo que
+quieres: qué haces, cómo te sientes, cuánto ganas. Y ese mismo día envía la postulación: el
+ritual abre el camino, el paso lo das tú. Cuando la vela se consuma, fotografía los restos y yo
+te digo cómo va. Soy Sibila, en mi arcana punto com."
+Para estos, generar el clip base de Sibila hablando (paso 1) de 10 s, extender a la duración del
+audio y aplicar Lip Sync; en el montaje va intercalado con los clips del ritual (Sibila 3–4 s al
+inicio y al cierre, el ritual en medio).
+
+==================== ESCENA EN VIVO (para el escenario de OBS, opcional) ====================
+Un clip de 10 s en loop sin audio, de la pintura "respirando" (para reemplazar el retrato fijo):
+"The painting breathes: very subtle idle animation of the fortune teller, slow blinking every few
+seconds, slight head sway, candle flames flickering, crystal ball glowing softly, golden dust.
+Mouth closed, no speech. Static camera, seamless loop. Preserve the exact face and painting
+style." → 16:9, 10 s. Se pone como video en bucle en el escenario cuando Sibila no habla.
+
+==================== SI ALGO SALE MAL ====================
+- Cara cambiada: subir sibila-retrato.jpg como referencia adicional (Omni Reference / Elements)
+  y bajar la creatividad.
+- Boca rara en lip sync: usar el busto (plano cerrado), luz frontal; evitar que la mano tape la
+  boca en el clip base.
+- Kling solo entrega 16:9: me mandas el 16:9 y yo recorto a 9:16 centrado en el rostro.
