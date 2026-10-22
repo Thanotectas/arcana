@@ -354,8 +354,14 @@ function precioHablado(pesos: number) {
 export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
   const prueba = precioHablado(PAQUETE_PRUEBA.precioCOP);
   const paquete = PAQUETES[0];
+  // Un código que es una palabra (SIBILA) se dice como palabra; uno con números o largo se deletrea.
+  const dicho = codigo
+    ? /^[A-Z]{3,8}$/.test(codigo.codigo)
+      ? codigo.codigo.charAt(0) + codigo.codigo.slice(1).toLowerCase()
+      : codigo.codigo.toLowerCase().split("").join(" ")
+    : "";
   const oferta = codigo
-    ? `Y esta noche hay regalo: entra a mi arcana punto com, barra, ce, barra, ${codigo.codigo.toLowerCase().split("").join(" ")}, y cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
+    ? `Y esta noche hay regalo: con el código ${dicho}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
     : "";
   return [
     "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",

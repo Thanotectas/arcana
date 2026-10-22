@@ -387,8 +387,8 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         )}
 
         {/* Subtítulos */}
-        <div className={`absolute bottom-[80px] left-16 flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${escena ? "right-[56px] bg-black/60" : "right-16 bg-black/45"}`}>
-          <p key={subtitulo} className="text-center text-[38px] leading-snug text-texto aparecer">{subtitulo}</p>
+        <div className={`absolute bottom-[80px] left-16 flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${escena ? "right-[770px] bg-black/60" : "right-16 bg-black/45"}`}>
+          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${escena ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
 
         {/* Pie */}
