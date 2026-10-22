@@ -343,7 +343,9 @@ Tras la prueba técnica: `pareceConsulta` acepta preguntas sin «?» («como me 
 «como voy a terminar este mes») con `PREGUNTA_SIN_SIGNO` (cómo/qué + verbo, cuándo, voy a, me ves,
 y temas: amor, trabajo, dinero, examen, este mes…); los comentarios sueltos («qué lindo», «hola a
 todos») no cuentan. Los mensajes de una misma persona (por nombre visible) se juntan en una sola
-consulta mientras espera turno, y si dijo su signo antes esa noche se reutiliza.
+consulta mientras espera turno, y si dijo su signo antes esa noche se reutiliza. Una persona puede
+recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no ha tenido ninguna
+(`siguienteLectura`).
 
 ## Códigos de oferta (20 oct 2026)
 

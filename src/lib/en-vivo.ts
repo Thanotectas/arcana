@@ -315,10 +315,17 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
   await admin.from("en_vivo_preguntas").update({ estado: "pendiente" }).eq("estado", "leyendo").lt("leida_en", new Date(Date.now() - 180_000).toISOString());
 
   for (let intento = 0; intento < 4; intento++) {
-    // Orden: manual, página (fotos), chat; dentro de cada una, la más antigua.
-    const { data: candidatas } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("origen", { ascending: true }).order("creado_en").limit(1);
-    const p = candidatas?.[0];
-    if (!p) return null;
+    // Orden: manual, página (fotos), chat; dentro de cada una, la más antigua. En el
+    // chat pasa primero quien aún no ha tenido lectura esta noche: quien repite
+    // puede seguir preguntando, pero si hay fila espera a que se atienda a los nuevos.
+    const { data: candidatas } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("origen", { ascending: true }).order("creado_en").limit(30);
+    if (!candidatas?.length) return null;
+    const autoresChat = [...new Set(candidatas.filter((c) => c.origen === "chat").map((c) => c.autor))];
+    const { data: yaLeidas } = autoresChat.length
+      ? await admin.from("en_vivo_preguntas").select("autor").eq("origen", "chat").eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
+      : { data: [] };
+    const repiten = new Set((yaLeidas ?? []).map((l) => l.autor));
+    const p = candidatas.find((c) => c.origen !== "chat" || !repiten.has(c.autor)) ?? candidatas[0];
     const { data: tomada } = await admin.from("en_vivo_preguntas").update({ estado: "leyendo", leida_en: new Date().toISOString() }).eq("id", p.id).eq("estado", "pendiente").select("id").maybeSingle();
     if (!tomada) continue;
 
