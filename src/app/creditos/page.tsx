@@ -38,6 +38,9 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // Sin pago en dólares activo (Lemon rechazó la tienda), todos ven pesos, aunque llegue ?moneda=usd.
   const internacional = internacionalDisponible && (moneda === "usd" || (moneda !== "cop" && pais !== "CO"));
   const accion = internacional ? accionComprarInternacional : accionComprar;
+  // Fuera de Colombia se paga en pesos con Bold (acepta Visa y Mastercard extranjeras): se muestra el aproximado en dólares.
+  const fuera = !internacional && pais !== "CO";
+  const aprox = (centavosUSD: number) => (fuera ? <span className="block text-xs font-normal text-texto-suave">≈ {formatoUSD(centavosUSD)}</span> : null);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) => (internacional ? formatoUSD(p.precioUSDCentavos) : formatoCOP(p.precioCOP));
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
@@ -79,7 +82,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
       <p className="text-center text-sm text-texto-suave">{plantilla(internacional ? t.persuasion.anclaAstralUSD : t.persuasion.anclaAstral, { precio: precioAstral })}</p>
       {!configurado && <Aviso tipo="info">{internacional ? t.creditos.internacional.sinConfigurar : t.creditos.sinConfigurar}</Aviso>}
       <p className="text-center text-sm text-texto-suave">
-        {internacional ? t.creditos.internacional.nota : null}{" "}
+        {internacional ? t.creditos.internacional.nota : fuera ? t.creditos.internacional.notaPesos : null}{" "}
         {internacional ? (
           <Link href="/creditos?moneda=cop" className="text-oro-suave underline">{t.creditos.internacional.enlaceColombia}</Link>
         ) : internacionalDisponible ? (
@@ -121,7 +124,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
                 {ahorro > 0 && <span className="rounded-full bg-exito/15 px-2 py-0.5 text-xs text-exito">{plantilla(t.creditos.ahorro, { pct: ahorro })}</span>}
               </div>
               <h2 className="font-display mt-1 text-2xl font-semibold">{textos?.nombre ?? p.nombre}</h2>
-              <p className="mt-2 text-3xl font-semibold text-oro-suave">{precio(p)}</p>
+              <p className="mt-2 text-3xl font-semibold text-oro-suave">{precio(p)}{aprox(p.precioUSDCentavos)}</p>
               <p className="text-sm text-texto-suave">
                 {p.creditos} {t.comun.creditos} · {plantilla(t.creditos.porCredito, { precio: internacional ? formatoUSD(Math.round(p.precioUSDCentavos / p.creditos)) : formatoCOP(Math.round(porCredito)) })}
               </p>
@@ -148,7 +151,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-2xl font-semibold text-oro-suave">{precio(PAQUETE_PRUEBA)}</p>
+          <p className="text-2xl font-semibold text-oro-suave">{precio(PAQUETE_PRUEBA)}{aprox(PAQUETE_PRUEBA.precioUSDCentavos)}</p>
           <BotonEnviar className="boton boton-secundario px-4 py-2 text-sm" cargando={t.creditos.preparando}>{t.creditos.prueba.boton}</BotonEnviar>
         </div>
       </form>
@@ -180,10 +183,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
             {oferta.activa ? (
               <>
                 <p className="text-lg text-texto-suave line-through">{precio(PAQUETE_CIRCULO)}</p>
-                <p className="text-4xl font-semibold text-oro-suave">{internacional ? formatoUSD(OFERTA_FUNDADORES.precioUSDCentavos) : formatoCOP(OFERTA_FUNDADORES.precioCOP)}</p>
+                <p className="text-4xl font-semibold text-oro-suave">{internacional ? formatoUSD(OFERTA_FUNDADORES.precioUSDCentavos) : formatoCOP(OFERTA_FUNDADORES.precioCOP)}{aprox(OFERTA_FUNDADORES.precioUSDCentavos)}</p>
               </>
             ) : (
-              <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}</p>
+              <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}{aprox(PAQUETE_CIRCULO.precioUSDCentavos)}</p>
             )}
             <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
             {!internacional && !oferta.activa && <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>}

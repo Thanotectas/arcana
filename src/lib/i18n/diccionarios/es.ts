@@ -506,6 +506,7 @@ export const es = {
       correo: "Precio de fundadores: Círculo Arcana a {precio} para las primeras personas. Quedan {n} cupos, hasta el 31 de octubre.",
     },
     internacional: {
+      notaPesos: "Desde fuera de Colombia pagas en pesos colombianos con tu tarjeta Visa o Mastercard; tu banco hace la conversión. Los valores en dólares son aproximados.",
       nota: "Pago internacional en dólares con tarjeta o PayPal a través de Lemon Squeezy; el impuesto de tu país se calcula al pagar.",
       enlaceFuera: "¿Estás fuera de Colombia? Paga en dólares",
       enlaceColombia: "¿Estás en Colombia? Paga en pesos",

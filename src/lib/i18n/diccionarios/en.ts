@@ -507,6 +507,7 @@ export const en: Diccionario = {
       correo: "Founders price: Arcana Circle for {precio} for the first people. {n} spots left, until October 31.",
     },
     internacional: {
+      notaPesos: "From outside Colombia you pay in Colombian pesos with your Visa or Mastercard; your bank does the conversion. Dollar amounts are approximate.",
       nota: "International payment in US dollars by card or PayPal through Lemon Squeezy; your country's tax is calculated at checkout.",
       enlaceFuera: "Outside Colombia? Pay in dollars",
       enlaceColombia: "In Colombia? Pay in pesos",

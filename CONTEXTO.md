@@ -24,7 +24,7 @@ El proyecto de Supabase "medirecordatorios" está pausado a propósito (el plan 
 
 - Push y cron: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET` (ver sección "Cron diario y avisos push").
 - Correos: `RESEND_API_KEY`, `CORREO_REMITENTE`, `CORREOS_MAXIMO` (ver `docs/CORREOS.md`).
-- Pagos internacionales: `LEMON_API_KEY`, `LEMON_STORE_ID`, `LEMON_WEBHOOK_SECRET`, `LEMON_VARIANTES` (ver `docs/PAGOS-INTERNACIONALES.md`). **Lemon Squeezy rechazó la tienda el 22 oct 2026** (categoría de alto riesgo): el pago en dólares queda apagado salvo `LEMON_ACTIVO=1`; todos pagan en pesos con Bold. Alternativas pendientes: confirmar si Bold acepta tarjetas extranjeras, o PayPal Business.
+- Pagos internacionales: `LEMON_API_KEY`, `LEMON_STORE_ID`, `LEMON_WEBHOOK_SECRET`, `LEMON_VARIANTES` (ver `docs/PAGOS-INTERNACIONALES.md`). **Lemon Squeezy rechazó la tienda el 22 oct 2026** (categoría de alto riesgo): el pago en dólares queda apagado salvo `LEMON_ACTIVO=1`; todos pagan en pesos con Bold. Bold acepta Visa y Mastercard extranjeras (cobra en pesos y el banco convierte): fuera de Colombia `/creditos` muestra el precio en pesos con el aproximado en dólares (`precioUSDCentavos`) y la nota `creditos.internacional.notaPesos`.
 - Instagram automático: `IG_USER_ID` (cuenta @miarcana.oficial) e `IG_PAGE_TOKEN` (token de la página de Facebook "Mi Arcana", app de Meta "Thanotectas Automation"; no caduca, pero el acceso a datos vence hacia el 30 dic 2026 y entonces hay que renovarlo con el Explorador de la API Graph).
 - CAPTCHA: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (la clave secreta de Turnstile se configura en Supabase Auth, no en Vercel).
 

@@ -504,6 +504,7 @@ export const pt: Diccionario = {
       correo: "Preço de fundadores: Círculo Arcana por {precio} para as primeiras pessoas. Restam {n} vagas, até 31 de outubro.",
     },
     internacional: {
+      notaPesos: "De fora da Colômbia você paga em pesos colombianos com seu cartão Visa ou Mastercard; seu banco faz a conversão. Os valores em dólares são aproximados.",
       nota: "Pagamento internacional em dólares com cartão ou PayPal pela Lemon Squeezy; o imposto do seu país é calculado ao pagar.",
       enlaceFuera: "Está fora da Colômbia? Pague em dólares",
       enlaceColombia: "Está na Colômbia? Pague em pesos",
