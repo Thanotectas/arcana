@@ -337,6 +337,14 @@ Directos de YouTube donde Sibila lee en voz alta. Piezas:
   preguntas seguidas gasta 20.000–30.000. YouTube exige verificar el canal con el teléfono
   (24 h) para emitir en directo.
 
+### Chat del directo: qué cuenta como consulta (22 oct 2026)
+
+Tras la prueba técnica: `pareceConsulta` acepta preguntas sin «?» («como me ves en el amor»,
+«como voy a terminar este mes») con `PREGUNTA_SIN_SIGNO` (cómo/qué + verbo, cuándo, voy a, me ves,
+y temas: amor, trabajo, dinero, examen, este mes…); los comentarios sueltos («qué lindo», «hola a
+todos») no cuentan. Los mensajes de una misma persona (por nombre visible) se juntan en una sola
+consulta mientras espera turno, y si dijo su signo antes esa noche se reutiliza.
+
 ## Códigos de oferta (20 oct 2026)
 
 `codigos_oferta` (migración 0034): créditos extra en una compra sin cambiar el precio. La

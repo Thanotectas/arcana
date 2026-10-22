@@ -58,11 +58,17 @@ async function api<T>(ruta: string, token: string): Promise<{ ok: boolean; statu
   return { ok: res.ok && !datos.error, status: res.status, datos };
 }
 
-/** Un mensaje sirve si parece una consulta: trae un signo, una pregunta o pide aura, numerología u horóscopo. */
+/**
+ * Un mensaje sirve si parece una consulta: trae un signo, una pregunta (con o
+ * sin «?», que en el celular casi nadie escribe), un tema típico o pide aura,
+ * numerología u horóscopo. Un saludo suelto («hola a todos») no cuenta.
+ */
+const PREGUNTA_SIN_SIGNO = /\b((c[oó]mo|qu[eé])\s+(me|te|le|nos|voy|vamos|va|van|est[aá]|ser[aá]|viene|sigue|ves|hago|pasa|dice|dicen|pinta)|cu[aá]ndo|d[oó]nde|por\s?qu[eé]|ser[aá]|voy a|va a|me ves|me va|amor|pareja|novi[oa]|trabajo|empleo|negocio|dinero|plata|examen|viaje|futuro|salud|familia|este mes|este a[nñ]o|esta semana)\b/i;
+
 export function pareceConsulta(texto: string) {
   const t = texto.trim();
   if (t.length < 8 || t.length > 300) return false;
-  return Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scopo/i.test(t);
+  return Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scopo/i.test(t) || PREGUNTA_SIN_SIGNO.test(t);
 }
 
 export interface EstadoChat {
@@ -110,14 +116,48 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
     .update({ page_token: r.datos.nextPageToken ?? pagina, proxima_consulta: new Date(Date.now() + espera).toISOString(), actualizado_en: new Date().toISOString() })
     .eq("id", 1);
 
-  const filas = (r.datos.items ?? [])
-    .filter((m) => m.snippet?.type === "textMessageEvent" && !m.authorDetails?.isChatOwner && pareceConsulta(m.snippet?.displayMessage ?? ""))
-    .flatMap((m) => {
-      const texto = (m.snippet?.displayMessage ?? "").trim();
-      const tipo = tipoDeMensaje(texto);
-      return tipo ? [{ mensaje_id: m.id, origen: "chat" as const, tipo, autor: (m.authorDetails?.displayName ?? "Alguien").slice(0, 60), texto, signo: detectarSigno(texto)?.id ?? null }] : [];
-    });
-  if (!filas.length) return { conectado: true, directo: true, nuevas: 0 };
+  // Una sola consulta por persona: sus mensajes del lote se juntan («soy Sagitario» +
+  // «¿cómo me ves en el amor?») y, si ya tiene una esperando turno, se le suman.
+  const porAutor = new Map<string, { mensaje_id: string; autor: string; textos: string[] }>();
+  for (const m of r.datos.items ?? []) {
+    const texto = (m.snippet?.displayMessage ?? "").trim();
+    if (m.snippet?.type !== "textMessageEvent" || m.authorDetails?.isChatOwner || !pareceConsulta(texto)) continue;
+    const autor = (m.authorDetails?.displayName ?? "Alguien").slice(0, 60);
+    const grupo = porAutor.get(autor);
+    if (grupo) grupo.textos.push(texto);
+    else porAutor.set(autor, { mensaje_id: m.id, autor, textos: [texto] });
+  }
+  if (!porAutor.size) return { conectado: true, directo: true, nuevas: 0 };
+
+  // Lo que cada persona ya preguntó esta noche: su consulta pendiente y el signo que dijo.
+  const { data: previas } = await admin
+    .from("en_vivo_preguntas")
+    .select("id, autor, texto, signo, estado")
+    .eq("origen", "chat")
+    .in("autor", [...porAutor.keys()])
+    .gte("creado_en", new Date(ahora - 6 * 3_600_000).toISOString())
+    .order("creado_en", { ascending: false });
+  const filas = [];
+  let sumadas = 0;
+  for (const g of porAutor.values()) {
+    const suyas = (previas ?? []).filter((p) => p.autor === g.autor);
+    const texto = g.textos.join(" · ").slice(0, 300);
+    const signo = detectarSigno(texto)?.id ?? suyas.find((p) => p.signo)?.signo ?? null;
+    const pendiente = suyas.find((p) => p.estado === "pendiente");
+    if (pendiente) {
+      const unido = `${pendiente.texto} · ${texto}`.slice(0, 300);
+      const tipo = tipoDeMensaje(unido);
+      if (!tipo) continue;
+      const { data: hecho } = await admin.from("en_vivo_preguntas").update({ texto: unido, tipo, signo: pendiente.signo ?? signo }).eq("id", pendiente.id).eq("estado", "pendiente").select("id");
+      if (hecho?.length) {
+        sumadas++;
+        continue;
+      }
+    }
+    const tipo = tipoDeMensaje(texto);
+    if (tipo) filas.push({ mensaje_id: g.mensaje_id, origen: "chat" as const, tipo, autor: g.autor, texto, signo });
+  }
+  if (!filas.length) return { conectado: true, directo: true, nuevas: 0, ...(sumadas ? { detalle: `${sumadas} mensaje(s) sumados a consultas en espera` } : {}) };
   const { data } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
   return { conectado: true, directo: true, nuevas: data?.length ?? 0 };
 }
