@@ -35,7 +35,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // Fuera de Colombia (país según Vercel) se cobra en dólares con Lemon Squeezy; la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
   const internacionalDisponible = pagosInternacionalesConfigurados();
-  const internacional = moneda === "usd" || (moneda !== "cop" && pais !== "CO" && internacionalDisponible);
+  // Sin pago en dólares activo (Lemon rechazó la tienda), todos ven pesos, aunque llegue ?moneda=usd.
+  const internacional = internacionalDisponible && (moneda === "usd" || (moneda !== "cop" && pais !== "CO"));
   const accion = internacional ? accionComprarInternacional : accionComprar;
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) => (internacional ? formatoUSD(p.precioUSDCentavos) : formatoCOP(p.precioCOP));
   const miembro = circuloActivo(perfil);

@@ -34,7 +34,14 @@ export function lemonEnv() {
   };
 }
 
+/**
+ * Apagado: Lemon Squeezy rechazó la tienda (22 oct 2026). Aunque las variables
+ * sigan en Vercel, el pago en dólares no se ofrece salvo con LEMON_ACTIVO=1
+ * (por si algún día se aprueba). Sin él, /creditos cobra a todos en pesos con
+ * Bold y no muestra el enlace "Paga en dólares".
+ */
 export function pagosInternacionalesConfigurados() {
+  if (process.env.LEMON_ACTIVO !== "1") return false;
   const c = lemonEnv();
   return Boolean(c.apiKey && c.storeId && c.webhookSecret && Object.keys(c.variantes).length);
 }

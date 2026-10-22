@@ -1,3 +1,5 @@
+> **Estado (22 oct 2026): Lemon Squeezy rechazó la tienda de Arcana** (también rechazó Thanotectas en marzo). El código lo deja apagado salvo `LEMON_ACTIVO=1`, aunque las demás variables sigan en Vercel. Lo de abajo queda como referencia por si algún día se reactiva.
+
 # Pagos internacionales con Lemon Squeezy
 
 Bold solo cobra en pesos con medios colombianos. Para quien está fuera de Colombia, Arcana cobra en dólares con Lemon Squeezy, que actúa como vendedor oficial (merchant of record): acepta tarjetas y PayPal de cualquier país, calcula y declara el IVA del comprador (por ejemplo el 21 % de España) y paga a Colombia por transferencia o PayPal. Comisión aproximada: 5 % + 0,50 USD por venta.
