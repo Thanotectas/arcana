@@ -36,7 +36,7 @@ export async function hechos() {
   const modulos = t.portada.modulos as Record<string, { titulo: string; texto: string }>;
   const lista = Object.values(modulos).map((m) => `- ${m.titulo}: ${m.texto}`).join("\n");
   const paquetes = [PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]
-    .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${formatoCOP(p.precioCOP)} (${usd(p.precioUSDCentavos)} fuera de Colombia)${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
+    .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${formatoCOP(p.precioCOP)} (≈ ${usd(p.precioUSDCentavos)})${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
     .join("\n");
   const f = await estadoOfertaFundadores();
   const oferta = f.activa
@@ -44,14 +44,14 @@ export async function hechos() {
     : "No hay oferta especial vigente.";
   const c = cartaDelDia(fechaBogota());
   return `HECHOS DE ARCANA (usa solo esto; si no sabes algo, dilo y ofrece pasar con una persona):
-- Arcana es una app web y de Android (Google Play) en ${sitio()} donde Sibila, la guía, escribe lecturas personales: tarot (Rider-Waite, Marsella, Oráculo de los Ángeles y Tarot Arcana), carta astral con cálculo astronómico real, numerología, sueños, lectura de la mano por foto, chocolate, tabaco, velas, I Ching, calendario chino, aura, compatibilidad, sinastría y lecturas cruzadas. Idiomas: español, inglés y portugués.
+- Arcana es una app web en ${sitio()} (pronto también en Google Play) donde Sibila, la guía, escribe lecturas personales: tarot (Rider-Waite, Marsella, Oráculo de los Ángeles y Tarot Arcana), carta astral con cálculo astronómico real, numerología, sueños, lectura de la mano por foto, chocolate, tabaco, velas, I Ching, calendario chino, aura, compatibilidad, sinastría y lecturas cruzadas. Idiomas: español, inglés y portugués.
 - Gratis sin pagar: la carta del día (una por día), el horóscopo, el calendario lunar, las guías de rituales (${sitio()}/rituales) y las de velas. Al crear la cuenta se regalan 3 créditos.
 - Las lecturas cuestan créditos: tirada de tres cartas ${COSTOS.tarot_tres}, Cruz Celta ${COSTOS.tarot_celta}, carta astral ${COSTOS.carta_astral}, numerología ${COSTOS.numerologia}, sueños ${COSTOS.suenos}, lectura de la mano ${COSTOS.quiromancia}, chocolate ${COSTOS.chocolate}, velas ${COSTOS.velas}, tabaco ${COSTOS.tabaco}, I Ching ${COSTOS.iching}, calendario chino ${COSTOS.chino}, aura ${COSTOS.aura}, compatibilidad ${COSTOS.compatibilidad}, sinastría ${COSTOS.sinastria}, cruce ${COSTOS.cruce}.
 - Paquetes de créditos (se compran en ${sitio()}/creditos con la cuenta abierta):
 ${paquetes}
 - La primera compra trae ${BONO_PRIMERA_COMPRA} créditos extra de regalo. El Círculo Arcana da 30 días con "tu cielo hoy" cada mañana y preguntas a Sibila sin cobro.
 - ${oferta}
-- Pago en Colombia con Bold: Nequi, PSE, tarjetas de crédito y débito. Fuera de Colombia con tarjeta en dólares. Los créditos se acreditan solos al aprobarse el pago; si no aparecen en unos minutos, que escriba aquí y una persona lo revisa.
+- Pago con Bold: en Colombia con Nequi, PSE o tarjeta de crédito o débito; desde otros países con tarjeta Visa o Mastercard, se cobra en pesos colombianos y el banco hace la conversión. Los créditos se acreditan solos al aprobarse el pago; si no aparecen en unos minutos, que escriba aquí y una persona lo revisa.
 - Cómo empezar: entrar a ${sitio()}, "Crear cuenta" con Google o correo, y ya puede sacar su carta del día gratis.
 - Invitar amigos: cada cuenta tiene un enlace en ${sitio()}/invitar; quien llega por él recibe créditos extra de bienvenida y quien invita también gana créditos cuando el invitado crea su cuenta.
 - Programa de Embajadores (en ${sitio()}/invitar, botón «Quiero ser Embajador de Arcana»): quien se une gana el 20 % de todo lo que paguen sus invitados durante su primer año; la comisión se libera a los 7 días y se cambia por créditos (cada $1.500 es 1 crédito) o se pide en dinero desde $20.000 a Nequi, Daviplata, banco o PayPal.

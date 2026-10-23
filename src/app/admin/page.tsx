@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
@@ -10,7 +10,8 @@ const HERRAMIENTAS = [
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },
   { href: "/admin/embajadores", icono: HandCoins, titulo: "Embajadores", texto: "Retiros de comisiones por pagar y quién trae más ventas con su enlace." },
   { href: "/admin/en-vivo", icono: Radio, titulo: "Sibila en vivo", texto: "Directos de YouTube: Sibila lee tarot, aura, numerología, horóscopo, tazas y manos en voz alta." },
-  { href: "/admin/whatsapp", icono: MessageCircle, titulo: "Atención", texto: "Preguntas de visitantes en el chat de la página y conversaciones de WhatsApp que responde Sibila." },
+  { href: "/admin/telegram", icono: Send, titulo: "Telegram", texto: "El bot de Sibila: responde dudas, manda la carta del día y la envía cada mañana a quien escribió /diaria." },
+  { href: "/admin/whatsapp", icono: MessageCircle, titulo: "Atención", texto: "Preguntas de visitantes en el chat de la página (y el historial de WhatsApp, desactivado por Meta)." },
   { href: "/admin/probadores", icono: Mail, titulo: "Correo a probadores", texto: "Agradecimiento a quienes prueban Arcana en Google Play, con sus créditos." },
 ];
 

@@ -19,5 +19,12 @@ export const WHATSAPP = {
   url: "https://wa.me/573001277552?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20de%20Arcana",
 } as const;
 
+/**
+ * Bot de Telegram de Sibila (reemplaza a WhatsApp; ver docs/TELEGRAM.md). El
+ * usuario del bot va en NEXT_PUBLIC_TELEGRAM_BOT (sin @); sin él no se muestra.
+ */
+const BOT_TELEGRAM = (process.env.NEXT_PUBLIC_TELEGRAM_BOT ?? "").replace(/^@/, "").trim();
+export const TELEGRAM = { activo: Boolean(BOT_TELEGRAM), usuario: BOT_TELEGRAM ? `@${BOT_TELEGRAM}` : "", url: BOT_TELEGRAM ? `https://t.me/${BOT_TELEGRAM}` : "" } as const;
+
 /** Mensaje directo de Instagram (lo responde Sibila): respaldo de la atención por WhatsApp. */
 export const MENSAJE_INSTAGRAM = { usuario: "@miarcana.oficial", url: "https://ig.me/m/miarcana.oficial" } as const;

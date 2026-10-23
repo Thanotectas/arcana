@@ -44,7 +44,7 @@ export interface ResumenSemanal {
   alertas: string[];
 }
 
-export const NOMBRE_ORIGEN: Record<string, string> = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", whatsapp: "WhatsApp", google: "Google", bing: "Bing", x: "X", pinterest: "Pinterest", desconocido: "Sin origen conocido" };
+export const NOMBRE_ORIGEN: Record<string, string> = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", whatsapp: "WhatsApp", telegram: "Telegram", google: "Google", bing: "Bing", x: "X", pinterest: "Pinterest", desconocido: "Sin origen conocido" };
 export const nombreOrigen = (o: string) => NOMBRE_ORIGEN[o] ?? o.charAt(0).toUpperCase() + o.slice(1);
 
 const DIA = 86_400_000;

@@ -8,7 +8,7 @@ import type { Database } from "@/types/database";
  * cron se repite; si el intento anterior falló o quedó colgado (más de 10
  * minutos en 'pendiente'), se retoma.
  */
-export type RedRegistro = "instagram" | "facebook" | "correo" | "youtube";
+export type RedRegistro = "instagram" | "facebook" | "correo" | "youtube" | "telegram";
 export type TipoRegistro = "carta_dia" | "historia" | "carrusel" | "kit_tiktok" | "publicacion";
 export type Resultado = { publicada: string } | { omitida: string } | { error: string };
 

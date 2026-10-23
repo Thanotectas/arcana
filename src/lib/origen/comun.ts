@@ -12,7 +12,7 @@ export interface Origen {
 }
 
 /** Redes con enlace corto propio (miarcana.com/yt, /ig, /tt, /fb, /wa). */
-export const ENLACES_CORTOS: Record<string, string> = { yt: "youtube", ig: "instagram", tt: "tiktok", fb: "facebook", wa: "whatsapp" };
+export const ENLACES_CORTOS: Record<string, string> = { yt: "youtube", ig: "instagram", tt: "tiktok", fb: "facebook", wa: "whatsapp", tg: "telegram" };
 
 const DOMINIOS: [RegExp, string][] = [
   [/(^|\.)(youtube\.com|youtu\.be)$/, "youtube"],
@@ -20,6 +20,7 @@ const DOMINIOS: [RegExp, string][] = [
   [/(^|\.)tiktok\.com$/, "tiktok"],
   [/(^|\.)(facebook\.com|fb\.com|fb\.me|messenger\.com)$/, "facebook"],
   [/(^|\.)(whatsapp\.com|wa\.me)$/, "whatsapp"],
+  [/(^|\.)(t\.me|telegram\.org|telegram\.me)$/, "telegram"],
   [/(^|\.)(twitter\.com|x\.com|t\.co)$/, "x"],
   [/(^|\.)pinterest\.[a-z.]+$/, "pinterest"],
   [/(^|\.)google\.[a-z.]+$/, "google"],

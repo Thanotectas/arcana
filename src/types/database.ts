@@ -296,6 +296,27 @@ type InteraccionRedesRow = {
   creado_en: string;
 };
 
+type MensajeTelegramRow = {
+  id: number;
+  chat_id: number;
+  nombre: string | null;
+  usuario: string | null;
+  rol: "persona" | "asistente";
+  contenido: string;
+  update_id: number | null;
+  tipo: string;
+  humano: boolean;
+  creado_en: string;
+};
+
+type SuscriptorTelegramRow = {
+  chat_id: number;
+  nombre: string | null;
+  activo: boolean;
+  creado_en: string;
+  actualizado_en: string;
+};
+
 type MensajeWhatsappRow = {
   id: number;
   telefono: string;
@@ -507,6 +528,18 @@ export type Database = {
         Row: InteraccionRedesRow;
         Insert: Insertable<InteraccionRedesRow, "id" | "remitente" | "objeto_id" | "respuesta" | "estado" | "humano" | "detalle" | "creado_en">;
         Update: Partial<InteraccionRedesRow>;
+        Relationships: [];
+      };
+      mensajes_telegram: {
+        Row: MensajeTelegramRow;
+        Insert: Insertable<MensajeTelegramRow, "id" | "nombre" | "usuario" | "update_id" | "tipo" | "humano" | "creado_en">;
+        Update: Partial<MensajeTelegramRow>;
+        Relationships: [];
+      };
+      suscriptores_telegram: {
+        Row: SuscriptorTelegramRow;
+        Insert: Insertable<SuscriptorTelegramRow, "nombre" | "activo" | "creado_en" | "actualizado_en">;
+        Update: Partial<SuscriptorTelegramRow>;
         Relationships: [];
       };
       mensajes_whatsapp: {
