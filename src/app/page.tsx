@@ -5,6 +5,19 @@ import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
+import { CarruselVideos } from "@/components/CarruselVideos";
+
+/** Reels de Sibila para la portada (versiones web en public/videos/portada, sin fechas que venzan). */
+const VIDEOS = [
+  { id: "abundancia", clave: "abundancia", href: "/rituales" },
+  { id: "mano", clave: "mano", href: "/quiromancia" },
+  { id: "trabajo", clave: "trabajo", href: "/rituales" },
+  { id: "chocolate", clave: "chocolate", href: "/chocolate" },
+  { id: "velas", clave: "velas", href: "/velas" },
+  { id: "aura", clave: "aura", href: "/aura" },
+  { id: "suenos", clave: "suenos", href: "/suenos" },
+  { id: "carta-astral", clave: "cartaAstral", href: "/carta-astral" },
+] as const;
 
 export default async function Portada() {
   const [usuario, t, contador] = await Promise.all([getUsuarioOpcional(), getT(), getContadorLecturas().catch(() => 0)]);
@@ -50,6 +63,14 @@ export default async function Portada() {
             <Link href="/horoscopo" className="boton boton-secundario">{t.portada.ctaHoroscopo}</Link>
           </div>
           {!usuario && <p className="mt-3 text-xs text-texto-suave">{t.crecimiento.sinTarjeta}</p>}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.videos.titulo}</h2>
+        <p className="mt-2 text-center text-texto-suave">{t.portada.videos.intro}</p>
+        <div className="mt-8">
+          <CarruselVideos videos={VIDEOS.map((v) => ({ ...v, titulo: t.portada.videos.items[v.clave] }))} textos={t.portada.videos} />
         </div>
       </section>
 
