@@ -112,3 +112,12 @@ botón «Escríbenos» del pie lleva a los mensajes de Instagram, que responde
 Sibila (`/api/webhooks/meta`). Al recuperarla, volver a `true`.
 No crear otra cuenta ni otro número para seguir operando mientras la
 revisión está abierta: Meta lo trata como evasión de la restricción.
+
+**Decisión final (23 oct 2026):** la revisión confirmó la desactivación del portafolio «thanotectas» y de
+la cuenta «Arcana» (Messaging account ID 1570178747677729) por incumplir las Condiciones de WhatsApp
+Business Platform. Duración: permanente (no recibe, no responde, no inicia conversaciones, no admite
+números nuevos). `WHATSAPP.activo` queda en `false` de forma definitiva. No crear otra cuenta de WhatsApp
+Business ni agregar números al portafolio «Arcana · Tarot y Astrología» (donde están la página y el
+Instagram): Meta lo trataría como evasión. El código de WhatsApp (`src/lib/whatsapp/`, `/api/webhooks/whatsapp`,
+`/admin/whatsapp`) queda sin uso. Compartir lecturas por WhatsApp desde la app (enlaces `wa.me` de cada
+persona) no depende de esta cuenta y sigue igual.

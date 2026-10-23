@@ -8,10 +8,9 @@ export const REDES = [
 
 /**
  * Línea de WhatsApp de atención (la responde Sibila; ver docs/WHATSAPP.md).
- * `activo: false` mientras Meta tenga la cuenta inhabilitada (desde el 12 oct
- * 2026, revisión pedida el 17 oct): el botón «Escríbenos» lleva entonces a
- * los mensajes de Instagram, que también responde Sibila. Al recuperarla,
- * volver a `true`.
+ * `activo: false`: Meta desactivó la cuenta el 12 oct 2026 y la revisión
+ * confirmó la decisión (permanente, 23 oct). El botón «Escríbenos» lleva a
+ * los mensajes de Instagram, que también responde Sibila.
  */
 export const WHATSAPP = {
   activo: false,
