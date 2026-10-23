@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind } from "lucide-react";
 import { PAQUETES, PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 import { CarruselVideos } from "@/components/CarruselVideos";
+import { AvisoDirecto } from "@/components/AvisoDirecto";
 
 /** Reels de Sibila para la portada (versiones web en public/videos/portada, sin fechas que venzan). */
 const VIDEOS = [
@@ -20,7 +21,7 @@ const VIDEOS = [
 ] as const;
 
 export default async function Portada() {
-  const [usuario, t, contador] = await Promise.all([getUsuarioOpcional(), getT(), getContadorLecturas().catch(() => 0)]);
+  const [usuario, t, idioma, contador] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0)]);
   const MODULOS = [
     { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
     { icono: Sunrise, ...t.crecimiento.moduloHoy, href: "/hoy" },
@@ -65,6 +66,8 @@ export default async function Portada() {
           {!usuario && <p className="mt-3 text-xs text-texto-suave">{t.crecimiento.sinTarjeta}</p>}
         </div>
       </section>
+
+      <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} />
 
       <section>
         <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.videos.titulo}</h2>
