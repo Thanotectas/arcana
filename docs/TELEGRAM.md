@@ -27,7 +27,7 @@ Reemplaza la línea de WhatsApp, que Meta desactivó de forma permanente (ver `d
 ## Puesta en marcha
 
 1. En Telegram, abrir **@BotFather** → `/newbot` → nombre «Sibila · Arcana» → usuario terminado en `bot`
-   (p. ej. `ArcanaSibilaBot`). Copiar el token.
+   (quedó **@MiArcanaBot**, https://t.me/MiArcanaBot). Copiar el token.
 2. En Vercel: `TELEGRAM_BOT_TOKEN` = el token (marcar **Sensitive**) y `NEXT_PUBLIC_TELEGRAM_BOT` = el
    usuario sin @. Volver a desplegar.
 3. Aplicar la migración 0038 en Supabase.
