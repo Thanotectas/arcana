@@ -67,10 +67,13 @@ async function api<T>(ruta: string, token: string): Promise<{ ok: boolean; statu
  */
 const PREGUNTA_SIN_SIGNO = /\b((c[oó]mo|qu[eé])\s+(me|te|le|nos|voy|vamos|va|van|est[aá]|ser[aá]|viene|sigue|ves|hago|pasa|dice|dicen|pinta)|cu[aá]ndo|d[oó]nde|por\s?qu[eé]|ser[aá]|voy a|va a|me ves|me va|amor|pareja|novi[oa]|trabajo|empleo|negocio|dinero|plata|examen|viaje|futuro|salud|familia|este mes|este a[nñ]o|esta semana)\b/i;
 
+/** Lo mismo en inglés y portugués (Sibila responde en el idioma en que le escriben). */
+const PREGUNTA_OTROS_IDIOMAS = /\b(what|when|will i|should i|how (is|will|do|does|can)|tell me|my (love|job|future|life)|love|boyfriend|girlfriend|relationship|job|work|career|money|business|future|family|this (week|month|year)|como (vai|vou|fica|est[aá])|o que|quando|vou|namorad[oa]|relacionamento|trabalho|emprego|dinheiro|neg[oó]cio|fam[ií]lia|essa semana|este m[eê]s)\b/i;
+
 export function pareceConsulta(texto: string) {
   const t = texto.trim();
   if (t.length < 8 || t.length > 300) return false;
-  return Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scopo/i.test(t) || PREGUNTA_SIN_SIGNO.test(t);
+  return Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t);
 }
 
 export interface EstadoChat {
@@ -172,10 +175,10 @@ export const BUCKET_FOTOS = "redes";
 /** Qué lectura pide un mensaje del chat; null si necesita foto (taza o mano: van por /vivo). */
 export function tipoDeMensaje(texto: string): TipoLectura | null {
   const t = texto.toLowerCase();
-  if (/chocolate|taza|pocillo|\bmano\b|palma/.test(t)) return null;
+  if (/chocolate|taza|pocillo|\bmano\b|palma|\bpalm\b|\bhand\b|\bcup\b|x[ií]cara|\bm[aã]o\b/.test(t)) return null;
   if (/\baura\b/.test(t)) return "aura";
-  if (/numerolog|mi n[uú]mero|\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t)) return "numerologia";
-  if (/hor[oó]scopo/.test(t)) return "horoscopo";
+  if (/numerolog|mi n[uú]mero|my number|meu n[uú]mero|\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t)) return "numerologia";
+  if (/hor[oó]scop/.test(t)) return "horoscopo";
   return "tarot";
 }
 
@@ -200,6 +203,7 @@ const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en vo
 - Empieza saludando por el nombre (y el signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo.
 - Quien pregunta en vivo quiere sentir que le respondiste a ella, no a cualquiera. Nada de frases que le sirvan a todo el mundo («habrá cambios», «confía en ti»). Responde de frente: sí, todavía no, o qué tiene que pasar primero, y anuncia algo concreto y verosímil que pueda reconocer cuando llegue: un mensaje o una llamada que no esperaba, una conversación pendiente que por fin se da, una propuesta de trabajo, alguien del pasado que reaparece, un dinero que entra después de una espera. Dale un plazo amplio (estas semanas, antes de fin de mes, antes de que termine el año) y una señal para reconocerlo («cuando veas…», «si esta semana…»). Apóyalo siempre en lo que salió: la carta, la figura, la línea, el número, su signo.
 - Termina con una frase de consejo concreta para aprovechar lo que viene. No invites a la página: eso lo hace el directo.
+- Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
 
 /** Fecha de nacimiento escrita en el mensaje (dd/mm/aaaa), si la hay. */

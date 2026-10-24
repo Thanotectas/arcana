@@ -49,13 +49,29 @@ function sinAcentos(t: string) {
   return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-/** Signo mencionado en el texto (por nombre, sin acentos); si hay varios, el que aparece primero. */
+/** Nombres de los signos en inglés y portugués (sin acentos) que no coinciden con el español. */
+const OTROS_NOMBRES: Record<string, string[]> = {
+  tauro: ["taurus", "touro"],
+  geminis: ["gemini", "gemeos"],
+  leo: ["leao"],
+  virgo: ["virgem"],
+  escorpio: ["scorpio", "escorpiao"],
+  sagitario: ["sagittarius"],
+  capricornio: ["capricorn"],
+  acuario: ["aquarius", "aquario"],
+  piscis: ["pisces", "peixes"],
+};
+
+/** Signo mencionado en el texto (por nombre, sin acentos, también en inglés o portugués); si hay varios, el que aparece primero. */
 export function detectarSigno(texto: string): Signo | null {
   const t = ` ${sinAcentos(texto)} `;
   let mejor: { signo: Signo; pos: number } | null = null;
   for (const signo of SIGNOS) {
-    const pos = t.search(new RegExp(`[^a-z]${sinAcentos(signo.nombre)}[^a-z]`));
-    if (pos >= 0 && (!mejor || pos < mejor.pos)) mejor = { signo, pos };
+    const nombre = sinAcentos(signo.nombre);
+    for (const n of [nombre, ...(OTROS_NOMBRES[nombre] ?? [])]) {
+      const pos = t.search(new RegExp(`[^a-z]${n}[^a-z]`));
+      if (pos >= 0 && (!mejor || pos < mejor.pos)) mejor = { signo, pos };
+    }
   }
   return mejor?.signo ?? null;
 }
