@@ -6,6 +6,7 @@ import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 import { CarruselVideos } from "@/components/CarruselVideos";
+import { comprasVisibles } from "@/lib/plataforma";
 import { AvisoDirecto } from "@/components/AvisoDirecto";
 
 /** Reels de Sibila para la portada (versiones web en public/videos/portada, sin fechas que venzan). */
@@ -21,7 +22,7 @@ const VIDEOS = [
 ] as const;
 
 export default async function Portada() {
-  const [usuario, t, idioma, contador] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0)]);
+  const [usuario, t, idioma, contador, compras] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0), comprasVisibles()]);
   const MODULOS = [
     { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
     { icono: Sunrise, ...t.crecimiento.moduloHoy, href: "/hoy" },
@@ -67,7 +68,7 @@ export default async function Portada() {
         </div>
       </section>
 
-      <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} />
+      <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} conOferta={compras} />
 
       <section>
         <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.videos.titulo}</h2>

@@ -11,7 +11,13 @@ import { PROXIMO_DIRECTO, ZONA_DIRECTO, diasParaDirecto, estadoDirecto } from "@
  * día y hora, recordatorio de YouTube y la oferta de esa noche. Durante el
  * directo invita a entrar; cuando termina deja de mostrarse solo.
  */
-export function AvisoDirecto({ t, sonido, idioma }: { t: Diccionario["portada"]["directo"]; sonido: { activarSonido: string; silenciar: string }; idioma: Idioma }) {
+export function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
+  t: Diccionario["portada"]["directo"];
+  sonido: { activarSonido: string; silenciar: string };
+  idioma: Idioma;
+  /** false en la app de Google Play, donde no se muestran compras. */
+  conOferta?: boolean;
+}) {
   const estado = estadoDirecto();
   if (!estado) return null;
 
@@ -42,7 +48,7 @@ export function AvisoDirecto({ t, sonido, idioma }: { t: Diccionario["portada"][
           </p>
         )}
         <p className="mt-4 text-texto-suave">{t.intro}</p>
-        {codigo && (
+        {codigo && conOferta && (
           <p className="mt-3 inline-flex items-start gap-2 text-sm text-texto">
             <Gift className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden />
             {plantilla(t.oferta, { codigo: codigo.codigo, n: codigo.creditosExtra })}

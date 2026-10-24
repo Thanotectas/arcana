@@ -13,6 +13,7 @@ import { Timer } from "lucide-react";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
+import { AvisoDirecto } from "@/components/AvisoDirecto";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -105,6 +106,8 @@ export default async function PaginaInicio() {
           </Link>
         </div>
       </section>
+
+      <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} conOferta={compras} />
 
       {compras && oferta.activa && !circuloActivo(perfil) && (
         <Link href="/creditos#circulo" className="tarjeta tarjeta-modulo aparecer flex flex-wrap items-center justify-between gap-3 border-oro/60 bg-oro/10 p-4">
