@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Bell } from "lucide-react";
 import { Marca } from "./Logo";
 import { CieloEnVivo } from "./CieloEnVivo";
 import { RostroSibila } from "./RostroSibila";
@@ -31,7 +32,7 @@ interface Lectura {
   audio: string | null;
 }
 
-type Respuesta = Lectura | { clase: "espera" } | { clase: "puente"; texto: string; audio: string | null };
+type Respuesta = Lectura | { clase: "espera" } | { clase: "fin" } | { clase: "puente" | "despedida"; texto: string; audio: string | null };
 
 const NOMBRE_TIPO: Record<TipoLectura, string> = {
   tarot: "Tarot",
@@ -68,6 +69,8 @@ function frasesDe(texto: string) {
  * servidor la siguiente lectura mientras suena la actual, voltea las tres
  * cartas, reproduce la voz de Sibila con subtítulos y hace latir su símbolo con
  * el volumen. Sin preguntas, Sibila dice frases de invitación de vez en cuando.
+ * A la hora de cierre se despide y queda la pantalla final (gracias y
+ * suscríbete); si en el panel se corre la hora, vuelve a leer sola.
  */
 export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: string; retrato: string | null }) {
   const [escala, setEscala] = useState(1);
@@ -78,6 +81,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
   const [bloqueado, setBloqueado] = useState(false);
   const [aviso, setAviso] = useState("");
   const [sinVoz, setSinVoz] = useState(false);
+  const [cierre, setCierre] = useState<"abierto" | "despidiendo" | "fin">("abierto");
   const contexto = useRef<AudioContext | null>(null);
   const desbloquear = useRef<(() => void) | null>(null);
 
@@ -186,10 +190,35 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
       let siguiente: Promise<Respuesta | null> | null = null;
       let quietos = 0;
       let puente = 0;
+      let despedida = false;
       while (activo) {
         const r = await (siguiente ?? pedir("lectura"));
         siguiente = null;
         if (!activo) break;
+        // La despedida suena una sola vez aunque el servidor la repita (sin la migración 0039 no queda marcada).
+        if (r?.clase === "despedida" || (r?.clase === "fin" && despedida)) {
+          if (!despedida && r.clase === "despedida") {
+            despedida = true;
+            setSinVoz(!r.audio);
+            setLectura(null);
+            setCierre("despidiendo");
+            await hablar(r.texto, r.audio);
+            setSubtitulo("");
+          }
+          setCierre("fin");
+          await esperar(15000);
+          continue;
+        }
+        if (r?.clase === "fin") {
+          setCierre("fin");
+          await esperar(15000);
+          continue;
+        }
+        if (despedida && r) {
+          // Se corrió la hora de cierre en el panel: Sibila sigue leyendo.
+          despedida = false;
+          setCierre("abierto");
+        }
         if (r?.clase === "lectura") {
           quietos = 0;
           setSinVoz(!r.audio);
@@ -209,7 +238,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         quietos++;
         // Sin preguntas: una frase de Sibila cada tres vueltas (unos 25 s).
         if (quietos % 3 === 1) {
-          const i = puente++ % 5;
+          const i = puente++ % 6;
           let frase = puentes.get(i) ?? null;
           if (!frase) {
             const r2 = await pedir("puente", i);
@@ -270,18 +299,25 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
               <p className="text-xl uppercase tracking-[0.35em] text-violeta-suave">Sibila en vivo</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 rounded-full border border-red-400/50 bg-red-500/15 px-6 py-3 text-2xl font-semibold text-red-200">
-            <span className="h-4 w-4 animate-pulse rounded-full bg-red-500" /> EN VIVO
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 rounded-full border border-oro/50 bg-black/45 px-6 py-3 text-2xl text-oro-suave">
+              <Bell className="h-6 w-6 vivo-campana" aria-hidden /> Suscríbete y activa la campanita
+            </div>
+            <div className="flex items-center gap-3 rounded-full border border-red-400/50 bg-red-500/15 px-6 py-3 text-2xl font-semibold text-red-200">
+              <span className="h-4 w-4 animate-pulse rounded-full bg-red-500" /> EN VIVO
+            </div>
           </div>
         </div>
 
-        {/* QR para subir la foto de la taza o de la mano */}
+        {/* QR para subir la foto de la taza o de la mano (al cerrar ya no aplica) */}
+        {cierre === "abierto" && (
         <div className={`absolute flex items-center gap-5 rounded-3xl border border-oro/30 bg-black/45 p-4 ${escena ? "left-[1190px] right-[56px] top-[770px]" : "bottom-[245px] left-16 w-[560px] p-5"}`}>
           <div className={`shrink-0 overflow-hidden rounded-xl ${escena ? "h-[120px] w-[120px]" : "h-[150px] w-[150px]"}`} dangerouslySetInnerHTML={{ __html: qr }} />
           <p className={`leading-snug text-texto ${escena ? "text-xl" : "text-2xl"}`}>
             ¿Tu <span className="text-oro-suave">taza de chocolate</span> o tu <span className="text-oro-suave">mano</span>? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span>
           </p>
         </div>
+        )}
 
         {/* Sibila (el rostro vectorial; sobre la pintura no hace falta) */}
         {!escena && (
@@ -311,7 +347,12 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
 
         {/* Pregunta */}
         <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/45 aparecer ${escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
-          {lectura ? (
+          {cierre !== "abierto" ? (
+            <>
+              <p className="text-2xl text-violeta-suave">Se acabó el tiempo por esta noche</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>Gracias por acompañarnos ✦</p>
+            </>
+          ) : lectura ? (
             <>
               <p className="text-2xl text-violeta-suave">
                 {NOMBRE_TIPO[lectura.tipo]} · {lectura.autor}
@@ -327,8 +368,15 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           )}
         </div>
 
-        {/* Lo que se lee: cartas, foto, aura, número o signo */}
-        {tipo === "tarot" || !lectura ? (
+        {/* Lo que se lee: cartas, foto, aura, número o signo (al cerrar, la invitación a suscribirse) */}
+        {cierre !== "abierto" ? (
+          <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
+            <Bell className={`text-oro-suave vivo-campana ${escena ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
+            <p className={`font-display leading-tight text-oro-suave ${escena ? "text-[44px]" : "text-[56px]"}`}>Suscríbete y activa la campanita</p>
+            <p className={`text-texto ${escena ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
+            <p className={`text-violeta-suave ${escena ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
+          </div>
+        ) : tipo === "tarot" || !lectura ? (
         <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
           {cartas.map((c, i) => {
             const visible = Boolean(lectura && c.id && volteadas > i);
@@ -387,13 +435,19 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         )}
 
         {/* Subtítulos */}
+        {!(cierre === "fin" && !subtitulo) && (
         <div className={`absolute bottom-[80px] left-16 flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${escena ? "right-[770px] bg-black/60" : "right-16 bg-black/45"}`}>
           <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${escena ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
+        )}
 
         {/* Pie */}
         <div className={`absolute bottom-5 left-0 right-0 text-center text-2xl text-violeta-suave ${escena ? "bg-black/40 py-2" : ""}`}>
-          ✦ Escribe en el chat tu signo y tu pregunta ✦ ¿Taza de chocolate o tu mano? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Lecturas de entretenimiento ✦
+          {cierre !== "abierto" ? (
+            <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
+          ) : (
+            <>✦ Escribe en el chat tu signo y tu pregunta ✦ ¿Taza de chocolate o tu mano? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Lecturas de entretenimiento ✦</>
+          )}
         </div>
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}

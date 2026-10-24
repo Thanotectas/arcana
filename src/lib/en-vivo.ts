@@ -12,6 +12,8 @@ import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
 import { PAQUETE_PRUEBA, PAQUETES } from "@/lib/creditos";
 import { codigoVigente } from "@/lib/pagos/codigos";
+import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
+import { TELEGRAM } from "@/lib/marca/redes";
 
 /**
  * «Sibila en vivo»: directos de YouTube donde Sibila lee el tarot a quien
@@ -344,6 +346,8 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
         await admin.from("en_vivo_preguntas").update({ estado: "omitida", detalle: "Sibila la omitió" }).eq("id", p.id);
         continue;
       }
+      // Cada cuarta lectura de la noche, Sibila invita a suscribirse (sin pedirlo a cambio de nada).
+      if ((count ?? 0) % 4 === 3) texto += ` ${INVITACION_SUSCRIBIRSE}`;
       let audio: string | null = null;
       if (vozConfigurada()) {
         try {
@@ -393,28 +397,32 @@ function precioHablado(pesos: number) {
   return `${m}${resto ? ` ${centenas[resto] ?? resto}` : ""} pesos`.trim();
 }
 
+/** Un código que es una palabra (SIBILA) se dice como palabra; uno con números o largo se deletrea. */
+function codigoDicho(codigo: string) {
+  return /^[A-Z]{3,8}$/.test(codigo) ? codigo.charAt(0) + codigo.slice(1).toLowerCase() : codigo.toLowerCase().split("").join(" ");
+}
+
+/** Invitación a suscribirse que Sibila agrega a algunas lecturas y dice al despedirse. */
+const INVITACION_SUSCRIBIRSE = "Y si esta lectura te habló, suscríbete al canal y activa la campanita: así te aviso del próximo directo.";
+
 /**
  * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez).
- * Incluyen el precio de la tirada de prueba y, si hay un código de oferta
- * vigente, cómo usarlo.
+ * Incluyen el precio de la tirada de prueba, la invitación a suscribirse y, si
+ * hay un código de oferta vigente, cómo usarlo.
  */
 export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
   const prueba = precioHablado(PAQUETE_PRUEBA.precioCOP);
   const paquete = PAQUETES[0];
-  // Un código que es una palabra (SIBILA) se dice como palabra; uno con números o largo se deletrea.
-  const dicho = codigo
-    ? /^[A-Z]{3,8}$/.test(codigo.codigo)
-      ? codigo.codigo.charAt(0) + codigo.codigo.slice(1).toLowerCase()
-      : codigo.codigo.toLowerCase().split("").join(" ")
-    : "";
   const oferta = codigo
-    ? `Y esta noche hay regalo: con el código ${dicho}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
+    ? `Y esta noche hay regalo: con el código ${codigoDicho(codigo.codigo)}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
     : "";
+  const telegram = TELEGRAM.activo ? " Y si quieres tu carta cada mañana, búscame en Telegram: Mi Arcana Bot." : "";
   return [
     "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
     "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y una tirada completa de tres cartas, con calma y por escrito, cuesta ${prueba}. ${oferta}`.trim(),
     "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
+    `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo.${telegram}`,
     `Si quieres una lectura más profunda, con más cartas y con calma, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
   ];
 }
@@ -429,6 +437,67 @@ export async function audioPuente(admin: Admin, i: number) {
       audio = (await sintetizar(texto)).toString("base64");
     } catch (e) {
       console.error("[en vivo] voz puente:", e instanceof Error ? e.message : e);
+    }
+  }
+  return { texto, audio };
+}
+
+// ───────────────────────── Cierre del directo ─────────────────────────
+
+/** Una hora de cierre o una despedida solo cuentan durante tres horas (no afectan otro directo). */
+const VENTANA_CIERRE = 3 * 3_600_000;
+
+/** Hora a la que Sibila se despide: la puesta en /admin/en-vivo o, si no, tres minutos antes del fin del próximo directo. */
+export function horaCierre(estado: { cierre_en?: string | null } | null, ahora = Date.now()): number {
+  const manual = estado?.cierre_en ? Date.parse(estado.cierre_en) : NaN;
+  if (Number.isFinite(manual) && ahora - manual < VENTANA_CIERRE) return manual;
+  return Date.parse(PROXIMO_DIRECTO.fin) - 3 * 60_000;
+}
+
+/** Hora de la despedida de esta noche, si ya ocurrió (null si no, o si fue hace más de tres horas). */
+export function despedidaReciente(estado: { despedida_en?: string | null } | null, ahora = Date.now()): string | null {
+  const d = estado?.despedida_en ? Date.parse(estado.despedida_en) : NaN;
+  return Number.isFinite(d) && ahora - d < VENTANA_CIERRE ? (estado?.despedida_en ?? null) : null;
+}
+
+/** «abierto» mientras haya directo, «despedirse» cuando llega la hora y «terminado» después de la despedida. */
+export async function estadoCierre(admin: Admin): Promise<"abierto" | "despedirse" | "terminado"> {
+  const { data } = await admin.from("en_vivo_estado").select("*").eq("id", 1).maybeSingle();
+  const ahora = Date.now();
+  if (despedidaReciente(data, ahora)) return "terminado";
+  const cierre = horaCierre(data, ahora);
+  return ahora >= cierre && ahora - cierre < VENTANA_CIERRE ? "despedirse" : "abierto";
+}
+
+/**
+ * Despedida de Sibila: cuántas consultas leyó esta noche, a dónde ir quien no
+ * alcanzó, el código si sigue vigente y la invitación a suscribirse. Marca la
+ * despedida para que el escenario no la repita si se recarga.
+ */
+export async function despedida(admin: Admin) {
+  await admin.from("en_vivo_estado").update({ despedida_en: new Date().toISOString() }).eq("id", 1);
+  const desde = new Date(Date.now() - 6 * 3_600_000).toISOString();
+  const [{ count: leidas }, { count: pendientes }, codigo] = await Promise.all([
+    admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "leida").gte("leida_en", desde),
+    admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "leyendo"]),
+    codigoVigente(admin).catch(() => null),
+  ]);
+  const partes = [
+    `Se nos acabó el tiempo por esta noche. Gracias por acompañarme${leidas ? `: hoy leímos ${leidas} ${leidas === 1 ? "consulta" : "consultas"}` : ""}.`,
+    pendientes
+      ? "A quienes no alcancé a leer, gracias por la paciencia: tu pregunta merece calma. Hazla en mi arcana punto com, donde tu carta del día es gratis, todos los días."
+      : "Recuerda que tu carta del día es gratis, todos los días, en mi arcana punto com.",
+    codigo ? `Y el código ${codigoDicho(codigo.codigo)} sigue valiendo esta noche: cualquier paquete trae ${codigo.creditos_extra} créditos más.` : "",
+    "Si te gustó, suscríbete al canal y activa la campanita, para que te avise del próximo directo.",
+    "Que las cartas te sean favorables. Buenas noches.",
+  ];
+  const texto = partes.filter(Boolean).join(" ");
+  let audio: string | null = null;
+  if (vozConfigurada()) {
+    try {
+      audio = (await sintetizar(texto)).toString("base64");
+    } catch (e) {
+      console.error("[en vivo] voz despedida:", e instanceof Error ? e.message : e);
     }
   }
   return { texto, audio };

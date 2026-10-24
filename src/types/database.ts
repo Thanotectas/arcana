@@ -248,6 +248,8 @@ type EnVivoEstadoRow = {
   proxima_consulta: string | null;
   buscado_en: string | null;
   latido_en: string | null;
+  cierre_en: string | null;
+  despedida_en: string | null;
   actualizado_en: string;
 };
 
@@ -478,7 +480,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "actualizado_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "actualizado_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };

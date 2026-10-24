@@ -113,3 +113,28 @@ export async function accionAlternarCodigo(_prev: EstadoEnVivo, formData: FormDa
   revalidatePath("/admin/en-vivo");
   return { mensaje: activo ? `Código ${codigo} activo.` : `Código ${codigo} apagado.` };
 }
+
+/**
+ * Hora a la que Sibila se despide esta noche («HH:MM», hora de Bogotá), o
+ * «ahora». Borra la marca de despedida: si ya se había despedido y se corre la
+ * hora, el escenario vuelve a leer solo.
+ */
+export async function accionCierre(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  const ahora = formData.get("ahora") === "1";
+  const hora = String(formData.get("hora") ?? "").trim();
+  let cierre: Date;
+  if (ahora) cierre = new Date();
+  else {
+    if (!/^\d{2}:\d{2}$/.test(hora)) return { error: "Elige la hora de cierre." };
+    const hoy = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
+    cierre = new Date(`${hoy}T${hora}:00-05:00`);
+    // Pasada la medianoche, una hora de la noche se refiere a la noche que sigue en curso.
+    if (cierre.getTime() < Date.now() - 12 * 3_600_000) cierre = new Date(cierre.getTime() + 86_400_000);
+  }
+  const { error } = await getSupabaseAdmin().from("en_vivo_estado").update({ cierre_en: cierre.toISOString(), despedida_en: null }).eq("id", 1);
+  if (error) return { error: error.message.includes("cierre_en") ? "Falta aplicar la migración 0039 (cierre del directo)." : error.message };
+  revalidatePath("/admin/en-vivo");
+  const texto = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(cierre);
+  return { mensaje: ahora ? "Sibila se despide al terminar la lectura que está en curso." : `Sibila se despide a las ${texto}.` };
+}

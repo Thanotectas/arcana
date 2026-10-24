@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Copy, Send, Ticket, Trash2 } from "lucide-react";
-import { accionAlternarCodigo, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
+import { Clock, Copy, Hand, Send, Ticket, Trash2 } from "lucide-react";
+import { accionAlternarCodigo, accionCierre, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { Aviso } from "@/components/Aviso";
 
@@ -100,5 +100,33 @@ export function AlternarCodigo({ codigo, activo }: { codigo: string; activo: boo
       </BotonEnviar>
       {estado.error && <span className="ml-2 text-xs text-peligro">{estado.error}</span>}
     </form>
+  );
+}
+
+/** Hora de la despedida de Sibila (o despedirse ya). */
+export function CierreDirecto({ hora }: { hora: string }) {
+  const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(accionCierre, {});
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <form action={enviar} className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-texto-suave">Se despide a las (hora Colombia)</span>
+            <input type="time" name="hora" defaultValue={hora} required className="campo" />
+          </label>
+          <BotonEnviar className="boton boton-secundario text-sm" cargando="Guardando…">
+            <Clock className="h-4 w-4" aria-hidden /> Cambiar la hora
+          </BotonEnviar>
+        </form>
+        <form action={enviar}>
+          <input type="hidden" name="ahora" value="1" />
+          <BotonEnviar className="boton boton-fantasma text-sm" cargando="Avisando…">
+            <Hand className="h-4 w-4" aria-hidden /> Despedirse ya
+          </BotonEnviar>
+        </form>
+      </div>
+      {estado.error && <Aviso>{estado.error}</Aviso>}
+      {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
+    </div>
   );
 }

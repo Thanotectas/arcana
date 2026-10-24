@@ -703,6 +703,30 @@ body {
 .vivo-carta {
   animation: vivo-carta 4.5s ease-in-out infinite;
 }
+/* La campanita de «suscríbete» se mece cada pocos segundos. */
+@keyframes vivo-campana {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(16deg);
+  }
+  82% {
+    transform: rotate(-14deg);
+  }
+  89% {
+    transform: rotate(8deg);
+  }
+  95% {
+    transform: rotate(-4deg);
+  }
+}
+.vivo-campana {
+  transform-origin: 50% 10%;
+  animation: vivo-campana 4s ease-in-out infinite;
+}
 @keyframes vivo-parpadeo {
   0%,
   92%,

@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sitio } from "@/lib/correo";
-import { claveEscenario, escenarioActivo, maximoDiario } from "@/lib/en-vivo";
+import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoDiario } from "@/lib/en-vivo";
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
-import { AlternarCodigo, CrearCodigo, DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +32,9 @@ export default async function PaginaAdminEnVivo() {
   const fechaHora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "no vence");
   const url = `${sitio()}/en-vivo/escenario?clave=${claveEscenario()}`;
   const hora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "");
+  const cierre = new Date(horaCierre(estado));
+  const horaInput = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "America/Bogota" }).format(cierre);
+  const despedida = despedidaReciente(estado);
   const punto = (ok: boolean) => <span className={`inline-block h-2.5 w-2.5 rounded-full ${ok ? "bg-exito" : "bg-peligro"}`} />;
 
   return (
@@ -66,6 +69,16 @@ export default async function PaginaAdminEnVivo() {
           <li>OBS → Ajustes → Emisión → Servicio YouTube → pega la clave. Luego <strong>Iniciar transmisión</strong>.</li>
           <li>Al minuto, el estado de arriba debe decir «Directo encontrado». Sibila empieza a leer el chat.</li>
         </ol>
+      </section>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Cierre</h2>
+        <p className="text-sm text-texto-suave">
+          {despedida
+            ? `Sibila ya se despidió (${hora(despedida)}): el escenario muestra la pantalla final. Ya puedes «Finalizar transmisión» en OBS. Si quieres seguir, pon una hora más tarde.`
+            : `Sibila se despide ${fechaHora(cierre.toISOString())}: termina la lectura en curso, dice cuántas consultas leyó, invita a suscribirse y queda la pantalla final. Después finaliza la transmisión en OBS.`}
+        </p>
+        <CierreDirecto hora={horaInput} />
       </section>
 
       <section className="tarjeta space-y-3 p-5">
