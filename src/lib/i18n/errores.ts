@@ -22,6 +22,14 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     velas: t.velas.errores,
     aura: t.aura.errores,
     tabaco: t.tabaco.errores,
+    revolucion: t.revolucion.errores,
+    baraja: t.baraja.errores,
+    lenormand: t.lenormand.errores,
+    runas: t.runas.errores,
+    pendulo: t.pendulo.errores,
+    cafe: t.cafe.errores,
+    huevo: t.huevo.errores,
+    maya: t.maya.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }

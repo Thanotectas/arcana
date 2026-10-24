@@ -23,6 +23,16 @@ import type { EntradaChocolate } from "../chocolate";
 import { esColor, esIntencion, esSenal, type EntradaVelas, type Senal } from "../velas";
 import { calcularAura, esRespuestasValidas, PREGUNTAS } from "../aura";
 import type { EntradaTabaco } from "../tabaco";
+import { TIRADAS_BARAJA, BARAJA, cartaEspanola, nombreCartaEspanola } from "../oraculos/baraja";
+import { TIRADAS_LENORMAND, LENORMAND, cartaLenormand } from "../oraculos/lenormand";
+import { TIRADAS_RUNAS, RUNAS, runaPorId } from "../oraculos/runas";
+import { tiradaPorId, type ResultadoOraculo, type TiradaOraculo } from "../oraculos/comun";
+import { sacarDesdeAbanico, leerElegidas } from "../oraculos/sorteo";
+import { MOVIMIENTOS, PESO_MOVIMIENTO, inicioDelDia, type Movimiento } from "../oraculos/pendulo";
+import { calcularMaya, nombreKin } from "../oraculos/maya";
+import type { EntradaFoto } from "../oraculos/foto";
+import { calcularRevolucion } from "../astro/revolucion";
+import { randomInt } from "node:crypto";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
 
@@ -692,6 +702,191 @@ export async function accionIChing(_prev: EstadoAccion, formData: FormData): Pro
       entrada: { pregunta },
       resultado,
     });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Oráculos de cartas y runas: la persona elige del abanico (o de la bolsa) y
+// el servidor decide qué pieza hay en cada posición.
+// ---------------------------------------------------------------------------
+async function lecturaDeOraculo(
+  formData: FormData,
+  datos: { tipo: "baraja_espanola" | "lenormand" | "runas"; tiradas: TiradaOraculo[]; ids: string[]; invertible: (id: string) => boolean; probInvertida: number; grupo: string; titulo: (piezas: ResultadoOraculo["piezas"], tirada: TiradaOraculo) => string },
+): Promise<EstadoAccion> {
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  const tirada = tiradaPorId(datos.tiradas, formData.get("tirada"));
+  if (!tirada) return { error: `${datos.grupo}.tirada` };
+  if (!pregunta) return { error: `${datos.grupo}.pregunta` };
+  const elegidas = leerElegidas(formData.get("posiciones"));
+  if (!elegidas) return { error: `${datos.grupo}.elegir` };
+
+  let id: string;
+  try {
+    const piezas = sacarDesdeAbanico(datos.ids, elegidas, tirada.posiciones.length, datos.invertible, datos.probInvertida);
+    const resultado: ResultadoOraculo = { tirada: tirada.id, piezas };
+    id = await crearLectura({ tipo: datos.tipo, titulo: `${datos.titulo(piezas, tirada)}: ${pregunta}`.slice(0, 200), entrada: { pregunta }, resultado });
+  } catch (e) {
+    if (e instanceof Error && e.message === "Selección no válida.") return { error: `${datos.grupo}.elegir` };
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+export async function accionBaraja(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  return lecturaDeOraculo(formData, {
+    tipo: "baraja_espanola",
+    tiradas: TIRADAS_BARAJA,
+    ids: BARAJA.map((c) => c.id),
+    invertible: () => true,
+    probInvertida: 25,
+    grupo: "baraja",
+    titulo: (piezas) => piezas.map((p) => { const c = cartaEspanola(p.id); return c ? nombreCartaEspanola(c) : ""; }).slice(0, 3).join(" · "),
+  });
+}
+
+export async function accionLenormand(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  return lecturaDeOraculo(formData, {
+    tipo: "lenormand",
+    tiradas: TIRADAS_LENORMAND,
+    ids: LENORMAND.map((c) => c.id),
+    invertible: () => false,
+    probInvertida: 0,
+    grupo: "lenormand",
+    titulo: (piezas) => piezas.map((p) => cartaLenormand(p.id)?.nombre.es ?? "").slice(0, 3).join(" · "),
+  });
+}
+
+export async function accionRunas(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  return lecturaDeOraculo(formData, {
+    tipo: "runas",
+    tiradas: TIRADAS_RUNAS,
+    ids: RUNAS.map((r) => r.id),
+    invertible: (id) => Boolean(runaPorId(id)?.invertida),
+    probInvertida: 25,
+    grupo: "runas",
+    titulo: (piezas) => piezas.map((p) => runaPorId(p.id)?.nombre ?? "").join(" · "),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Péndulo: una pregunta de sí o no, gratis una vez al día.
+// ---------------------------------------------------------------------------
+function movimientoAlAzar(): Movimiento {
+  const total = MOVIMIENTOS.reduce((s, m) => s + PESO_MOVIMIENTO[m], 0);
+  let r = randomInt(0, total);
+  for (const m of MOVIMIENTOS) {
+    if (r < PESO_MOVIMIENTO[m]) return m;
+    r -= PESO_MOVIMIENTO[m];
+  }
+  return "vaiven";
+}
+
+export async function accionPendulo(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 200);
+  if (pregunta.length < 5) return { error: "pendulo.pregunta" };
+  const { user } = await usuarioActual();
+  const perfil = await getPerfil();
+  if (!perfil?.ilimitado) {
+    // Un péndulo gratis por día (hora de Colombia, donde está casi todo el público).
+    const desde = inicioDelDia();
+    const { count } = await getSupabaseAdmin().from("lecturas").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).eq("tipo", "pendulo").gte("creado_en", desde);
+    if ((count ?? 0) > 0) return { error: "pendulo.hoy" };
+  }
+  let id: string;
+  try {
+    const movimiento = movimientoAlAzar();
+    id = await crearLectura({ tipo: "pendulo", titulo: `Péndulo: ${pregunta}`, entrada: { pregunta }, resultado: { movimiento } });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Café y huevo: lecturas por foto, como el chocolate.
+// ---------------------------------------------------------------------------
+async function lecturaPorFoto(formData: FormData, tipo: "cafe" | "huevo", titulo: string): Promise<EstadoAccion> {
+  const { user } = await usuarioActual();
+  const foto = formData.get("foto");
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  if (!(foto instanceof File) || foto.size === 0) return { error: `${tipo}.foto` };
+  if (!TIPOS_FOTO.has(foto.type)) return { error: "FOTO_FORMATO" };
+  if (foto.size > TAMANO_MAX_FOTO) return { error: "FOTO_TAMANO" };
+  const tipoReal = tipoImagenReal(new Uint8Array(await foto.slice(0, 16).arrayBuffer()));
+  if (!tipoReal || tipoReal !== foto.type) return { error: "FOTO_FORMATO" };
+
+  const admin = getSupabaseAdmin();
+  const extension = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+  const ruta = `${user.id}/${tipo}-${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await admin.storage.from("palmas").upload(ruta, foto, { contentType: foto.type, upsert: false });
+  if (errorSubida) {
+    console.error(`[${tipo}] subida fallida`, errorSubida);
+    return { error: "FOTO_SUBIR" };
+  }
+  let id: string;
+  try {
+    const entrada: EntradaFoto = { foto: ruta, pregunta };
+    id = await crearLectura({ tipo, titulo: pregunta ? `${titulo}: ${pregunta}` : titulo, entrada, resultado: {} });
+  } catch (e) {
+    await admin.storage.from("palmas").remove([ruta]);
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+export async function accionCafe(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  return lecturaPorFoto(formData, "cafe", "Lectura del café");
+}
+
+export async function accionHuevo(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  return lecturaPorFoto(formData, "huevo", "Limpia con huevo");
+}
+
+// ---------------------------------------------------------------------------
+// Calendario maya: kin, tono y oráculo desde la fecha de nacimiento.
+// ---------------------------------------------------------------------------
+export async function accionMaya(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 80);
+  const fecha = String(formData.get("fecha") ?? "");
+  if (!nombre) return { error: "maya.nombre" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "maya.fecha" };
+  const anio = Number(fecha.slice(0, 4));
+  if (anio < 1900 || anio > new Date().getFullYear()) return { error: "maya.fecha" };
+  let id: string;
+  try {
+    const r = calcularMaya(fecha);
+    id = await crearLectura({ tipo: "maya", titulo: `${nombre}: Kin ${r.kin}, ${nombreKin(r.kin)}`, entrada: { nombre, fecha }, resultado: r });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Revolución solar: el año de cumpleaños a cumpleaños (premium).
+// ---------------------------------------------------------------------------
+export async function accionRevolucion(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const natal = leerNacimiento(formData, "");
+  const error = errorNacimiento(natal, "astral");
+  if (error) return { error };
+  const anio = Number(formData.get("anio"));
+  const actual = new Date().getFullYear();
+  if (!Number.isInteger(anio) || anio < actual - 1 || anio > actual + 1) return { error: "revolucion.anio" };
+  const otroLugar = formData.get("otro_lugar") === "on";
+  const lugar = otroLugar
+    ? { lugar: String(formData.get("lugar_rs") ?? "").trim().slice(0, 120), latitud: Number(formData.get("latitud_rs")), longitud: Number(formData.get("longitud_rs")), zonaHoraria: String(formData.get("zona_horaria_rs") ?? "") }
+    : { lugar: natal.lugar, latitud: natal.latitud, longitud: natal.longitud, zonaHoraria: natal.zonaHoraria };
+  if (!lugar.lugar || Number.isNaN(lugar.latitud) || Number.isNaN(lugar.longitud) || Math.abs(lugar.latitud) > 90 || Math.abs(lugar.longitud) > 180 || !zonaHorariaValida(lugar.zonaHoraria)) {
+    return { error: "revolucion.lugar" };
+  }
+  await guardarNacimiento(natal);
+  let id: string;
+  try {
+    const r = calcularRevolucion(natal, anio, lugar);
+    id = await crearLectura({ tipo: "revolucion_solar", titulo: `Revolución solar ${anio}-${anio + 1} de ${natal.nombre}`, entrada: { ...natal, anio, lugarRevolucion: lugar }, resultado: r });
   } catch (e) {
     return manejarError(e);
   }

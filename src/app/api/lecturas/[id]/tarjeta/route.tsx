@@ -13,6 +13,10 @@ import { FICHA, nombrePilar, type ResultadoChino } from "@/lib/chino";
 import type { ResultadoSinastria } from "@/lib/astro/sinastria";
 import type { TipoLectura } from "@/lib/creditos";
 import type { PerfilNumerologico } from "@/lib/numerologia";
+import { nombrePieza } from "@/components/VistaOraculo";
+import type { ResultadoOraculo } from "@/lib/oraculos/comun";
+import { nombreKin, type ResultadoMaya } from "@/lib/oraculos/maya";
+import { getIdioma } from "@/lib/i18n/servidor";
 
 /**
  * Tarjeta vertical para compartir una lectura en redes y WhatsApp: 1080×1350
@@ -56,7 +60,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (MAZOS_CON_IMAGEN.has(mazo)) imagenes = await Promise.all(cartas.slice(0, 3).map((c) => cartaComoDataUri(mazo, c.carta.id)));
     simbolos = cartas.slice(0, 4).map((c) => (c.carta.arcano === "mayor" ? "✦" : { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" }[c.carta.palo ?? "bastos"]));
     void (tipo as TipoTirada);
-  } else if (tipo === "carta_astral") {
+  } else if (tipo === "carta_astral" || tipo === "revolucion_solar") {
     const planetas = (resultado.planetas as { cuerpo: string; signo: string }[]) ?? [];
     const casas = resultado.casas as { ascendente: number } | undefined;
     const sol = signoPorId(planetas.find((p) => p.cuerpo === "sol")?.signo ?? "");
@@ -92,6 +96,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     simbolos = ["◉"];
     imagenes = [await auraComoDataUri(r.principal, r.secundario)];
     titulo = `${t.aura.tuAura}: ${nombres[r.principal]?.nombre ?? r.principal} + ${nombres[r.secundario]?.nombre ?? r.secundario}`;
+  } else if (tipo === "baraja_espanola" || tipo === "lenormand" || tipo === "runas") {
+    const r = resultado as unknown as ResultadoOraculo;
+    const idioma = await getIdioma();
+    simbolos = ["✦"];
+    titulo = (r.piezas ?? []).map((p) => nombrePieza(tipo, p.id, idioma)).join(" · ");
+  } else if (tipo === "maya") {
+    const r = resultado as unknown as ResultadoMaya;
+    simbolos = ["✦"];
+    titulo = `Kin ${r.kin} · ${nombreKin(r.kin, await getIdioma())}`;
+  } else if (tipo === "pendulo") {
+    const movimiento = String((resultado as { movimiento?: string }).movimiento ?? "");
+    simbolos = ["◇"];
+    titulo = `${t.pendulo.respondio}: ${(t.pendulo.movimientos as Record<string, string>)[movimiento] ?? movimiento}`;
   } else if (tipo === "tabaco") {
     simbolos = ["✦"];
     titulo = t.lecturas.nombres.tabaco;
@@ -129,7 +146,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     pie: t.lecturas.detalle.tarjetaPie,
     hexagrama,
     imagenes: imagenes?.filter(Boolean),
-    monedas: tipo === "carta_astral" || tipo === "compatibilidad" || tipo === "chino" || tipo === "sinastria" || tipo === "aura",
+    monedas: tipo === "carta_astral" || tipo === "revolucion_solar" || tipo === "compatibilidad" || tipo === "chino" || tipo === "sinastria" || tipo === "aura",
     formato,
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");

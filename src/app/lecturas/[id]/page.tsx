@@ -32,6 +32,12 @@ import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import type { Diccionario } from "@/lib/i18n/diccionarios";
 import type { Idioma } from "@/lib/i18n/idiomas";
+import { VistaOraculo } from "@/components/VistaOraculo";
+import { Pendulo } from "@/components/Pendulo";
+import type { ResultadoOraculo } from "@/lib/oraculos/comun";
+import type { ResultadoPendulo } from "@/lib/oraculos/pendulo";
+import { selloPorNumero, nombreKin, TONOS, NAWALES, COLOR_CSS, type ResultadoMaya } from "@/lib/oraculos/maya";
+import type { ResultadoRevolucion } from "@/lib/astro/revolucion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -49,7 +55,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
   const esChocolate = lectura.tipo === "chocolate";
   const esVelas = lectura.tipo === "velas";
   const esTabaco = lectura.tipo === "tabaco";
-  const urlFoto = esQuiromancia || esChocolate || esVelas || esTabaco ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
+  const esFotoNueva = lectura.tipo === "cafe" || lectura.tipo === "huevo";
+  const urlFoto = esQuiromancia || esChocolate || esVelas || esTabaco || esFotoNueva ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
 
   return (
     <article className="mx-auto max-w-4xl space-y-8">
@@ -84,6 +91,24 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
           <img src={urlFoto} alt={t.tabaco.tuTabaco} className="mx-auto max-h-96 rounded-xl" />
         </section>
+      )}
+      {esFotoNueva && urlFoto && (
+        <section className="tarjeta p-4">
+          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t[lectura.tipo as "cafe" | "huevo"].tuFoto}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
+          <img src={urlFoto} alt={t[lectura.tipo as "cafe" | "huevo"].tuFoto} className="mx-auto max-h-96 rounded-xl" />
+        </section>
+      )}
+      {(lectura.tipo === "baraja_espanola" || lectura.tipo === "lenormand" || lectura.tipo === "runas") && (
+        <VistaOraculo tipo={lectura.tipo} resultado={lectura.resultado as unknown as ResultadoOraculo} idioma={idioma} titulo={lectura.tipo === "runas" ? t.runas.tusCartas : t.baraja.tusCartas} invertida={t.oraculo.invertida} />
+      )}
+      {lectura.tipo === "pendulo" && <VistaPendulo resultado={lectura.resultado as unknown as ResultadoPendulo} t={t} />}
+      {lectura.tipo === "maya" && <VistaMaya resultado={lectura.resultado as unknown as ResultadoMaya} t={t} idioma={idioma} />}
+      {lectura.tipo === "revolucion_solar" && (
+        <>
+          <p className="text-sm text-oro-suave">{momentoRevolucion(lectura.resultado as unknown as ResultadoRevolucion, t)}</p>
+          <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />
+        </>
       )}
       {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
       {esVelas && <VistaVelas entrada={lectura.entrada as unknown as EntradaVelas} urlFoto={urlFoto} t={t} />}
@@ -142,6 +167,17 @@ function rutaNueva(tipo: string) {
   if (tipo === "velas") return "/velas";
   if (tipo === "aura") return "/aura";
   if (tipo === "tabaco") return "/tabaco";
+  const nuevas: Record<string, string> = {
+    revolucion_solar: "/revolucion-solar",
+    baraja_espanola: "/baraja-espanola",
+    lenormand: "/lenormand",
+    runas: "/runas",
+    pendulo: "/pendulo",
+    cafe: "/cafe",
+    huevo: "/huevo",
+    maya: "/calendario-maya",
+  };
+  if (nuevas[tipo]) return nuevas[tipo];
   return "/compatibilidad";
 }
 
@@ -449,6 +485,63 @@ function VistaAura({ resultado, t }: { resultado: ResultadoAura; t: Diccionario 
           ))}
         </ul>
       </div>
+    </section>
+  );
+}
+
+function momentoRevolucion(r: ResultadoRevolucion, t: Diccionario) {
+  return plantilla(t.revolucion.momento, { fecha: r.fechaLocal, hora: r.horaLocal, lugar: r.lugar?.lugar ?? "" });
+}
+
+function VistaPendulo({ resultado, t }: { resultado: ResultadoPendulo; t: Diccionario }) {
+  const movimientos = t.pendulo.movimientos as Record<string, string>;
+  return (
+    <section className="tarjeta flex flex-col items-center gap-2 p-6 text-center">
+      <Pendulo movimiento={resultado.movimiento} className="h-56 w-48" />
+      <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.pendulo.respondio}</p>
+      <p className="font-display text-4xl text-oro">{movimientos[resultado.movimiento] ?? resultado.movimiento}</p>
+    </section>
+  );
+}
+
+function VistaMaya({ resultado: r, t, idioma }: { resultado: ResultadoMaya; t: Diccionario; idioma: Idioma }) {
+  const sello = selloPorNumero(r.sello);
+  const tono = TONOS[r.tono - 1];
+  const oraculo = [
+    { etiqueta: t.maya.oraculo.guia, n: r.oraculo.guia },
+    { etiqueta: t.maya.oraculo.analogo, n: r.oraculo.analogo },
+    { etiqueta: t.maya.oraculo.antipoda, n: r.oraculo.antipoda },
+    { etiqueta: t.maya.oraculo.oculto, n: r.oraculo.oculto },
+  ];
+  const nawal = NAWALES[r.nawal.indice];
+  return (
+    <section className="tarjeta space-y-6 p-6">
+      <div className="flex flex-wrap items-center gap-5">
+        <div className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-2xl border-2 font-display" style={{ borderColor: COLOR_CSS[sello.color], boxShadow: `0 0 24px ${COLOR_CSS[sello.color]}55` }}>
+          <span className="text-xs uppercase tracking-widest text-texto-suave">Kin</span>
+          <span className="text-4xl">{r.kin}</span>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.maya.tuKin}</p>
+          <p className="font-display text-3xl">{nombreKin(r.kin, idioma)}</p>
+          <p className="text-sm text-texto-suave">{t.maya.sello}: {sello.nombre[idioma]} · {t.maya.tono} {tono.numero}: {tono.nombre[idioma]}</p>
+        </div>
+      </div>
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {oraculo.map((o) => {
+          const s = selloPorNumero(o.n);
+          return (
+            <li key={o.etiqueta} className="rounded-xl border border-borde p-3 text-center">
+              <span className="mx-auto mb-2 block h-3 w-3 rounded-full" style={{ background: COLOR_CSS[s.color] }} />
+              <span className="block text-xs uppercase tracking-widest text-texto-suave">{o.etiqueta}</span>
+              <span className="font-display text-lg">{s.nombre[idioma]}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="text-sm text-texto-suave">
+        {t.maya.nawal}: <span className="text-oro-suave">{r.nawal.numero} {nawal.nombre}</span> · {t.maya.kinHoy}: {r.kinHoy}, {nombreKin(r.kinHoy, idioma)}
+      </p>
     </section>
   );
 }

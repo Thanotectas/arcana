@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
@@ -79,6 +79,14 @@ export default async function PaginaInicio() {
     { href: "/chocolate", icono: Coffee, ...t.inicio.accesos.chocolate, costo: COSTOS.chocolate },
     { href: "/velas", icono: FlameKindling, ...t.inicio.accesos.velas, costo: COSTOS.velas },
     { href: "/tabaco", icono: Wind, ...t.inicio.accesos.tabaco, costo: COSTOS.tabaco },
+    { href: "/cafe", icono: Bean, ...t.inicio.accesos.cafe, costo: COSTOS.cafe },
+    { href: "/huevo", icono: Egg, ...t.inicio.accesos.huevo, costo: COSTOS.huevo },
+    { href: "/baraja-espanola", icono: Swords, ...t.inicio.accesos.baraja, costo: COSTOS.baraja_espanola },
+    { href: "/lenormand", icono: Clover, ...t.inicio.accesos.lenormand, costo: COSTOS.lenormand },
+    { href: "/runas", icono: Axe, ...t.inicio.accesos.runas, costo: COSTOS.runas },
+    { href: "/pendulo", icono: Diamond, ...t.inicio.accesos.pendulo, costo: COSTOS.pendulo },
+    { href: "/revolucion-solar", icono: Sun, ...t.inicio.accesos.revolucion, costo: COSTOS.revolucion_solar },
+    { href: "/calendario-maya", icono: Pyramid, ...t.inicio.accesos.maya, costo: COSTOS.maya },
     { href: "/aura", icono: Sparkle, ...t.inicio.accesos.aura, costo: COSTOS.aura },
     { href: "/cruce", icono: Layers, ...t.inicio.accesos.cruce, costo: COSTOS.cruce },
   ];

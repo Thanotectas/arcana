@@ -770,3 +770,15 @@ body {
   animation: vivo-parpadeo-retrato 5.2s linear infinite;
 }
 
+
+/* Péndulo: vaivén y giro (el giro se sugiere con la órbita bajo el cristal). */
+@keyframes pendulo-vaiven {
+  0%, 100% { transform: rotate(-22deg); }
+  50% { transform: rotate(22deg); }
+}
+.pendulo-vaiven { transform-origin: 100px 12px; animation: pendulo-vaiven 1.6s ease-in-out infinite; }
+.pendulo-lento { transform-origin: 100px 12px; animation: pendulo-vaiven 4s ease-in-out infinite; }
+.pendulo-giro { transform-origin: 100px 12px; animation: pendulo-vaiven 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .pendulo-vaiven, .pendulo-lento, .pendulo-giro { animation: none; }
+}

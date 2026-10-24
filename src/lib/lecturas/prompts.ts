@@ -19,6 +19,14 @@ import { resumenChocolate, TRADICION_CHOCOLATE, type EntradaChocolate } from "..
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
 import { resumenTabaco, TRADICION_TABACO, type EntradaTabaco } from "../tabaco";
+import { TIRADAS_BARAJA, resumenBaraja, TRADICION_BARAJA } from "../oraculos/baraja";
+import { TIRADAS_LENORMAND, resumenLenormand, TRADICION_LENORMAND } from "../oraculos/lenormand";
+import { TIRADAS_RUNAS, resumenRunas, TRADICION_RUNAS } from "../oraculos/runas";
+import { tiradaPorId, type ResultadoOraculo } from "../oraculos/comun";
+import { resumenPendulo, TRADICION_PENDULO, type EntradaPendulo, type ResultadoPendulo } from "../oraculos/pendulo";
+import { resumenMaya, TRADICION_MAYA, type ResultadoMaya } from "../oraculos/maya";
+import { resumenCafe, resumenHuevo, TRADICION_CAFE, TRADICION_HUEVO, type EntradaFoto } from "../oraculos/foto";
+import { resumenRevolucion, type ResultadoRevolucion } from "../astro/revolucion";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -224,6 +232,87 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Extensión: 600 a 850 palabras.`,
       sistemaExtra: TRADICION_TABACO,
       opciones: { idioma, effort: "medium", maxTokens: 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "baraja_espanola" || l.tipo === "lenormand" || l.tipo === "runas") {
+    const r = resultado as unknown as ResultadoOraculo;
+    const pregunta = String(entrada.pregunta ?? "");
+    const datos = {
+      baraja_espanola: { tiradas: TIRADAS_BARAJA, resumen: resumenBaraja, tradicion: TRADICION_BARAJA, que: "esta tirada de baraja española", anuncia: "## Lo que las cartas anuncian" },
+      lenormand: { tiradas: TIRADAS_LENORMAND, resumen: resumenLenormand, tradicion: TRADICION_LENORMAND, que: "esta tirada de Lenormand", anuncia: "## Lo que el Lenormand anuncia" },
+      runas: { tiradas: TIRADAS_RUNAS, resumen: resumenRunas, tradicion: TRADICION_RUNAS, que: "esta tirada de runas", anuncia: "## Lo que las runas anuncian" },
+    }[l.tipo];
+    const tirada = tiradaPorId(datos.tiradas, r.tirada) ?? datos.tiradas[0];
+    const corta = tirada.posiciones.length === 1;
+    const frase = l.tipo === "lenormand" ? "## La frase de las cartas (lo que dicen juntas, en dos o tres líneas, como respuesta directa), " : "";
+    return {
+      usuario:
+        `Interpreta ${datos.que} para la persona.\n\n${datos.resumen(tirada, r.piezas, pregunta)}\n\n` +
+        `Estructura: ${frase}## ${corta ? "La respuesta" : "Pieza por pieza"} (${corta ? "la pieza, su imagen y lo que responde a la pregunta" : "cada posición con su pieza, su sentido tradicional y lo que dice para esta persona"}), ` +
+        (corta ? "" : "## Cómo se hablan (la historia que cuentan juntas), ") +
+        `## Respuesta a tu pregunta (clara: sí, no o depende de qué, y por qué), ${anuncio(datos.anuncia)}, ## Consejo para los próximos días. ` +
+        `Extensión: ${corta ? "350 a 500" : "600 a 850"} palabras.`,
+      sistemaExtra: datos.tradicion,
+      opciones: { idioma, effort: "low", maxTokens: corta ? 1800 : 3000 },
+    };
+  }
+
+  if (l.tipo === "pendulo") {
+    const e = entrada as unknown as EntradaPendulo;
+    const r = resultado as unknown as ResultadoPendulo;
+    return {
+      usuario:
+        `Explica la respuesta del péndulo.\n\n${resumenPendulo(e, r)}\n\n` +
+        `Estructura: ## Lo que dijo el péndulo (la respuesta en una frase, sin rodeos), ## Lo que significa para ti (qué hay detrás de esta respuesta, en concreto), ## Una señal para confirmarlo (algo reconocible que la persona puede notar en los próximos días), ## Tu siguiente paso. ` +
+        `Extensión: 180 a 280 palabras.`,
+      sistemaExtra: TRADICION_PENDULO,
+      opciones: { idioma, effort: "low", maxTokens: 900 },
+    };
+  }
+
+  if (l.tipo === "maya") {
+    const r = resultado as unknown as ResultadoMaya;
+    const nombre = String(entrada.nombre ?? "");
+    return {
+      usuario:
+        `Interpreta el kin maya de esta persona.\n\n${resumenMaya(r, nombre, String(entrada.fecha ?? ""))}\n\n` +
+        `Estructura: ## Tu kin (quién eres según tu sello y tu tono, con ejemplos de la vida diaria), ## Tu sello solar (su acción, su poder y su esencia; luces y sombras), ## Tu tono galáctico (cómo actúas y la pregunta que te acompaña), ## Tu oráculo (guía, análogo, antípoda y oculto: una entrada breve para cada uno y cómo reconocerlos en las personas que te rodean), ## Tu nawal en la cuenta k'iche' (lo que añade la tradición viva), ## La energía de hoy (el kin del día y cómo te toca), ${anuncio("## Lo que tu kin anuncia")}, ## Síntesis. ` +
+        `Usa el nombre de la persona. Extensión: 800 a 1000 palabras.`,
+      sistemaExtra: TRADICION_MAYA,
+      opciones: { idioma, effort: "low", maxTokens: 3400 },
+    };
+  }
+
+  if (l.tipo === "cafe" || l.tipo === "huevo") {
+    const e = entrada as unknown as EntradaFoto;
+    const imagen = await descargarPalma(e.foto);
+    const esCafe = l.tipo === "cafe";
+    return {
+      usuario: esCafe
+        ? `Lee la borra del café de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenCafe(e)}\n\n` +
+          `Estructura: ## Lo que veo en tu taza (recorrido concreto: zonas limpias y zonas de borra espesa, y cada figura que sí se distingue, con su posición: borde o fondo, lado del asa o enfrente, si sube o baja; al menos cinco elementos si la foto lo permite), ## Figura por figura (su sentido tradicional y lo que puede decir para esta persona), ## Cómo se relacionan (la historia que cuentan juntas), ## Lo que el café responde (la pregunta, o el mensaje del momento), ${anuncio("## Lo que el café anuncia")}, ## Un consejo para los próximos días. ` +
+          `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer lo que nombras. Extensión: 800 a 1100 palabras.`
+        : `Lee el huevo de esta limpia (foto adjunta del vaso). Mira la imagen con detalle antes de escribir.\n\n${resumenHuevo(e)}\n\n` +
+          `Estructura: ## Lo que veo en el vaso (la yema, la clara, burbujas, hilos, manchas y figuras, con su posición: arriba, abajo, alrededor), ## Señal por señal (su sentido tradicional y lo que dice de tu energía), ## Lo que la limpia se llevó (lo que soltaste y cómo puedes sentirte en los próximos días), ${anuncio("## Lo que el huevo anuncia")}, ## Cómo cerrar la limpia (qué hacer con el agua y el huevo, y un gesto de protección sencillo para esta semana). ` +
+          `Extensión: 600 a 850 palabras.`,
+      sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4200 : 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+    };
+  }
+
+  if (l.tipo === "revolucion_solar") {
+    const r = resultado as unknown as ResultadoRevolucion;
+    const natal = entrada as unknown as DatosNacimiento;
+    return {
+      usuario:
+        `Interpreta esta revolución solar: es la predicción del año de la persona, de un cumpleaños al siguiente.\n\n${resumenRevolucion(r, natal)}\n\n` +
+        `Estructura: ## El tono de tu año (el Ascendente de la revolución${natal.horaDesconocida ? "" : " y la casa natal donde cae"}: qué clima tendrá el año y dónde se jugará), ## Dónde brilla tu Sol (la casa del Sol en la revolución: el área protagonista), ## Tus emociones este año (la Luna), ## Amor y vínculos (Venus, la casa 7 y la 5), ## Dinero y trabajo (casas 2, 6 y 10, Júpiter y Saturno), ## Cambios, viajes y aprendizajes (casas 3, 9 y 4, Urano), ## Los aspectos que marcan el año (los 3 o 4 más fuertes, en la vida real), ## Mes a mes (una línea por trimestre: qué se mueve en cada uno, con plazos amplios), ${anuncio(`## Lo que se anuncia para ${r.anio}-${r.anio + 1}`)}, ## Síntesis y un consejo para el año. ` +
+        (natal.horaDesconocida ? "La hora de nacimiento es desconocida: las casas son orientativas; dilo una vez y apóyate más en signos y aspectos. " : "") +
+        `Usa el nombre de la persona. Extensión: 1300 a 1700 palabras.`,
+      sistemaExtra:
+        "Revolución solar (técnica predictiva clásica): la carta del regreso del Sol a su grado natal describe el año. El Ascendente de la revolución da el tono; la casa del Sol, el área protagonista; la Luna, el clima emocional; los planetas angulares (casas 1, 4, 7, 10) pesan más; Júpiter abre y Saturno exige. Habla de lo que viene con franqueza y por áreas, con plazos amplios, sin fatalismos.",
+      opciones: { idioma, effort: "medium", maxTokens: 5200, nivel: "premium" },
     };
   }
 

@@ -37,6 +37,14 @@ export const RUTAS: Record<TipoLectura, string> = {
   velas: "/velas",
   aura: "/aura",
   tabaco: "/tabaco",
+  revolucion_solar: "/revolucion-solar",
+  baraja_espanola: "/baraja-espanola",
+  lenormand: "/lenormand",
+  runas: "/runas",
+  pendulo: "/pendulo",
+  cafe: "/cafe",
+  huevo: "/huevo",
+  maya: "/calendario-maya",
 };
 
 /** Sistema para el chat: quién es, qué sabe de la persona y de la app. */

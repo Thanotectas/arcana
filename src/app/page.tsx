@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
 import { PAQUETES, PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -38,6 +38,14 @@ export default async function Portada() {
     { icono: Coffee, ...t.portada.modulos.chocolate, href: "/chocolate" },
     { icono: FlameKindling, ...t.portada.modulos.velas, href: "/velas" },
     { icono: Wind, ...t.portada.modulos.tabaco, href: "/tabaco" },
+    { icono: Sun, ...t.portada.modulos.revolucion, href: "/revolucion-solar" },
+    { icono: Swords, ...t.portada.modulos.baraja, href: "/baraja-espanola" },
+    { icono: Clover, ...t.portada.modulos.lenormand, href: "/lenormand" },
+    { icono: Axe, ...t.portada.modulos.runas, href: "/runas" },
+    { icono: Diamond, ...t.portada.modulos.pendulo, href: "/pendulo" },
+    { icono: Bean, ...t.portada.modulos.cafe, href: "/cafe" },
+    { icono: Egg, ...t.portada.modulos.huevo, href: "/huevo" },
+    { icono: Pyramid, ...t.portada.modulos.maya, href: "/calendario-maya" },
     { icono: Sparkle, ...t.portada.modulos.aura, href: "/aura" },
     { icono: Moon, ...t.portada.modulos.horoscopo, href: "/horoscopo" },
     { icono: Orbit, ...t.portada.modulos.luna, href: "/luna" },

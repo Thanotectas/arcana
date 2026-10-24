@@ -8,7 +8,7 @@ import type { Diccionario } from "./i18n/diccionarios";
 export type GrupoCatalogo = "oraculos" | "cielo" | "pareja" | "profundo";
 export const GRUPOS_CATALOGO: GrupoCatalogo[] = ["oraculos", "cielo", "pareja", "profundo"];
 
-export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales" | "piedras";
+export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales" | "piedras" | "revolucion" | "baraja" | "lenormand" | "runas" | "pendulo" | "cafe" | "huevo" | "maya";
 
 export interface ItemCatalogo {
   clave: IconoCatalogo;
@@ -27,12 +27,20 @@ export const CATALOGO: ItemCatalogo[] = [
   { clave: "chocolate", href: "/chocolate", grupo: "oraculos", costo: COSTOS.chocolate },
   { clave: "velas", href: "/velas", grupo: "oraculos", costo: COSTOS.velas },
   { clave: "tabaco", href: "/tabaco", grupo: "oraculos", costo: COSTOS.tabaco },
+  { clave: "cafe", href: "/cafe", grupo: "oraculos", costo: COSTOS.cafe },
+  { clave: "huevo", href: "/huevo", grupo: "oraculos", costo: COSTOS.huevo },
+  { clave: "baraja", href: "/baraja-espanola", grupo: "oraculos", costo: COSTOS.baraja_espanola },
+  { clave: "lenormand", href: "/lenormand", grupo: "oraculos", costo: COSTOS.lenormand },
+  { clave: "runas", href: "/runas", grupo: "oraculos", costo: COSTOS.runas },
+  { clave: "pendulo", href: "/pendulo", grupo: "oraculos", costo: 0, requiereCuenta: true },
   { clave: "rituales", href: "/rituales", grupo: "oraculos", costo: 0 },
   { clave: "piedras", href: "/piedras", grupo: "oraculos", costo: 0 },
   { clave: "hoy", href: "/hoy", grupo: "cielo", costo: 0, requiereCuenta: true },
   { clave: "horoscopo", href: "/horoscopo", grupo: "cielo", costo: 0 },
   { clave: "luna", href: "/luna", grupo: "cielo", costo: 0 },
   { clave: "astral", href: "/carta-astral", grupo: "cielo", costo: COSTOS.carta_astral },
+  { clave: "revolucion", href: "/revolucion-solar", grupo: "cielo", costo: COSTOS.revolucion_solar },
+  { clave: "maya", href: "/calendario-maya", grupo: "cielo", costo: COSTOS.maya },
   { clave: "chino", href: "/calendario-chino", grupo: "cielo", costo: COSTOS.chino },
   { clave: "numerologia", href: "/numerologia", grupo: "cielo", costo: COSTOS.numerologia },
   { clave: "aura", href: "/aura", grupo: "profundo", costo: COSTOS.aura },

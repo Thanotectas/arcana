@@ -33,6 +33,14 @@ const ICONO: Record<TipoLectura, string> = {
   velas: "🕯",
   aura: "◉",
   tabaco: "~",
+  revolucion_solar: "☉↻",
+  baraja_espanola: "🂡",
+  lenormand: "☘",
+  runas: "ᚱ",
+  pendulo: "◇",
+  cafe: "☕",
+  huevo: "◯",
+  maya: "◈",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

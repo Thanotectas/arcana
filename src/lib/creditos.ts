@@ -19,7 +19,15 @@ export type TipoLectura =
   | "velas"
   | "aura"
   | "tabaco"
-  | "cruce";
+  | "cruce"
+  | "revolucion_solar"
+  | "baraja_espanola"
+  | "lenormand"
+  | "runas"
+  | "pendulo"
+  | "cafe"
+  | "huevo"
+  | "maya";
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -38,6 +46,14 @@ export const COSTOS: Record<TipoLectura, number> = {
   aura: 2,
   tabaco: 3,
   cruce: 4, // premium: combina dos sistemas con los datos de la persona
+  revolucion_solar: 6, // premium: el año completo, de cumpleaños a cumpleaños
+  baraja_espanola: 2,
+  lenormand: 2,
+  runas: 2,
+  pendulo: 0, // gratis: 1 por día (gancho, como la carta del día)
+  cafe: 3,
+  huevo: 3,
+  maya: 2,
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -57,6 +73,14 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   aura: "Lectura del aura",
   tabaco: "Lectura del tabaco",
   cruce: "Lectura cruzada",
+  revolucion_solar: "Revolución solar",
+  baraja_espanola: "Baraja española",
+  lenormand: "Lenormand",
+  runas: "Runas",
+  pendulo: "Péndulo",
+  cafe: "Lectura del café",
+  huevo: "Limpia con huevo",
+  maya: "Calendario maya",
 };
 
 /** Pregunta de seguimiento sobre una lectura. */

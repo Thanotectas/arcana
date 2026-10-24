@@ -20,6 +20,12 @@ import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
 import type { EntradaSueno } from "@/lib/suenos";
 import type { EntradaVelas } from "@/lib/velas";
 import type { TipoLectura } from "@/lib/creditos";
+import { nombrePieza } from "@/components/VistaOraculo";
+import { TIRADAS_BARAJA } from "@/lib/oraculos/baraja";
+import { TIRADAS_LENORMAND } from "@/lib/oraculos/lenormand";
+import { TIRADAS_RUNAS } from "@/lib/oraculos/runas";
+import { tiradaPorId, type ResultadoOraculo } from "@/lib/oraculos/comun";
+import { nombreKin, selloPorNumero, NAWALES, type ResultadoMaya } from "@/lib/oraculos/maya";
 
 export const maxDuration = 60;
 
@@ -81,7 +87,32 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       ),
     };
     fichas.push({ etiqueta: t.tarot.eligeMazo, valor: (t.tarot.mazos as Record<string, { nombre: string }>)[mazo]?.nombre ?? MAZOS[mazo].nombre });
-  } else if (tipo === "carta_astral") {
+  } else if (tipo === "baraja_espanola" || tipo === "lenormand" || tipo === "runas") {
+    const r = resultado as unknown as ResultadoOraculo;
+    const tiradas = tipo === "baraja_espanola" ? TIRADAS_BARAJA : tipo === "lenormand" ? TIRADAS_LENORMAND : TIRADAS_RUNAS;
+    const tirada = tiradaPorId(tiradas, r.tirada) ?? tiradas[0];
+    visual = {
+      tipo: "cartas",
+      items: (r.piezas ?? []).map((p) => ({
+        imagen: null,
+        nombre: nombrePieza(tipo, p.id, idioma) + (p.invertida ? ` (${t.pdf.invertida})` : ""),
+        posicion: tirada.posiciones[p.posicion]?.nombre[idioma] ?? "",
+      })),
+    };
+  } else if (tipo === "pendulo") {
+    const movimiento = String((resultado as { movimiento?: string }).movimiento ?? "");
+    fichas.push({ etiqueta: t.pendulo.respondio, valor: (t.pendulo.movimientos as Record<string, string>)[movimiento] ?? movimiento });
+  } else if (tipo === "maya") {
+    const r = resultado as unknown as ResultadoMaya;
+    titulo = `Kin ${r.kin} · ${nombreKin(r.kin, idioma)}`;
+    fichas.push(
+      { etiqueta: t.maya.oraculo.guia, valor: selloPorNumero(r.oraculo.guia).nombre[idioma] },
+      { etiqueta: t.maya.oraculo.analogo, valor: selloPorNumero(r.oraculo.analogo).nombre[idioma] },
+      { etiqueta: t.maya.oraculo.antipoda, valor: selloPorNumero(r.oraculo.antipoda).nombre[idioma] },
+      { etiqueta: t.maya.oraculo.oculto, valor: selloPorNumero(r.oraculo.oculto).nombre[idioma] },
+      { etiqueta: t.maya.nawal, valor: `${r.nawal.numero} ${NAWALES[r.nawal.indice]?.nombre ?? ""}` },
+    );
+  } else if (tipo === "carta_astral" || tipo === "revolucion_solar") {
     const planetas = (resultado.planetas as { cuerpo: string; signo: string }[]) ?? [];
     const casas = resultado.casas as { ascendente: number } | undefined;
     const sol = signoPorId(planetas.find((p) => p.cuerpo === "sol")?.signo ?? "");
@@ -135,7 +166,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       titulo: h ? `${h.numero}. ${h.nombre} ${h.chino}` : lectura.titulo,
       futuro: f ? `${t.pdf.futuro}: ${f.numero}. ${f.nombre}` : undefined,
     };
-  } else if (tipo === "quiromancia" || tipo === "chocolate" || tipo === "velas" || tipo === "tabaco") {
+  } else if (tipo === "quiromancia" || tipo === "chocolate" || tipo === "velas" || tipo === "tabaco" || tipo === "cafe" || tipo === "huevo") {
     const foto = await fotoComoDataUri(entrada.foto);
     if (foto) visual = { tipo: "foto", imagen: foto };
     if (tipo === "velas") {

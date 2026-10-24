@@ -15,7 +15,7 @@ type Modo = "inicio" | "camara" | "vista";
  * permiso, se puede elegir una imagen de la galería. La foto se recorta al
  * marco, se reduce (máx. 1280 px, JPEG) y queda en un input oculto.
  */
-export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" | "vela" | "tabaco"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
+export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "derecha" }: { nombreCampo?: string; /** Qué se encuadra: una palma o una taza vista desde arriba. */ variante?: "mano" | "taza" | "vela" | "tabaco" | "cafe" | "huevo"; /** Qué mano se fotografía: el contorno se refleja para la derecha. */ mano?: "derecha" | "izquierda" }) {
   const { t } = useT();
   const taza = variante !== "mano";
   const textos =
@@ -25,8 +25,12 @@ export function CapturaPalma({ nombreCampo = "foto", variante = "mano", mano = "
         ? { alinea: t.velas.alineaVela, guia: t.velas.guiaFoto, alt: t.velas.tuVela }
         : variante === "tabaco"
           ? { alinea: t.tabaco.alinea, guia: t.tabaco.guiaFoto, alt: t.tabaco.tuTabaco }
-          : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
-  const guia = (enVivo = false) => (variante === "tabaco" ? <GuiaTabaco enVivo={enVivo} /> : taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
+          : variante === "cafe"
+            ? { alinea: t.cafe.alinea, guia: t.cafe.guiaFoto, alt: t.cafe.tuFoto }
+            : variante === "huevo"
+              ? { alinea: t.huevo.alinea, guia: t.huevo.guiaFoto, alt: t.huevo.tuFoto }
+              : { alinea: t.quiromancia.alineaPalma, guia: t.quiromancia.guia, alt: t.quiromancia.tuPalma };
+  const guia = (enVivo = false) => (variante === "tabaco" ? <GuiaTabaco enVivo={enVivo} /> : variante === "huevo" ? <GuiaVaso enVivo={enVivo} /> : taza ? <GuiaTaza enVivo={enVivo} /> : <GuiaMano enVivo={enVivo} mano={mano} />);
   const [modo, setModo] = useState<Modo>("inicio");
   const [vista, setVista] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -321,6 +325,26 @@ function GuiaTaza({ enVivo = false }: { enVivo?: boolean }) {
       <circle cx="140" cy="200" r="118" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
       <circle cx="140" cy="200" r="70" fill="none" stroke="rgba(241,217,154,0.35)" strokeWidth="1.5" strokeDasharray="3 5" />
       <path d="M258 165c28 0 36 20 36 35s-8 35-36 35" fill="none" stroke={enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)"} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" />
+    </svg>
+  );
+}
+
+/** Contorno de un vaso de agua visto de frente, con la yema al fondo. */
+function GuiaVaso({ enVivo = false }: { enVivo?: boolean }) {
+  const color = enVivo ? "rgba(241,217,154,0.95)" : "rgba(241,217,154,0.8)";
+  const vaso = "M78 60 L222 60 L204 350 Q150 362 96 350 Z";
+  return (
+    <svg viewBox="0 0 300 400" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <defs>
+        <mask id="fueraVaso">
+          <rect width="300" height="400" fill="white" />
+          <path d={vaso} fill="black" />
+        </mask>
+      </defs>
+      {enVivo && <rect width="300" height="400" fill="rgba(11,7,22,0.55)" mask="url(#fueraVaso)" />}
+      <path d={vaso} fill={enVivo ? "none" : "rgba(143,199,255,0.08)"} stroke={color} strokeWidth={enVivo ? 3 : 2} strokeDasharray="6 6" className={enVivo ? "marco-vivo" : undefined} />
+      <line x1="84" y1="100" x2="216" y2="100" stroke="rgba(143,199,255,0.5)" strokeWidth="1.5" strokeDasharray="3 5" />
+      <ellipse cx="150" cy="320" rx="26" ry="18" fill="none" stroke="rgba(241,217,154,0.5)" strokeWidth="1.5" />
     </svg>
   );
 }
