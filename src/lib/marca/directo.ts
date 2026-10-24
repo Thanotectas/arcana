@@ -6,7 +6,7 @@
  */
 export const PROXIMO_DIRECTO = {
   inicio: "2026-10-25T20:00:00-05:00",
-  fin: "2026-10-25T22:00:00-05:00",
+  fin: "2026-10-25T21:00:00-05:00",
   url: "https://youtube.com/live/ONPScsjRvZ4",
   codigo: { codigo: "SIBILA", creditosExtra: 2 } as { codigo: string; creditosExtra: number } | null,
   video: "directo",
