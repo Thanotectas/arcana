@@ -1,0 +1,114 @@
+BARAJA ESPAÑOLA DE ARCANA CON GEMINI — 40 cartas + reverso en 9 imágenes
+
+Por palo van dos imágenes: una cuadrícula de 6 (del 1 al 6, 3 columnas × 2 filas) y otra de 4 (el 7, la Sota,
+el Caballo y el Rey, 2 columnas × 2 filas). Al final, el reverso. Pide la resolución más alta. Adjunta la
+cuadrícula aprobada de Oros 1–6 como referencia de estilo en todas las demás. Si sale texto, números, cartas de
+distinto tamaño o un número de figuras equivocado (es el error típico: cuéntalas), repite esa imagen.
+Sube las imágenes a marketing/imagenes/fuentes-gemini/ con estos nombres:
+baraja-oros-1.jpg, baraja-oros-2.jpg, baraja-copas-1.jpg, baraja-copas-2.jpg, baraja-espadas-1.jpg,
+baraja-espadas-2.jpg, baraja-bastos-1.jpg, baraja-bastos-2.jpg, baraja-reverso.jpg
+
+==================== ESTILO MAESTRO (va en todos los prompts) ====================
+
+Una sola imagen que contiene [6 cartas en 3 columnas y 2 filas | 4 cartas en 2 columnas y 2 filas] de una baraja
+española. Cada carta es un rectángulo vertical en proporción 2:3, todas del mismo tamaño exacto, separadas entre sí
+y del borde por franjas de fondo negro liso de unos 40 píxeles, sin nada en esas franjas.
+
+Estilo de todas las cartas, idéntico entre sí: naipe español clásico (de la tradición de los naipes de Vitoria y
+de las barajas que se usan en España y Latinoamérica) redibujado como ilustración de lujo: grabado fino coloreado
+a mano con gouache, líneas de tinta delicadas, colores planos y cálidos con sombreado suave, sin aspecto de 3D ni
+de fotografía. Fondo de papel crema envejecido con una textura muy sutil. Marco de cada carta: doble filete fino,
+el exterior granate y el interior dorado, con pequeños adornos en las cuatro esquinas, idéntico en todas. Paleta
+por palo: Oros en oro y ocre con rojos; Copas en rojo granate y oro; Espadas en azul acero y oro; Bastos en verde
+oliva y madera castaña. Las figuras humanas visten ropa del Renacimiento español (jubones, capas, calzas, sombreros
+de ala o coronas), con rostros expresivos y dignos, diversos entre sí (edades, tonos de piel, rasgos), nunca
+caricaturas. Sin cartela, sin título, sin texto, sin letras, sin números, sin índices en las esquinas, sin firmas
+ni marcas de agua. En las cartas numéricas se ven SOLO los símbolos del palo, exactamente en la cantidad indicada,
+grandes, ordenados y simétricos, con un pequeño adorno vegetal central si queda espacio.
+
+Los símbolos: Oro = moneda de oro grande con un sol o una flor grabados en el centro. Copa = cáliz dorado de pie
+alto con detalles rojos. Espada = espada recta de hoja azul acero, empuñadura dorada con guarda en cruz. Basto =
+garrote de madera nudosa, verde y castaño, con pequeños brotes de hojas.
+
+==================== OROS · imagen 1 (cuadrícula 3 × 2) ====================
+De izquierda a derecha y de arriba abajo:
+1. As de oros: una sola moneda de oro enorme en el centro, con un sol de rostro sereno grabado y rayos alrededor,
+   enmarcada por una guirnalda de laurel.
+2. Dos de oros: exactamente 2 monedas, una arriba y otra abajo, unidas por una cinta roja ondulante.
+3. Tres de oros: exactamente 3 monedas en columna vertical, una sobre otra.
+4. Cuatro de oros: exactamente 4 monedas, una en cada esquina del centro de la carta (2 arriba, 2 abajo).
+5. Cinco de oros: exactamente 5 monedas: 2 arriba, 1 en el centro, 2 abajo.
+6. Seis de oros: exactamente 6 monedas en dos columnas de 3.
+
+==================== OROS · imagen 2 (cuadrícula 2 × 2) ====================
+1. Siete de oros: exactamente 7 monedas: dos columnas de 3 y una más en el centro, arriba.
+2. Sota de oros: joven de pie, de cuerpo entero, con jubón rojo y capa ocre, que sostiene una moneda de oro grande
+   a la altura del pecho con ambas manos y la mira con atención.
+3. Caballo de oros: caballero joven montado en un caballo blanco que avanza al paso, con una moneda de oro
+   levantada en la mano derecha; arreos rojos y dorados.
+4. Rey de oros: rey maduro sentado en un trono de madera dorada, con corona, manto granate con armiño y una moneda
+   de oro apoyada en la rodilla; mirada firme y generosa.
+
+==================== COPAS · imagen 1 (cuadrícula 3 × 2) ====================
+1. As de copas: una sola copa enorme y muy ornamentada en el centro, de la que brota agua clara que cae por los
+   lados, con un corazón pequeño grabado en el cáliz.
+2. Dos de copas: exactamente 2 copas, una frente a otra en el centro, unidas por una cinta roja.
+3. Tres de copas: exactamente 3 copas: 2 arriba y 1 abajo.
+4. Cuatro de copas: exactamente 4 copas: 2 arriba y 2 abajo.
+5. Cinco de copas: exactamente 5 copas: 2 arriba, 1 en el centro, 2 abajo.
+6. Seis de copas: exactamente 6 copas en dos columnas de 3.
+
+==================== COPAS · imagen 2 (cuadrícula 2 × 2) ====================
+1. Siete de copas: exactamente 7 copas: dos columnas de 3 y una más en el centro, arriba.
+2. Sota de copas: joven de pie, de cuerpo entero, con jubón azul y capa roja, que sostiene una copa dorada con
+   delicadeza, como si ofreciera un brindis.
+3. Caballo de copas: caballero montado en un caballo castaño, que levanta una copa dorada; gesto amable y
+   enamorado; arreos rojos.
+4. Rey de copas: rey sentado en su trono, con corona y manto rojo, que sostiene una copa dorada en alto con la mano
+   derecha; rostro bondadoso.
+
+==================== ESPADAS · imagen 1 (cuadrícula 3 × 2) ====================
+1. As de espadas: una sola espada enorme, vertical, con la punta hacia arriba, sostenida por una mano que sale de
+   una nube a la altura de la empuñadura, rodeada por una corona de laurel.
+2. Dos de espadas: exactamente 2 espadas que se cruzan en el centro formando una X, con la punta hacia arriba.
+3. Tres de espadas: exactamente 3 espadas: 2 cruzadas en X y 1 vertical en el centro.
+4. Cuatro de espadas: exactamente 4 espadas: 2 pares cruzados en X, uno arriba y otro abajo.
+5. Cinco de espadas: exactamente 5 espadas: 2 pares cruzados en X y 1 vertical en el centro.
+6. Seis de espadas: exactamente 6 espadas: 3 pares cruzados en X, en columna.
+
+==================== ESPADAS · imagen 2 (cuadrícula 2 × 2) ====================
+1. Siete de espadas: exactamente 7 espadas: 3 pares cruzados en X en columna y 1 vertical en el centro.
+2. Sota de espadas: joven de pie, de cuerpo entero, con jubón azul acero y capa gris, que sostiene una espada
+   apoyada sobre el hombro; mirada alerta, de perfil.
+3. Caballo de espadas: caballero con armadura ligera montado en un caballo negro que galopa, con la espada en
+   alto; capa al viento.
+4. Rey de espadas: rey sentado en un trono de piedra, con corona y armadura bajo el manto azul, que sostiene una
+   espada vertical delante del pecho; rostro serio y justo.
+
+==================== BASTOS · imagen 1 (cuadrícula 3 × 2) ====================
+1. As de bastos: un solo basto enorme de madera nudosa, vertical, sostenido por una mano que sale de una nube,
+   con brotes de hojas verdes que nacen de la madera.
+2. Dos de bastos: exactamente 2 bastos cruzados en el centro formando una X.
+3. Tres de bastos: exactamente 3 bastos: 2 cruzados en X y 1 vertical en el centro.
+4. Cuatro de bastos: exactamente 4 bastos: 2 pares cruzados en X, uno arriba y otro abajo.
+5. Cinco de bastos: exactamente 5 bastos: 2 pares cruzados en X y 1 vertical en el centro.
+6. Seis de bastos: exactamente 6 bastos: 3 pares cruzados en X, en columna.
+
+==================== BASTOS · imagen 2 (cuadrícula 2 × 2) ====================
+1. Siete de bastos: exactamente 7 bastos: 3 pares cruzados en X en columna y 1 vertical en el centro.
+2. Sota de bastos: joven de pie, de cuerpo entero, con jubón verde y capa castaña, que se apoya en un basto alto
+   como en un bastón de caminante; sonrisa decidida.
+3. Caballo de bastos: caballero montado en un caballo bayo que se encabrita, con un basto en alto; mucha energía.
+4. Rey de bastos: rey sentado en un trono de madera tallada con hojas, con corona y manto verde, que sostiene un
+   basto como un cetro; mirada de líder.
+
+==================== REVERSO (una sola carta vertical 2:3 sobre fondo negro) ====================
+Una sola carta vertical en proporción 2:3 vista por el reverso, sobre fondo negro. Mismo estilo de grabado
+coloreado: fondo granate profundo con una trama fina de rombos dorados, en el centro un medallón crema con los
+cuatro símbolos de la baraja española (moneda, copa, espada y basto) dispuestos en cruz alrededor de una estrella
+de ocho puntas dorada, y el mismo marco de doble filete granate y oro con adornos en las esquinas. Diseño
+simétrico, que se vea igual al girarlo. Sin texto.
+
+==================== ESTADO ====================
+Pendiente de generar (24 oct 2026). Cuando estén las imágenes, Claude las recorta a 500×750 en
+public/cartas/espanola/<palo>-<numero>.webp (10 = sota, 11 = caballo, 12 = rey) y dorso.webp.
