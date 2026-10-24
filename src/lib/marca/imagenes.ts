@@ -22,6 +22,11 @@ export function cartaComoDataUri(mazo: IdMazo, id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", "cartas", mazo, `${id}.webp`), { alto: 527 });
 }
 
+/** Carta de la baraja española (public/cartas/espanola/<palo>-<numero>.webp). */
+export function cartaEspanolaComoDataUri(id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "espanola", `${id}.webp`), { alto: 527 });
+}
+
 /** Moneda dorada (signo occidental o animal chino), reducida para la tarjeta. */
 export function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), { lado: 260 });

@@ -5,7 +5,7 @@ import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri } from "@/lib/marca/imagenes";
 import type { ResultadoAura } from "@/lib/aura";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
@@ -101,6 +101,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const idioma = await getIdioma();
     simbolos = ["✦"];
     titulo = (r.piezas ?? []).map((p) => nombrePieza(tipo, p.id, idioma)).join(" · ");
+    if (tipo === "baraja_espanola") imagenes = await Promise.all((r.piezas ?? []).slice(0, 3).map((p) => cartaEspanolaComoDataUri(p.id)));
   } else if (tipo === "maya") {
     const r = resultado as unknown as ResultadoMaya;
     simbolos = ["✦"];

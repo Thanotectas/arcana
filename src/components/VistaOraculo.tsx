@@ -1,11 +1,9 @@
-import { Coins, Wine, Sword, Wand } from "lucide-react";
-import { TIRADAS_BARAJA, cartaEspanola, nombreCartaEspanola, type Palo } from "@/lib/oraculos/baraja";
+import { TIRADAS_BARAJA, cartaEspanola, nombreCartaEspanola } from "@/lib/oraculos/baraja";
 import { TIRADAS_LENORMAND, cartaLenormand } from "@/lib/oraculos/lenormand";
 import { TIRADAS_RUNAS, runaPorId, type Runa } from "@/lib/oraculos/runas";
 import { tiradaPorId, type ResultadoOraculo } from "@/lib/oraculos/comun";
 import type { Idioma } from "@/lib/i18n/idiomas";
 
-const ICONO_PALO: Record<Palo, typeof Coins> = { oros: Coins, copas: Wine, espadas: Sword, bastos: Wand };
 
 /** Las piezas que salieron en una lectura de baraja española, Lenormand o runas. */
 export function VistaOraculo({ tipo, resultado, idioma, titulo, invertida }: { tipo: "baraja_espanola" | "lenormand" | "runas"; resultado: ResultadoOraculo; idioma: Idioma; titulo: string; invertida: string }) {
@@ -43,14 +41,9 @@ export function nombrePieza(tipo: "baraja_espanola" | "lenormand" | "runas", id:
 function PiezaEspanola({ id, invertida, idioma }: { id: string; invertida: boolean; idioma: Idioma }) {
   const c = cartaEspanola(id);
   if (!c) return null;
-  const Icono = ICONO_PALO[c.palo];
-  const figura = c.numero === 1 ? (idioma === "en" ? "A" : "As") : c.numero >= 10 ? nombreCartaEspanola(c, idioma).split(" ")[0] : String(c.numero);
   return (
-    <div className={`flex aspect-[2/3] w-full flex-col items-center justify-between rounded-lg border border-oro/40 bg-gradient-to-b from-[#f6efdf] to-[#e8dcc0] p-2 text-[#3a2a12] shadow-lg ${invertida ? "rotate-180" : ""}`}>
-      <span className="self-start font-display text-lg leading-none">{figura}</span>
-      <Icono className="h-10 w-10 drop-shadow" style={{ color: { oros: "#b8860b", copas: "#b0303a", espadas: "#2f5d8a", bastos: "#3d6b35" }[c.palo] }} aria-hidden />
-      <span className="self-end rotate-180 font-display text-lg leading-none">{figura}</span>
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element -- ilustración estática del mazo
+    <img src={`/cartas/espanola/${c.id}.webp`} alt={nombreCartaEspanola(c, idioma)} width={500} height={750} className={`aspect-[2/3] w-full rounded-lg shadow-lg ${invertida ? "rotate-180" : ""}`} />
   );
 }
 
