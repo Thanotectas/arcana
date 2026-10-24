@@ -20,6 +20,7 @@ import { vozConfigurada } from "@/lib/redes/voz";
 import { cuentaYoutube, privacidadYoutube, youtubeConfigurado } from "@/lib/redes/youtube";
 import { BotonDesconectarYoutube, BotonShortDelDia, SubirYoutube } from "@/components/admin/SubirYoutube";
 import { BotonDesconectarTiktok, BotonEstadosTiktok, PublicarTiktok, type FuenteTiktok } from "@/components/admin/PublicarTiktok";
+import { PublicarReelMeta } from "@/components/admin/PublicarReelMeta";
 import { Aviso } from "@/components/Aviso";
 
 // Generar una semana (Sibila) o el reel de la carta del día puede tardar medio minuto o más.
@@ -161,6 +162,14 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
           {diagnostico.avisoId && <p className="text-xs text-oro-suave">{diagnostico.avisoId}</p>}
           {diagnostico.tokenDeUsuario && <p className="text-xs text-oro-suave">{`${diagnostico.fuenteToken} es un token de usuario: funciona, pero vence. Cámbialo por el token de la página (en el Explorador: 1337589612768238?fields=name,access_token).`}</p>}
         </div>
+      </section>
+
+      <section id="video-meta" className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Publicar un video en Instagram y Facebook</h2>
+        <p className="text-sm text-texto-suave">
+          Para los videos hechos aparte (Gemini, Kling, montajes): sube el MP4 vertical (hasta 50 MB), pega el texto y sale ya como reel en Instagram y como video en la página de Facebook.
+        </p>
+        <PublicarReelMeta fuentes={fuentesTiktok} />
       </section>
 
       <section id="tiktok" className="tarjeta space-y-3 p-5">
