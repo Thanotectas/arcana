@@ -150,6 +150,7 @@ export const pt: Diccionario = {
       tabaco: { titulo: "Leitura do charuto", texto: "Acenda um charuto, fotografe-o quando tiver cinza e Sibila lê a queima, a cinza e a capa como se faz no Caribe." },
       luna: { titulo: "Calendário lunar", texto: "Lua nova, cheia e quartos com seu signo, a hora exata no seu fuso e um ritual simples para cada fase. Grátis." },
       rituales: { titulo: "Guia de rituais", texto: "Como preparar a xícara de chocolate, o charuto, a mão e as moedas do I Ching, e o que se pode ver em cada um. Grátis." },
+      piedras: {"titulo": "Pedras e energias", "texto": "A energia de cada pedra, qual acompanha o seu signo e como limpar e energizar. Grátis."},
     },
     comoFunciona: "Como funciona",
     pasos: [
@@ -940,6 +941,111 @@ export const pt: Diccionario = {
     foto: "Sua foto",
     afinidad: "Afinidade",
     futuro: "Hexagrama resultante",
+  },
+  piedras: {
+    "seccion": "Guia gratuito",
+    "titulo": "Pedras e suas energias",
+    "intro": "Cada pedra guarda uma tradição: uma cor, uma intenção e um jeito de usar. Aqui está a simbologia das mais conhecidas, qual acompanha o seu signo e como limpar e energizar as suas pedras.",
+    "porIntencion": "Escolha pela intenção",
+    "energia": "Energia",
+    "uso": "Como usar",
+    "signos": "Signos",
+    "signoTitulo": "A pedra do seu signo",
+    "limpiarTitulo": "Como limpar e energizar suas pedras",
+    "limpiarPasos": [
+      "Limpe ao levar para casa e sempre que sentir que está \"pesada\": passe pela fumaça de incenso ou palo santo, ou deixe alguns minutos sob água corrente (selenita e pirita não podem molhar: use fumaça ou terra).",
+      "Energize sob a lua cheia por uma noite inteira, ou alguns minutos no sol da manhã (ametista e quartzo rosa desbotam com muito sol).",
+      "Programe: segure a pedra, respire três vezes e diga baixinho para que você a quer, numa frase curta e no presente.",
+      "Leve com você (bolso, bolsa ou colar) ou deixe onde ela trabalha: o criado-mudo, a escrivaninha, a entrada de casa."
+    ],
+    "aviso": "A simbologia das pedras é uma tradição de reflexão e bem-estar. Não substitui tratamento médico nem psicológico.",
+    "cta": "Combine com um ritual de vela",
+    "nombresSignos": {
+      "aries": "Áries",
+      "tauro": "Touro",
+      "geminis": "Gêmeos",
+      "cancer": "Câncer",
+      "leo": "Leão",
+      "virgo": "Virgem",
+      "libra": "Libra",
+      "escorpio": "Escorpião",
+      "sagitario": "Sagitário",
+      "capricornio": "Capricórnio",
+      "acuario": "Aquário",
+      "piscis": "Peixes"
+    },
+    "piedras": {
+      "cuarzo_rosa": {
+        "nombre": "Quartzo rosa",
+        "energia": "A pedra do amor: atrai afeto, suaviza as feridas do coração e desperta o amor-próprio.",
+        "uso": "Deixe no criado-mudo ou leve perto do peito. Para casais, uma em cada criado-mudo."
+      },
+      "amatista": {
+        "nombre": "Ametista",
+        "energia": "Acalma a mente, ajuda a dormir e abre a intuição. Usada contra os excessos e a ansiedade do dia.",
+        "uso": "Debaixo do travesseiro ou ao lado da cama; segure enquanto medita ou antes de interpretar um sonho."
+      },
+      "citrino": {
+        "nombre": "Citrino",
+        "energia": "A pedra do comerciante: atrai dinheiro, alegria e boas vendas. Contagia otimismo.",
+        "uso": "No caixa, na carteira ou no canto esquerdo do fundo da sua casa ou loja."
+      },
+      "pirita": {
+        "nombre": "Pirita",
+        "energia": "O \"ouro dos tolos\" chama prosperidade e trabalho. Dá confiança para negociar e cobrar.",
+        "uso": "Sobre a escrivaninha ou na carteira. Não molhe: limpe com fumaça."
+      },
+      "jade": {
+        "nombre": "Jade",
+        "energia": "Sorte, abundância duradoura e harmonia em casa. No Oriente é a pedra da boa fortuna.",
+        "uso": "No bolso para uma entrevista ou um negócio; na sala para a harmonia da família."
+      },
+      "cuarzo_cristal": {
+        "nombre": "Quartzo cristal",
+        "energia": "A pedra mestra: limpa, traz clareza e amplifica a intenção das outras pedras.",
+        "uso": "Coloque ao lado de outra pedra para potencializá-la, ou no centro do seu altar ou mesa."
+      },
+      "turmalina_negra": {
+        "nombre": "Turmalina negra",
+        "energia": "A grande protetora: absorve inveja e energias ruins e ajuda você a se manter firme.",
+        "uso": "Na entrada de casa, ao lado do computador ou no bolso em lugares pesados."
+      },
+      "obsidiana": {
+        "nombre": "Obsidiana",
+        "energia": "Espelho do que não queremos ver: protege, corta laços que pesam e ajuda a fechar ciclos.",
+        "uso": "Use por períodos curtos e com intenção (é intensa). Muito útil em rituais de fechamento e na lua minguante."
+      },
+      "ojo_tigre": {
+        "nombre": "Olho de tigre",
+        "energia": "Coragem, sucesso e proteção contra a inveja. Dá segurança para decidir e empreender.",
+        "uso": "No bolso ou numa pulseira para entrevistas, provas e reuniões importantes."
+      },
+      "aventurina": {
+        "nombre": "Aventurina verde",
+        "energia": "A pedra da sorte e das oportunidades. Abre caminhos no trabalho e no jogo limpo da vida.",
+        "uso": "Na carteira ou ao lado das suas plantas; leve quando começar algo novo."
+      },
+      "lapislazuli": {
+        "nombre": "Lápis-lazúli",
+        "energia": "Verdade, sabedoria e boa comunicação. Ajuda a dizer o que você sente e a estudar.",
+        "uso": "Perto da garganta (colar) ou sobre os livros e anotações."
+      },
+      "piedra_luna": {
+        "nombre": "Pedra da lua",
+        "energia": "Intuição, ciclos e fertilidade simbólica. Acompanha as mudanças e os recomeços.",
+        "uso": "Energize na lua cheia e leve nos dias de mudança; debaixo do travesseiro para sonhar com clareza."
+      },
+      "cornalina": {
+        "nombre": "Cornalina",
+        "energia": "Fogo, impulso e criatividade. Devolve a vontade e o desejo quando falta energia.",
+        "uso": "No bolso ou numa pulseira nos dias em que você precisa de um empurrão para começar."
+      },
+      "selenita": {
+        "nombre": "Selenita",
+        "energia": "Luz e paz: limpa os ambientes e as outras pedras. Traz calma ao lar.",
+        "uso": "Numa janela ou ao lado das suas outras pedras para limpá-las. Não molhe: é muito macia."
+      }
+    }
   },
   rituales: {
     seccion: "Guia gratuito",

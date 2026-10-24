@@ -153,6 +153,7 @@ export const en: Diccionario = {
       tabaco: { titulo: "Cigar reading", texto: "Light a cigar, photograph it once it has ash and Sibila reads the burn, the ash and the wrapper the way it is done in the Caribbean." },
       luna: { titulo: "Moon calendar", texto: "New moon, full moon and quarters with their sign, the exact time in your zone and a simple ritual for each phase. Free." },
       rituales: { titulo: "Ritual guide", texto: "How to prepare the cup of chocolate, the cigar, the hand and the I Ching coins, and what can be seen in each. Free." },
+      piedras: {"titulo": "Stones and energies", "texto": "The energy of each stone, which one goes with your sign and how to cleanse and charge it. Free."},
     },
     comoFunciona: "How it works",
     pasos: [
@@ -943,6 +944,111 @@ export const en: Diccionario = {
     foto: "Your photo",
     afinidad: "Affinity",
     futuro: "Resulting hexagram",
+  },
+  piedras: {
+    "seccion": "Free guide",
+    "titulo": "Stones and their energies",
+    "intro": "Every stone holds a tradition: a color, an intention and a way to use it. Here is the symbolism of the best-known ones, which stone goes with your sign and how to cleanse and charge them.",
+    "porIntencion": "Choose by intention",
+    "energia": "Energy",
+    "uso": "How to use it",
+    "signos": "Signs",
+    "signoTitulo": "Your sign's stone",
+    "limpiarTitulo": "How to cleanse and charge your stones",
+    "limpiarPasos": [
+      "Cleanse it when you bring it home and whenever it feels \"heavy\": pass it through incense or palo santo smoke, or leave it a few minutes under running water (selenite and pyrite must not get wet: use smoke or earth).",
+      "Charge it under the full moon for a whole night, or a few minutes in the morning sun (amethyst and rose quartz fade with too much sun).",
+      "Program it: hold it, breathe three times and quietly say what you want it for, in a short sentence in the present tense.",
+      "Carry it with you (pocket, purse or necklace) or leave it where it works: your nightstand, your desk, the entrance of your home."
+    ],
+    "aviso": "Stone symbolism is a tradition of reflection and well-being. It does not replace medical or psychological treatment.",
+    "cta": "Pair it with a candle ritual",
+    "nombresSignos": {
+      "aries": "Aries",
+      "tauro": "Taurus",
+      "geminis": "Gemini",
+      "cancer": "Cancer",
+      "leo": "Leo",
+      "virgo": "Virgo",
+      "libra": "Libra",
+      "escorpio": "Scorpio",
+      "sagitario": "Sagittarius",
+      "capricornio": "Capricorn",
+      "acuario": "Aquarius",
+      "piscis": "Pisces"
+    },
+    "piedras": {
+      "cuarzo_rosa": {
+        "nombre": "Rose quartz",
+        "energia": "The stone of love: it draws affection, softens heartache and awakens self-love.",
+        "uso": "Keep it on your nightstand or close to your chest. For couples, one on each nightstand."
+      },
+      "amatista": {
+        "nombre": "Amethyst",
+        "energia": "Calms the mind, helps you sleep and opens intuition. Used against excess and the day's anxiety.",
+        "uso": "Under the pillow or by the bed; hold it while meditating or before interpreting a dream."
+      },
+      "citrino": {
+        "nombre": "Citrine",
+        "energia": "The merchant's stone: it draws money, joy and good sales. It spreads optimism.",
+        "uso": "In the cash register, your wallet or the far left corner of your home or shop."
+      },
+      "pirita": {
+        "nombre": "Pyrite",
+        "energia": "\"Fool's gold\" calls in prosperity and work. It gives confidence to negotiate and get paid.",
+        "uso": "On your desk or in your wallet. Do not wet it: cleanse it with smoke."
+      },
+      "jade": {
+        "nombre": "Jade",
+        "energia": "Luck, lasting abundance and harmony at home. In the East it is the stone of good fortune.",
+        "uso": "In your pocket for an interview or a deal; in the living room for family harmony."
+      },
+      "cuarzo_cristal": {
+        "nombre": "Clear quartz",
+        "energia": "The master stone: it cleanses, brings clarity and amplifies the intention of other stones.",
+        "uso": "Place it next to another stone to boost it, or at the center of your altar or desk."
+      },
+      "turmalina_negra": {
+        "nombre": "Black tourmaline",
+        "energia": "The great protector: it absorbs envy and bad energy and helps you stand firm.",
+        "uso": "At your front door, next to your computer or in your pocket in heavy places."
+      },
+      "obsidiana": {
+        "nombre": "Obsidian",
+        "energia": "A mirror of what we do not want to see: it protects, cuts ties that weigh you down and helps close cycles.",
+        "uso": "Use it in short spells and with intention (it is intense). Very useful in closing rituals and the waning moon."
+      },
+      "ojo_tigre": {
+        "nombre": "Tiger's eye",
+        "energia": "Courage, success and protection from envy. It gives you confidence to decide and start.",
+        "uso": "In your pocket or on a bracelet for interviews, exams and important meetings."
+      },
+      "aventurina": {
+        "nombre": "Green aventurine",
+        "energia": "The stone of luck and opportunity. It opens paths at work and in life's fair play.",
+        "uso": "In your wallet or next to your plants; carry it when you start something new."
+      },
+      "lapislazuli": {
+        "nombre": "Lapis lazuli",
+        "energia": "Truth, wisdom and good communication. It helps you say what you feel and study.",
+        "uso": "Near your throat (necklace) or on top of your books and notes."
+      },
+      "piedra_luna": {
+        "nombre": "Moonstone",
+        "energia": "Intuition, cycles and symbolic fertility. It accompanies changes and new beginnings.",
+        "uso": "Charge it under the full moon and carry it on days of change; under the pillow for clear dreams."
+      },
+      "cornalina": {
+        "nombre": "Carnelian",
+        "energia": "Fire, drive and creativity. It brings back motivation and desire when energy runs low.",
+        "uso": "In your pocket or on a bracelet on days you need a push to get started."
+      },
+      "selenita": {
+        "nombre": "Selenite",
+        "energia": "Light and peace: it cleanses spaces and other stones. It brings calm to the home.",
+        "uso": "On a windowsill or next to your other stones to cleanse them. Do not wet it: it is very soft."
+      }
+    }
   },
   rituales: {
     seccion: "Free guide",

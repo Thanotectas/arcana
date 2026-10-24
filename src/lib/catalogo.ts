@@ -8,7 +8,7 @@ import type { Diccionario } from "./i18n/diccionarios";
 export type GrupoCatalogo = "oraculos" | "cielo" | "pareja" | "profundo";
 export const GRUPOS_CATALOGO: GrupoCatalogo[] = ["oraculos", "cielo", "pareja", "profundo"];
 
-export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales";
+export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales" | "piedras";
 
 export interface ItemCatalogo {
   clave: IconoCatalogo;
@@ -28,6 +28,7 @@ export const CATALOGO: ItemCatalogo[] = [
   { clave: "velas", href: "/velas", grupo: "oraculos", costo: COSTOS.velas },
   { clave: "tabaco", href: "/tabaco", grupo: "oraculos", costo: COSTOS.tabaco },
   { clave: "rituales", href: "/rituales", grupo: "oraculos", costo: 0 },
+  { clave: "piedras", href: "/piedras", grupo: "oraculos", costo: 0 },
   { clave: "hoy", href: "/hoy", grupo: "cielo", costo: 0, requiereCuenta: true },
   { clave: "horoscopo", href: "/horoscopo", grupo: "cielo", costo: 0 },
   { clave: "luna", href: "/luna", grupo: "cielo", costo: 0 },
