@@ -1,0 +1,61 @@
+VIDEO 20 — "SINASTRÍA" (una pareja y sus dos cielos). Gemini / Google Flow (Veo), 2 clips de 8 s, vertical 9:16.
+Lleva a miarcana.com/sinastria (4 créditos): las dos cartas astrales completas frente a frente, la afinidad, cuatro
+dimensiones (emoción, pasión, comunicación, estabilidad) y los "hilos" entre los planetas de cada uno.
+Estética: noche cálida y romántica, nada cursi ni esotérico pesado. Protagonistas: una pareja latina de unos 30 años.
+Los prompts van en inglés (Veo los sigue mejor); el texto en español es para ti. Después hago el montaje (rótulos,
+voz de Marcela, gráficos de la app y QR).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- Modo "Texto a video" (o "Ingredientes a video" si quieres fijar a la pareja con una foto generada antes en Gemini).
+- Vertical 9:16, 8 s. Genera el clip 1; el clip 2 con "Extender" (si sale con Veo) o con la misma descripción de la
+  pareja para que sean los mismos.
+- Sonido: solo ambiente (ciudad lejana de noche, grillos, una risa suave); sin música y sin diálogos.
+- Revisa antes de extender: que sean las mismas personas y que no aparezca texto en el cielo ni en el celular.
+
+==================== DESCRIPCIÓN DE LA PAREJA (va en los dos clips) ====================
+A Latino couple in their early thirties: she has long dark wavy hair, warm brown skin and a mustard-yellow knit
+sweater; he has short dark hair, a trimmed beard and a dark green overshirt. Natural, affectionate, relaxed, real
+people (not models posing).
+
+==================== CLIP 1 · "Dos cielos" (8 s) ====================
+Vertical 9:16, cinematic, warm and romantic night. [COUPLE]. They lie side by side on a blanket on a rooftop terrace
+at night, string lights glowing softly around them and the city lights far below. They look up at a sky full of
+stars, she points at something and they both smile. Slowly, thin lines of golden light draw two separate
+constellations in the sky above them, one over each of them, like two delicate star maps made of light. The two
+constellations drift toward each other and gently overlap, and where their lines cross, small sparks of gold
+appear. The camera slowly rises from their faces to the sky. Soft, magical, hopeful atmosphere.
+Sound: distant city at night, crickets, a soft laugh, no music, no dialogue.
+No text, no letters, no zodiac symbols, no numbers, no logos.
+
+==================== CLIP 2 · "Los hilos" (8 s) ====================
+Vertical 9:16, same couple, same rooftop, same night and light. [COUPLE]. They sit up close together on the blanket,
+she holds a phone between them and they look at the glowing screen, curious and amused (the screen only shows a soft
+golden circular pattern, nothing readable). From the phone two circles of golden light rise into the air, one in
+front of each of them, and thin glowing threads stretch between the two circles, some warm green, some amber, softly
+pulsing. He looks at her, she laughs and leans her head on his shoulder; the threads of light wrap gently around
+their intertwined hands and glow brighter. Slow push-in to their hands and the golden threads. Warm, intimate,
+joyful atmosphere.
+Sound: soft night ambience, a quiet laugh, no music, no dialogue.
+No text, no letters, no readable screen, no zodiac symbols, no numbers, no logos.
+
+Negativo (agrégalo al final si algo sale raro):
+Avoid: text, letters, readable phone screen, deformed hands, extra fingers, changing faces, different people, cartoon
+style, horror, watermark.
+
+==================== VOZ PARA ELEVENLABS (Marcela, configuración de siempre, ≈ 18 s) ====================
+"¿Por qué con esa persona todo fluye… y a veces choca? La respuesta está en el cielo del día en que nacieron. La
+sinastría pone sus dos cartas astrales frente a frente: dónde se atraen, dónde se cuidan y dónde tienen que
+aprender. Descubre la suya en mi arcana punto com."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+Rótulos: clip 1 "¿Por qué con esa persona todo fluye?" / "La respuesta está en sus dos cielos";
+clip 2 "Sinastría: sus dos cartas frente a frente".
+Entre los clips, 3 s con los gráficos reales de la app (el anillo de afinidad y "los hilos entre sus cartas").
+Cierre: "Sinastría · Afinidad, pasión, comunicación y estabilidad" + "miarcana.com/sinastria" + QR a
+miarcana.com/yt/sinastria.
+
+==================== SI ALGO SALE MAL ====================
+- Cambian las caras entre clips: genera el clip 2 con "Extender" o sube una captura del clip 1 como primer cuadro.
+- Aparecen letras o signos del zodiaco en el cielo: agrega "the sky only has stars and thin golden lines, nothing else".
+- La pantalla del celular muestra texto: "the phone screen only shows a soft abstract golden glow".
+- Se ve frío o triste: "warm string lights, cozy, joyful, romantic".
