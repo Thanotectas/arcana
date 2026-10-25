@@ -9,6 +9,8 @@ import { getUsuarioOpcional } from "@/lib/dal";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
+import { cieloDelSigno, instanteDelDia } from "@/lib/horoscopo/cielo";
+import { CieloSigno } from "@/components/CieloSigno";
 
 export async function generateStaticParams() {
   return SIGNOS.map((s) => ({ signo: s.id }));
@@ -36,10 +38,11 @@ export default async function PaginaSigno({ params }: { params: Promise<{ signo:
   const s = signoPorId(signo);
   if (!s) notFound();
   const [usuario, t, idioma] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma()]);
+  const cielo = cieloDelSigno(s, instanteDelDia(fechaHoy()));
   const fecha = new Date(fechaHoy() + "T12:00:00Z").toLocaleDateString(LOCALE_INTL[idioma], { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <header className="text-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
         <img src={imagenSigno(s.id)} alt="" width={128} height={128} className="moneda-signo mx-auto" />
@@ -48,6 +51,7 @@ export default async function PaginaSigno({ params }: { params: Promise<{ signo:
           {fecha} · {t.horoscopo.elementos[s.elemento]} · {t.horoscopo.regente} {s.regente}
         </p>
       </header>
+      <CieloSigno cielo={cielo} t={t.horoscopo} fasesLuna={t.inicio.fasesLuna} />
       <section className="tarjeta p-6 sm:p-8">
         <Suspense fallback={<p className="animate-pulse text-texto-suave">{t.horoscopo.leyendo}</p>}>
           <Contenido signoId={s.id} idioma={idioma} noDisponible={t.horoscopo.noDisponible} />
