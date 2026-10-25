@@ -1,0 +1,70 @@
+VIDEO 18 — "SIBILA Y LAS RUNAS" (Sibila hace el ritual de las runas). Google Flow (Veo), 3 clips de 8 s, vertical 9:16.
+Es la lectura de miarcana.com/runas: se hace la pregunta, se mezclan las runas en la bolsa, se eligen tres y se leen en la
+tirada "Las tres Nornas" (Urd: lo que fue · Verdandi: lo que es · Skuld: lo que será). Cuesta 2 créditos.
+La protagonista es Sibila, en su mesa de siempre, con la bolsa y el paño que ya tenemos.
+
+==================== CÓMO HACERLO EN FLOW ====================
+- Modo "Ingredientes a video" (Ingredients to video) con 4 imágenes de referencia:
+  marketing/imagenes/sibila-retrato.jpg (su cara), marketing/imagenes/sibila-escena.jpg (su mesa),
+  marketing/imagenes/fuentes-gemini/runas-bolsa.jpg (la bolsa) y marketing/imagenes/fuentes-gemini/runas-pano.jpg (el paño).
+- Vertical 9:16, 8 s cada clip, el mejor modelo de Veo que tengas.
+- Genera el clip 1; para los clips 2 y 3 usa "Extender" (Extend) desde el anterior, así Sibila, la luz y la mesa no
+  cambian. Si Extender no sale bien, genera cada clip con las mismas 4 referencias y la misma descripción de Sibila.
+- Sonido: Flow genera audio. Pide solo ambiente (velas, terciopelo, piedras); la voz la ponemos con Marcela (ElevenLabs).
+- Las piedras van LISAS en el video: las runas grabadas las pongo yo en el montaje con las imágenes reales de la app,
+  para que sean las correctas. Por eso el último plano es cenital y quieto.
+
+==================== DESCRIPCIÓN DE SIBILA (igual en los 3 clips) ====================
+Sibila, la vidente de las imágenes de referencia: mujer latina de unos 35 años, cabello largo, oscuro y ondulado, velo
+violeta sobre la cabeza, una pequeña estrella dorada en la frente, aretes de luna dorados y vestido morado con bordados
+dorados en el cuello. Estilo de pintura al óleo cálida que cobra vida, luz de velas, noche. Conserva exactamente su
+rostro y el estilo de la pintura.
+
+==================== CLIP 1 · "La pregunta" (8 s) ====================
+Video vertical 9:16, pintura al óleo cálida que cobra vida, de noche, luz de velas. [Descripción de Sibila]. Sibila está
+sentada a su mesa de madera, con velas encendidas a los lados. Extiende con las dos manos un paño de terciopelo índigo
+con un círculo bordado en hilo dorado y pequeñas estrellas bordadas, y lo alisa con calma. Luego toma la bolsa de
+terciopelo violeta con cordón dorado de la imagen de referencia, la sostiene contra el pecho con las dos manos, cierra
+los ojos y mueve los labios en silencio, como si hiciera una pregunta en voz muy baja. Las llamas de las velas se
+inclinan un poco hacia ella y flotan motas de polvo dorado. Cámara que se acerca despacio desde un plano medio hasta
+su rostro. Atmósfera íntima, mágica y serena, nada oscuro ni de terror.
+Sonido: crepitar suave de velas y roce de terciopelo, sin música, sin voces.
+Sin texto, sin letras, sin símbolos, sin logos.
+
+==================== CLIP 2 · "Mezclar y elegir" (8 s) ====================
+Video vertical 9:16, misma escena, misma Sibila, misma luz. Sibila abre los ojos, afloja el cordón dorado de la bolsa
+y la agita suavemente con las dos manos; se oye el choque sordo de piedras dentro. Mete la mano derecha en la bolsa y,
+una por una, saca tres piedras de río lisas, grises y ovaladas, del tamaño de la palma, y las coloca boca abajo en
+fila dentro del círculo dorado del paño: la primera a la izquierda, la segunda en el centro, la tercera a la derecha.
+Plano medio cerrado sobre sus manos y la bolsa, con su rostro concentrado visible arriba del encuadre.
+Sonido: piedras que chocan dentro de la bolsa y se apoyan sobre el terciopelo, velas, sin música, sin voces.
+Las piedras son completamente lisas: nada grabado ni pintado en ellas. Sin texto, sin letras, sin símbolos, sin logos.
+
+==================== CLIP 3 · "Las tres Nornas" (8 s) ====================
+Video vertical 9:16, misma escena, misma Sibila, misma luz. Sibila pasa la palma de la mano despacio por encima de las
+tres piedras lisas que están en fila dentro del círculo dorado del paño; bajo su mano, cada piedra se ilumina por
+dentro con un resplandor dorado suave, primero la de la izquierda, luego la del centro y luego la de la derecha. Ella
+levanta la mirada hacia la cámara con una sonrisa sabia y cálida. En los últimos 3 segundos la cámara queda en plano
+cenital fijo, mirando desde arriba el paño índigo con las tres piedras lisas en fila dentro del círculo dorado, sin
+manos, con el resplandor dorado que se apaga lentamente; la cámara no se mueve en ese final.
+Sonido: un tintineo suave y cálido cuando cada piedra se ilumina, velas, sin música, sin voces.
+Las piedras son completamente lisas: nada grabado ni pintado en ellas. Sin texto, sin letras, sin símbolos, sin logos.
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+Voz en off (ElevenLabs, Marcela, misma configuración de siempre), unos 22 s:
+"Haz tu pregunta en silencio. Mezcla las runas en la bolsa, y deja que tu mano elija tres. La primera habla de lo que
+fue; la segunda, de lo que es; y la tercera, de lo que viene. Las runas no adivinan: aconsejan. Tira las tuyas en mi
+arcana punto com."
+Rótulos: clip 1 "Las runas de Sibila" / "Haz tu pregunta en silencio"; clip 2 "Mezcla la bolsa y elige tres";
+clip 3 "Lo que fue · lo que es · lo que viene". En el plano cenital final aparecen grabadas sobre las tres piedras las
+runas reales (por ejemplo Fehu, Raidho y Sowilo) con sus nombres.
+Cierre: "Runas · Las tres Nornas" + "Elige tus tres runas y Sibila las lee" + miarcana.com/runas + QR a
+miarcana.com/yt/runas.
+
+==================== SI ALGO SALE MAL ====================
+- Aparecen símbolos o letras en las piedras: repite agregando "las piedras son lisas, de río, sin ningún grabado ni
+  dibujo"; si igual salen, no importa mucho en los clips 1 y 2 (se ven de lejos), pero el plano final debe quedar liso.
+- Manos raras: pide "plano medio, manos parcialmente visibles" en vez de primer plano de las manos.
+- Cambia la cara de Sibila: vuelve a subir sibila-retrato.jpg y escribe "conserva exactamente el rostro de la referencia".
+- El final cenital se mueve: genera solo ese plano aparte (4 a 8 s), "plano cenital fijo, cámara inmóvil", sin Sibila.
+- Sale oscuro o tenebroso: "luz de velas cálida y dorada, atmósfera serena y luminosa, nada de terror".
