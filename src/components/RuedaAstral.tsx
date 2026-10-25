@@ -48,6 +48,20 @@ const COLOR_ASPECTO: Record<TipoAspecto, string> = {
 
 const TIPOS: TipoAspecto[] = ["conjuncion", "oposicion", "trigono", "cuadratura", "sextil"];
 
+/** Estrellas fijas del fondo de la rueda: [longitud, radio, tamaño], siempre las mismas. */
+const ESTRELLAS: [number, number, number][] = Array.from({ length: 46 }, (_, i) => [(i * 137.5) % 360, 256 + ((i * 53) % 22), 0.5 + ((i * 7) % 5) * 0.18]);
+
+/** Estrella de ocho puntas de Arcana, centrada en (x, y). */
+function estrellaCentro(x: number, y: number, largo: number, corto: number) {
+  const pts: string[] = [];
+  for (let k = 0; k < 16; k++) {
+    const r = k % 2 === 0 ? (k % 4 === 0 ? largo : largo * 0.55) : corto;
+    const a = (k * Math.PI) / 8 - Math.PI / 2;
+    pts.push(`${Math.round((x + r * Math.cos(a)) * 100) / 100},${Math.round((y + r * Math.sin(a)) * 100) / 100}`);
+  }
+  return `M ${pts.join(" L ")} Z`;
+}
+
 const conTeclado = (accion: () => void) => (e: KeyboardEvent) => {
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
@@ -80,22 +94,26 @@ export function RuedaAstral({
   const cx = S / 2;
   const cy = S / 2;
   const rExt = 250;
-  const rSignos = 215;
+  const rSignos = 212;
   const rCasas = 190;
   const rPlanetas = 160;
-  const rAspectos = 125;
+  const rAspectos = 122;
 
-  const ang = (lon: number) => 180 - (lon - ascendente);
+  // El Ascendente a las 9 en punto y el zodiaco en sentido antihorario (la casa 1 queda debajo del AC y el MC arriba).
+  const ang = (lon: number) => 180 + (lon - ascendente);
   const punto = (lon: number, r: number) => {
     const a = (ang(lon) * Math.PI) / 180;
     // Redondeo: servidor y navegador difieren en el último decimal de cos/sin.
     const redondear = (v: number) => Math.round(v * 100) / 100;
     return [redondear(cx + r * Math.cos(a)), redondear(cy - r * Math.sin(a))] as const;
   };
-  const arco = (desde: number, hasta: number, r: number) => {
-    const [x1, y1] = punto(desde, r);
-    const [x2, y2] = punto(hasta, r);
-    return `M ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2}`;
+  /** Franja anular entre dos longitudes (en el sentido del zodiaco). */
+  const sector = (desde: number, hasta: number, rIn: number, rOut: number) => {
+    const [x1, y1] = punto(desde, rOut);
+    const [x2, y2] = punto(hasta, rOut);
+    const [x3, y3] = punto(hasta, rIn);
+    const [x4, y4] = punto(desde, rIn);
+    return `M ${x1} ${y1} A ${rOut} ${rOut} 0 0 0 ${x2} ${y2} L ${x3} ${y3} A ${rIn} ${rIn} 0 0 1 ${x4} ${y4} Z`;
   };
 
   // Evita superposición de símbolos planetarios cercanos.
@@ -104,7 +122,8 @@ export function RuedaAstral({
   for (const p of ordenados) {
     let lon = p.longitud;
     const prev = ajustados.at(-1);
-    if (prev && ((lon - prev.lonDibujo + 360) % 360) < 7) lon = (prev.lonDibujo + 7) % 360;
+    // Las monedas miden unos 10° en la órbita de los planetas: más cerca se montarían.
+    if (prev && ((lon - prev.lonDibujo + 360) % 360) < 10) lon = (prev.lonDibujo + 10) % 360;
     ajustados.push({ ...p, lonDibujo: lon });
   }
 
@@ -129,13 +148,39 @@ export function RuedaAstral({
 
   return (
     <div className="space-y-4">
-      <svg viewBox={`-28 -4 ${S + 56} ${S + 8}`} className="rueda-astral mx-auto w-full max-w-[560px] select-none" role="group" aria-label="Rueda de la carta astral. Toca un planeta o un aspecto para ver su significado.">
-        <circle cx={cx} cy={cy} r={rExt} fill="rgba(255,255,255,0.02)" stroke="rgba(217,180,90,0.5)" />
-        <circle cx={cx} cy={cy} r={rSignos} fill="none" stroke="rgba(255,255,255,0.15)" />
-        <circle cx={cx} cy={cy} r={rCasas} fill="none" stroke="rgba(255,255,255,0.1)" />
-        <circle cx={cx} cy={cy} r={rAspectos} fill="rgba(11,7,22,0.6)" stroke="rgba(255,255,255,0.1)" onClick={() => setSel(null)} />
+      <svg viewBox={`-30 -30 ${S + 60} ${S + 60}`} className="rueda-astral mx-auto w-full max-w-[560px] select-none" role="group" aria-label="Rueda de la carta astral. Toca un planeta o un aspecto para ver su significado.">
+        <defs>
+          <radialGradient id="rueda-fondo" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stopColor="#2a1a5e" stopOpacity="0.55" />
+            <stop offset="0.7" stopColor="#150f26" stopOpacity="0.35" />
+            <stop offset="1" stopColor="#0b0716" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="rueda-centro" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stopColor="#1e1145" />
+            <stop offset="1" stopColor="#0b0716" />
+          </radialGradient>
+          <linearGradient id="rueda-oro" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fff1c4" />
+            <stop offset="0.5" stopColor="#e2bc63" />
+            <stop offset="1" stopColor="#a87a2a" />
+          </linearGradient>
+          <filter id="rueda-brillo" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+        </defs>
 
-        {/* Signos */}
+        {/* Fondo, cielo con estrellas y doble aro dorado */}
+        <circle cx={cx} cy={cy} r={rExt + 26} fill="url(#rueda-fondo)" />
+        {ESTRELLAS.map(([lon, rr, t], i) => {
+          const [x, y] = punto(lon, rr);
+          return <circle key={i} cx={x} cy={y} r={t} fill="#fff" opacity={0.25 + (i % 3) * 0.12} />;
+        })}
+        <circle cx={cx} cy={cy} r={rExt + 7} fill="none" stroke="url(#rueda-oro)" strokeOpacity="0.45" strokeWidth="0.8" />
+        <circle cx={cx} cy={cy} r={rExt} fill="none" stroke="url(#rueda-oro)" strokeWidth="1.6" />
+        <circle cx={cx} cy={cy} r={rCasas} fill="rgba(11,7,22,0.35)" stroke="rgba(255,255,255,0.12)" />
+        <circle cx={cx} cy={cy} r={rAspectos} fill="url(#rueda-centro)" stroke="rgba(217,180,90,0.35)" onClick={() => setSel(null)} />
+
+        {/* Signos: franja de color por elemento */}
         {SIGNOS.map((s, i) => {
           const ini = i * 30;
           const [x1, y1] = punto(ini, rSignos);
@@ -145,34 +190,70 @@ export function RuedaAstral({
           return (
             <g key={s.id}>
               <title>{`${s.nombre}: ${s.rasgos.join(", ")}`}</title>
-              <path d={arco(ini, ini + 30, rExt)} fill="none" stroke={COLOR_ELEMENTO[s.elemento]} strokeOpacity={resaltado ? 1 : 0.5} strokeWidth={resaltado ? 5 : 3} />
-              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.15)" />
-              <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize={resaltado ? 22 : 18} fill={COLOR_ELEMENTO[s.elemento]}>
-                {s.simbolo}
+              <path d={sector(ini, ini + 30, rSignos, rExt)} fill={COLOR_ELEMENTO[s.elemento]} fillOpacity={resaltado ? 0.32 : i % 2 ? 0.1 : 0.16} />
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(241,217,154,0.35)" />
+              <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize={resaltado ? 24 : 20} fill={COLOR_ELEMENTO[s.elemento]} style={{ filter: resaltado ? "drop-shadow(0 0 6px currentColor)" : undefined }}>
+                {`${s.simbolo}\uFE0E`}
               </text>
             </g>
           );
         })}
 
+        {/* Grados: cada grado una marca; cada 5 y cada 10, más larga */}
+        {Array.from({ length: 360 }, (_, g) => {
+          const largo = g % 10 === 0 ? 7 : g % 5 === 0 ? 4.5 : 2.2;
+          const [x1, y1] = punto(g, rSignos);
+          const [x2, y2] = punto(g, rSignos - largo);
+          return <line key={g} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(241,217,154,0.45)" strokeWidth={g % 10 === 0 ? 0.9 : 0.5} />;
+        })}
+
         {/* Casas */}
         {mostrarCasas &&
           cuspides.map((c, i) => {
+            const angular = i === 0 || i === 3 || i === 6 || i === 9;
             const [x1, y1] = punto(c, rAspectos);
-            const [x2, y2] = punto(c, rSignos);
+            const [x2, y2] = punto(c, angular ? rExt + 14 : rSignos);
             const sig = cuspides[(i + 1) % 12];
             const medio = c + ((sig - c + 360) % 360) / 2;
-            const [tx, ty] = punto(medio, rAspectos + 14);
-            const angular = i === 0 || i === 3 || i === 6 || i === 9;
+            const [tx, ty] = punto(medio, rAspectos + 13);
             const resaltada = planetaSel?.casa === i + 1;
             return (
               <g key={i}>
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={angular ? "rgba(217,180,90,0.8)" : "rgba(255,255,255,0.2)"} strokeWidth={angular ? 2 : 1} />
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={angular ? "url(#rueda-oro)" : "rgba(255,255,255,0.18)"} strokeWidth={angular ? 2 : 1} />
                 <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize={resaltada ? 13 : 10} fontWeight={resaltada ? 700 : 400} fill={resaltada ? "#f1d99a" : "rgba(168,159,192,0.9)"}>
                   {i + 1}
                 </text>
               </g>
             );
           })}
+
+        {/* Ejes: AC, IC, DC y MC fuera del aro */}
+        {mostrarCasas &&
+          ([
+            ["AC", cuspides[0]],
+            ["IC", cuspides[3]],
+            ["DC", cuspides[6]],
+            ["MC", cuspides[9]],
+          ] as const).map(([nombre, lon]) => {
+            const [x, y] = punto(lon, rExt + 22);
+            return (
+              <text key={nombre} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600} letterSpacing="0.06em" fill="#f1d99a">
+                {nombre}
+              </text>
+            );
+          })}
+        {!mostrarCasas &&
+          (() => {
+            const [x, y] = punto(ascendente, rExt + 22);
+            return (
+              <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600} fill="#f1d99a">
+                AC
+              </text>
+            );
+          })()}
+
+        {/* Estrella de Arcana en el centro */}
+        <path d={estrellaCentro(cx, cy, 16, 4)} fill="#f1d99a" opacity="0.18" pointerEvents="none" />
 
         {/* Aspectos */}
         {aspectos.map((a, i) => {
@@ -198,6 +279,7 @@ export function RuedaAstral({
               onKeyDown={conTeclado(() => alternar({ tipo: "aspecto", indice: i }))}
             >
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={10} />
+              {activo && <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={COLOR_ASPECTO[a.tipo]} strokeWidth={5} opacity={0.5} filter="url(#rueda-brillo)" />}
               <line
                 className="trazo-aspecto"
                 style={{ animationDelay: `${300 + i * 40}ms` }}
@@ -210,15 +292,18 @@ export function RuedaAstral({
                 strokeOpacity={opacidad}
                 strokeWidth={activo ? 2.5 : a.orbe < 2 ? 1.5 : 1}
               />
+              <circle cx={x1} cy={y1} r={1.8} fill={COLOR_ASPECTO[a.tipo]} opacity={opacidad} />
+              <circle cx={x2} cy={y2} r={1.8} fill={COLOR_ASPECTO[a.tipo]} opacity={opacidad} />
             </g>
           );
         })}
 
-        {/* Planetas */}
+        {/* Planetas: monedas con su símbolo y una aguja hasta su grado exacto */}
         {ajustados.map((p, n) => {
           const [x, y] = punto(p.lonDibujo, rPlanetas);
-          const [mx, my] = punto(p.longitud, rCasas);
-          const [tx, ty] = punto(p.lonDibujo, rPlanetas + 16);
+          const [ax, ay] = punto(p.longitud, rSignos - 9);
+          const [bx, by] = punto(p.lonDibujo, rPlanetas + 14);
+          const [tx, ty] = punto(p.lonDibujo, rPlanetas - 21);
           const activo = sel?.tipo === "planeta" && sel.cuerpo === p.cuerpo;
           const apagado = sel !== null && !activo && !vinculados.has(p.cuerpo);
           return (
@@ -233,29 +318,21 @@ export function RuedaAstral({
               onClick={() => alternar({ tipo: "planeta", cuerpo: p.cuerpo })}
               onKeyDown={conTeclado(() => alternar({ tipo: "planeta", cuerpo: p.cuerpo }))}
             >
-              <circle cx={x} cy={y} r={15} fill={activo ? "rgba(217,180,90,0.22)" : "transparent"} stroke={activo ? "#d9b45a" : "none"} />
-              <circle cx={mx} cy={my} r={2} fill="#d9b45a" />
-              <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={activo ? 23 : 20} fill="#f1d99a">
-                {SIMBOLOS_CUERPO[p.cuerpo]}
+              <line x1={bx} y1={by} x2={ax} y2={ay} stroke="rgba(241,217,154,0.55)" strokeWidth={0.8} />
+              <circle cx={ax} cy={ay} r={2.2} fill="#f1d99a" />
+              {activo && <circle cx={x} cy={y} r={18} fill="#d9b45a" opacity={0.45} filter="url(#rueda-brillo)" />}
+              <circle cx={x} cy={y} r={14} fill="#150f26" stroke={activo ? "#f1d99a" : "url(#rueda-oro)"} strokeWidth={activo ? 1.8 : 1} />
+              <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={activo ? 19 : 17} fill="#f1d99a">
+                {`${SIMBOLOS_CUERPO[p.cuerpo]}\uFE0E`}
               </text>
               {p.retrogrado && p.cuerpo !== "nodo_norte" && (
-                <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize={8} fill="#ff9f6b">
+                <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize={8} fontWeight={700} fill="#ff9f6b">
                   R
                 </text>
               )}
             </g>
           );
         })}
-
-        {/* Ascendente */}
-        {(() => {
-          const [x, y] = punto(ascendente, rExt + 4);
-          return (
-            <text x={x - 14} y={y} textAnchor="end" dominantBaseline="central" fontSize={11} fill="#f1d99a">
-              ASC
-            </text>
-          );
-        })()}
       </svg>
 
       <div className="flex flex-wrap justify-center gap-2 text-xs" aria-label="Mostrar u ocultar tipos de aspecto">

@@ -959,6 +959,16 @@ export const en: Diccionario = {
     ver: "See my year · {n} credits",
     calculando: "Finding your Sun's return…",
     momento: "Your Sun returns to its place on {fecha} at {hora} ({lugar}).",
+    retorno: {
+      titulo: "Your solar year",
+      vuelve: "The Sun returns to {signo} {grado}",
+      cuando: "{fecha} · {hora} · {lugar}",
+      asc: "Ascendant of the year",
+      ascCasa: "Rises in your natal house {n}",
+      luna: "Moon of the year",
+      sol: "Sun of the year",
+      casa: "House {n}",
+    },
     errores: { anio: "Choose the year you want to see.", lugar: "Pick from the list the city where you will spend your birthday." },
   },
   baraja: {

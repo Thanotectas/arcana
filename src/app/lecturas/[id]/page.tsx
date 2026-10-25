@@ -10,6 +10,7 @@ import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
 import { VistaCartaAstral } from "@/components/VistaCartaAstral";
+import { RetornoSolar } from "@/components/RetornoSolar";
 import { CompartirLectura } from "@/components/CompartirLectura";
 import { TIRADAS, POSICIONES_I18N, cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
@@ -106,7 +107,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "maya" && <VistaMaya resultado={lectura.resultado as unknown as ResultadoMaya} t={t} idioma={idioma} />}
       {lectura.tipo === "revolucion_solar" && (
         <>
-          <p className="text-sm text-oro-suave">{momentoRevolucion(lectura.resultado as unknown as ResultadoRevolucion, t)}</p>
+          <RetornoSolar r={lectura.resultado as unknown as ResultadoRevolucion} horaDesconocida={Boolean(lectura.entrada.horaDesconocida)} t={t} idioma={idioma} />
           <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />
         </>
       )}
@@ -487,10 +488,6 @@ function VistaAura({ resultado, t }: { resultado: ResultadoAura; t: Diccionario 
       </div>
     </section>
   );
-}
-
-function momentoRevolucion(r: ResultadoRevolucion, t: Diccionario) {
-  return plantilla(t.revolucion.momento, { fecha: r.fechaLocal, hora: r.horaLocal, lugar: r.lugar?.lugar ?? "" });
 }
 
 function VistaPendulo({ resultado, t }: { resultado: ResultadoPendulo; t: Diccionario }) {

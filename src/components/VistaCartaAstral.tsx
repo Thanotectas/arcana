@@ -6,6 +6,8 @@ import { signoPorId, signoPorLongitud, formatoGrado } from "@/lib/zodiaco";
 import { plantilla } from "@/lib/i18n/formato";
 import type { Diccionario } from "@/lib/i18n/diccionarios";
 
+const COLOR_ELEMENTO: Record<string, string> = { fuego: "#ff8a5b", tierra: "#9ad07f", aire: "#8fc7ff", agua: "#b28dff" };
+
 export interface ResultadoAstral {
   planetas: { cuerpo: Cuerpo; longitud: number; retrogrado: boolean; casa: number; signo: string }[];
   casas: Casas;
@@ -59,14 +61,20 @@ export function VistaCartaAstral({ resultado, entrada, t }: { resultado: Record<
             ))}
           </ul>
           <h3 className="font-display mb-2 mt-5 text-xl">{t.astral.elementos}</h3>
-          <div className="grid grid-cols-4 gap-2 text-center text-sm">
-            {Object.entries(r.elementos).map(([k, v]) => (
-              <div key={k} className="rounded-lg bg-superficie-2 p-2">
-                <p className="text-lg font-semibold text-oro-suave">{v}</p>
-                <p className="text-xs capitalize text-texto-suave">{t.horoscopo.elementos[k as keyof typeof t.horoscopo.elementos] ?? k}</p>
-              </div>
-            ))}
-          </div>
+          <ul className="space-y-2 text-sm">
+            {Object.entries(r.elementos).map(([k, v]) => {
+              const total = Object.values(r.elementos).reduce((a, b) => a + b, 0) || 1;
+              return (
+                <li key={k} className="grid grid-cols-[5.5rem_1fr_1.5rem] items-center gap-3">
+                  <span className="capitalize text-texto-suave">{t.horoscopo.elementos[k as keyof typeof t.horoscopo.elementos] ?? k}</span>
+                  <span className="h-2.5 overflow-hidden rounded-full bg-superficie-2">
+                    <span className="block h-full rounded-full" style={{ width: `${(v / total) * 100}%`, background: COLOR_ELEMENTO[k] ?? "#d9b45a" }} />
+                  </span>
+                  <span className="text-right font-semibold text-oro-suave">{v}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     </section>

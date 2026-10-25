@@ -799,14 +799,156 @@ body {
 }
 
 
-/* Péndulo: vaivén y giro (el giro se sugiere con la órbita bajo el cristal). */
+/* Revolución solar: el camino dorado del año se traza desde el Sol y vuelve a él. */
+.retorno-camino {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: retorno-camino 2.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+}
+@keyframes retorno-camino {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.retorno-brillo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: retorno-brillo 3s ease-in-out infinite;
+}
+@keyframes retorno-brillo {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .retorno-camino {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .retorno-brillo {
+    animation: none;
+  }
+}
+
+/* Péndulo: cuelga del punto (100, 14) del dibujo. El giro horario (sí) y
+   antihorario (no) es un péndulo cónico visto de frente: oscila y se alarga
+   un poco al pasar por delante; la sombra recorre la elipse del tablero. */
 @keyframes pendulo-vaiven {
   0%, 100% { transform: rotate(-22deg); }
   50% { transform: rotate(22deg); }
 }
-.pendulo-vaiven { transform-origin: 100px 12px; animation: pendulo-vaiven 1.6s ease-in-out infinite; }
-.pendulo-lento { transform-origin: 100px 12px; animation: pendulo-vaiven 4s ease-in-out infinite; }
-.pendulo-giro { transform-origin: 100px 12px; animation: pendulo-vaiven 2.4s ease-in-out infinite; }
+@keyframes pendulo-sombra-vaiven {
+  0%, 100% { transform: translateX(61.4px); }
+  50% { transform: translateX(-61.4px); }
+}
+@keyframes pendulo-lento {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+@keyframes pendulo-busca {
+  0%, 100% { transform: rotate(-5deg); }
+  20% { transform: rotate(11deg); }
+  45% { transform: rotate(-14deg); }
+  70% { transform: rotate(9deg); }
+}
+@keyframes pendulo-si {
+  0.00% { transform: rotate(-20.00deg) scaleY(1.000); }
+  6.25% { transform: rotate(-18.48deg) scaleY(1.019); }
+  12.50% { transform: rotate(-14.14deg) scaleY(1.035); }
+  18.75% { transform: rotate(-7.65deg) scaleY(1.046); }
+  25.00% { transform: rotate(-0.00deg) scaleY(1.050); }
+  31.25% { transform: rotate(7.65deg) scaleY(1.046); }
+  37.50% { transform: rotate(14.14deg) scaleY(1.035); }
+  43.75% { transform: rotate(18.48deg) scaleY(1.019); }
+  50.00% { transform: rotate(20.00deg) scaleY(1.000); }
+  56.25% { transform: rotate(18.48deg) scaleY(0.981); }
+  62.50% { transform: rotate(14.14deg) scaleY(0.965); }
+  68.75% { transform: rotate(7.65deg) scaleY(0.954); }
+  75.00% { transform: rotate(0.00deg) scaleY(0.950); }
+  81.25% { transform: rotate(-7.65deg) scaleY(0.954); }
+  87.50% { transform: rotate(-14.14deg) scaleY(0.965); }
+  93.75% { transform: rotate(-18.48deg) scaleY(0.981); }
+  100.00% { transform: rotate(-20.00deg) scaleY(1.000); }
+}
+@keyframes pendulo-no {
+  0.00% { transform: rotate(-20.00deg) scaleY(1.000); }
+  6.25% { transform: rotate(-18.48deg) scaleY(0.981); }
+  12.50% { transform: rotate(-14.14deg) scaleY(0.965); }
+  18.75% { transform: rotate(-7.65deg) scaleY(0.954); }
+  25.00% { transform: rotate(-0.00deg) scaleY(0.950); }
+  31.25% { transform: rotate(7.65deg) scaleY(0.954); }
+  37.50% { transform: rotate(14.14deg) scaleY(0.965); }
+  43.75% { transform: rotate(18.48deg) scaleY(0.981); }
+  50.00% { transform: rotate(20.00deg) scaleY(1.000); }
+  56.25% { transform: rotate(18.48deg) scaleY(1.019); }
+  62.50% { transform: rotate(14.14deg) scaleY(1.035); }
+  68.75% { transform: rotate(7.65deg) scaleY(1.046); }
+  75.00% { transform: rotate(0.00deg) scaleY(1.050); }
+  81.25% { transform: rotate(-7.65deg) scaleY(1.046); }
+  87.50% { transform: rotate(-14.14deg) scaleY(1.035); }
+  93.75% { transform: rotate(-18.48deg) scaleY(1.019); }
+  100.00% { transform: rotate(-20.00deg) scaleY(1.000); }
+}
+@keyframes pendulo-sombra-si {
+  0.00% { transform: translate(56.1px, 0.0px); }
+  6.25% { transform: translate(52.0px, 3.8px); }
+  12.50% { transform: translate(40.1px, 7.1px); }
+  18.75% { transform: translate(21.8px, 9.2px); }
+  25.00% { transform: translate(0.0px, 10.0px); }
+  31.25% { transform: translate(-21.8px, 9.2px); }
+  37.50% { transform: translate(-40.1px, 7.1px); }
+  43.75% { transform: translate(-52.0px, 3.8px); }
+  50.00% { transform: translate(-56.1px, 0.0px); }
+  56.25% { transform: translate(-52.0px, -3.8px); }
+  62.50% { transform: translate(-40.1px, -7.1px); }
+  68.75% { transform: translate(-21.8px, -9.2px); }
+  75.00% { transform: translate(-0.0px, -10.0px); }
+  81.25% { transform: translate(21.8px, -9.2px); }
+  87.50% { transform: translate(40.1px, -7.1px); }
+  93.75% { transform: translate(52.0px, -3.8px); }
+  100.00% { transform: translate(56.1px, -0.0px); }
+}
+@keyframes pendulo-sombra-no {
+  0.00% { transform: translate(56.1px, -0.0px); }
+  6.25% { transform: translate(52.0px, -3.8px); }
+  12.50% { transform: translate(40.1px, -7.1px); }
+  18.75% { transform: translate(21.8px, -9.2px); }
+  25.00% { transform: translate(0.0px, -10.0px); }
+  31.25% { transform: translate(-21.8px, -9.2px); }
+  37.50% { transform: translate(-40.1px, -7.1px); }
+  43.75% { transform: translate(-52.0px, -3.8px); }
+  50.00% { transform: translate(-56.1px, -0.0px); }
+  56.25% { transform: translate(-52.0px, 3.8px); }
+  62.50% { transform: translate(-40.1px, 7.1px); }
+  68.75% { transform: translate(-21.8px, 9.2px); }
+  75.00% { transform: translate(-0.0px, 10.0px); }
+  81.25% { transform: translate(21.8px, 9.2px); }
+  87.50% { transform: translate(40.1px, 7.1px); }
+  93.75% { transform: translate(52.0px, 3.8px); }
+  100.00% { transform: translate(56.1px, 0.0px); }
+}
+@keyframes pendulo-brillo {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.9; }
+}
+.pendulo-brazo { transform-origin: 100px 14px; transform-box: view-box; }
+.pendulo-vaiven { animation: pendulo-vaiven 1.8s ease-in-out infinite; }
+.pendulo-lento { animation: pendulo-lento 4s ease-in-out infinite; }
+.pendulo-buscando { animation: pendulo-busca 1.5s ease-in-out infinite; }
+.pendulo-si { animation: pendulo-si 2.4s linear infinite; }
+.pendulo-no { animation: pendulo-no 2.4s linear infinite; }
+.pendulo-sombra { transform-box: view-box; }
+.pendulo-sombra-vaiven { animation: pendulo-sombra-vaiven 1.8s ease-in-out infinite; }
+.pendulo-sombra-si { animation: pendulo-sombra-si 2.4s linear infinite; }
+.pendulo-sombra-no { animation: pendulo-sombra-no 2.4s linear infinite; }
+.pendulo-brillo { animation: pendulo-brillo 2.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .pendulo-vaiven, .pendulo-lento, .pendulo-giro { animation: none; }
+  .pendulo-vaiven, .pendulo-lento, .pendulo-buscando, .pendulo-si, .pendulo-no,
+  .pendulo-sombra-vaiven, .pendulo-sombra-si, .pendulo-sombra-no, .pendulo-brillo { animation: none; }
 }

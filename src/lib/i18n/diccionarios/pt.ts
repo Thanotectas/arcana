@@ -956,6 +956,16 @@ export const pt: Diccionario = {
     ver: "Ver meu ano · {n} créditos",
     calculando: "Buscando a volta do seu Sol…",
     momento: "Seu Sol volta ao seu lugar em {fecha} às {hora} ({lugar}).",
+    retorno: {
+      titulo: "Seu ano solar",
+      vuelve: "O Sol volta a {signo} {grado}",
+      cuando: "{fecha} · {hora} · {lugar}",
+      asc: "Ascendente do ano",
+      ascCasa: "Surge na sua casa natal {n}",
+      luna: "Lua do ano",
+      sol: "Sol do ano",
+      casa: "Casa {n}",
+    },
     errores: { anio: "Escolha o ano que quer ver.", lugar: "Escolha na lista a cidade onde passará o aniversário." },
   },
   baraja: {

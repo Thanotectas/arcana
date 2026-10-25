@@ -958,6 +958,16 @@ export const es = {
     ver: "Ver mi año · {n} créditos",
     calculando: "Buscando el regreso de tu Sol…",
     momento: "Tu Sol vuelve a su lugar el {fecha} a las {hora} ({lugar}).",
+    retorno: {
+      titulo: "Tu año solar",
+      vuelve: "El Sol vuelve a {signo} {grado}",
+      cuando: "{fecha} · {hora} · {lugar}",
+      asc: "Ascendente del año",
+      ascCasa: "Sale por tu casa natal {n}",
+      luna: "Luna del año",
+      sol: "Sol del año",
+      casa: "Casa {n}",
+    },
     errores: { anio: "Elige el año que quieres ver.", lugar: "Elige de la lista la ciudad donde pasarás tu cumpleaños." },
   },
   baraja: {
