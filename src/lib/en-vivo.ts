@@ -215,6 +215,20 @@ function fechaEn(texto: string): Date | null {
   return fecha.getUTCDate() === Number(m[1]) && anio > 1900 && fecha < new Date() ? fecha : null;
 }
 
+/**
+ * Año que pide leer el mensaje («mi año», «año personal», «el próximo año»,
+ * «2027»), o null si no pide un año. Solo el actual y los dos siguientes.
+ */
+export function anioQuePide(texto: string, hoy = new Date()): number | null {
+  const t = texto.toLowerCase().replace(/\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/g, " ");
+  const actual = hoy.getUTCFullYear();
+  const explicito = /\b(20[2-4]\d)\b/.exec(t);
+  if (explicito && Number(explicito[1]) >= actual && Number(explicito[1]) <= actual + 2) return Number(explicito[1]);
+  if (/pr[oó]ximo a[nñ]o|a[nñ]o que viene|a[nñ]o entrante|next year|ano que vem|pr[oó]ximo ano/.test(t)) return actual + 1;
+  if (/\b(mi|este|my|this|meu|esse)\s+(a[nñ]o|year)\b|a[nñ]o personal|personal year|ano pessoal/.test(t)) return actual;
+  return null;
+}
+
 interface Preparada {
   entrada: string;
   sistema: string;
@@ -234,6 +248,16 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
       };
     case "numerologia": {
       const fecha = fechaEn(p.texto);
+      const anio = fecha ? anioQuePide(p.texto) : null;
+      if (fecha && anio) {
+        // Lectura de su año: el año personal del año que pide (de enero a diciembre).
+        const perfil = calcularPerfil(p.autor, fecha, new Date(Date.UTC(anio, 5, 1)));
+        return {
+          entrada: [...base, `Pide la lectura de su año ${anio}. Año personal ${anio}: ${perfil.anioPersonal}. Camino de vida: ${perfil.caminoDeVida}.`].join("\n"),
+          sistema: `${SISTEMA_EN_VIVO}\nLectura de su año en numerología pitagórica: su año personal ${anio} es el ${perfil.anioPersonal}. Di qué ciclo abre o cierra ese número, en qué temporada del año se mueve más (amor, trabajo o dinero, según lo que preguntó) y un anuncio concreto para ese año.`,
+          extra: { ...vacio, numero: perfil.anioPersonal, etiquetaNumero: `Tu año personal ${anio}` },
+        };
+      }
       const perfil = calcularPerfil(p.autor, fecha ?? new Date(Date.UTC(2000, 0, 1)));
       const numero = fecha ? perfil.caminoDeVida : perfil.expresion;
       const etiqueta = fecha ? "Camino de vida" : "Número de tu nombre";
@@ -423,7 +447,7 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
   const telegram = TELEGRAM.activo ? " Y si quieres tu carta cada mañana, búscame en Telegram: Mi Arcana Bot." : "";
   return [
     "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
-    "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene.",
+    "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene. Y si quieres saber qué te trae tu año, escribe «mi año» con tu fecha de nacimiento.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y una tirada completa de tres cartas, con calma y por escrito, cuesta ${prueba}. ${oferta}`.trim(),
     "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
     `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo.${telegram}`,
