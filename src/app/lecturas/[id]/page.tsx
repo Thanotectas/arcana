@@ -38,7 +38,8 @@ import { VistaOraculo } from "@/components/VistaOraculo";
 import { Pendulo } from "@/components/Pendulo";
 import type { ResultadoOraculo } from "@/lib/oraculos/comun";
 import type { ResultadoPendulo } from "@/lib/oraculos/pendulo";
-import { selloPorNumero, nombreKin, TONOS, NAWALES, COLOR_CSS, type ResultadoMaya } from "@/lib/oraculos/maya";
+import type { ResultadoMaya } from "@/lib/oraculos/maya";
+import { VistaMaya } from "@/components/VistaMaya";
 import type { ResultadoRevolucion } from "@/lib/astro/revolucion";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -381,44 +382,3 @@ function VistaPendulo({ resultado, t }: { resultado: ResultadoPendulo; t: Diccio
   );
 }
 
-function VistaMaya({ resultado: r, t, idioma }: { resultado: ResultadoMaya; t: Diccionario; idioma: Idioma }) {
-  const sello = selloPorNumero(r.sello);
-  const tono = TONOS[r.tono - 1];
-  const oraculo = [
-    { etiqueta: t.maya.oraculo.guia, n: r.oraculo.guia },
-    { etiqueta: t.maya.oraculo.analogo, n: r.oraculo.analogo },
-    { etiqueta: t.maya.oraculo.antipoda, n: r.oraculo.antipoda },
-    { etiqueta: t.maya.oraculo.oculto, n: r.oraculo.oculto },
-  ];
-  const nawal = NAWALES[r.nawal.indice];
-  return (
-    <section className="tarjeta space-y-6 p-6">
-      <div className="flex flex-wrap items-center gap-5">
-        <div className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-2xl border-2 font-display" style={{ borderColor: COLOR_CSS[sello.color], boxShadow: `0 0 24px ${COLOR_CSS[sello.color]}55` }}>
-          <span className="text-xs uppercase tracking-widest text-texto-suave">Kin</span>
-          <span className="text-4xl">{r.kin}</span>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.maya.tuKin}</p>
-          <p className="font-display text-3xl">{nombreKin(r.kin, idioma)}</p>
-          <p className="text-sm text-texto-suave">{t.maya.sello}: {sello.nombre[idioma]} · {t.maya.tono} {tono.numero}: {tono.nombre[idioma]}</p>
-        </div>
-      </div>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {oraculo.map((o) => {
-          const s = selloPorNumero(o.n);
-          return (
-            <li key={o.etiqueta} className="rounded-xl border border-borde p-3 text-center">
-              <span className="mx-auto mb-2 block h-3 w-3 rounded-full" style={{ background: COLOR_CSS[s.color] }} />
-              <span className="block text-xs uppercase tracking-widest text-texto-suave">{o.etiqueta}</span>
-              <span className="font-display text-lg">{s.nombre[idioma]}</span>
-            </li>
-          );
-        })}
-      </ul>
-      <p className="text-sm text-texto-suave">
-        {t.maya.nawal}: <span className="text-oro-suave">{r.nawal.numero} {nawal.nombre}</span> · {t.maya.kinHoy}: {r.kinHoy}, {nombreKin(r.kinHoy, idioma)}
-      </p>
-    </section>
-  );
-}

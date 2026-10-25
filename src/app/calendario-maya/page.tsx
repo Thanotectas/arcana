@@ -3,6 +3,7 @@ import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { accionMaya } from "@/lib/lecturas/acciones";
 import { FormularioLectura } from "@/components/FormularioLectura";
+import { FechaMaya } from "@/components/FechaMaya";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 
@@ -29,10 +30,7 @@ export default async function PaginaMaya() {
             <label className="etiqueta" htmlFor="nombre">{t.maya.nombre}</label>
             <input id="nombre" name="nombre" className="campo" defaultValue={perfil?.nombre ?? ""} required maxLength={80} />
           </div>
-          <div>
-            <label className="etiqueta" htmlFor="fecha">{t.maya.fecha}</label>
-            <input id="fecha" name="fecha" type="date" className="campo" min="1900-01-01" required defaultValue={perfil?.fecha_nacimiento ?? ""} />
-          </div>
+          <FechaMaya fechaInicial={perfil?.fecha_nacimiento ?? ""} />
         </FormularioLectura>
       </div>
     </div>
