@@ -92,6 +92,6 @@ cuatro hojas, una llave y una estrella dorada de ocho puntas, rodeados de una gu
 perfectamente simétrico, que se vea igual si se gira la carta 180 grados. Sin texto, sin letras, sin números.
 
 ==================== ESTADO ====================
-Recibidas las cuadrículas 1 a 4 (cartas 1–24) el 25 oct 2026; faltan la 5, la 6 y el reverso. Salieron en proporción
+Las 36 cartas están desde el 25 oct 2026 (la cuadrícula 5 vino casi cuadrada y se estrechó); falta el reverso. Salieron en proporción
 ~5:6 (no 2:3), así que el Lenormand usa 500×600: se recorta por dentro del marco azul y se dibuja un marco uniforme
 (crema + azul petróleo). LENORMAND_CON_IMAGEN en src/lib/oraculos/lenormand.ts lista las que tienen imagen.

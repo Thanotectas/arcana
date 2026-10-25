@@ -55,7 +55,7 @@ export const LENORMAND: CartaLenormand[] = [
 ];
 
 /** Cartas con ilustración en public/cartas/lenormand/<id>.webp (500×600). Al sumar archivos, ampliar el rango. */
-export const LENORMAND_CON_IMAGEN = new Set(Array.from({ length: 24 }, (_, i) => `l${i + 1}`));
+export const LENORMAND_CON_IMAGEN = new Set(Array.from({ length: 36 }, (_, i) => `l${i + 1}`));
 
 export function cartaLenormand(id: string) {
   return LENORMAND.find((c) => c.id === id);
