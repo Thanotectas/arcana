@@ -37,8 +37,8 @@ export function RitualOraculo({
   total: number;
   estilo: "carta" | "runa";
   textos: { elige: string; leer: string };
-  /** Imagen del reverso del mazo, si la tiene (baraja española). */
-  dorso?: string;
+  /** Imagen del reverso del mazo, si la tiene, y su proporción (el Lenormand es 5:6). */
+  dorso?: { src: string; ancho: number; alto: number };
 }) {
   const { t } = useT();
   const [estado, enviar] = useActionState<EstadoAccion, FormData>(accion, {});
@@ -156,11 +156,11 @@ export function RitualOraculo({
   );
 }
 
-function Pieza({ estilo, dorso, elegida = false, className = "", style }: { estilo: "carta" | "runa"; dorso?: string; elegida?: boolean; className?: string; style?: CSSProperties }) {
+function Pieza({ estilo, dorso, elegida = false, className = "", style }: { estilo: "carta" | "runa"; dorso?: { src: string; ancho: number; alto: number }; elegida?: boolean; className?: string; style?: CSSProperties }) {
   const borde = elegida ? "border-oro shadow-[0_0_14px_rgba(217,180,90,0.5)]" : "border-oro/30";
   if (dorso) {
     // eslint-disable-next-line @next/next/no-img-element -- reverso estático del mazo
-    return <img src={dorso} alt="" width={500} height={750} style={style} className={`block aspect-[2/3] w-full rounded-md ${elegida ? "opacity-60 shadow-[0_0_14px_rgba(217,180,90,0.7)] ring-2 ring-oro" : ""} ${className}`} />;
+    return <img src={dorso.src} alt="" width={dorso.ancho} height={dorso.alto} style={{ aspectRatio: `${dorso.ancho} / ${dorso.alto}`, ...style }} className={`block w-full rounded-md ${elegida ? "opacity-60 shadow-[0_0_14px_rgba(217,180,90,0.7)] ring-2 ring-oro" : ""} ${className}`} />;
   }
   if (estilo === "runa") {
     return <span style={style} className={`block aspect-[4/5] rounded-[45%] border bg-gradient-to-br from-stone-500/50 to-stone-800/70 ${borde} ${className}`} />;
