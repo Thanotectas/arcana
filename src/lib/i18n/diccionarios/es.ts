@@ -713,6 +713,8 @@ export const es = {
     juicio: "El Juicio",
     imagen: "La Imagen",
     trigramas: { cielo: "Cielo", tierra: "Tierra", trueno: "Trueno", agua: "Agua", montana: "Montaña", viento: "Viento", fuego: "Fuego", lago: "Lago" },
+    sobre: "{a} sobre {b}",
+    lineasQueCambian: "Las líneas que cambian",
     errores: { pregunta: "Escribe tu pregunta antes de lanzar las monedas.", lanzamientos: "Faltan lanzamientos: el hexagrama debe tener seis líneas." },
   },
   chino: {

@@ -711,6 +711,8 @@ export const pt: Diccionario = {
     juicio: "O Julgamento",
     imagen: "A Imagem",
     trigramas: { cielo: "Céu", tierra: "Terra", trueno: "Trovão", agua: "Água", montana: "Montanha", viento: "Vento", fuego: "Fogo", lago: "Lago" },
+    sobre: "{a} sobre {b}",
+    lineasQueCambian: "As linhas que mudam",
     errores: { pregunta: "Escreva sua pergunta antes de lançar as moedas.", lanzamientos: "Faltam lançamentos: o hexagrama precisa de seis linhas." },
   },
   chino: {

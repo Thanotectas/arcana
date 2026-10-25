@@ -5,6 +5,7 @@ import Link from "next/link";
 import { accionIChing, type EstadoAccion } from "@/lib/lecturas/acciones";
 import { valorDeMonedas, esYang, esMutante, hexagramaPorLineas, type ValorLinea } from "@/lib/iching";
 import { HexagramaVisual } from "./HexagramaVisual";
+import { MonedaIChing } from "./MonedaIChing";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { useT } from "@/lib/i18n/cliente";
@@ -87,8 +88,8 @@ export function RitualIChing({ nombresHexagramas }: { nombresHexagramas: Record<
               const cara = monedasVista ? monedasVista[i] : null;
               return (
                 <div key={i} className={`moneda ${girando ? "girando" : ""} ${cara === false ? "cruz" : ""}`} style={{ animationDelay: `${i * 90}ms` }}>
-                  <span className="moneda-cara">陽</span>
-                  <span className="moneda-cruz">陰</span>
+                  <span className="moneda-cara"><MonedaIChing lado="cara" /></span>
+                  <span className="moneda-cruz"><MonedaIChing lado="cruz" /></span>
                 </div>
               );
             })}
@@ -104,7 +105,7 @@ export function RitualIChing({ nombresHexagramas }: { nombresHexagramas: Record<
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <HexagramaVisual lineas={lineas} mutantes={mutantes} tamano={140} animado />
+          <HexagramaVisual lineas={lineas} mutantes={mutantes} valores={tiros.map((x) => x.valor)} tamano={140} animado />
           <ol className="text-center text-[11px] text-texto-suave">
             {tiros.map((x, i) => (
               <li key={i}>

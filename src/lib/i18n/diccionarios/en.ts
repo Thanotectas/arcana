@@ -714,6 +714,8 @@ export const en: Diccionario = {
     juicio: "The Judgment",
     imagen: "The Image",
     trigramas: { cielo: "Heaven", tierra: "Earth", trueno: "Thunder", agua: "Water", montana: "Mountain", viento: "Wind", fuego: "Fire", lago: "Lake" },
+    sobre: "{a} over {b}",
+    lineasQueCambian: "The changing lines",
     errores: { pregunta: "Write your question before tossing the coins.", lanzamientos: "Tosses are missing: the hexagram needs six lines." },
   },
   chino: {

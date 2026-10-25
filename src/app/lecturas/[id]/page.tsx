@@ -18,8 +18,8 @@ import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { signoPorId, imagenSigno } from "@/lib/zodiaco";
 import type { PerfilNumerologico } from "@/lib/numerologia";
 import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia } from "@/components/GraficosNumerologia";
-import { HexagramaVisual } from "@/components/HexagramaVisual";
-import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } from "@/lib/iching";
+import { VistaIChing } from "@/components/VistaIChing";
+import type { ResultadoIChing } from "@/lib/iching";
 import { SiguientePaso } from "@/components/SiguientePaso";
 import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
@@ -267,51 +267,6 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
         <p className="font-display text-xl">{b?.nombre}</p>
       </div>
     </section>
-  );
-}
-
-function VistaIChing({ resultado, t }: { resultado: ResultadoIChing; t: Diccionario }) {
-  const presente = hexagramaPorNumero(resultado.presente);
-  const futuro = resultado.futuro ? hexagramaPorNumero(resultado.futuro) : null;
-  if (!presente) return null;
-  const lineas = resultado.valores.map((v) => (esYang(v) ? 1 : 0)) as (0 | 1)[];
-  return (
-    <section className={`grid gap-4 ${futuro ? "md:grid-cols-2" : ""}`}>
-      <BloqueHexagrama h={presente} titulo={t.iching.presente} lineasH={lineas} mutantes={resultado.mutantes} t={t} />
-      {futuro && <BloqueHexagrama h={futuro} titulo={t.iching.futuro} lineasH={futuro.lineas} mutantes={[]} t={t} />}
-    </section>
-  );
-}
-
-function BloqueHexagrama({
-  h,
-  titulo,
-  lineasH,
-  mutantes,
-  t,
-}: {
-  h: NonNullable<ReturnType<typeof hexagramaPorNumero>>;
-  titulo: string;
-  lineasH: (0 | 1)[];
-  mutantes: number[];
-  t: Diccionario;
-}) {
-  return (
-    <div className="tarjeta flex flex-col items-center gap-3 p-5 text-center">
-      <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{titulo}</p>
-      <HexagramaVisual lineas={lineasH} mutantes={mutantes} tamano={110} animado />
-      <p className="font-display text-2xl text-oro-suave">
-        {h.numero}. {h.nombre} <span className="text-base text-texto-suave">{h.chino} · {h.pinyin}</span>
-      </p>
-      <p className="text-xs text-texto-suave">
-        {SIMBOLO_TRIGRAMA[h.trigramaSuperior]} {t.iching.trigramas[h.trigramaSuperior]} / {SIMBOLO_TRIGRAMA[h.trigramaInferior]} {t.iching.trigramas[h.trigramaInferior]}
-      </p>
-      <div className="flex flex-wrap justify-center gap-1.5">
-        {h.palabrasClave.map((p) => (
-          <span key={p} className="rounded-full border border-oro/30 px-2.5 py-0.5 text-xs text-oro-suave">{p}</span>
-        ))}
-      </div>
-    </div>
   );
 }
 
