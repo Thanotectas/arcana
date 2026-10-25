@@ -7,7 +7,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaLarga, plantilla } from "@/lib/i18n/formato";
 import { pdfDeLectura, type DatosPdf, type VisualPdf } from "@/lib/pdf/documento";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri, runaComoDataUri } from "@/lib/marca/imagenes";
 import { cartasDeTirada, POSICIONES_I18N, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, MAZOS, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
@@ -87,9 +87,21 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       ),
     };
     fichas.push({ etiqueta: t.tarot.eligeMazo, valor: (t.tarot.mazos as Record<string, { nombre: string }>)[mazo]?.nombre ?? MAZOS[mazo].nombre });
-  } else if (tipo === "baraja_espanola" || tipo === "lenormand" || tipo === "runas") {
+  } else if (tipo === "runas") {
+    // Las runas son piedras redondas: van como monedas (nombre y posición debajo).
     const r = resultado as unknown as ResultadoOraculo;
-    const tiradas = tipo === "baraja_espanola" ? TIRADAS_BARAJA : tipo === "lenormand" ? TIRADAS_LENORMAND : TIRADAS_RUNAS;
+    const tirada = tiradaPorId(TIRADAS_RUNAS, r.tirada) ?? TIRADAS_RUNAS[0];
+    visual = {
+      tipo: "monedas",
+      items: await Promise.all((r.piezas ?? []).map(async (p) => ({
+        imagen: await runaComoDataUri(p.id),
+        valor: nombrePieza(tipo, p.id, idioma) + (p.invertida ? ` (${t.pdf.invertida})` : ""),
+        etiqueta: tirada.posiciones[p.posicion]?.nombre[idioma] ?? "",
+      }))),
+    };
+  } else if (tipo === "baraja_espanola" || tipo === "lenormand") {
+    const r = resultado as unknown as ResultadoOraculo;
+    const tiradas = tipo === "baraja_espanola" ? TIRADAS_BARAJA : TIRADAS_LENORMAND;
     const tirada = tiradaPorId(tiradas, r.tirada) ?? tiradas[0];
     visual = {
       tipo: "cartas",

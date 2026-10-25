@@ -32,6 +32,11 @@ export function cartaLenormandComoDataUri(id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "lenormand", `${id}.webp`), { alto: 527 });
 }
 
+/** Piedra de una runa con su grabado (public/runas/<id>.webp, 360×360 con fondo transparente). */
+export function runaComoDataUri(id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", "runas", `${id}.webp`), { lado: 300 });
+}
+
 /** Moneda dorada (signo occidental o animal chino), reducida para la tarjeta. */
 export function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), { lado: 260 });

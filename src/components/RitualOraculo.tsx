@@ -118,7 +118,15 @@ export function RitualOraculo({
         </>
       )}
 
-      {fase === "barajar" && (
+      {fase === "barajar" && estilo === "runa" && (
+        <div className="flex h-48 items-center justify-center" aria-live="polite">
+          {/* eslint-disable-next-line @next/next/no-img-element -- la bolsa de las runas, estática */}
+          <img src="/runas/bolsa.webp" alt="" width={576} height={720} className="h-44 w-auto rounded-2xl runas-agitar" />
+          <p className="sr-only">{t.oraculo.mezclando}</p>
+        </div>
+      )}
+
+      {fase === "barajar" && estilo !== "runa" && (
         <div className="flex h-48 items-center justify-center" aria-live="polite">
           <div className="relative h-32 w-24">
             {[0, 1, 2, 3, 4].map((i) => (
@@ -135,13 +143,20 @@ export function RitualOraculo({
             <p className="font-display text-xl">{plantilla(textos.elige, { n: tirada.n })}</p>
             <p className="text-sm text-texto-suave">{plantilla(t.oraculo.elegidas, { a: seleccion.length, b: tirada.n })}</p>
           </div>
-          <div className={`grid gap-2 ${estilo === "runa" ? "grid-cols-6 sm:grid-cols-8" : "grid-cols-8 sm:grid-cols-10"}`}>
+          <div
+            className={`grid gap-2 ${estilo === "runa" ? "grid-cols-6 rounded-2xl bg-cover bg-center p-3 sm:grid-cols-8 sm:p-4" : "grid-cols-8 sm:grid-cols-10"}`}
+            style={estilo === "runa" ? { backgroundImage: "linear-gradient(rgba(11,7,22,0.2), rgba(11,7,22,0.35)), url(/runas/pano.webp)" } : undefined}
+          >
             {Array.from({ length: total }, (_, i) => {
               const orden = seleccion.indexOf(i);
               return (
                 <button key={i} type="button" onClick={() => tocar(i)} aria-pressed={orden >= 0} aria-label={`${i + 1}`} className="relative transition hover:-translate-y-1">
-                  <Pieza estilo={estilo} dorso={dorso} elegida={orden >= 0} />
-                  {orden >= 0 && <span className="absolute inset-0 flex items-center justify-center font-display text-xl text-oro">{orden + 1}</span>}
+                  <Pieza estilo={estilo} dorso={dorso} elegida={orden >= 0} indice={i} />
+                  {orden >= 0 && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-noche/85 font-display text-lg text-oro ring-1 ring-oro">{orden + 1}</span>
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -156,14 +171,16 @@ export function RitualOraculo({
   );
 }
 
-function Pieza({ estilo, dorso, elegida = false, className = "", style }: { estilo: "carta" | "runa"; dorso?: { src: string; ancho: number; alto: number }; elegida?: boolean; className?: string; style?: CSSProperties }) {
+function Pieza({ estilo, dorso, elegida = false, indice = 0, className = "", style }: { estilo: "carta" | "runa"; dorso?: { src: string; ancho: number; alto: number }; elegida?: boolean; indice?: number; className?: string; style?: CSSProperties }) {
   const borde = elegida ? "border-oro shadow-[0_0_14px_rgba(217,180,90,0.5)]" : "border-oro/30";
   if (dorso) {
     // eslint-disable-next-line @next/next/no-img-element -- reverso estático del mazo
     return <img src={dorso.src} alt="" width={dorso.ancho} height={dorso.alto} style={{ aspectRatio: `${dorso.ancho} / ${dorso.alto}`, ...style }} className={`block w-full rounded-md ${elegida ? "opacity-60 shadow-[0_0_14px_rgba(217,180,90,0.7)] ring-2 ring-oro" : ""} ${className}`} />;
   }
   if (estilo === "runa") {
-    return <span style={style} className={`block aspect-[4/5] rounded-[45%] border bg-gradient-to-br from-stone-500/50 to-stone-800/70 ${borde} ${className}`} />;
+    // Piedras lisas (boca abajo): nueve pinturas distintas que se repiten.
+    // eslint-disable-next-line @next/next/no-img-element -- piedra estática
+    return <img src={`/runas/piedra-${(indice % 9) + 1}.webp`} alt="" width={360} height={360} style={style} className={`block aspect-square w-full ${elegida ? "opacity-70 drop-shadow-[0_0_10px_rgba(217,180,90,0.9)]" : "drop-shadow-[0_6px_8px_rgba(0,0,0,0.55)]"} ${className}`} />;
   }
   return (
     <span style={style} className={`block aspect-[2/3] rounded-md border bg-gradient-to-br from-violeta/50 via-superficie to-violeta/30 ${borde} ${className}`}>

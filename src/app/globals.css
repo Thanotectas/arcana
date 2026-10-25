@@ -703,6 +703,34 @@ body {
 .vivo-carta {
   animation: vivo-carta 4.5s ease-in-out infinite;
 }
+/* La bolsa de las runas se agita mientras se mezclan. */
+@keyframes runas-agitar {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  20% {
+    transform: rotate(-7deg) translateY(-4px);
+  }
+  40% {
+    transform: rotate(6deg) translateY(2px);
+  }
+  60% {
+    transform: rotate(-5deg) translateY(-3px);
+  }
+  80% {
+    transform: rotate(4deg) translateY(1px);
+  }
+}
+.runas-agitar {
+  transform-origin: 50% 85%;
+  animation: runas-agitar 0.55s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .runas-agitar {
+    animation: none;
+  }
+}
 /* La campanita de «suscríbete» se mece cada pocos segundos. */
 @keyframes vivo-campana {
   0%,

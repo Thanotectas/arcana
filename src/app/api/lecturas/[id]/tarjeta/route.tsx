@@ -5,7 +5,7 @@ import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri, runaComoDataUri } from "@/lib/marca/imagenes";
 import { LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
 import type { ResultadoAura } from "@/lib/aura";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
@@ -104,6 +104,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     simbolos = ["✦"];
     titulo = (r.piezas ?? []).map((p) => nombrePieza(tipo, p.id, idioma)).join(" · ");
     if (tipo === "baraja_espanola") imagenes = await Promise.all((r.piezas ?? []).slice(0, 3).map((p) => cartaEspanolaComoDataUri(p.id)));
+    if (tipo === "runas" && r.piezas?.length) {
+      imagenes = await Promise.all(r.piezas.slice(0, 3).map((p) => runaComoDataUri(p.id)));
+      proporcion = 1;
+    }
     const lenormand = (r.piezas ?? []).slice(0, 3);
     if (tipo === "lenormand" && lenormand.length && lenormand.every((p) => LENORMAND_CON_IMAGEN.has(p.id))) {
       imagenes = await Promise.all(lenormand.map((p) => cartaLenormandComoDataUri(p.id)));

@@ -1,6 +1,6 @@
 import { TIRADAS_BARAJA, cartaEspanola, nombreCartaEspanola } from "@/lib/oraculos/baraja";
 import { TIRADAS_LENORMAND, cartaLenormand, LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
-import { TIRADAS_RUNAS, runaPorId, type Runa } from "@/lib/oraculos/runas";
+import { TIRADAS_RUNAS, runaPorId } from "@/lib/oraculos/runas";
 import { tiradaPorId, type ResultadoOraculo } from "@/lib/oraculos/comun";
 import type { Idioma } from "@/lib/i18n/idiomas";
 
@@ -12,7 +12,10 @@ export function VistaOraculo({ tipo, resultado, idioma, titulo, invertida }: { t
   return (
     <section className="tarjeta p-6">
       <p className="mb-4 text-xs uppercase tracking-[0.25em] text-violeta-suave">{titulo} · {tirada.nombre[idioma]}</p>
-      <ol className="flex flex-wrap justify-center gap-4">
+      <ol
+        className={`flex flex-wrap justify-center gap-4 ${tipo === "runas" ? "rounded-2xl bg-cover bg-center px-3 py-6 shadow-inner" : ""}`}
+        style={tipo === "runas" ? { backgroundImage: "linear-gradient(rgba(11,7,22,0.25), rgba(11,7,22,0.45)), url(/runas/pano.webp)" } : undefined}
+      >
         {(resultado.piezas ?? []).map((p) => {
           const posicion = tirada.posiciones[p.posicion]?.nombre[idioma] ?? "";
           return (
@@ -63,22 +66,12 @@ function PiezaLenormand({ id, idioma }: { id: string; idioma: Idioma }) {
   );
 }
 
-export function GlifoRuna({ runa, className = "" }: { runa: Runa; className?: string }) {
-  return (
-    <svg viewBox="-1 -1 12 18" className={className} aria-hidden>
-      {runa.trazos.map((t, i) => (
-        <polyline key={i} points={t.map(([x, y]) => `${x},${y}`).join(" ")} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-      ))}
-    </svg>
-  );
-}
-
 function PiezaRuna({ id, invertida }: { id: string; invertida: boolean }) {
   const r = runaPorId(id);
   if (!r) return null;
+  // Piedra pintada con la runa grabada (public/runas/<id>.webp); invertida, la piedra queda de cabeza.
   return (
-    <div className="flex aspect-[4/5] w-full items-center justify-center rounded-[45%] border border-oro/30 bg-gradient-to-br from-stone-500 to-stone-800 shadow-lg">
-      <GlifoRuna runa={r} className={`h-16 w-12 text-oro-suave drop-shadow ${invertida ? "rotate-180" : ""}`} />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element -- imagen estática de la runa
+    <img src={`/runas/${r.id}.webp`} alt={r.nombre} width={360} height={360} className={`aspect-square w-full drop-shadow-[0_8px_10px_rgba(0,0,0,0.55)] ${invertida ? "rotate-180" : ""}`} />
   );
 }

@@ -7,7 +7,6 @@ import { TIRADAS_BARAJA, BARAJA } from "@/lib/oraculos/baraja";
 import { TIRADAS_LENORMAND, LENORMAND } from "@/lib/oraculos/lenormand";
 import { TIRADAS_RUNAS, RUNAS } from "@/lib/oraculos/runas";
 import { RitualOraculo } from "./RitualOraculo";
-import { GlifoRuna } from "./VistaOraculo";
 
 const DATOS = {
   baraja_espanola: { clave: "baraja", accion: accionBaraja, tiradas: TIRADAS_BARAJA, total: BARAJA.length, estilo: "carta" },
@@ -46,7 +45,8 @@ export async function PaginaOraculo({ tipo }: { tipo: keyof typeof DATOS }) {
           <ul className="mt-4 grid grid-cols-4 gap-3 text-center text-xs sm:grid-cols-6">
             {RUNAS.map((r) => (
               <li key={r.id} className="flex flex-col items-center gap-1 rounded-lg border border-borde p-2">
-                <GlifoRuna runa={r} className="h-8 w-6 text-oro-suave" />
+                {/* eslint-disable-next-line @next/next/no-img-element -- imagen estática de la runa */}
+                <img src={`/runas/${r.id}.webp`} alt="" width={360} height={360} loading="lazy" className="h-12 w-12 drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]" />
                 <span className="font-semibold">{r.nombre}</span>
                 <span className="text-texto-suave">{r.significado[idioma]}</span>
               </li>
