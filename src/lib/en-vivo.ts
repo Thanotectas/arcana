@@ -73,7 +73,11 @@ const PREGUNTA_OTROS_IDIOMAS = /\b(what|when|will i|should i|how (is|will|do|doe
 export function pareceConsulta(texto: string) {
   const t = texto.trim();
   if (t.length < 8 || t.length > 300) return false;
-  return Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t);
+  // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
+  return (
+    Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
+    /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t) || anioQuePide(t) !== null
+  );
 }
 
 export interface EstadoChat {
