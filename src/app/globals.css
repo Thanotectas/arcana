@@ -608,6 +608,44 @@ body {
   filter: hue-rotate(215deg) saturate(1.4) brightness(1.1) drop-shadow(0 0 8px rgba(139, 108, 246, 0.5));
 }
 
+/* Rueda china y ciclo de los cinco elementos */
+.chino-trazo {
+  stroke-dasharray: 1;
+  animation: chino-trazo 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+}
+.chino-trazo-2 { animation-delay: 0.9s; }
+@keyframes chino-trazo {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.chino-aparecer { animation: chino-aparecer 0.8s ease-out 1.5s both; }
+@keyframes chino-aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.chino-halo { animation: chino-halo 3.2s ease-in-out infinite; }
+@keyframes chino-halo {
+  0%, 100% { transform: scale(1); opacity: 0.18; }
+  50% { transform: scale(1.14); opacity: 0.3; }
+}
+.chino-orbita { animation: chino-orbita 14s linear infinite; }
+@keyframes chino-orbita {
+  to { transform: rotate(360deg); }
+}
+.chino-flecha-viva { animation: chino-flecha 2.4s ease-in-out infinite; }
+@keyframes chino-flecha {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.chino-moneda { animation: chino-moneda 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes chino-moneda {
+  from { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chino-trazo, .chino-aparecer, .chino-halo, .chino-orbita, .chino-flecha-viva, .chino-moneda { animation: none; }
+}
+
 /* Aura: halos que respiran */
 @keyframes respirar {
   0%, 100% { transform: scale(1); opacity: 0.9; }

@@ -747,6 +747,19 @@ export const en: Diccionario = {
       mono: "Cunning, curiosity and versatility", gallo: "Precision, honesty and pride", perro: "Loyalty, justice and protection", cerdo: "Generosity, sincerity and enjoyment",
     },
     relaciones: { mismo: "it is your own year: it asks for care and protection", trino: "a supportive year: it is in your triangle", amigo: "a year of alliances: it is your secret friend", choque: "a year of friction: it asks for prudence", neutra: "a neutral year: it depends on your choices" },
+    ciclo: {
+      titulo: "The five elements",
+      nota: "The circle is the nourishing cycle: Wood feeds Fire, Fire makes Earth, Earth bears Metal, Metal gathers Water and Water nourishes Wood. The star is the controlling cycle.",
+      tuElemento: "Your element (your year's)",
+      fijo: "Your animal's fixed element",
+      relaciones: {
+        mismo: "{anio} is a {suyo} year, your same element: its energy adds to yours, for better and for worse.",
+        nutre: "The {suyo} of {anio} feeds your {tuyo}: a year that nourishes and pushes you.",
+        nutres: "Your {tuyo} feeds the {suyo} of {anio}: you give a lot this year; look after your energy.",
+        controla: "The {suyo} of {anio} controls your {tuyo}: a year that polishes you and asks for discipline.",
+        controlas: "Your {tuyo} masters the {suyo} of {anio}: you hold the upper hand; use it with tact.",
+      },
+    },
     errores: { nombre: "Enter your name.", fecha: "Invalid birth date (from 1900).", hora: "Invalid time." },
   },
   voz: {

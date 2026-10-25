@@ -746,6 +746,19 @@ export const es = {
       mono: "Astucia, curiosidad y versatilidad", gallo: "Precisión, honestidad y orgullo", perro: "Fidelidad, justicia y protección", cerdo: "Generosidad, sinceridad y disfrute",
     },
     relaciones: { mismo: "es tu propio año: pide cuidado y protección", trino: "año de apoyo: está en tu triángulo", amigo: "año de alianzas: es tu amigo secreto", choque: "año de fricción: pide prudencia", neutra: "año neutro: depende de tus decisiones" },
+    ciclo: {
+      titulo: "Los cinco elementos",
+      nota: "El círculo es el ciclo que nutre: la Madera alimenta al Fuego, el Fuego hace Tierra, la Tierra da Metal, el Metal recoge el Agua y el Agua riega la Madera. La estrella es el ciclo que controla.",
+      tuElemento: "Tu elemento (el de tu año)",
+      fijo: "Elemento fijo de tu animal",
+      relaciones: {
+        mismo: "{anio} es un año de {suyo}, tu mismo elemento: su energía se suma a la tuya, para bien y para mal.",
+        nutre: "El elemento {suyo} de {anio} alimenta a tu {tuyo}: un año que te nutre y te empuja.",
+        nutres: "Tu {tuyo} alimenta al elemento {suyo} de {anio}: das mucho este año; cuida tu energía.",
+        controla: "El elemento {suyo} de {anio} controla a tu {tuyo}: un año que te pule y te exige disciplina.",
+        controlas: "Tu {tuyo} domina al elemento {suyo} de {anio}: tienes la sartén por el mango; úsala con tacto.",
+      },
+    },
     errores: { nombre: "Escribe tu nombre.", fecha: "Fecha de nacimiento no válida (desde 1900).", hora: "Hora no válida." },
   },
   voz: {

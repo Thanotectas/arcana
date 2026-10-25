@@ -21,7 +21,8 @@ import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia }
 import { VistaIChing } from "@/components/VistaIChing";
 import type { ResultadoIChing } from "@/lib/iching";
 import { SiguientePaso } from "@/components/SiguientePaso";
-import { FICHA, COLOR_ELEMENTO, CARACTER_ELEMENTO, type ResultadoChino, type Animal, type ElementoChino, type PilarAnio } from "@/lib/chino";
+import type { ResultadoChino } from "@/lib/chino";
+import { VistaChino } from "@/components/VistaChino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
 import { TONO_COLOR, type EntradaVelas } from "@/lib/velas";
 import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
@@ -265,31 +266,6 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
         {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
         {b && <img src={imagenSigno(b.id)} alt="" width={96} height={96} className="moneda-signo mx-auto" />}
         <p className="font-display text-xl">{b?.nombre}</p>
-      </div>
-    </section>
-  );
-}
-
-function VistaChino({ resultado, t }: { resultado: ResultadoChino; t: Diccionario }) {
-  const nombres = t.chino.animales as Record<Animal, string>;
-  const elementos = t.chino.elementos as Record<ElementoChino, string>;
-  const pilar = (p: PilarAnio) => plantilla(t.chino.pilar, { animal: nombres[p.animal], elemento: elementos[p.elemento] });
-  const color = COLOR_ELEMENTO[resultado.pilar.elemento];
-  return (
-    <section className="grid gap-4 sm:grid-cols-[auto_1fr]">
-      <div className="tarjeta flex flex-col items-center justify-center p-6 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático pequeño, sin optimización necesaria */}
-        <img src={`/animales/${resultado.pilar.animal}.webp`} alt="" width={128} height={128} className="animal-oro-vivo" />
-        <p className="mt-1 text-2xl" style={{ color }}>{FICHA[resultado.pilar.animal].caracter}</p>
-        <p className="font-display mt-2 text-2xl text-oro-suave">{pilar(resultado.pilar)}</p>
-        <p className="text-xs text-texto-suave">{CARACTER_ELEMENTO[resultado.pilar.elemento]} {elementos[resultado.pilar.elemento]} · {resultado.pilar.polaridad} · {resultado.pilar.anio}</p>
-      </div>
-      <div className="tarjeta grid gap-2 p-5 text-sm sm:grid-cols-2">
-        <p><span className="text-texto-suave">{t.chino.trino}:</span> {resultado.companeros.map((a) => nombres[a]).join(" · ")}</p>
-        <p><span className="text-texto-suave">{t.chino.amigo}:</span> {nombres[resultado.amigo]}</p>
-        <p><span className="text-texto-suave">{t.chino.choque}:</span> {nombres[resultado.choque]}</p>
-        {resultado.animalHora && <p><span className="text-texto-suave">{t.chino.animalSecreto}:</span> {nombres[resultado.animalHora]}</p>}
-        <p className="sm:col-span-2"><span className="text-texto-suave">{t.chino.anioActual}:</span> {resultado.anioActual.anio}, {pilar(resultado.anioActual)} · {(t.chino.relaciones as Record<string, string>)[resultado.relacionAnioActual]}</p>
       </div>
     </section>
   );

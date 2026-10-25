@@ -744,6 +744,19 @@ export const pt: Diccionario = {
       mono: "Astúcia, curiosidade e versatilidade", gallo: "Precisão, honestidade e orgulho", perro: "Fidelidade, justiça e proteção", cerdo: "Generosidade, sinceridade e prazer",
     },
     relaciones: { mismo: "é o seu próprio ano: pede cuidado e proteção", trino: "ano de apoio: está no seu triângulo", amigo: "ano de alianças: é seu amigo secreto", choque: "ano de atrito: pede prudência", neutra: "ano neutro: depende das suas decisões" },
+    ciclo: {
+      titulo: "Os cinco elementos",
+      nota: "O círculo é o ciclo que nutre: a Madeira alimenta o Fogo, o Fogo faz a Terra, a Terra dá o Metal, o Metal recolhe a Água e a Água rega a Madeira. A estrela é o ciclo que controla.",
+      tuElemento: "Seu elemento (o do seu ano)",
+      fijo: "Elemento fixo do seu animal",
+      relaciones: {
+        mismo: "{anio} é um ano de {suyo}, o seu mesmo elemento: a energia dele se soma à sua, para o bem e para o mal.",
+        nutre: "O elemento {suyo} de {anio} alimenta o seu elemento {tuyo}: um ano que nutre e impulsiona você.",
+        nutres: "Seu elemento {tuyo} alimenta o elemento {suyo} de {anio}: você dá muito este ano; cuide da sua energia.",
+        controla: "O elemento {suyo} de {anio} controla o seu elemento {tuyo}: um ano que lapida você e pede disciplina.",
+        controlas: "Seu elemento {tuyo} domina o elemento {suyo} de {anio}: você tem as rédeas; use-as com tato.",
+      },
+    },
     errores: { nombre: "Digite seu nome.", fecha: "Data de nascimento inválida (a partir de 1900).", hora: "Hora inválida." },
   },
   voz: {
