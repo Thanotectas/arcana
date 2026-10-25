@@ -200,6 +200,7 @@ export const es = {
       siguiente: "Siguiente",
       probar: "Probar",
       items: {
+        runas: "Las runas de Sibila",
         abundancia: "El ritual de la abundancia",
         mano: "¿Qué dice tu mano?",
         trabajo: "Ritual para atraer trabajo",

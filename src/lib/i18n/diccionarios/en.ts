@@ -201,6 +201,7 @@ export const en: Diccionario = {
       siguiente: "Next",
       probar: "Try it",
       items: {
+        runas: "Sibila's runes",
         abundancia: "The abundance ritual",
         mano: "What does your hand say?",
         trabajo: "A ritual to attract work",

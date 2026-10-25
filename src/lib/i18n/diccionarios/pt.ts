@@ -198,6 +198,7 @@ export const pt: Diccionario = {
       siguiente: "Próximo",
       probar: "Experimentar",
       items: {
+        runas: "As runas de Sibila",
         abundancia: "O ritual da abundância",
         mano: "O que diz a sua mão?",
         trabajo: "Ritual para atrair trabalho",

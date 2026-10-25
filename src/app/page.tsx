@@ -11,6 +11,7 @@ import { AvisoDirecto } from "@/components/AvisoDirecto";
 
 /** Reels de Sibila para la portada (versiones web en public/videos/portada, sin fechas que venzan). */
 const VIDEOS = [
+  { id: "runas", clave: "runas", href: "/runas" },
   { id: "abundancia", clave: "abundancia", href: "/rituales" },
   { id: "mano", clave: "mano", href: "/quiromancia" },
   { id: "trabajo", clave: "trabajo", href: "/rituales" },
