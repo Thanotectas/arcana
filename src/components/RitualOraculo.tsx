@@ -30,12 +30,15 @@ export function RitualOraculo({
   total,
   estilo,
   textos,
+  dorso,
 }: {
   accion: Accion;
   tiradas: TiradaRitualOraculo[];
   total: number;
   estilo: "carta" | "runa";
   textos: { elige: string; leer: string };
+  /** Imagen del reverso del mazo, si la tiene (baraja española). */
+  dorso?: string;
 }) {
   const { t } = useT();
   const [estado, enviar] = useActionState<EstadoAccion, FormData>(accion, {});
@@ -119,7 +122,7 @@ export function RitualOraculo({
         <div className="flex h-48 items-center justify-center" aria-live="polite">
           <div className="relative h-32 w-24">
             {[0, 1, 2, 3, 4].map((i) => (
-              <Pieza key={i} estilo={estilo} className="absolute inset-0 animate-pulse" style={{ transform: `rotate(${(i - 2) * 9}deg) translateX(${(i - 2) * 6}px)`, animationDelay: `${i * 120}ms` }} />
+              <Pieza key={i} estilo={estilo} dorso={dorso} className="absolute inset-0 animate-pulse" style={{ transform: `rotate(${(i - 2) * 9}deg) translateX(${(i - 2) * 6}px)`, animationDelay: `${i * 120}ms` }} />
             ))}
           </div>
           <p className="sr-only">{t.oraculo.mezclando}</p>
@@ -137,7 +140,7 @@ export function RitualOraculo({
               const orden = seleccion.indexOf(i);
               return (
                 <button key={i} type="button" onClick={() => tocar(i)} aria-pressed={orden >= 0} aria-label={`${i + 1}`} className="relative transition hover:-translate-y-1">
-                  <Pieza estilo={estilo} elegida={orden >= 0} />
+                  <Pieza estilo={estilo} dorso={dorso} elegida={orden >= 0} />
                   {orden >= 0 && <span className="absolute inset-0 flex items-center justify-center font-display text-xl text-oro">{orden + 1}</span>}
                 </button>
               );
@@ -153,8 +156,12 @@ export function RitualOraculo({
   );
 }
 
-function Pieza({ estilo, elegida = false, className = "", style }: { estilo: "carta" | "runa"; elegida?: boolean; className?: string; style?: CSSProperties }) {
+function Pieza({ estilo, dorso, elegida = false, className = "", style }: { estilo: "carta" | "runa"; dorso?: string; elegida?: boolean; className?: string; style?: CSSProperties }) {
   const borde = elegida ? "border-oro shadow-[0_0_14px_rgba(217,180,90,0.5)]" : "border-oro/30";
+  if (dorso) {
+    // eslint-disable-next-line @next/next/no-img-element -- reverso estático del mazo
+    return <img src={dorso} alt="" width={500} height={750} style={style} className={`block aspect-[2/3] w-full rounded-md ${elegida ? "opacity-60 shadow-[0_0_14px_rgba(217,180,90,0.7)] ring-2 ring-oro" : ""} ${className}`} />;
+  }
   if (estilo === "runa") {
     return <span style={style} className={`block aspect-[4/5] rounded-[45%] border bg-gradient-to-br from-stone-500/50 to-stone-800/70 ${borde} ${className}`} />;
   }

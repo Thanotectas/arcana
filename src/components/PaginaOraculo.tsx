@@ -62,6 +62,7 @@ export async function PaginaOraculo({ tipo }: { tipo: keyof typeof DATOS }) {
           estilo={d.estilo}
           tiradas={d.tiradas.map((x) => ({ id: x.id, nombre: x.nombre[idioma], descripcion: x.descripcion[idioma], n: x.posiciones.length }))}
           textos={{ elige: textos.elige, leer: textos.leer }}
+          dorso={tipo === "baraja_espanola" ? "/cartas/espanola/dorso.webp" : undefined}
         />
       </div>
     </div>

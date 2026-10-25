@@ -110,5 +110,5 @@ de ocho puntas dorada, y el mismo marco de doble filete granate y oro con adorno
 simétrico, que se vea igual al girarlo. Sin texto.
 
 ==================== ESTADO ====================
-Pendiente de generar (24 oct 2026). Cuando estén las imágenes, Claude las recorta a 500×750 en
-public/cartas/espanola/<palo>-<numero>.webp (10 = sota, 11 = caballo, 12 = rey) y dorso.webp.
+Generado (24 oct 2026): las 40 cartas y el reverso están en public/cartas/espanola/<palo>-<numero>.webp (10 = sota,
+11 = caballo, 12 = rey) y dorso.webp. Las ilustraciones traen el nombre y el número en español dentro de la imagen.
