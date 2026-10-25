@@ -1,0 +1,72 @@
+RUNAS DE ARCANA CON GEMINI — piedras, bolsa y paño (3 imágenes; opcional, la 4)
+
+Hoy las runas de /runas son un óvalo gris con degradado y el trazo dorado encima. La idea: piedras pintadas de
+verdad y el mismo mundo de Sibila (pintura al óleo, luz de velas, violeta y oro).
+
+IMPORTANTE: a Gemini NO se le piden las runas grabadas. Los modelos de imagen deforman los símbolos (salen runas
+que no existen o repetidas). Se le piden piedras LISAS, sin nada grabado, y el sistema les graba encima el trazo
+exacto de cada runa (las 24 del Futhark ya están dibujadas en el código), con efecto de grabado dorado. Así cada
+runa es correcta y las 24 comparten la misma piedra.
+
+Pide la resolución más alta. Si sale una piedra con símbolos, letras o dibujos, repite. Mándalas en un zip o
+súbelas a marketing/imagenes/fuentes-gemini/ como runas-piedras.jpg, runas-bolsa.jpg y runas-pano.jpg.
+
+==================== ESTILO MAESTRO (va en todos los prompts) ====================
+
+Pintura al óleo realista y cálida, con pinceladas finas y luz de velas, como un bodegón íntimo; sin aspecto de 3D
+ni de fotografía de catálogo. Paleta de Arcana: sombras de índigo profundo y violeta, brillos dorados y ámbar de las
+velas. Sin texto, sin letras, sin números, sin símbolos, sin runas, sin grabados, sin firmas ni marcas de agua.
+
+==================== 1 · LAS PIEDRAS (runas-piedras.jpg) ====================
+
+Una sola imagen cuadrada con 6 piedras de runas vistas desde arriba, en 3 columnas y 2 filas, cada una centrada en
+su casilla y separadas entre sí por fondo negro liso (sin nada entre ellas, sin sombras que se toquen). Cada piedra
+es un canto rodado de río, plano y ovalado, un poco más alto que ancho (proporción 4:5), del tamaño de la palma de
+una mano, con la cara superior LISA y pulida, sin ningún símbolo grabado. Las 6 son de la misma familia pero no
+idénticas: piedra gris pizarra con vetas finas más claras, bordes suaves y redondeados, pequeñas imperfecciones
+naturales, un brillo cálido de vela en el borde superior izquierdo y una sombra suave hacia abajo a la derecha.
+La cara central debe quedar despejada y uniforme (ahí va la runa). Fondo negro liso absoluto alrededor de cada
+piedra.
+
+Variante si salen muy oscuras: "piedra gris clara azulada, tipo pizarra de río, con la cara superior más luminosa
+en el centro".
+
+==================== 2 · LA BOLSA (runas-bolsa.jpg) ====================
+
+Una bolsa pequeña de terciopelo violeta oscuro, cerrada con un cordón dorado trenzado, apoyada sobre una mesa de
+madera oscura; de la boca entreabierta asoman dos o tres piedras lisas grises (sin símbolos). Una vela encendida
+fuera de foco al fondo, polvo dorado flotando en la luz. Composición vertical 4:5, la bolsa centrada ocupando dos
+tercios del alto, fondo que se pierde en violeta oscuro casi negro. Pintura al óleo, luz de velas. Sin texto, sin
+símbolos.
+
+(Sirve para el momento de "Mezclar las runas": la bolsa se mueve y de ahí salen las piedras.)
+
+==================== 3 · EL PAÑO DE LA TIRADA (runas-pano.jpg) ====================
+
+Un paño de terciopelo índigo profundo extendido sobre una mesa, visto desde arriba, con un círculo fino bordado
+en hilo dorado en el centro y pequeñas estrellas bordadas dispersas, muy sutiles; pliegues suaves en las orillas,
+luz de vela cálida que entra desde un lado y deja el centro un poco más iluminado. Formato horizontal 16:9, el
+centro despejado (ahí caen las piedras). Pintura al óleo. Sin texto, sin letras, sin símbolos rúnicos, sin piedras.
+
+Pide también la versión vertical 9:16 (para el celular y la tarjeta para compartir) con el mismo prompt.
+
+==================== 4 · OPCIONAL · VIDEO PARA REDES (Kling o Flow, 9:16) ====================
+
+Referencias: sibila-escena.jpg + sibila-retrato.jpg + runas-bolsa.jpg.
+Prompt: Oil-painting style, warm candlelight, the same fortune teller from the reference images (long dark hair,
+violet veil, small gold star on her forehead, purple dress with gold embroidery) sits at her wooden table at night.
+She loosens the golden cord of a small violet velvet pouch, shakes it gently and lets three smooth grey river
+stones fall onto an indigo velvet cloth with a thin gold embroidered circle. She turns each stone face up with one
+finger; as she does, a thin line of golden light glows on the smooth stone. She looks up at the camera with a
+knowing smile. Slow camera push-in from the stones to her face, golden dust in the light. Preserve her exact face
+and the painting style. No text, no letters, no readable symbols, no logos.
+Negative prompt: deformed hands, extra fingers, melted face, text, letters, runes, symbols, watermark, flicker,
+style change.
+(Los trazos de las runas los pongo yo en el montaje, para que sean las correctas.)
+
+==================== SI ALGO SALE MAL ====================
+- Salen símbolos o letras en las piedras: repite agregando "completely smooth blank stones, nothing carved,
+  nothing painted on them".
+- Piedras con formas muy distintas: adjunta la primera imagen buena como referencia y pide "same stones, same
+  light, same color".
+- Fondo con textura en la imagen de las piedras: pide "pure flat black background, #000000".
