@@ -3,12 +3,13 @@
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { accionNumerologia, type EstadoAccion } from "@/lib/lecturas/acciones";
-import { calcularPerfil, SIGNIFICADO_NUMERO } from "@/lib/numerologia";
+import { calcularPerfil } from "@/lib/numerologia";
 import { letrasConValor, pasoFecha, pasoSuma } from "@/lib/numerologia-detalle";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { useT } from "@/lib/i18n/cliente";
 import { textoErrorLectura } from "@/lib/i18n/errores";
+import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia } from "./GraficosNumerologia";
 
 /**
  * Numerología en vivo: los números aparecen mientras la persona escribe, con
@@ -32,7 +33,6 @@ export function NumerologiaInteractiva({ nombreInicial, fechaInicial }: { nombre
   const sumaVocales = pasoSuma(letras.filter((l) => l.vocal).map((l) => l.valor));
   const sumaConsonantes = pasoSuma(letras.filter((l) => !l.vocal).map((l) => l.valor));
 
-  const claves = ["caminoDeVida", "expresion", "almaOImpulso", "personalidad", "cumpleanos", "anioPersonal"] as const;
   const sinCreditos = estado.error === "SIN_CREDITOS";
 
   return (
@@ -70,15 +70,19 @@ export function NumerologiaInteractiva({ nombreInicial, fechaInicial }: { nombre
       )}
 
       {perfil ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {claves.map((k, i) => (
-            <div key={k} className="tarjeta aparecer p-4 text-center" style={{ animationDelay: `${i * 80}ms` }}>
-              <p key={perfil[k]} className="numero-brota font-display text-5xl text-oro-suave">{perfil[k]}</p>
-              <p className="mt-1 text-sm font-medium">{t.numerologia.numeros[k]}</p>
-              <p className="text-xs text-texto-suave">{SIGNIFICADO_NUMERO[perfil[k]]?.titulo}</p>
-              {[11, 22, 33].includes(perfil[k]) && <p className="mt-1 text-[10px] uppercase tracking-widest text-violeta-suave">{t.numerologia.maestro}</p>}
+        <div className="space-y-4">
+          <div className="grid items-center gap-4 sm:grid-cols-2">
+            <MandalaNumerologia perfil={perfil} t={t} />
+            <div>
+              <p className="mb-1 text-center text-xs uppercase tracking-[0.2em] text-violeta-suave">{t.numerologia.cicloTitulo}</p>
+              <CicloNumerologia anio={perfil.anioPersonal} t={t} />
             </div>
-          ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {CLAVES_NUMEROLOGIA.map((k, i) => (
+              <FichaNumero key={k} clave={k} valor={perfil[k]} t={t} retraso={i * 80} />
+            ))}
+          </div>
         </div>
       ) : (
         <p className="rounded-xl border border-dashed border-borde p-6 text-center text-sm text-texto-suave">{t.numerologia.escribeParaVer}</p>

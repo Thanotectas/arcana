@@ -799,6 +799,29 @@ body {
 }
 
 
+/* Numerología: el año personal del ciclo late suave. */
+.num-ciclo-pulso {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: num-ciclo-pulso 2.4s ease-in-out infinite;
+}
+@keyframes num-ciclo-pulso {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .num-ciclo-pulso {
+    animation: none;
+  }
+}
+
 /* Sinastría: el anillo de afinidad se llena, la chispa lo recorre y el radar crece. */
 .sinastria-anillo {
   animation: sinastria-anillo 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;

@@ -448,6 +448,11 @@ export const es = {
     vocales: "vocales",
     consonantes: "consonantes",
     escribeParaVer: "Escribe tu nombre y tu fecha para ver los números aparecer.",
+    constelacion: "Tu constelación numérica",
+    constelacionNota: "Tus seis números sobre el círculo del 1 al 9, unidos en el orden en que se calculan.",
+    cicloTitulo: "Tu ciclo de 9 años",
+    cicloNota: "Estás en el año {n} de 9: {titulo}.",
+    siglas: { caminoDeVida: "CV", expresion: "EX", almaOImpulso: "AL", personalidad: "PE", cumpleanos: "CU", anioPersonal: "AP" },
     errores: {
       nombre: "Escribe tu nombre completo tal como aparece en tu documento.",
       fecha: "Fecha de nacimiento no válida.",

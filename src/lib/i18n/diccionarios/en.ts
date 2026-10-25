@@ -449,6 +449,11 @@ export const en: Diccionario = {
     vocales: "vowels",
     consonantes: "consonants",
     escribeParaVer: "Enter your name and your birth date to see the numbers appear.",
+    constelacion: "Your numerology constellation",
+    constelacionNota: "Your six numbers on the circle from 1 to 9, joined in the order they are calculated.",
+    cicloTitulo: "Your 9-year cycle",
+    cicloNota: "You are in year {n} of 9: {titulo}.",
+    siglas: { caminoDeVida: "LP", expresion: "EX", almaOImpulso: "SO", personalidad: "PE", cumpleanos: "BD", anioPersonal: "PY" },
     errores: {
       nombre: "Enter your full name exactly as it appears on your ID.",
       fecha: "Invalid date of birth.",

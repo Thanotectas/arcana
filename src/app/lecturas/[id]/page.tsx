@@ -16,7 +16,8 @@ import { CompartirLectura } from "@/components/CompartirLectura";
 import { TIRADAS, POSICIONES_I18N, cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { signoPorId, imagenSigno } from "@/lib/zodiaco";
-import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "@/lib/numerologia";
+import type { PerfilNumerologico } from "@/lib/numerologia";
+import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia } from "@/components/GraficosNumerologia";
 import { HexagramaVisual } from "@/components/HexagramaVisual";
 import { hexagramaPorNumero, esYang, SIMBOLO_TRIGRAMA, type ResultadoIChing } from "@/lib/iching";
 import { SiguientePaso } from "@/components/SiguientePaso";
@@ -223,16 +224,24 @@ function VistaTarot({
 }
 
 function VistaNumerologia({ resultado, t }: { resultado: PerfilNumerologico; t: Diccionario }) {
-  const claves = ["caminoDeVida", "expresion", "almaOImpulso", "personalidad", "cumpleanos", "anioPersonal"] as const;
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {claves.map((k, i) => (
-        <div key={k} className="tarjeta aparecer p-4 text-center" style={{ animationDelay: `${i * 90}ms` }}>
-          <p className="font-display text-5xl text-oro-suave">{resultado[k]}</p>
-          <p className="mt-1 text-sm font-medium">{t.numerologia.numeros[k]}</p>
-          <p className="text-xs text-texto-suave">{SIGNIFICADO_NUMERO[resultado[k]]?.titulo}</p>
+    <section className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="tarjeta p-5">
+          <h2 className="font-display mb-1 text-2xl">{t.numerologia.constelacion}</h2>
+          <p className="mb-2 text-xs text-texto-suave">{t.numerologia.constelacionNota}</p>
+          <MandalaNumerologia perfil={resultado} t={t} />
         </div>
-      ))}
+        <div className="tarjeta flex flex-col justify-center p-5">
+          <h2 className="font-display mb-3 text-2xl">{t.numerologia.cicloTitulo}</h2>
+          <CicloNumerologia anio={resultado.anioPersonal} t={t} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {CLAVES_NUMEROLOGIA.map((k, i) => (
+          <FichaNumero key={k} clave={k} valor={resultado[k]} t={t} retraso={i * 90} />
+        ))}
+      </div>
     </section>
   );
 }

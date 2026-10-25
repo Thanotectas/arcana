@@ -446,6 +446,11 @@ export const pt: Diccionario = {
     vocales: "vogais",
     consonantes: "consoantes",
     escribeParaVer: "Digite seu nome e sua data para ver os números aparecerem.",
+    constelacion: "Sua constelação numérica",
+    constelacionNota: "Seus seis números no círculo do 1 ao 9, unidos na ordem em que são calculados.",
+    cicloTitulo: "Seu ciclo de 9 anos",
+    cicloNota: "Você está no ano {n} de 9: {titulo}.",
+    siglas: { caminoDeVida: "CV", expresion: "EX", almaOImpulso: "AL", personalidad: "PE", cumpleanos: "AN", anioPersonal: "AP" },
     errores: {
       nombre: "Digite seu nome completo exatamente como aparece no seu documento.",
       fecha: "Data de nascimento inválida.",
