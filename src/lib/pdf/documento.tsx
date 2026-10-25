@@ -56,7 +56,7 @@ const s = StyleSheet.create({
   visual: { marginBottom: 14, padding: 12, borderWidth: 1, borderColor: LINEA, borderRadius: 10, backgroundColor: "#f6f0e2" },
   fila: { flexDirection: "row", justifyContent: "center", flexWrap: "wrap", gap: 12 },
   carta: { alignItems: "center", width: 96 },
-  cartaImagen: { width: 84, height: 126, borderRadius: 6, borderWidth: 1, borderColor: ORO, objectFit: "cover" },
+  cartaImagen: { width: 84, height: 126, borderRadius: 6, borderWidth: 1, borderColor: ORO, objectFit: "contain" },
   cartaNombre: { fontFamily: "Cormorant", fontSize: 12, fontWeight: 600, color: VIOLETA, marginTop: 5, textAlign: "center", lineHeight: 1.2 },
   cartaPosicion: { fontSize: 7.5, color: TINTA_SUAVE, textAlign: "center", marginTop: 1, lineHeight: 1.3 },
   moneda: { alignItems: "center", width: 110 },

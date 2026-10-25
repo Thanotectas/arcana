@@ -33,6 +33,8 @@ export interface DatosTarjeta {
   imagenes?: string[];
   /** Las imágenes son monedas redondas (signos, animales): sin marco de carta. */
   monedas?: boolean;
+  /** Alto ÷ ancho de las cartas (1.5 por defecto; el Lenormand es 1.2). */
+  proporcion?: number;
   /** "historia" = 1080×1920 con márgenes para los controles de Instagram; por defecto publicación 1080×1350. */
   formato?: "publicacion" | "historia";
 }
@@ -62,7 +64,7 @@ export async function imagenTarjeta(d: DatosTarjeta) {
   const unaImagen = d.imagenes?.length === 1;
   const ladoMoneda = Math.round((unaImagen ? 260 : 220) * escala);
   const anchoCarta = Math.round((unaImagen ? 300 : 230) * escala);
-  const altoCarta = Math.round((unaImagen ? 527 : 404) * escala);
+  const altoCarta = Math.round(anchoCarta * (d.proporcion ?? 527 / 300));
   return new ImageResponse(
     (
       <div

@@ -7,7 +7,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaLarga, plantilla } from "@/lib/i18n/formato";
 import { pdfDeLectura, type DatosPdf, type VisualPdf } from "@/lib/pdf/documento";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri } from "@/lib/marca/imagenes";
 import { cartasDeTirada, POSICIONES_I18N, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, MAZOS, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
@@ -22,7 +22,7 @@ import type { EntradaVelas } from "@/lib/velas";
 import type { TipoLectura } from "@/lib/creditos";
 import { nombrePieza } from "@/components/VistaOraculo";
 import { TIRADAS_BARAJA } from "@/lib/oraculos/baraja";
-import { TIRADAS_LENORMAND } from "@/lib/oraculos/lenormand";
+import { TIRADAS_LENORMAND, LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
 import { TIRADAS_RUNAS } from "@/lib/oraculos/runas";
 import { tiradaPorId, type ResultadoOraculo } from "@/lib/oraculos/comun";
 import { nombreKin, selloPorNumero, NAWALES, type ResultadoMaya } from "@/lib/oraculos/maya";
@@ -94,7 +94,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     visual = {
       tipo: "cartas",
       items: await Promise.all((r.piezas ?? []).map(async (p) => ({
-        imagen: tipo === "baraja_espanola" ? await cartaEspanolaComoDataUri(p.id) : null,
+        imagen: tipo === "baraja_espanola" ? await cartaEspanolaComoDataUri(p.id) : tipo === "lenormand" && LENORMAND_CON_IMAGEN.has(p.id) ? await cartaLenormandComoDataUri(p.id) : null,
         nombre: nombrePieza(tipo, p.id, idioma) + (p.invertida ? ` (${t.pdf.invertida})` : ""),
         posicion: tirada.posiciones[p.posicion]?.nombre[idioma] ?? "",
       }))),

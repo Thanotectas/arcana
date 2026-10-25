@@ -5,7 +5,8 @@ import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri } from "@/lib/marca/imagenes";
+import { LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
 import type { ResultadoAura } from "@/lib/aura";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
 import { hexagramaPorNumero, esYang, type ResultadoIChing } from "@/lib/iching";
@@ -52,6 +53,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   let simbolos: string[] = ["✦"];
   let hexagrama: (0 | 1)[] | undefined;
   let imagenes: string[] | undefined;
+  let proporcion: number | undefined;
 
   if (tipo.startsWith("tarot")) {
     const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
@@ -102,6 +104,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     simbolos = ["✦"];
     titulo = (r.piezas ?? []).map((p) => nombrePieza(tipo, p.id, idioma)).join(" · ");
     if (tipo === "baraja_espanola") imagenes = await Promise.all((r.piezas ?? []).slice(0, 3).map((p) => cartaEspanolaComoDataUri(p.id)));
+    const lenormand = (r.piezas ?? []).slice(0, 3);
+    if (tipo === "lenormand" && lenormand.length && lenormand.every((p) => LENORMAND_CON_IMAGEN.has(p.id))) {
+      imagenes = await Promise.all(lenormand.map((p) => cartaLenormandComoDataUri(p.id)));
+      proporcion = 1.2;
+    }
   } else if (tipo === "maya") {
     const r = resultado as unknown as ResultadoMaya;
     simbolos = ["✦"];
@@ -149,6 +156,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     imagenes: imagenes?.filter(Boolean),
     monedas: tipo === "carta_astral" || tipo === "revolucion_solar" || tipo === "compatibilidad" || tipo === "chino" || tipo === "sinastria" || tipo === "aura",
     formato,
+    proporcion,
   });
   respuesta.headers.set("Cache-Control", "private, max-age=3600");
   respuesta.headers.set("Content-Disposition", `inline; filename="arcana-${id.slice(0, 8)}${formato === "historia" ? "-historia" : ""}.png"`);

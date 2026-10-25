@@ -27,6 +27,11 @@ export function cartaEspanolaComoDataUri(id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "espanola", `${id}.webp`), { alto: 527 });
 }
 
+/** Carta del Lenormand (public/cartas/lenormand/l<numero>.webp, 500×600). */
+export function cartaLenormandComoDataUri(id: string) {
+  return webpComoDataUri(path.join(process.cwd(), "public", "cartas", "lenormand", `${id}.webp`), { alto: 527 });
+}
+
 /** Moneda dorada (signo occidental o animal chino), reducida para la tarjeta. */
 export function monedaComoDataUri(carpeta: "signos" | "animales", id: string) {
   return webpComoDataUri(path.join(process.cwd(), "public", carpeta, `${id}.webp`), { lado: 260 });

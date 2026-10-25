@@ -1,5 +1,5 @@
 import { TIRADAS_BARAJA, cartaEspanola, nombreCartaEspanola } from "@/lib/oraculos/baraja";
-import { TIRADAS_LENORMAND, cartaLenormand } from "@/lib/oraculos/lenormand";
+import { TIRADAS_LENORMAND, cartaLenormand, LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
 import { TIRADAS_RUNAS, runaPorId, type Runa } from "@/lib/oraculos/runas";
 import { tiradaPorId, type ResultadoOraculo } from "@/lib/oraculos/comun";
 import type { Idioma } from "@/lib/i18n/idiomas";
@@ -50,8 +50,12 @@ function PiezaEspanola({ id, invertida, idioma }: { id: string; invertida: boole
 function PiezaLenormand({ id, idioma }: { id: string; idioma: Idioma }) {
   const c = cartaLenormand(id);
   if (!c) return null;
+  if (LENORMAND_CON_IMAGEN.has(c.id)) {
+    // eslint-disable-next-line @next/next/no-img-element -- ilustración estática del mazo
+    return <img src={`/cartas/lenormand/${c.id}.webp`} alt={c.nombre[idioma]} width={500} height={600} className="aspect-[5/6] w-full rounded-lg shadow-lg" />;
+  }
   return (
-    <div className="flex aspect-[2/3] w-full flex-col items-center justify-between rounded-lg border border-oro/40 bg-gradient-to-b from-[#f6efdf] to-[#e3d3b0] p-2 text-[#3a2a12] shadow-lg">
+    <div className="flex aspect-[5/6] w-full flex-col items-center justify-between rounded-lg border border-oro/40 bg-gradient-to-b from-[#f6efdf] to-[#e3d3b0] p-2 text-[#3a2a12] shadow-lg">
       <span className="self-start text-xs font-semibold">{c.numero}</span>
       <span className="text-5xl" aria-hidden>{c.emoji}</span>
       <span className="text-[11px] font-semibold uppercase tracking-wide">{c.nombre[idioma]}</span>
