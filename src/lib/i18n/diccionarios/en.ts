@@ -764,6 +764,11 @@ export const en: Diccionario = {
     armonico: "harmonious",
     tenso: "tense",
     sinAspectos: "No close aspects between the two charts: the relationship rests on signs and elements.",
+    hilosTitulo: "The threads between your charts",
+    hilosNota: "Green: aspects that add up · Amber: aspects that create tension. Thickness shows how much it weighs.",
+    elementosTitulo: "Balance of elements",
+    casasTitulo: "Where each one falls in the other's life",
+    casaDe: "{de}'s {planeta} → {en}'s house {n}",
     errores: { nombre: "Enter the other person's name.", fecha: "The other person's birth date is not valid.", hora: "The other person's birth time is not valid.", lugar: "Select the other person's birthplace from the list.", anio: "The other person's year must be between 1900 and today." },
   },
   chocolate: {

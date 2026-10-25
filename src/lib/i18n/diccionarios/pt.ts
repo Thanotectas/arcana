@@ -761,6 +761,11 @@ export const pt: Diccionario = {
     armonico: "harmônico",
     tenso: "tenso",
     sinAspectos: "Não há aspectos estreitos entre os dois mapas: a relação se apoia nos signos e nos elementos.",
+    hilosTitulo: "Os fios entre os mapas",
+    hilosNota: "Verde: aspectos que somam · Âmbar: aspectos que tensionam. A espessura mostra o peso.",
+    elementosTitulo: "Equilíbrio dos elementos",
+    casasTitulo: "Onde cada um cai na vida do outro",
+    casaDe: "{planeta} de {de} → casa {n} de {en}",
     errores: { nombre: "Escreva o nome da outra pessoa.", fecha: "Data de nascimento da outra pessoa inválida.", hora: "Hora da outra pessoa inválida.", lugar: "Selecione o lugar de nascimento da outra pessoa na lista.", anio: "O ano da outra pessoa deve estar entre 1900 e hoje." },
   },
   chocolate: {

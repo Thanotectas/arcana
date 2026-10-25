@@ -763,6 +763,11 @@ export const es = {
     armonico: "armónico",
     tenso: "tenso",
     sinAspectos: "No hay aspectos estrechos entre las dos cartas: la relación se apoya en los signos y los elementos.",
+    hilosTitulo: "Los hilos entre sus cartas",
+    hilosNota: "Verde: aspectos que suman · Ámbar: aspectos que tensan. El grosor dice cuánto pesa.",
+    elementosTitulo: "Balance de elementos",
+    casasTitulo: "Dónde cae cada uno en la vida del otro",
+    casaDe: "{planeta} de {de} → casa {n} de {en}",
     errores: { nombre: "Escribe el nombre de la otra persona.", fecha: "Fecha de nacimiento de la otra persona no válida.", hora: "Hora de la otra persona no válida.", lugar: "Selecciona el lugar de nacimiento de la otra persona en la lista.", anio: "El año de la otra persona debe estar entre 1900 y hoy." },
   },
   chocolate: {

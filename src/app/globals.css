@@ -799,6 +799,43 @@ body {
 }
 
 
+/* Sinastría: el anillo de afinidad se llena, la chispa lo recorre y el radar crece. */
+.sinastria-anillo {
+  animation: sinastria-anillo 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+@keyframes sinastria-anillo {
+  from {
+    stroke-dasharray: 0 100;
+  }
+}
+.sinastria-chispa {
+  transform-origin: 100px 100px;
+  animation: sinastria-chispa 6s linear infinite;
+  filter: drop-shadow(0 0 4px #f1d99a);
+}
+@keyframes sinastria-chispa {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sinastria-radar {
+  transform-origin: 150px 150px;
+  animation: sinastria-radar 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+}
+@keyframes sinastria-radar {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sinastria-anillo,
+  .sinastria-chispa,
+  .sinastria-radar {
+    animation: none;
+  }
+}
+
 /* Revolución solar: el camino dorado del año se traza desde el Sol y vuelve a él. */
 .retorno-camino {
   stroke-dasharray: 1;
