@@ -4,15 +4,28 @@ tirada "Las tres Nornas" (Urd: lo que fue · Verdandi: lo que es · Skuld: lo qu
 La protagonista es Sibila, en su mesa de siempre, con la bolsa y el paño que ya tenemos.
 
 ==================== CÓMO HACERLO EN FLOW ====================
-- Modo "Ingredientes a video" (Ingredients to video) con 4 imágenes de referencia:
-  marketing/imagenes/sibila-retrato.jpg (su cara), marketing/imagenes/sibila-escena.jpg (su mesa),
-  marketing/imagenes/fuentes-gemini/runas-bolsa.jpg (la bolsa) y marketing/imagenes/fuentes-gemini/runas-pano.jpg (el paño).
+Sibila SÍ se sube: es la referencia que le dice a Flow cómo es ella. Dos caminos (el A es el más seguro):
+
+A) Primer cuadro hecho en Gemini + "Imagen a video" (como el video 12):
+   1. En Gemini (imagen), sube sibila-retrato.jpg, runas-bolsa.jpg y runas-pano.jpg y pide el PRIMER CUADRO (abajo).
+   2. En Flow, "Fotogramas a video" (Frames to video) con esa imagen como primer cuadro → clip 1.
+   3. Clips 2 y 3 con "Extender" (Extend) desde el anterior: Sibila, la luz y la mesa no cambian.
+B) "Ingredientes a video" (Ingredients to video): sube como ingredientes sibila-retrato.jpg (su cara),
+   runas-bolsa.jpg y runas-pano.jpg. Flow suele aceptar hasta 3 ingredientes: la escena de la mesa
+   (sibila-escena.jpg) va descrita en el texto. Clips 2 y 3 con "Extender".
 - Vertical 9:16, 8 s cada clip, el mejor modelo de Veo que tengas.
-- Genera el clip 1; para los clips 2 y 3 usa "Extender" (Extend) desde el anterior, así Sibila, la luz y la mesa no
-  cambian. Si Extender no sale bien, genera cada clip con las mismas 4 referencias y la misma descripción de Sibila.
 - Sonido: Flow genera audio. Pide solo ambiente (velas, terciopelo, piedras); la voz la ponemos con Marcela (ElevenLabs).
 - Las piedras van LISAS en el video: las runas grabadas las pongo yo en el montaje con las imágenes reales de la app,
   para que sean las correctas. Por eso el último plano es cenital y quieto.
+
+PRIMER CUADRO (Gemini, imagen vertical 9:16, con las 3 imágenes adjuntas):
+Pintura al óleo cálida, de noche, luz de velas. La mujer del retrato adjunto (mismo rostro exacto, velo violeta,
+estrella dorada en la frente, aretes de luna, vestido morado con bordados dorados) sentada a una mesa de madera
+oscura, en plano medio, mirando hacia abajo con calma. Frente a ella, sobre la mesa, el paño de terciopelo índigo con
+el círculo bordado en hilo dorado de la imagen adjunta, y en sus manos la bolsa de terciopelo violeta con cordón
+dorado de la imagen adjunta. Velas encendidas a los lados, fondo violeta oscuro con una ventana de noche estrellada
+desenfocada, polvo dorado en el aire. Vertical 9:16, ella centrada, con espacio libre arriba y abajo para rótulos.
+Sin texto, sin letras, sin símbolos, sin logos.
 
 ==================== DESCRIPCIÓN DE SIBILA (igual en los 3 clips) ====================
 Sibila, la vidente de las imágenes de referencia: mujer latina de unos 35 años, cabello largo, oscuro y ondulado, velo
@@ -22,7 +35,8 @@ rostro y el estilo de la pintura.
 
 ==================== CLIP 1 · "La pregunta" (8 s) ====================
 Video vertical 9:16, pintura al óleo cálida que cobra vida, de noche, luz de velas. [Descripción de Sibila]. Sibila está
-sentada a su mesa de madera, con velas encendidas a los lados. Extiende con las dos manos un paño de terciopelo índigo
+sentada a su mesa de madera, con velas encendidas a los lados. (Si usas el primer cuadro, empieza así: "Anima esta
+pintura sin cambiar el estilo ni el rostro".) Extiende con las dos manos un paño de terciopelo índigo
 con un círculo bordado en hilo dorado y pequeñas estrellas bordadas, y lo alisa con calma. Luego toma la bolsa de
 terciopelo violeta con cordón dorado de la imagen de referencia, la sostiene contra el pecho con las dos manos, cierra
 los ojos y mueve los labios en silencio, como si hiciera una pregunta en voz muy baja. Las llamas de las velas se
