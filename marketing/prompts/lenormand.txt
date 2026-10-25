@@ -1,0 +1,96 @@
+LENORMAND DE ARCANA CON GEMINI — 36 cartas + reverso en 7 imágenes
+
+Seis cuadrículas de 6 cartas (3 columnas × 2 filas) y el reverso aparte. Pide la resolución más alta. Cuando la
+cuadrícula 1 quede bien, adjúntala como referencia de estilo en todas las demás. Si sale texto, cartas de distinto
+tamaño o una escena distinta de la pedida, repite esa imagen.
+Mándalas en un zip o súbelas a marketing/imagenes/fuentes-gemini/ como lenormand-1.jpg … lenormand-6.jpg y
+lenormand-reverso.jpg.
+
+==================== ESTILO MAESTRO (va en todos los prompts) ====================
+
+Una sola imagen que contiene 6 cartas del oráculo Petit Lenormand ordenadas en 3 columnas y 2 filas. Cada carta es
+un rectángulo vertical en proporción 2:3 con las esquinas redondeadas, todas del mismo tamaño exacto, separadas
+entre sí y del borde por franjas de fondo negro liso de unos 40 píxeles, sin nada en esas franjas.
+
+Estilo de todas las cartas, idéntico entre sí: cromolitografía francesa del siglo XIX, como los naipes de salón de
+la época de Mademoiselle Lenormand: ilustración fina a tinta con colores suaves de acuarela, un poco desvaídos, y
+sombreado delicado, sin aspecto de 3D ni de fotografía. Fondo de papel crema envejecido con textura muy sutil. Cada
+carta tiene una sola escena central, clara y fácil de reconocer de un vistazo, dentro de una viñeta ovalada con un
+borde fino dorado; alrededor del óvalo, pequeños adornos florales en las esquinas. Marco de cada carta: doble
+filete fino, el exterior azul petróleo profundo y el interior dorado, idéntico en todas. Paleta: azul petróleo,
+verde salvia, rosa viejo, ocre y oro sobre el crema. Las personas visten ropa de mediados del siglo XIX y tienen
+rostros expresivos y diversos entre sí, nunca caricaturas. Sin cartela, sin título, sin texto, sin letras, sin
+números, sin naipes en miniatura, sin firmas ni marcas de agua.
+
+==================== CUADRÍCULA 1 (cartas 1–6) ====================
+De izquierda a derecha y de arriba abajo:
+1. El Jinete: un jinete con levita y sombrero galopa en un caballo castaño por un camino, con una carta sellada en
+   la mano; polvo levantado, sensación de rapidez.
+2. El Trébol: un trébol de cuatro hojas grande y verde en primer plano, sobre un prado con gotas de rocío que
+   brillan.
+3. El Barco: un velero de tres palos navega con las velas llenas hacia el horizonte en un mar calmo, al atardecer.
+4. La Casa: una casa de campo acogedora con tejado rojo, ventanas iluminadas, chimenea con humo y un jardín
+   cercado con una puerta abierta.
+5. El Árbol: un roble enorme y frondoso, de raíces visibles que se hunden en la tierra, solo en una colina verde.
+6. Las Nubes: nubes de tormenta grises y blancas sobre un paisaje; de un lado oscuras, del otro empiezan a abrirse
+   con luz.
+
+==================== CUADRÍCULA 2 (cartas 7–12) ====================
+1. La Serpiente: una serpiente verde y elegante enroscada en la rama de un árbol, con la cabeza alzada y la lengua
+   fuera.
+2. El Ataúd: un cofre de madera oscura cerrado, sobre un paño morado, con una vela apagada y flores secas al lado;
+   sobrio, nada macabro.
+3. El Ramo: un ramo grande de flores frescas (rosas, lirios, flores silvestres) atado con una cinta rosa, como un
+   regalo.
+4. La Guadaña: una guadaña apoyada sobre espigas de trigo recién cortadas en un campo dorado.
+5. El Látigo: una fusta de jinete y una escoba de ramas cruzadas sobre el suelo de un establo.
+6. Los Pájaros: dos pájaros pequeños posados juntos en una rama florecida, uno con el pico abierto como si cantara.
+
+==================== CUADRÍCULA 3 (cartas 13–18) ====================
+1. El Niño: un niño pequeño de pie en un jardín, con un juguete de madera en la mano y mirada curiosa.
+2. El Zorro: un zorro rojizo sentado en el borde de un bosque, mirando de lado con astucia.
+3. El Oso: un oso pardo grande, de pie entre los árboles, fuerte y tranquilo.
+4. Las Estrellas: un cielo nocturno azul profundo lleno de estrellas, con una más grande y brillante en el centro
+   sobre unas colinas.
+5. La Cigüeña: una cigüeña blanca en vuelo con las alas extendidas sobre los tejados de un pueblo, junto a un nido
+   en una chimenea.
+6. El Perro: un perro leal de pelo claro sentado con la cabeza alta y una correa suelta en el suelo, mirando al
+   frente con cariño.
+
+==================== CUADRÍCULA 4 (cartas 19–24) ====================
+1. La Torre: una torre de piedra alta y solitaria con una ventana iluminada arriba, sobre una colina.
+2. El Jardín: un parque público con caminos, una fuente, bancos y gente paseando bajo los árboles.
+3. La Montaña: una montaña alta y escarpada con la cima nevada que bloquea el camino del primer plano.
+4. Los Caminos: un camino que se bifurca en dos senderos en un bosque, con un poste indicador de madera sin
+   letras.
+5. Los Ratones: dos ratones grises mordisqueando un trozo de pan y queso sobre una mesa de cocina.
+6. El Corazón: un corazón rojo grande rodeado de rosas y hojas, con un brillo suave.
+
+==================== CUADRÍCULA 5 (cartas 25–30) ====================
+1. El Anillo: un anillo de oro con una piedra preciosa, sobre un cojín de terciopelo azul.
+2. El Libro: un libro grueso y cerrado con tapas de cuero y cierre dorado, sobre una mesa con un candil.
+3. La Carta: una carta doblada con un sello de lacre rojo, junto a una pluma y un tintero.
+4. El Hombre: un caballero de mediana edad, de cuerpo entero, con levita y sombrero en la mano, mirando hacia la
+   derecha.
+5. La Mujer: una dama de cuerpo entero con vestido largo y un abanico, mirando hacia la izquierda.
+6. Los Lirios: un ramo de lirios blancos altos en un jarrón de porcelana.
+
+==================== CUADRÍCULA 6 (cartas 31–36) ====================
+1. El Sol: un sol radiante y dorado con rayos amplios sobre un campo de trigo y girasoles.
+2. La Luna: una luna creciente grande y plateada sobre un lago tranquilo que la refleja, de noche.
+3. La Llave: una llave antigua grande de hierro y oro, con un lazo azul atado al ojo de la llave.
+4. Los Peces: dos peces dorados nadando en círculo en agua clara, entre algas.
+5. El Ancla: un ancla de hierro con una cuerda enrollada, apoyada en la arena de una playa.
+6. La Cruz: una cruz sencilla de madera en lo alto de una colina, bajo un cielo de atardecer sereno.
+
+==================== REVERSO (una sola carta vertical 2:3 sobre fondo negro) ====================
+Una sola carta vertical en proporción exacta 2:3 vista por el reverso, centrada sobre fondo negro liso, de la
+misma baraja que las cartas adjuntas: mismo papel crema, mismo grabado coloreado y el mismo doble filete azul
+petróleo y oro con esquinas redondeadas. Dentro del marco, fondo azul petróleo profundo con una trama fina de
+estrellas pequeñas doradas; en el centro, una viñeta ovalada crema con borde dorado que contiene un trébol de
+cuatro hojas, una llave y una estrella dorada de ocho puntas, rodeados de una guirnalda de flores pequeñas. Diseño
+perfectamente simétrico, que se vea igual si se gira la carta 180 grados. Sin texto, sin letras, sin números.
+
+==================== ESTADO ====================
+Pendiente de generar (25 oct 2026). Claude recorta cada carta a 500×750 en public/cartas/lenormand/l<numero>.webp
+(l1 = El Jinete … l36 = La Cruz) y dorso.webp.
