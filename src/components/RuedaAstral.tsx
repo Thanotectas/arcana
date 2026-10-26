@@ -2,17 +2,18 @@
 
 import { useState, type KeyboardEvent } from "react";
 import { SIGNOS, signoPorId, formatoGrado } from "@/lib/zodiaco";
-import {
-  NOMBRES_CUERPO,
-  SIMBOLOS_CUERPO,
-  SIGNIFICADO_CUERPO,
-  SIGNIFICADO_CASA,
-  NOMBRES_ASPECTO,
-  SIMBOLOS_ASPECTO,
-  SIGNIFICADO_ASPECTO,
-  type Cuerpo,
-  type TipoAspecto,
-} from "@/lib/astro/textos";
+import { SIMBOLOS_CUERPO, SIMBOLOS_ASPECTO, type Cuerpo, type TipoAspecto } from "@/lib/astro/textos";
+import { useT } from "@/lib/i18n/cliente";
+import { plantilla } from "@/lib/i18n/formato";
+import type { Diccionario } from "@/lib/i18n/diccionarios";
+
+/** Nombres y textos de la rueda en el idioma de la página. */
+function textosRueda(t: Diccionario) {
+  const cuerpos = t.astral.cuerpos as Record<Cuerpo, string>;
+  const aspectos = t.astral.aspectosNombres as Record<TipoAspecto, string>;
+  const signos = t.piedras.nombresSignos as Record<string, string>;
+  return { cuerpo: (c: Cuerpo) => cuerpos[c] ?? c, aspecto: (a: TipoAspecto) => aspectos[a] ?? a, signo: (id: string) => signos[id] ?? signoPorId(id)?.nombre ?? id, r: t.astral.rueda, t };
+}
 
 interface PlanetaRueda {
   cuerpo: Cuerpo;
@@ -87,6 +88,8 @@ export function RuedaAstral({
   aspectos: AspectoRueda[];
   mostrarCasas?: boolean;
 }) {
+  const { t } = useT();
+  const tr = textosRueda(t);
   const [sel, setSel] = useState<Seleccion>(null);
   const [visibles, setVisibles] = useState<Set<TipoAspecto>>(() => new Set(TIPOS));
 
@@ -148,7 +151,7 @@ export function RuedaAstral({
 
   return (
     <div className="space-y-4">
-      <svg viewBox={`-30 -30 ${S + 60} ${S + 60}`} className="rueda-astral mx-auto w-full max-w-[560px] select-none" role="group" aria-label="Rueda de la carta astral. Toca un planeta o un aspecto para ver su significado.">
+      <svg viewBox={`-30 -30 ${S + 60} ${S + 60}`} className="rueda-astral mx-auto w-full max-w-[560px] select-none" role="group" aria-label={tr.r.etiqueta}>
         <defs>
           <radialGradient id="rueda-fondo" cx="50%" cy="50%" r="50%">
             <stop offset="0" stopColor="#2a1a5e" stopOpacity="0.55" />
@@ -273,7 +276,7 @@ export function RuedaAstral({
               className="cursor-pointer"
               role="button"
               tabIndex={0}
-              aria-label={`${NOMBRES_CUERPO[a.a]} ${NOMBRES_ASPECTO[a.tipo].toLowerCase()} ${NOMBRES_CUERPO[a.b]}`}
+              aria-label={`${tr.cuerpo(a.a)} ${tr.aspecto(a.tipo).toLowerCase()} ${tr.cuerpo(a.b)}`}
               aria-pressed={sel?.tipo === "aspecto" && sel.indice === i}
               onClick={() => alternar({ tipo: "aspecto", indice: i })}
               onKeyDown={conTeclado(() => alternar({ tipo: "aspecto", indice: i }))}
@@ -313,7 +316,7 @@ export function RuedaAstral({
               style={{ animationDelay: `${n * 60}ms`, opacity: apagado ? 0.35 : 1 }}
               role="button"
               tabIndex={0}
-              aria-label={`${NOMBRES_CUERPO[p.cuerpo]} en ${signoPorId(p.signo)?.nombre ?? ""}`}
+              aria-label={plantilla(t.astral.enSigno, { cuerpo: tr.cuerpo(p.cuerpo), signo: tr.signo(p.signo) })}
               aria-pressed={activo}
               onClick={() => alternar({ tipo: "planeta", cuerpo: p.cuerpo })}
               onKeyDown={conTeclado(() => alternar({ tipo: "planeta", cuerpo: p.cuerpo }))}
@@ -335,18 +338,18 @@ export function RuedaAstral({
         })}
       </svg>
 
-      <div className="flex flex-wrap justify-center gap-2 text-xs" aria-label="Mostrar u ocultar tipos de aspecto">
-        {TIPOS.map((t) => {
-          const activo = visibles.has(t);
+      <div className="flex flex-wrap justify-center gap-2 text-xs" aria-label={tr.r.filtros}>
+        {TIPOS.map((tipo) => {
+          const activo = visibles.has(tipo);
           return (
             <button
-              key={t}
+              key={tipo}
               type="button"
-              onClick={() => alternarTipo(t)}
+              onClick={() => alternarTipo(tipo)}
               aria-pressed={activo}
               className={`rounded-full border px-3 py-1 transition ${activo ? "border-borde text-texto" : "border-transparent text-texto-suave line-through opacity-60"}`}
             >
-              <span style={{ color: COLOR_ASPECTO[t] }}>{SIMBOLOS_ASPECTO[t]}</span> {NOMBRES_ASPECTO[t]}
+              <span style={{ color: COLOR_ASPECTO[tipo] }}>{SIMBOLOS_ASPECTO[tipo]}</span> {tr.aspecto(tipo)}
             </button>
           );
         })}
@@ -359,21 +362,22 @@ export function RuedaAstral({
             mostrarCasas={mostrarCasas}
             aspectos={aspectosDe(planetaSel.cuerpo)}
             alElegirAspecto={(i) => setSel({ tipo: "aspecto", indice: i })}
+            tr={tr}
           />
         ) : aspectoSel ? (
           <div className="aparecer space-y-1">
             <p className="font-display text-xl">
-              {SIMBOLOS_CUERPO[aspectoSel.a]} {NOMBRES_CUERPO[aspectoSel.a]}{" "}
+              {SIMBOLOS_CUERPO[aspectoSel.a]} {tr.cuerpo(aspectoSel.a)}{" "}
               <span style={{ color: COLOR_ASPECTO[aspectoSel.tipo] }}>
-                {SIMBOLOS_ASPECTO[aspectoSel.tipo]} {NOMBRES_ASPECTO[aspectoSel.tipo]}
+                {SIMBOLOS_ASPECTO[aspectoSel.tipo]} {tr.aspecto(aspectoSel.tipo)}
               </span>{" "}
-              {SIMBOLOS_CUERPO[aspectoSel.b]} {NOMBRES_CUERPO[aspectoSel.b]}
+              {SIMBOLOS_CUERPO[aspectoSel.b]} {tr.cuerpo(aspectoSel.b)}
             </p>
-            <p className="text-xs text-texto-suave">Orbe de {aspectoSel.orbe}° (cuanto menor, más fuerte)</p>
-            <p className="text-sm leading-relaxed text-[#d9d2ea]">{SIGNIFICADO_ASPECTO[aspectoSel.tipo]}</p>
+            <p className="text-xs text-texto-suave">{plantilla(tr.r.orbe, { n: aspectoSel.orbe })}</p>
+            <p className="text-sm leading-relaxed text-[#d9d2ea]">{tr.r.aspectos[aspectoSel.tipo]}</p>
           </div>
         ) : (
-          <p className="text-center text-sm text-texto-suave">Toca un planeta o una línea de la rueda para descubrir qué significa.</p>
+          <p className="text-center text-sm text-texto-suave">{tr.r.toca}</p>
         )}
       </div>
     </div>
@@ -385,34 +389,41 @@ function FichaPlaneta({
   mostrarCasas,
   aspectos,
   alElegirAspecto,
+  tr,
 }: {
   planeta: PlanetaRueda;
   mostrarCasas: boolean;
   aspectos: { a: AspectoRueda; i: number }[];
   alElegirAspecto: (i: number) => void;
+  tr: ReturnType<typeof textosRueda>;
 }) {
   const signo = signoPorId(planeta.signo);
   return (
     <div className="aparecer space-y-2">
       <p className="font-display text-xl">
-        {SIMBOLOS_CUERPO[planeta.cuerpo]} {NOMBRES_CUERPO[planeta.cuerpo]} en {signo?.simbolo} {signo?.nombre} {formatoGrado(planeta.longitud)}
-        {mostrarCasas && <span className="text-texto-suave"> · casa {planeta.casa}</span>}
-        {planeta.retrogrado && planeta.cuerpo !== "nodo_norte" && <span className="text-sm text-[#ff9f6b]"> · retrógrado</span>}
+        {SIMBOLOS_CUERPO[planeta.cuerpo]} {plantilla(tr.t.astral.enSigno, { cuerpo: tr.cuerpo(planeta.cuerpo), signo: `${signo?.simbolo ?? ""} ${tr.signo(planeta.signo)}` })} {formatoGrado(planeta.longitud)}
+        {mostrarCasas && <span className="text-texto-suave"> · {plantilla(tr.t.astral.casaN, { n: planeta.casa })}</span>}
+        {planeta.retrogrado && planeta.cuerpo !== "nodo_norte" && <span className="text-sm text-[#ff9f6b]"> · {tr.r.retrogrado}</span>}
       </p>
-      <p className="text-sm leading-relaxed text-[#d9d2ea]">{SIGNIFICADO_CUERPO[planeta.cuerpo]}</p>
+      <p className="text-sm leading-relaxed text-[#d9d2ea]">{(tr.r.cuerpos as Record<Cuerpo, string>)[planeta.cuerpo]}</p>
       {signo && (
         <p className="text-sm text-texto-suave">
-          En {signo.nombre} ({signo.elemento}, {signo.modalidad}) se expresa con {signo.rasgos.join(", ")}.
+          {plantilla(tr.r.seExpresa, {
+            signo: tr.signo(signo.id),
+            elemento: tr.t.astral.elementosNombres[signo.elemento].toLowerCase(),
+            modalidad: tr.t.astral.modalidades[signo.modalidad].toLowerCase(),
+            rasgos: (tr.r.rasgos as Record<string, string>)[signo.id] ?? "",
+          })}
         </p>
       )}
-      {mostrarCasas && <p className="text-sm text-texto-suave">Casa {planeta.casa}: {SIGNIFICADO_CASA.at(planeta.casa - 1)}</p>}
+      {mostrarCasas && <p className="text-sm text-texto-suave">{plantilla(tr.r.casaSentido, { n: planeta.casa, texto: tr.r.casas[planeta.casa - 1] ?? "" })}</p>}
       {aspectos.length > 0 && (
         <div className="flex flex-wrap gap-1.5 pt-1">
           {aspectos.map(({ a, i }) => {
             const otro = a.a === planeta.cuerpo ? a.b : a.a;
             return (
               <button key={i} type="button" onClick={() => alElegirAspecto(i)} className="rounded-full border border-borde px-2.5 py-0.5 text-xs text-texto hover:border-oro/40">
-                <span style={{ color: COLOR_ASPECTO[a.tipo] }}>{SIMBOLOS_ASPECTO[a.tipo]}</span> {NOMBRES_CUERPO[otro]}
+                <span style={{ color: COLOR_ASPECTO[a.tipo] }}>{SIMBOLOS_ASPECTO[a.tipo]}</span> {tr.cuerpo(otro)}
               </button>
             );
           })}
