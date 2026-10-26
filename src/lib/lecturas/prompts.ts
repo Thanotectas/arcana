@@ -5,6 +5,8 @@ import type { TipoLectura } from "../creditos";
 import { TIRADAS, resumenTirada, type CartaTirada, type TipoTirada } from "../tarot/tiradas";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import { calcularCarta, resumenCarta, type DatosNacimiento } from "../astro/carta";
+import { resumenFiguras } from "../astro/figuras";
+import { NOMBRES_CUERPO } from "../astro/textos";
 import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "../numerologia";
 import { resumenNumerologiaAvanzada } from "../numerologia-avanzada";
 import { signoPorId } from "../zodiaco";
@@ -105,8 +107,13 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const carta = calcularCarta(datos);
     return {
       usuario:
-        `Interpreta esta carta astral natal.\n\n${resumenCarta(carta)}\n\n` +
-        `Estructura sugerida: ## Tu esencia (Sol, Luna y Ascendente como trío), ## Cómo piensas y te comunicas (Mercurio), ## Amor y valores (Venus), ## Energía y deseo (Marte), ## Expansión y límites (Júpiter y Saturno), ## Aspectos que marcan tu carta (los 3 o 4 más relevantes), ## Balance de elementos, ## Tu camino (Nodo Norte y Medio Cielo), ${anuncio("## Lo que tu carta anuncia")}, ## Síntesis.` +
+        `Interpreta esta carta astral natal.\n\n${resumenCarta(carta)}\n${resumenFiguras(
+          carta.planetas.map((p) => ({ cuerpo: p.cuerpo, longitud: p.longitud, casa: p.casa, signo: p.signo.id })),
+          carta.aspectos,
+          datos.horaDesconocida ? null : carta.casas.ascendente,
+          (c) => NOMBRES_CUERPO[c],
+        )}\n\n` +
+        `Estructura sugerida: ## Tu esencia (Sol, Luna y Ascendente como trío, y el regente de la carta), ## Cómo piensas y te comunicas (Mercurio), ## Amor y valores (Venus), ## Energía y deseo (Marte), ## Expansión y límites (Júpiter y Saturno), ## Aspectos que marcan tu carta (los 3 o 4 más relevantes), ## Las figuras de tu carta (si hay stellium, gran trígono, T-cuadrada o gran cruz, qué significan; si no hay, sáltala), ## Tu temperamento (elementos, modalidades y hemisferios), ## Tu camino (Nodo Norte y Medio Cielo), ${anuncio("## Lo que tu carta anuncia")}, ## Síntesis.` +
         (datos.horaDesconocida ? " La hora es desconocida: no interpretes casas ni Ascendente, y menciona brevemente por qué." : "") +
         ` Extensión: 1300 a 1700 palabras.`,
       opciones: { idioma, effort: "medium", maxTokens: 5000, nivel: "premium" },
