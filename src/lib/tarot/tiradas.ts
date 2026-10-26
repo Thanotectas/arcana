@@ -1,4 +1,5 @@
 import { randomInt } from "node:crypto";
+import { resumenPanorama } from "./panorama";
 import type { CartaTarot } from "./deck";
 import { MAZOS, type IdMazo } from "./mazos";
 import type { TipoLectura } from "../creditos";
@@ -165,5 +166,7 @@ export function resumenTirada(tipo: TipoTirada, cartas: CartaTirada[], pregunta:
         `Significado: ${c.invertida ? c.carta.significadoInvertido : c.carta.significado}${sombra}`,
     );
   }
+  const reveladas = cartasDeTirada(cartas, mazo);
+  if (reveladas.length >= 2) lineas.push(resumenPanorama(reveladas.map((c) => ({ ...c.carta, invertida: c.invertida }))));
   return lineas.join("\n");
 }

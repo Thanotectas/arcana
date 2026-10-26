@@ -209,6 +209,9 @@ function VistaTarot({
     const pos = posiciones[c.posicion];
     return {
       nombre: c.carta.nombre,
+      elemento: c.carta.elemento,
+      arcano: c.carta.arcano,
+      numero: c.carta.numero,
       ...rotuloCarta(c.carta, mazo),
       imagen: imagenCarta(c.carta, mazo),
       repeticiones: c.carta.arcano === "menor" ? c.carta.numero : 1,

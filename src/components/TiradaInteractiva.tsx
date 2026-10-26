@@ -5,8 +5,9 @@ import { DisposicionTirada } from "./DisposicionTirada";
 import { CaraCarta } from "./CartaVisual";
 import { useT } from "@/lib/i18n/cliente";
 import { plantilla } from "@/lib/i18n/formato";
+import { PanoramaTirada, type CartaPanorama } from "./PanoramaTirada";
 
-export interface CartaRevelada {
+export interface CartaRevelada extends CartaPanorama {
   nombre: string;
   etiqueta: string;
   simbolo: string;
@@ -171,6 +172,9 @@ export function TiradaInteractiva({
           </p>
         </div>
       )}
+
+      {/* Con todas a la vista: la tirada en conjunto (elementos, invertidas y ecos). */}
+      {todas && cartas.length >= 2 && <PanoramaTirada cartas={cartas} t={t.tarot.panorama} conInvertidas={estilo !== "angeles"} />}
     </section>
   );
 }
