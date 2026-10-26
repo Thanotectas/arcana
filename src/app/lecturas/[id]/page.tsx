@@ -8,6 +8,7 @@ import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
 import { LecturaTaza } from "@/components/LecturaTaza";
 import { LecturaHuevo } from "@/components/LecturaHuevo";
+import { LecturaTabaco } from "@/components/LecturaTabaco";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
@@ -83,13 +84,6 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
       {lectura.tipo === "cruce" && <VistaCruce entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
-      {esTabaco && urlFoto && (
-        <section className="tarjeta p-4">
-          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.tabaco.tuTabaco}</p>
-          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
-          <img src={urlFoto} alt={t.tabaco.tuTabaco} className="mx-auto max-h-96 rounded-xl" />
-        </section>
-      )}
       {(lectura.tipo === "baraja_espanola" || lectura.tipo === "lenormand" || lectura.tipo === "runas") && (
         <VistaOraculo tipo={lectura.tipo} resultado={lectura.resultado as unknown as ResultadoOraculo} idioma={idioma} titulo={lectura.tipo === "runas" ? t.runas.tusCartas : t.baraja.tusCartas} invertida={t.oraculo.invertida} />
       )}
@@ -115,6 +109,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           mano={lectura.entrada.mano === "izquierda" ? "izquierda" : "derecha"}
           dominante={lectura.entrada.dominante === "izquierda" ? "izquierda" : "derecha"}
         />
+      ) : esTabaco ? (
+        <LecturaTabaco id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
       ) : esHuevo ? (
         <LecturaHuevo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
       ) : esTaza ? (

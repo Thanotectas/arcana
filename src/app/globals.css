@@ -647,6 +647,24 @@ body {
   .huevo-hilo, .huevo-burbuja, .huevo-nube, .huevo-flota { animation: none; }
 }
 
+/* Tabaco: la brasa late, la ceniza crece y el humo sube */
+.tabaco-brasa { animation: tabaco-brasa 2.4s ease-in-out infinite; filter: drop-shadow(0 0 4px #ff7a3d); }
+@keyframes tabaco-brasa {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.tabaco-ceniza { transform-box: fill-box; transform-origin: left center; animation: tabaco-ceniza 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards; }
+@keyframes tabaco-ceniza {
+  from { transform: scaleX(0); }
+}
+.tabaco-humo { stroke-dasharray: 46 10; animation: tabaco-humo 2.6s linear infinite; }
+@keyframes tabaco-humo {
+  to { stroke-dashoffset: -56; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabaco-brasa, .tabaco-ceniza, .tabaco-humo { animation: none; }
+}
+
 /* Quiromancia: el mapa de la mano */
 .mano-linea {
   stroke-dasharray: 1;

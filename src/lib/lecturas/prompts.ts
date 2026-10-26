@@ -21,6 +21,7 @@ import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type Entrad
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
 import { resumenTabaco, TRADICION_TABACO, type EntradaTabaco } from "../tabaco";
+import { INSTRUCCION_TABACO } from "../tabaco/senales";
 import { TIRADAS_BARAJA, resumenBaraja, TRADICION_BARAJA } from "../oraculos/baraja";
 import { TIRADAS_LENORMAND, resumenLenormand, TRADICION_LENORMAND } from "../oraculos/lenormand";
 import { TIRADAS_RUNAS, resumenRunas, TRADICION_RUNAS } from "../oraculos/runas";
@@ -232,9 +233,10 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
       usuario:
         `Lee el tabaco de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenTabaco(e)}\n\n` +
         `Estructura: ## Lo que veo en tu tabaco (descripción concreta: color y forma de la ceniza, cómo va la quema, marcas de la capa, la punta, el humo si se ve; dónde está cada cosa), ## Señal por señal (cada una con su sentido tradicional y lo que puede decir para esta persona), ## Lo que el tabaco responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ${anuncio("## Lo que el tabaco anuncia")}, ## Un consejo para los próximos días. ` +
-        `Extensión: 600 a 850 palabras.`,
+        `Extensión: 600 a 850 palabras.\n\n` +
+        INSTRUCCION_TABACO,
       sistemaExtra: TRADICION_TABACO,
-      opciones: { idioma, effort: "medium", maxTokens: 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "medium", maxTokens: 3900, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 
