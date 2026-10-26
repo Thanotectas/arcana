@@ -27,7 +27,8 @@ export function VistaSinastria({ resultado: r, entrada, t }: { resultado: Result
   const n = nombresAstro(t);
   const simbolo = (p: PuntoSinastria) => (p === "ascendente" ? "AC" : texto(SIMBOLOS_CUERPO[p]));
   const nombre = (p: PuntoSinastria) => (p === "ascendente" ? t.astral.ascendente : n.cuerpo(p));
-  const casas = t.astral.rueda.casas;
+  // Las casas en tercera persona: hablan de la vida de la otra persona, no de quien lee.
+  const casas = s.casasSentido;
   // Con los datos de nacimiento se recalculan las dos cartas para la rueda doble (las lecturas guardan solo los signos).
   const cartas = entrada?.a && entrada?.b ? [calcularCarta(entrada.a), calcularCarta(entrada.b)] : null;
 
