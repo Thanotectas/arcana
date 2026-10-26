@@ -6,6 +6,8 @@ import { Marca } from "./Logo";
 import { CieloEnVivo } from "./CieloEnVivo";
 import { RostroSibila } from "./RostroSibila";
 import { RetratoSibila } from "./RetratoSibila";
+import { GraficoEnVivo } from "./GraficoEnVivo";
+import type { GraficoVivo } from "@/lib/en-vivo-graficos";
 
 interface Carta {
   id: string;
@@ -13,7 +15,7 @@ interface Carta {
   posicion: string;
 }
 
-type TipoLectura = "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano";
+type TipoLectura = "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria";
 
 interface Lectura {
   clase: "lectura";
@@ -28,6 +30,7 @@ interface Lectura {
   numero: number | null;
   etiquetaNumero: string | null;
   simbolo: string | null;
+  grafico?: GraficoVivo | null;
   texto: string;
   audio: string | null;
 }
@@ -41,7 +44,21 @@ const NOMBRE_TIPO: Record<TipoLectura, string> = {
   horoscopo: "Horóscopo",
   chocolate: "Lectura del chocolate",
   mano: "Lectura de la mano",
+  carta: "Carta astral",
+  sinastria: "Sinastría",
 };
+
+/** Lo que se puede pedir en el chat: el recuadro de arriba lo va mostrando por turnos mientras no hay lectura. */
+const INSTRUCCIONES = [
+  { titulo: "Tarot · tres cartas para ti", ejemplo: "Leo, ¿me sale el trabajo?" },
+  { titulo: "Tu carta astral, dibujada en vivo", ejemplo: "carta astral 14/03/1985 10:30 Medellín" },
+  { titulo: "Sinastría · sus dos cielos juntos", ejemplo: "sinastría 14/03/1985 y 22/08/1990" },
+  { titulo: "Horóscopo · tu cielo de hoy", ejemplo: "horóscopo Piscis" },
+  { titulo: "Numerología · lo que trae tu año", ejemplo: "mi año 14/03/1985" },
+  { titulo: "Aura · el color de tu energía", ejemplo: "aura: ando muy cansada" },
+];
+/** Frases de espera de Sibila (FRASES_PUENTE en src/lib/en-vivo.ts). */
+const FRASES_PUENTE = 12;
 
 const COLOR_AURA: Record<string, string> = {
   violeta: "#8b6cf6",
@@ -82,8 +99,14 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
   const [aviso, setAviso] = useState("");
   const [sinVoz, setSinVoz] = useState(false);
   const [cierre, setCierre] = useState<"abierto" | "despidiendo" | "fin">("abierto");
+  const [instruccion, setInstruccion] = useState(0);
   const contexto = useRef<AudioContext | null>(null);
   const desbloquear = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const id = setInterval(() => setInstruccion((n) => (n + 1) % INSTRUCCIONES.length), 7000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const ajustar = () => setEscala(Math.min(window.innerWidth / ANCHO, window.innerHeight / ALTO));
@@ -238,7 +261,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         quietos++;
         // Sin preguntas: una frase de Sibila cada tres vueltas (unos 25 s).
         if (quietos % 3 === 1) {
-          const i = puente++ % 6;
+          const i = puente++ % FRASES_PUENTE;
           let frase = puentes.get(i) ?? null;
           if (!frase) {
             const r2 = await pedir("puente", i);
@@ -361,10 +384,10 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
               <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
             </>
           ) : (
-            <>
-              <p className="text-2xl text-violeta-suave">Tarot · Aura · Numerología · Horóscopo · Chocolate · Mano</p>
-              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>Escribe en el chat tu signo y lo que quieres saber</p>
-            </>
+            <div key={instruccion} className="aparecer">
+              <p className="text-2xl text-violeta-suave">Escribe en el chat · {INSTRUCCIONES[instruccion].titulo}</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>«{INSTRUCCIONES[instruccion].ejemplo}»</p>
+            </div>
           )}
         </div>
 
@@ -400,6 +423,11 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
             );
           })}
         </div>
+        ) : lectura.grafico ? (
+          // Carta astral, sinastría o cielo del horóscopo: se dibuja a tamaño completo.
+          <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
+            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={escena ? 440 : 520} />
+          </div>
         ) : (
           <div className={`absolute ${derecha} flex items-center justify-center ${escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: escena ? "scale(0.82)" : undefined }}>
             {(tipo === "chocolate" || tipo === "mano") && lectura.imagen && (
@@ -446,7 +474,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           {cierre !== "abierto" ? (
             <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
           ) : (
-            <>✦ Escribe en el chat tu signo y tu pregunta ✦ ¿Taza de chocolate o tu mano? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Lecturas de entretenimiento ✦</>
+            <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦</>
           )}
         </div>
 

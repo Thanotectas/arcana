@@ -226,8 +226,8 @@ type PublicacionYoutubeRow = {
 type EnVivoPreguntaRow = {
   id: number;
   mensaje_id: string | null;
-  origen: "chat" | "manual" | "pagina";
-  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano";
+  origen: "chat" | "manual" | "pagina" | "facebook";
+  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria";
   imagen: string | null;
   huella: string | null;
   autor: string;
@@ -250,6 +250,10 @@ type EnVivoEstadoRow = {
   latido_en: string | null;
   cierre_en: string | null;
   despedida_en: string | null;
+  fb_live_id: string | null;
+  fb_desde: string | null;
+  fb_buscado_en: string | null;
+  fb_detalle: string | null;
   actualizado_en: string;
 };
 
@@ -480,7 +484,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "actualizado_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "actualizado_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };

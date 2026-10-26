@@ -57,7 +57,7 @@ export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData):
   return { mensaje: `¡Listo, ${nombre}! Tu ${tipo === "mano" ? "mano" : "taza"} está en la fila${antes && antes > 1 ? ` (hay ${antes - 1} antes de ti)` : ""}. Mira el directo: Sibila te va a nombrar.` };
 }
 
-const TIPOS: TipoLectura[] = ["tarot", "aura", "numerologia", "horoscopo"];
+const TIPOS: TipoLectura[] = ["tarot", "aura", "numerologia", "horoscopo", "carta", "sinastria"];
 
 /** Consulta agregada a mano desde /admin/en-vivo (pasa primero en la fila). */
 export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {

@@ -1,7 +1,7 @@
 SIBILA EN VIVO — CÓMO PEDIR LECTURA (para fijar en el chat, decir en voz y responder dudas)
 
 ==================== MENSAJE PARA FIJAR EN EL CHAT (menos de 200 caracteres) ====================
-✨ Pide tu lectura: tu signo + tu pregunta. ¿Tu año? escribe «mi año» + tu fecha (ej: mi año 14/03/1985). Foto de tu taza o tu mano: miarcana.com/vivo
+✨ Tu signo + tu pregunta · «carta astral» + fecha, hora y ciudad · «sinastría» + dos fechas · «mi año» + fecha · taza o mano: miarcana.com/vivo
 
 ==================== QUÉ ESCRIBIR SEGÚN LA LECTURA ====================
 1. TAROT (3 cartas): tu signo + tu pregunta.
@@ -13,16 +13,29 @@ SIBILA EN VIVO — CÓMO PEDIR LECTURA (para fijar en el chat, decir en voz y re
    Se puede sumar el tema: «mi año en el amor 14/03/1985».
    (Sin la fecha, Sibila lo lee con tres cartas de tarot.)
 
-3. TU NÚMERO (camino de vida): solo la fecha de nacimiento, o «numerología» + la fecha.
+3. TU CARTA ASTRAL, DIBUJADA EN VIVO: «carta astral» + fecha + hora + ciudad.
+   Ej: «Carta astral 14/03/1985 10:30 Medellín»
+   En pantalla se dibuja su rueda: los signos, los planetas uno por uno y los aspectos.
+   Sibila lee el Sol, la Luna y el Ascendente.
+   Sin hora o sin ciudad también se dibuja, pero sin Ascendente.
+   También sirve: «mapa astral», «carta natal», «birth chart».
+
+4. SINASTRÍA (DOS PERSONAS), DIBUJADA EN VIVO: «sinastría» + las dos fechas.
+   Ej: «Sinastría 14/03/1985 y 22/08/1990»
+   En pantalla se ven las dos cartas, una dentro de la otra, con los hilos verdes (unen) y ámbar (tensan)
+   y el anillo de afinidad. También sirve «compatibilidad» + dos fechas.
+
+5. TU NÚMERO (camino de vida): solo la fecha de nacimiento, o «numerología» + la fecha.
    Ej: «Numerología 02/07/1966»
 
-4. HORÓSCOPO DEL DÍA: «horóscopo» + tu signo.
+6. HORÓSCOPO DEL DÍA: «horóscopo» + tu signo.
    Ej: «Horóscopo de Piscis para hoy»
+   En pantalla se dibuja el cielo de hoy para su signo: dónde está la Luna y cada planeta.
 
-5. AURA: «aura» + lo que quieras contar.
+7. AURA: «aura» + lo que quieras contar.
    Ej: «Aura: ando muy cansada, ¿qué me pasa?»
 
-6. TAZA DE CHOCOLATE O LA MANO: la foto se sube en miarcana.com/vivo (no en el chat).
+8. TAZA DE CHOCOLATE O LA MANO: la foto se sube en miarcana.com/vivo (no en el chat).
 
 También en inglés o portugués: Sibila responde en el idioma en que le escriben.
 
@@ -39,5 +52,7 @@ También en inglés o portugués: Sibila responde en el idioma en que le escribe
 - «¿Cómo pido mi lectura?» → Escribe tu signo y tu pregunta 🙌 Sibila la lee en voz en unos minutos.
 - «¿Cómo sé lo de mi año?» → Escribe: mi año + tu fecha, así: mi año 14/03/1985 ✨
 - «¿Y lo de 2027?» → Escribe: 2027 + tu fecha, así: 2027 14/03/1985
+- «¿Cómo veo mi carta astral?» → Escribe: carta astral + tu fecha, hora y ciudad, así: carta astral 14/03/1985 10:30 Medellín ✨
+- «¿Y con mi pareja?» → Escribe: sinastría + las dos fechas, así: sinastría 14/03/1985 y 22/08/1990 💞
 - «¿Me lees la taza / la mano?» → Sube la foto en miarcana.com/vivo y Sibila la mira en vivo 📸
 - «¿Por qué no me ha leído?» → Hay fila y van en orden; ya casi 💜

@@ -43,9 +43,11 @@ export function PreguntaManual() {
           <option value="aura">Aura</option>
           <option value="numerologia">Numerología</option>
           <option value="horoscopo">Horóscopo</option>
+          <option value="carta">Carta astral (fecha, hora y ciudad)</option>
+          <option value="sinastria">Sinastría (dos fechas)</option>
         </select>
       </div>
-      <input name="texto" placeholder="Ej: Soy Leo, ¿qué viene en el amor? (numerología: con fecha 12/08/1990)" maxLength={300} required className="campo w-full" />
+      <input name="texto" placeholder="Ej: Soy Leo, ¿qué viene en el amor? · carta: 14/03/1985 10:30 Medellín · sinastría: 14/03/1985 y 22/08/1990" maxLength={300} required className="campo w-full" />
       {estado.error && <Aviso>{estado.error}</Aviso>}
       {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
       <BotonEnviar className="boton boton-secundario text-sm" cargando="Agregando…">

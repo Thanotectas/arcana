@@ -14,6 +14,9 @@ import { PAQUETE_PRUEBA, PAQUETES } from "@/lib/creditos";
 import { codigoVigente } from "@/lib/pagos/codigos";
 import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
 import { TELEGRAM } from "@/lib/marca/redes";
+import { createHash } from "node:crypto";
+import { PIDE_CARTA, PIDE_SINASTRIA, fechasEn, prepararCarta, prepararCielo, prepararSinastria } from "@/lib/en-vivo-astro";
+import type { GraficoVivo } from "@/lib/en-vivo-graficos";
 
 /**
  * «Sibila en vivo»: directos de YouTube donde Sibila lee el tarot a quien
@@ -76,7 +79,7 @@ export function pareceConsulta(texto: string) {
   // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
   return (
     Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
-    /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t) || anioQuePide(t) !== null
+    /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t) || anioQuePide(t) !== null || PIDE_CARTA.test(t)
   );
 }
 
@@ -167,7 +170,13 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
     if (tipo) filas.push({ mensaje_id: g.mensaje_id, origen: "chat" as const, tipo, autor: g.autor, texto, signo });
   }
   if (!filas.length) return { conectado: true, directo: true, nuevas: 0, ...(sumadas ? { detalle: `${sumadas} mensaje(s) sumados a consultas en espera` } : {}) };
-  const { data } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
+  let { data, error } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
+  if (error?.code === "23514") {
+    // Sin la migración 0041 no existen los tipos carta y sinastría: se leen como numerología (traen fecha).
+    const viejas = filas.map((f) => (f.tipo === "carta" || f.tipo === "sinastria" ? { ...f, tipo: "numerologia" as const } : f));
+    ({ data, error } = await admin.from("en_vivo_preguntas").upsert(viejas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id"));
+  }
+  if (error) console.error("[en vivo] encolar:", error.message);
   return { conectado: true, directo: true, nuevas: data?.length ?? 0 };
 }
 
@@ -180,6 +189,10 @@ export const BUCKET_FOTOS = "redes";
 export function tipoDeMensaje(texto: string): TipoLectura | null {
   const t = texto.toLowerCase();
   if (/chocolate|taza|pocillo|\bmano\b|palma|\bpalm\b|\bhand\b|\bcup\b|x[ií]cara|\bm[aã]o\b/.test(t)) return null;
+  // Carta astral y sinastría se dibujan en pantalla: necesitan la fecha (o las dos fechas).
+  const fechas = fechasEn(t).length;
+  if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
+  if (fechas >= 1 && PIDE_CARTA.test(t)) return "carta";
   if (/\baura\b/.test(t)) return "aura";
   if (/numerolog|mi n[uú]mero|my number|meu n[uú]mero|\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t)) return "numerologia";
   if (/hor[oó]scop/.test(t)) return "horoscopo";
@@ -204,9 +217,9 @@ const COLORES_AURA = ["violeta", "dorado", "azul", "verde", "rosa", "rojo", "nar
 
 const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en voz alta a quien escribe en el chat o sube su foto. Tu texto se convierte en voz: escribe como se habla.
 - Entre 70 y 110 palabras, en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
-- Empieza saludando por el nombre (y el signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo.
+- Nombra a la persona (y su signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo, pero varía la manera de empezar en cada lectura: a veces por su nombre, a veces por lo que salió («Salió la Torre para ti, Marta…»), a veces por su pregunta («¿El trabajo, Andrés? Mira…»). No empieces con «Hola» ni con la misma fórmula de las lecturas anteriores, que te paso en «Ya dijiste esta noche».
 - Quien pregunta en vivo quiere sentir que le respondiste a ella, no a cualquiera. Nada de frases que le sirvan a todo el mundo («habrá cambios», «confía en ti»). Responde de frente: sí, todavía no, o qué tiene que pasar primero, y anuncia algo concreto y verosímil que pueda reconocer cuando llegue: un mensaje o una llamada que no esperaba, una conversación pendiente que por fin se da, una propuesta de trabajo, alguien del pasado que reaparece, un dinero que entra después de una espera. Dale un plazo amplio (estas semanas, antes de fin de mes, antes de que termine el año) y una señal para reconocerlo («cuando veas…», «si esta semana…»). Apóyalo siempre en lo que salió: la carta, la figura, la línea, el número, su signo.
-- Termina con una frase de consejo concreta para aprovechar lo que viene. No invites a la página: eso lo hace el directo.
+- Termina con un consejo concreto para aprovechar lo que viene, dicho cada vez de otra forma (nada de cerrar siempre con «confía», «recuerda» o «mi consejo es»). No invites a la página: eso lo hace el directo.
 - Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
 
@@ -237,12 +250,12 @@ interface Preparada {
   entrada: string;
   sistema: string;
   imagenes?: ImagenEntrada[];
-  extra: Pick<LecturaEnVivo, "cartas" | "numero" | "etiquetaNumero" | "simbolo">;
+  extra: Pick<LecturaEnVivo, "cartas" | "numero" | "etiquetaNumero" | "simbolo" | "grafico">;
 }
 
 async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string; simbolo: string; id: string } | null): Promise<Preparada> {
   const base = [`Nombre: «${p.autor}»`, signo ? `Signo: ${signo.nombre}` : "Signo: no lo dijo", p.texto ? `Mensaje: «${p.texto}»` : "Mensaje: (sin pregunta)"];
-  const vacio = { cartas: null, numero: null, etiquetaNumero: null, simbolo: null };
+  const vacio = { cartas: null, numero: null, etiquetaNumero: null, simbolo: null, grafico: null };
   switch (p.tipo) {
     case "aura":
       return {
@@ -273,10 +286,39 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
     }
     case "horoscopo": {
       const texto = signo ? await horoscopoDelDia(signo as Signo).catch(() => "") : "";
+      // En pantalla se dibuja el cielo de hoy para su signo (los planetas en sus casas).
+      const cielo = signo ? prepararCielo(signo as Signo) : null;
       return {
-        entrada: [...base, texto ? `Horóscopo de hoy para ${signo?.nombre}: ${texto.slice(0, 1500)}` : ""].join("\n"),
-        sistema: `${SISTEMA_EN_VIVO}\nLectura de horóscopo: resume en voz alta lo que trae el día para su signo y conéctalo con su pregunta. Si no dijo su signo, responde OMITIR.`,
-        extra: { ...vacio, simbolo: signo?.simbolo ?? null },
+        entrada: [...base, texto ? `Horóscopo de hoy para ${signo?.nombre}: ${texto.slice(0, 1500)}` : "", cielo ? cielo.entrada : ""].join("\n"),
+        sistema: `${SISTEMA_EN_VIVO}\nLectura de horóscopo: resume en voz alta lo que trae el día para su signo y conéctalo con su pregunta. En pantalla se está dibujando el cielo de hoy para su signo: nombra dónde está la Luna y otro planeta y en qué área de su vida caen, en palabras sencillas. Si no dijo su signo, responde OMITIR.`,
+        extra: { ...vacio, simbolo: signo?.simbolo ?? null, grafico: cielo?.grafico ?? null },
+      };
+    }
+    case "carta": {
+      const carta = await prepararCarta(p.autor, p.texto);
+      if (!carta) throw new Error("No se pudo leer la fecha de nacimiento.");
+      const grafico = carta.grafico.tipo === "carta" ? carta.grafico : null;
+      const completa = grafico?.asc != null;
+      return {
+        entrada: [...base, carta.entrada].join("\n"),
+        sistema:
+          `${SISTEMA_EN_VIVO}\nLectura de carta astral: en pantalla se está dibujando su carta. Explica su Sol (su esencia), su Luna (cómo siente)` +
+          `${completa ? " y su Ascendente (cómo la ven y cómo empieza las cosas)" : ""} y uno de los aspectos más exactos, conectados con su pregunta si hizo una.` +
+          `${completa ? "" : " Al final dile, en una frase, que con la hora y la ciudad de nacimiento se ve también el Ascendente."}` +
+          " Aquí no hace falta anunciar un suceso con plazo: basta con un rasgo concreto que pueda reconocer y un consejo.",
+        extra: { ...vacio, grafico: carta.grafico },
+      };
+    }
+    case "sinastria": {
+      const sinastria = prepararSinastria(p.autor, p.texto);
+      if (!sinastria) throw new Error("Faltan las dos fechas de nacimiento.");
+      return {
+        entrada: [...base, sinastria.entrada].join("\n"),
+        sistema:
+          `${SISTEMA_EN_VIVO}\nLectura de sinastría: en pantalla se dibujan las dos cartas, una dentro de la otra, con los hilos que las unen. ` +
+          "Di la afinidad en palabras (puedes nombrar el porcentaje una vez), qué los une (uno o dos contactos armónicos), qué tienen que cuidar (uno tenso) y un consejo para la pareja. " +
+          "Habla de «tú» y «la otra persona». Sin horas de nacimiento no hay ascendentes: no los menciones.",
+        extra: { ...vacio, grafico: sinastria.grafico },
       };
     }
     case "chocolate":
@@ -319,6 +361,8 @@ export interface LecturaEnVivo {
   numero: number | null;
   etiquetaNumero: string | null;
   simbolo: string | null;
+  /** Carta astral, cielo del horóscopo o sinastría que el escenario dibuja. */
+  grafico: GraficoVivo | null;
   texto: string;
   audio: string | null;
 }
@@ -366,7 +410,17 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
     const signo = p.signo ? SIGNOS.find((s) => s.id === p.signo) ?? null : null;
     try {
       const prep = await preparar(admin, p, signo);
-      let texto = (await generarTexto(prep.entrada, prep.sistema, { effort: "low", maxTokens: 500, imagenes: prep.imagenes })).replace(/[#*_>`]/g, "").trim();
+      // Para que no suene automático: cómo empezaron y cerraron las últimas lecturas de la noche.
+      const { data: previas } = await admin.from("en_vivo_preguntas").select("lectura").eq("estado", "leida").gte("leida_en", inicioDia.toISOString()).order("leida_en", { ascending: false }).limit(5);
+      const yaDijiste = (previas ?? [])
+        .map((x) => x.lectura?.trim() ?? "")
+        .filter(Boolean)
+        .map((l) => `- empezó «${l.split(/\s+/).slice(0, 8).join(" ")}…» y cerró «…${l.split(/\s+/).slice(-8).join(" ")}»`);
+      // Cada cuarta lectura de la noche, Sibila invita a suscribirse, con sus palabras (sin pedirlo a cambio de nada).
+      const invitar = (count ?? 0) % 4 === 3;
+      const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (no repitas esas aperturas ni esos cierres):\n${yaDijiste.join("\n")}` : ""].join("");
+      const sistema = invitar ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a suscribirse al canal y activar la campanita para el próximo directo.` : prep.sistema;
+      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, imagenes: prep.imagenes })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {
@@ -378,8 +432,6 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
         await admin.from("en_vivo_preguntas").update({ estado: "omitida", detalle: "Sibila la omitió" }).eq("id", p.id);
         continue;
       }
-      // Cada cuarta lectura de la noche, Sibila invita a suscribirse (sin pedirlo a cambio de nada).
-      if ((count ?? 0) % 4 === 3) texto += ` ${INVITACION_SUSCRIBIRSE}`;
       let audio: string | null = null;
       if (vozConfigurada()) {
         try {
@@ -434,13 +486,14 @@ function codigoDicho(codigo: string) {
   return /^[A-Z]{3,8}$/.test(codigo) ? codigo.charAt(0) + codigo.slice(1).toLowerCase() : codigo.toLowerCase().split("").join(" ");
 }
 
-/** Invitación a suscribirse que Sibila agrega a algunas lecturas y dice al despedirse. */
-const INVITACION_SUSCRIBIRSE = "Y si esta lectura te habló, suscríbete al canal y activa la campanita: así te aviso del próximo directo.";
+/** Cuántas frases de espera hay: el escenario las recorre en orden (EscenarioEnVivo usa el mismo número). */
+export const FRASES_PUENTE = 12;
 
 /**
- * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez).
- * Incluyen el precio de la tirada de prueba, la invitación a suscribirse y, si
- * hay un código de oferta vigente, cómo usarlo.
+ * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez y
+ * el audio queda guardado en Storage, así recargar el escenario no gasta voz).
+ * Explican cómo pedir cada lectura, el precio de la tirada de prueba, la
+ * invitación a suscribirse y, si hay un código de oferta vigente, cómo usarlo.
  */
 export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
   const prueba = precioHablado(PAQUETE_PRUEBA.precioCOP);
@@ -449,29 +502,44 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     ? `Y esta noche hay regalo: con el código ${codigoDicho(codigo.codigo)}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
     : "";
   const telegram = TELEGRAM.activo ? " Y si quieres tu carta cada mañana, búscame en Telegram: Mi Arcana Bot." : "";
-  return [
+  const frases = [
     "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
-    "Sigo leyendo. Si quieres tu lectura, escribe tu signo y lo que quieres saber: amor, trabajo, un cambio que viene. Y si quieres saber qué te trae tu año, escribe «mi año» con tu fecha de nacimiento.",
+    "¿Quieres ver tu carta astral dibujada aquí, en vivo? Escribe carta astral, tu fecha de nacimiento, la hora y la ciudad donde naciste.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y una tirada completa de tres cartas, con calma y por escrito, cuesta ${prueba}. ${oferta}`.trim(),
-    "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
+    "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos.",
+    "Si quieres saber qué te trae tu año, escribe mi año y tu fecha de nacimiento. Los números también hablan.",
     `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo.${telegram}`,
+    "Escribe horóscopo y tu signo, y te muestro cómo está el cielo hoy para ti: dónde anda la Luna y qué área de tu vida mueve.",
+    "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
+    "¿De qué color está tu energía hoy? Escribe aura y cuéntame cómo te sientes, y te digo el color que veo.",
     `Si quieres una lectura más profunda, con más cartas y con calma, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
+    "¿Tu taza de chocolate o la palma de tu mano? Escanea el código de la pantalla, sube la foto, y aquí la miramos.",
+    "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe tu signo y tu pregunta, que ya te llega el turno.",
   ];
+  return frases.slice(0, FRASES_PUENTE);
+}
+
+/** Voz de una frase guardada en Storage por su texto: solo se sintetiza la primera vez. */
+async function vozGuardada(admin: Admin, texto: string): Promise<string | null> {
+  const ruta = `en-vivo/puentes/${createHash("sha256").update(texto).digest("hex").slice(0, 24)}.mp3`;
+  const guardado = await admin.storage.from(BUCKET_FOTOS).download(ruta).catch(() => null);
+  if (guardado?.data) return Buffer.from(await guardado.data.arrayBuffer()).toString("base64");
+  if (!vozConfigurada()) return null;
+  try {
+    const audio = await sintetizar(texto);
+    await admin.storage.from(BUCKET_FOTOS).upload(ruta, audio, { contentType: "audio/mpeg", upsert: true }).catch(() => null);
+    return audio.toString("base64");
+  } catch (e) {
+    console.error("[en vivo] voz puente:", e instanceof Error ? e.message : e);
+    return null;
+  }
 }
 
 export async function audioPuente(admin: Admin, i: number) {
   const codigo = await codigoVigente(admin).catch(() => null);
   const frases = frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
   const texto = frases[((i % frases.length) + frases.length) % frases.length];
-  let audio: string | null = null;
-  if (vozConfigurada()) {
-    try {
-      audio = (await sintetizar(texto)).toString("base64");
-    } catch (e) {
-      console.error("[en vivo] voz puente:", e instanceof Error ? e.message : e);
-    }
-  }
-  return { texto, audio };
+  return { texto, audio: await vozGuardada(admin, texto) };
 }
 
 // ───────────────────────── Cierre del directo ─────────────────────────

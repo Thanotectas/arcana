@@ -347,6 +347,27 @@ consulta mientras espera turno, y si dijo su signo antes esa noche se reutiliza.
 recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no ha tenido ninguna
 (`siguienteLectura`).
 
+### Carta astral, sinastría y cielo dibujados en vivo (26 oct 2026)
+
+- **Pedidos en el chat** (`src/lib/en-vivo-pedidos.ts`): «carta astral 14/03/1985 10:30 Medellín» (también
+  mapa astral, carta natal, birth chart) → tipo `carta`; «sinastría 14/03/1985 y 22/08/1990» (también
+  compatibilidad / synastry con dos fechas) → tipo `sinastria`. Se leen la fecha, la hora (10:30, 7.15 pm,
+  6 am, 22h40) y la ciudad (lo que sigue a «en/in/em» o el último trozo entre comas), que se busca en
+  Open-Meteo como en /carta-astral.
+- **Cálculo** (`src/lib/en-vivo-astro.ts`): carta completa con `calcularCarta` (Ascendente y medio cielo
+  solo con hora y ciudad), sinastría con `calcularSinastria` (mediodía, sin ascendentes) y, en el
+  horóscopo, el cielo del día para el signo (`cieloDelSigno`, el mismo de /horoscopo). Devuelven el
+  resumen para Sibila y el `grafico` (`src/lib/en-vivo-graficos.ts`).
+- **Escenario** (`GraficoEnVivo`): la rueda se dibuja de a poco mientras Sibila habla (signos, planetas uno
+  por uno, aspectos o hilos, anillo de afinidad). Sin consultas, el recuadro de arriba rota ejemplos de
+  qué escribir para cada lectura.
+- **Que no suene automático**: Sibila recibe cómo empezaron y cerraron sus últimas cinco lecturas de la
+  noche y varía el saludo y el cierre; la invitación a suscribirse la dice con sus palabras (cada cuarta
+  lectura). Las frases de espera son 12 (`FRASES_PUENTE`) y su audio se guarda en Storage
+  (`redes/en-vivo/puentes/`), así recargar el escenario no gasta voz.
+- Migración `0041_en_vivo_carta_facebook.sql` (tipos `carta` y `sinastria`, origen `facebook` y columnas
+  de Facebook en `en_vivo_estado`). Sin ella, los pedidos de carta o sinastría se leen como numerología.
+
 ## Códigos de oferta (20 oct 2026)
 
 `codigos_oferta` (migración 0034): créditos extra en una compra sin cambiar el precio. La
