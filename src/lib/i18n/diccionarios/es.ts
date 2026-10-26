@@ -872,6 +872,16 @@ export const es = {
     consejo: "Consejo: funciona mejor con chocolate espeso. Con la taza ya volteada y escurrida, las figuras se ven más claras.",
     leer: "Leer mi taza",
     subiendo: "Mirando el fondo de la taza…",
+    figurasTitulo: "Lo que se ve en tu taza",
+    figurasNota: "Toca un número para ver la figura en la foto.",
+    tiempoTitulo: "Tu taza en el tiempo",
+    tiempoNota: "En la tradición, lo que queda cerca del borde llega pronto y lo del fondo tarda más.",
+    zonas: {
+      borde: { nombre: "Cerca del borde", cuando: "Pronto" },
+      medio: { nombre: "En las paredes", cuando: "Estos meses" },
+      fondo: { nombre: "En el fondo", cuando: "Más adelante" },
+    },
+    vacia: "Nada en esta zona",
     errores: { foto: "Sube una foto del interior de tu taza." },
   },
   explorar: {

@@ -870,6 +870,16 @@ export const pt: Diccionario = {
     consejo: "Dica: funciona melhor com chocolate espesso. Com a xícara já virada e escorrida, as figuras aparecem mais claras.",
     leer: "Ler minha xícara",
     subiendo: "Olhando o fundo da xícara…",
+    figurasTitulo: "O que se vê na sua xícara",
+    figurasNota: "Toque um número para ver a figura na foto.",
+    tiempoTitulo: "A sua xícara no tempo",
+    tiempoNota: "Na tradição, o que fica perto da borda chega logo e o que está no fundo demora mais.",
+    zonas: {
+      borde: { nombre: "Perto da borda", cuando: "Em breve" },
+      medio: { nombre: "Nas paredes", cuando: "Nestes meses" },
+      fondo: { nombre: "No fundo", cuando: "Mais adiante" },
+    },
+    vacia: "Nada nesta zona",
     errores: { foto: "Envie uma foto do interior da sua xícara." },
   },
   explorar: {

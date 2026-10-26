@@ -873,6 +873,16 @@ export const en: Diccionario = {
     consejo: "Tip: it works best with thick chocolate. Once the cup has been tipped and drained, the shapes show more clearly.",
     leer: "Read my cup",
     subiendo: "Looking into the cup…",
+    figurasTitulo: "What shows in your cup",
+    figurasNota: "Tap a number to see the figure in the photo.",
+    tiempoTitulo: "Your cup in time",
+    tiempoNota: "By tradition, what sits near the rim comes soon and what lies at the bottom takes longer.",
+    zonas: {
+      borde: { nombre: "Near the rim", cuando: "Soon" },
+      medio: { nombre: "On the sides", cuando: "These months" },
+      fondo: { nombre: "At the bottom", cuando: "Further ahead" },
+    },
+    vacia: "Nothing in this area",
     errores: { foto: "Upload a photo of the inside of your cup." },
   },
   explorar: {

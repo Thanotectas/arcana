@@ -15,7 +15,7 @@ import { resumenChino, type ResultadoChino } from "../chino";
 import type { FuenteCruce } from "../cruce";
 import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
-import { resumenChocolate, TRADICION_CHOCOLATE, type EntradaChocolate } from "../chocolate";
+import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
 import { resumenTabaco, TRADICION_TABACO, type EntradaTabaco } from "../tabaco";
@@ -190,7 +190,8 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: ## Lo que veo en tu taza (un recorrido descriptivo y concreto por la taza: cómo quedó la espuma y el poso, zonas densas y zonas limpias, y cada mancha o figura que sí se distingue, con su posición exacta: cerca del borde o del fondo, del lado del asa, enfrente, a la derecha o a la izquierda; su tamaño, su nitidez y a qué se parece; nombra al menos cinco elementos si la foto lo permite), ` +
         `## Figura por figura (cada figura con su sentido tradicional, por qué su posición importa y lo que puede decir para esta persona; una entrada por figura), ## Cómo se relacionan (qué historia cuentan juntas las figuras: de dónde viene, qué está pasando, hacia dónde va), ` +
         `## Lo que la taza responde (si hubo pregunta, la respuesta clara; si no, el mensaje del momento), ${anuncio("## Lo que la taza anuncia")}, ## Un consejo para los próximos días. ` +
-        `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer cada cosa que nombras. Extensión: 800 a 1100 palabras.`,
+        `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer cada cosa que nombras. Extensión: 800 a 1100 palabras.\n\n` +
+        INSTRUCCION_FIGURAS,
       sistemaExtra: TRADICION_CHOCOLATE,
       opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };

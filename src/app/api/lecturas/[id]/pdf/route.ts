@@ -210,7 +210,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     visual,
     fichas,
     cita,
-    interpretacion: lectura.interpretacion,
+    // Sin el anexo JSON del final (trazos de la mano, figuras de la taza).
+    interpretacion: lectura.interpretacion.replace(/```json[\s\S]*$/, "").trim(),
     preguntas: (preguntas ?? []).filter((p) => p.estado === "lista" && p.respuesta).map((p) => ({ pregunta: p.pregunta, respuesta: p.respuesta as string })),
     textos: { preguntas: t.pdf.preguntas, pagina: t.pdf.pagina, pie: t.pdf.pie, aviso: t.comun.aviso },
   };

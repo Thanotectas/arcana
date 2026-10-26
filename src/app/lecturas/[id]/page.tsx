@@ -6,6 +6,7 @@ import { comprasVisibles } from "@/lib/plataforma";
 import { ConversacionLectura } from "@/components/ConversacionLectura";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
+import { LecturaChocolate } from "@/components/LecturaChocolate";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
@@ -81,13 +82,6 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
       {lectura.tipo === "cruce" && <VistaCruce entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
-      {esChocolate && urlFoto && (
-        <section className="tarjeta p-4">
-          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.chocolate.tuTaza}</p>
-          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
-          <img src={urlFoto} alt={t.chocolate.tuTaza} className="mx-auto max-h-96 rounded-xl" />
-        </section>
-      )}
       {esTabaco && urlFoto && (
         <section className="tarjeta p-4">
           <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.tabaco.tuTabaco}</p>
@@ -127,6 +121,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           mano={lectura.entrada.mano === "izquierda" ? "izquierda" : "derecha"}
           dominante={lectura.entrada.dominante === "izquierda" ? "izquierda" : "derecha"}
         />
+      ) : esChocolate ? (
+        <LecturaChocolate id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
       ) : (
         <section className="tarjeta p-6 sm:p-8">
           <LecturaEnVivo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} />
