@@ -608,6 +608,16 @@ body {
   filter: hue-rotate(215deg) saturate(1.4) brightness(1.1) drop-shadow(0 0 8px rgba(139, 108, 246, 0.5));
 }
 
+/* Quiromancia: el mapa de la mano */
+.mano-linea {
+  stroke-dasharray: 1;
+  animation: chino-trazo 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.mano-monte { animation: chino-halo 3.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .mano-linea, .mano-monte { animation: none; }
+}
+
 /* Tarot: la tirada en conjunto */
 .tarot-petalo { animation: tarot-petalo 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
 @keyframes tarot-petalo {

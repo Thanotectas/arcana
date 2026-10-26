@@ -119,7 +119,14 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
       {esQuiromancia ? (
-        <LecturaQuiromancia id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
+        <LecturaQuiromancia
+          id={lectura.id}
+          estadoInicial={lectura.estado}
+          textoInicial={lectura.interpretacion}
+          urlFoto={urlFoto}
+          mano={lectura.entrada.mano === "izquierda" ? "izquierda" : "derecha"}
+          dominante={lectura.entrada.dominante === "izquierda" ? "izquierda" : "derecha"}
+        />
       ) : (
         <section className="tarjeta p-6 sm:p-8">
           <LecturaEnVivo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} />
