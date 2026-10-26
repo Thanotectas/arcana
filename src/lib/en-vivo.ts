@@ -351,6 +351,7 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
 export interface LecturaEnVivo {
   id: number;
   tipo: TipoLectura;
+  origen: PreguntaEnVivo["origen"];
   autor: string;
   signo: string | null;
   pregunta: string;
@@ -393,17 +394,20 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
   await admin.from("en_vivo_preguntas").update({ estado: "pendiente" }).eq("estado", "leyendo").lt("leida_en", new Date(Date.now() - 180_000).toISOString());
 
   for (let intento = 0; intento < 4; intento++) {
-    // Orden: manual, página (fotos), chat; dentro de cada una, la más antigua. En el
-    // chat pasa primero quien aún no ha tenido lectura esta noche: quien repite
-    // puede seguir preguntando, pero si hay fila espera a que se atienda a los nuevos.
-    const { data: candidatas } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("origen", { ascending: true }).order("creado_en").limit(30);
-    if (!candidatas?.length) return null;
-    const autoresChat = [...new Set(candidatas.filter((c) => c.origen === "chat").map((c) => c.autor))];
+    // Orden: manual, página (fotos), chat de YouTube y comentarios de Facebook; dentro de
+    // cada grupo, la más antigua. En el chat pasa primero quien aún no ha tenido lectura
+    // esta noche: quien repite puede seguir preguntando, pero si hay fila espera a los nuevos.
+    const { data: lista } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("creado_en").limit(30);
+    if (!lista?.length) return null;
+    const PRIORIDAD: Record<string, number> = { manual: 0, pagina: 1, chat: 2, facebook: 2 };
+    const candidatas = [...lista].sort((a, b) => (PRIORIDAD[a.origen] ?? 3) - (PRIORIDAD[b.origen] ?? 3));
+    const esChat = (origen: string) => origen === "chat" || origen === "facebook";
+    const autoresChat = [...new Set(candidatas.filter((c) => esChat(c.origen)).map((c) => c.autor))];
     const { data: yaLeidas } = autoresChat.length
-      ? await admin.from("en_vivo_preguntas").select("autor").eq("origen", "chat").eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
+      ? await admin.from("en_vivo_preguntas").select("autor").in("origen", ["chat", "facebook"]).eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
       : { data: [] };
     const repiten = new Set((yaLeidas ?? []).map((l) => l.autor));
-    const p = candidatas.find((c) => c.origen !== "chat" || !repiten.has(c.autor)) ?? candidatas[0];
+    const p = candidatas.find((c) => !esChat(c.origen) || !repiten.has(c.autor)) ?? candidatas[0];
     const { data: tomada } = await admin.from("en_vivo_preguntas").update({ estado: "leyendo", leida_en: new Date().toISOString() }).eq("id", p.id).eq("estado", "pendiente").select("id").maybeSingle();
     if (!tomada) continue;
 
@@ -444,6 +448,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       return {
         id: p.id,
         tipo: p.tipo,
+        origen: p.origen,
         autor: p.autor,
         signo: signo?.nombre ?? null,
         pregunta: p.texto,

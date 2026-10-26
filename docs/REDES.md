@@ -368,6 +368,22 @@ recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no
 - Migración `0041_en_vivo_carta_facebook.sql` (tipos `carta` y `sinastria`, origen `facebook` y columnas
   de Facebook en `en_vivo_estado`). Sin ella, los pedidos de carta o sinastría se leen como numerología.
 
+### Facebook al mismo tiempo (26 oct 2026)
+
+- **Transmisión:** OBS manda la misma señal a YouTube y a la página "Mi Arcana" con el complemento
+  «Multiple RTMP Outputs» (obs-multi-rtmp). La clave de Facebook sale de Facebook → Video en vivo →
+  Software de transmisión (servidor `rtmps://live-api-s.facebook.com:443/rtmp/`). Guía paso a paso en
+  `marketing/textos/directo-facebook-obs.txt`.
+- **Comentarios** (`src/lib/en-vivo-facebook.ts`, `sincronizarFacebook`): con el escenario prendido se
+  busca el directo de la página (`/{página}/live_videos?broadcast_status=["LIVE"]`, cada 30 s) y se leen
+  sus comentarios (`/{live_video}/comments`); los que parecen consulta entran a la fila con origen
+  `facebook` y `mensaje_id` `fb:<id>`. Mismo filtro y mismos tipos que el chat de YouTube; en pantalla
+  dice «· Facebook». Usa el token de la página (`META_PAGE_TOKEN`): `pages_read_engagement` para leer, y
+  `pages_read_user_content` para que llegue el nombre de quien comenta (si no, «Alguien en Facebook»).
+  El estado se ve en /admin/en-vivo. Necesita la migración 0041.
+- **Orden de la fila:** manual, fotos de /vivo y luego chat de YouTube y Facebook juntos por antigüedad
+  (antes el orden alfabético por origen dejaba el chat antes que lo manual).
+
 ## Códigos de oferta (20 oct 2026)
 
 `codigos_oferta` (migración 0034): créditos extra en una compra sin cambiar el precio. La

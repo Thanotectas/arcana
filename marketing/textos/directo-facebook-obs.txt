@@ -1,0 +1,50 @@
+SIBILA EN VIVO TAMBIÉN EN FACEBOOK — CÓMO CONFIGURARLO EN OBS (una sola vez)
+
+La misma imagen y voz de Sibila sale a YouTube y a la página de Facebook «Mi Arcana» al mismo tiempo.
+Sibila lee las preguntas de los dos lados (en pantalla dice «· Facebook» cuando viene de allá).
+
+==================== 1. INSTALAR EL COMPLEMENTO (5 minutos) ====================
+1. Cierra OBS.
+2. Descarga «Multiple RTMP Outputs» (obs-multi-rtmp, de sorayuki) desde la página oficial de
+   complementos de OBS (obsproject.com → Forums → Resources → «Multiple RTMP outputs plugin»).
+   Elige el instalador para Windows (.exe) de la versión que diga compatible con OBS 32.
+3. Instálalo y abre OBS. Aparece un panel nuevo, «Multiple output». Si no se ve:
+   Paneles (D) → «Multiple output».
+
+==================== 2. SACAR LA CLAVE DE FACEBOOK (cada directo) ====================
+1. Entra a facebook.com con tu perfil, cámbiate a la página «Mi Arcana».
+2. Crear → «Video en vivo» (o facebook.com/live/producer).
+3. Elige «Software de transmisión» (Streaming software).
+4. Pon el título: «Sibila en vivo · Tarot, aura y tu carta astral» y la descripción con el enlace
+   miarcana.com/vivo.
+5. Copia la «Clave de transmisión» (Stream key). La URL del servidor es:
+   rtmps://live-api-s.facebook.com:443/rtmp/
+   (No pegues la clave en ningún chat: va solo en OBS.)
+   Consejo: activa «Usar una clave de transmisión persistente» y así la configuras una sola vez.
+
+==================== 3. CONFIGURAR LA SALIDA EN OBS (una sola vez si la clave es persistente) ====================
+1. En el panel «Multiple output» → «Add new target» (Agregar destino).
+2. Nombre: Facebook.
+   Servidor (RTMP Server): rtmps://live-api-s.facebook.com:443/rtmp/
+   Clave (RTMP Key): la que copiaste.
+3. En «Video encoder» elige «Use the same encoder as the main output» (usar el mismo que la salida principal)
+   para no cargar el computador; audio igual.
+4. Guarda (OK).
+
+==================== 4. EL DÍA DEL DIRECTO ====================
+1. Primero inicia YouTube como siempre: «Iniciar transmisión» (sale YouTube).
+2. En el panel «Multiple output», pulsa «Start» en el destino Facebook (sale Facebook).
+3. En Facebook Live Producer, cuando veas la vista previa, pulsa «Transmitir en vivo» (Go live).
+4. En miarcana.com/admin/en-vivo deben quedar en verde «Directo de YouTube encontrado» y
+   «Directo de Facebook encontrado» (tarda hasta 30 segundos en encontrarlo).
+5. Al terminar: «Stop» en Facebook (panel Multiple output) y «Detener transmisión» en OBS.
+   Nunca «Finalizar transmisión» de YouTube mientras sigas en vivo.
+
+==================== SI ALGO FALLA ====================
+- «Directo de Facebook no encontrado (… permiso …)»: el token de la página en Vercel (META_PAGE_TOKEN)
+  necesita el permiso pages_read_engagement. Si los nombres salen como «Alguien en Facebook», falta
+  pages_read_user_content. Se agregan en la app de Meta y se genera de nuevo el token de la página.
+- El indicador de Facebook en OBS queda en rojo: revisa la clave; si la clave no es persistente, cambia
+  en cada directo.
+- El computador se pone lento: en «Multiple output» usa el mismo codificador que la salida principal
+  (paso 3.3) y deja la tasa de bits en 2500.

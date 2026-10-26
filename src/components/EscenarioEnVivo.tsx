@@ -21,6 +21,7 @@ interface Lectura {
   clase: "lectura";
   id: number;
   tipo: TipoLectura;
+  origen?: string;
   autor: string;
   signo: string | null;
   pregunta: string;
@@ -379,6 +380,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
             <>
               <p className="text-2xl text-violeta-suave">
                 {NOMBRE_TIPO[lectura.tipo]} · {lectura.autor}
+                {lectura.origen === "facebook" ? " · Facebook" : ""}
                 {lectura.signo ? ` · ${lectura.signo}` : ""}
               </p>
               <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>

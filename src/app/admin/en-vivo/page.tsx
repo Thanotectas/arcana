@@ -5,14 +5,15 @@ import { sitio } from "@/lib/correo";
 import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoDiario } from "@/lib/en-vivo";
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
+import { metaConfigurado } from "@/lib/redes/meta";
 import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
 
-const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano" };
-const ORIGEN: Record<string, string> = { chat: "Chat", manual: "A mano", pagina: "Foto (/vivo)" };
+const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", carta: "Carta astral", sinastria: "Sinastría" };
+const ORIGEN: Record<string, string> = { chat: "YouTube", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)" };
 
 /** Control de «Sibila en vivo»: dirección del escenario para OBS, estado, fila de consultas y lecturas. */
 export default async function PaginaAdminEnVivo() {
@@ -55,6 +56,14 @@ export default async function PaginaAdminEnVivo() {
           <li className="flex items-center gap-2">{punto(vozConfigurada())} Voz de Sibila {vozConfigurada() ? "activa" : "sin configurar (sin voz, solo subtítulos)"}</li>
           <li className="flex items-center gap-2">{punto(transmitiendo)} Escenario {transmitiendo ? `transmitiendo (último pedido ${hora(estado?.latido_en ?? null)})` : "apagado"}</li>
           <li className="flex items-center gap-2">{punto(Boolean(estado?.live_chat_id))} Directo de YouTube {estado?.live_chat_id ? "encontrado: leyendo el chat" : "no encontrado todavía (se busca solo cuando el escenario está prendido)"}</li>
+          <li className="flex items-center gap-2">
+            {punto(Boolean(estado?.fb_live_id))} Directo de Facebook{" "}
+            {!metaConfigurado()
+              ? "sin token de la página (META_PAGE_TOKEN)"
+              : estado?.fb_live_id
+                ? "encontrado: leyendo los comentarios"
+                : `no encontrado todavía${estado?.fb_detalle ? ` (${estado.fb_detalle})` : " (se busca solo cuando el escenario está prendido)"}`}
+          </li>
           <li className="text-texto-suave">Lecturas hoy: {leidasHoy ?? 0} de {maximoDiario()} (tope diario por gasto de voz)</li>
         </ul>
       </section>
