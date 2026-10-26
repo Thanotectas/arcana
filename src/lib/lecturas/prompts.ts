@@ -15,6 +15,7 @@ import { resumenChino, type ResultadoChino } from "../chino";
 import type { FuenteCruce } from "../cruce";
 import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
+import { instruccionFiguras } from "../oraculos/taza";
 import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
@@ -293,12 +294,13 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
       usuario: esCafe
         ? `Lee la borra del café de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenCafe(e)}\n\n` +
           `Estructura: ## Lo que veo en tu taza (recorrido concreto: zonas limpias y zonas de borra espesa, y cada figura que sí se distingue, con su posición: borde o fondo, lado del asa o enfrente, si sube o baja; al menos cinco elementos si la foto lo permite), ## Figura por figura (su sentido tradicional y lo que puede decir para esta persona), ## Cómo se relacionan (la historia que cuentan juntas), ## Lo que el café responde (la pregunta, o el mensaje del momento), ${anuncio("## Lo que el café anuncia")}, ## Un consejo para los próximos días. ` +
-          `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer lo que nombras. Extensión: 800 a 1100 palabras.`
+          `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer lo que nombras. Extensión: 800 a 1100 palabras.\n\n` +
+          instruccionFiguras(true)
         : `Lee el huevo de esta limpia (foto adjunta del vaso). Mira la imagen con detalle antes de escribir.\n\n${resumenHuevo(e)}\n\n` +
           `Estructura: ## Lo que veo en el vaso (la yema, la clara, burbujas, hilos, manchas y figuras, con su posición: arriba, abajo, alrededor), ## Señal por señal (su sentido tradicional y lo que dice de tu energía), ## Lo que la limpia se llevó (lo que soltaste y cómo puedes sentirte en los próximos días), ${anuncio("## Lo que el huevo anuncia")}, ## Cómo cerrar la limpia (qué hacer con el agua y el huevo, y un gesto de protección sencillo para esta semana). ` +
           `Extensión: 600 a 850 palabras.`,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
-      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4200 : 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 

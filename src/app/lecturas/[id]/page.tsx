@@ -6,7 +6,7 @@ import { comprasVisibles } from "@/lib/plataforma";
 import { ConversacionLectura } from "@/components/ConversacionLectura";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
-import { LecturaChocolate } from "@/components/LecturaChocolate";
+import { LecturaTaza } from "@/components/LecturaTaza";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
@@ -56,11 +56,11 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
   const preguntas = lectura.estado === "lista" ? await getPreguntas(lectura.id) : [];
 
   const esQuiromancia = lectura.tipo === "quiromancia";
-  const esChocolate = lectura.tipo === "chocolate";
+  const esTaza = lectura.tipo === "chocolate" || lectura.tipo === "cafe";
   const esVelas = lectura.tipo === "velas";
   const esTabaco = lectura.tipo === "tabaco";
-  const esFotoNueva = lectura.tipo === "cafe" || lectura.tipo === "huevo";
-  const urlFoto = esQuiromancia || esChocolate || esVelas || esTabaco || esFotoNueva ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
+  const esHuevo = lectura.tipo === "huevo";
+  const urlFoto = esQuiromancia || esTaza || esVelas || esTabaco || esHuevo ? await urlFirmadaPalma(String(lectura.entrada.foto ?? "")) : null;
 
   return (
     <article className="mx-auto max-w-4xl space-y-8">
@@ -89,11 +89,11 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <img src={urlFoto} alt={t.tabaco.tuTabaco} className="mx-auto max-h-96 rounded-xl" />
         </section>
       )}
-      {esFotoNueva && urlFoto && (
+      {esHuevo && urlFoto && (
         <section className="tarjeta p-4">
-          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t[lectura.tipo as "cafe" | "huevo"].tuFoto}</p>
+          <p className="mb-2 text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.huevo.tuFoto}</p>
           {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
-          <img src={urlFoto} alt={t[lectura.tipo as "cafe" | "huevo"].tuFoto} className="mx-auto max-h-96 rounded-xl" />
+          <img src={urlFoto} alt={t.huevo.tuFoto} className="mx-auto max-h-96 rounded-xl" />
         </section>
       )}
       {(lectura.tipo === "baraja_espanola" || lectura.tipo === "lenormand" || lectura.tipo === "runas") && (
@@ -121,8 +121,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           mano={lectura.entrada.mano === "izquierda" ? "izquierda" : "derecha"}
           dominante={lectura.entrada.dominante === "izquierda" ? "izquierda" : "derecha"}
         />
-      ) : esChocolate ? (
-        <LecturaChocolate id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
+      ) : esTaza ? (
+        <LecturaTaza id={lectura.id} tipo={lectura.tipo === "cafe" ? "cafe" : "chocolate"} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
       ) : (
         <section className="tarjeta p-6 sm:p-8">
           <LecturaEnVivo id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} />

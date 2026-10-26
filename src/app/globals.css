@@ -617,6 +617,15 @@ body {
   .taza-marca { animation: none; }
 }
 
+/* Café: el anillo de lo limpio crece desde arriba */
+.cafe-anillo { animation: cafe-anillo 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards; }
+@keyframes cafe-anillo {
+  from { stroke-dasharray: 0 var(--largo); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cafe-anillo { animation: none; }
+}
+
 /* Quiromancia: el mapa de la mano */
 .mano-linea {
   stroke-dasharray: 1;
