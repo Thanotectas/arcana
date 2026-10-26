@@ -1,4 +1,4 @@
-import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "@/lib/numerologia";
+import type { PerfilNumerologico } from "@/lib/numerologia";
 import type { Diccionario } from "@/lib/i18n/diccionarios";
 import { plantilla } from "@/lib/i18n/formato";
 import type { Cuadricula, Deuda, Etapa, Flecha, Nombre } from "@/lib/numerologia-avanzada";
@@ -26,6 +26,8 @@ const posicion = (n: number, radio = R) => {
   return [r2(C + radio * Math.cos(a)), r2(C + radio * Math.sin(a))] as const;
 };
 const esMaestro = (n: number) => n === 11 || n === 22 || n === 33;
+/** El arquetipo de un número («El Pionero», «The Pioneer»…) en el idioma de la página. */
+const arquetipo = (n: number, t: Diccionario) => (t.numerologia.arquetipos as Record<string, string>)[String(n)] ?? "";
 
 /**
  * Mandala numerológico: el círculo del 1 al 9 con la figura del eneagrama de
@@ -133,7 +135,7 @@ export function CicloNumerologia({ anio, t }: { anio: number; t: Diccionario }) 
         })}
       </svg>
       <p className="text-center text-sm text-texto-suave">
-        {plantilla(t.numerologia.cicloNota, { n: anio, titulo: SIGNIFICADO_NUMERO[anio]?.titulo ?? "" })}
+        {plantilla(t.numerologia.cicloNota, { n: anio, titulo: arquetipo(anio, t) })}
       </p>
     </div>
   );
@@ -149,7 +151,7 @@ export function FichaNumero({ clave, valor, t, retraso = 0 }: { clave: Clave; va
         {valor}
       </p>
       <p className="mt-1 text-sm font-medium">{t.numerologia.numeros[clave]}</p>
-      <p className="text-xs text-texto-suave">{SIGNIFICADO_NUMERO[valor]?.titulo}</p>
+      <p className="text-xs text-texto-suave">{arquetipo(valor, t)}</p>
       {esMaestro(valor) && <p className="mt-1 text-[10px] uppercase tracking-widest text-violeta-suave">{t.numerologia.maestro}</p>}
     </div>
   );
