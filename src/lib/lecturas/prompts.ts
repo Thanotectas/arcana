@@ -19,6 +19,7 @@ import { instruccionFiguras } from "../oraculos/taza";
 import { INSTRUCCION_SENALES } from "../oraculos/huevo";
 import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
+import { INSTRUCCION_RESTOS } from "../velas/restos";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
 import { resumenTabaco, TRADICION_TABACO, type EntradaTabaco } from "../tabaco";
 import { INSTRUCCION_TABACO } from "../tabaco/senales";
@@ -207,9 +208,10 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
       usuario:
         `Interpreta los restos de esta vela ritual (foto adjunta).\n\n${resumenVelas(e)}\n\n` +
         `Estructura: ## Lo que veo en los restos (cera, hollín, mecha, figuras, con honestidad), ## Lo que dijo la llama (las señales que la persona observó, leídas una por una), ## Cómo avanza tu intención (síntesis del ritual: qué está fluyendo, qué resiste), ## Lo que la vela anuncia (si la intención se cumplirá, cuándo se empezará a notar, con plazo amplio, y qué la frena si algo la frena), ## Qué hacer ahora (un paso concreto para los próximos días y, si conviene, si repetir el ritual y con qué color o fase lunar). ` +
-        `Extensión: 600 a 800 palabras.`,
+        `Extensión: 600 a 800 palabras.\n\n` +
+        INSTRUCCION_RESTOS,
       sistemaExtra: TRADICION_VELAS,
-      opciones: { idioma, effort: "medium", maxTokens: 3000, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 

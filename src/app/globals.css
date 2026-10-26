@@ -665,6 +665,22 @@ body {
   .tabaco-brasa, .tabaco-ceniza, .tabaco-humo { animation: none; }
 }
 
+/* Velas: la llama tiembla o baila */
+.vela-llama, .vela-inquieta { transform-box: fill-box; transform-origin: 50% 100%; }
+.vela-llama { animation: vela-llama 1.8s ease-in-out infinite; }
+@keyframes vela-llama {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.94, 1.06); }
+}
+.vela-inquieta { animation: vela-inquieta 0.9s ease-in-out infinite; }
+@keyframes vela-inquieta {
+  0%, 100% { transform: rotate(-7deg) scale(1, 0.95); }
+  50% { transform: rotate(8deg) scale(0.92, 1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vela-llama, .vela-inquieta { animation: none; }
+}
+
 /* Quiromancia: el mapa de la mano */
 .mano-linea {
   stroke-dasharray: 1;

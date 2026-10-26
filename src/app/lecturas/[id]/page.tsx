@@ -9,6 +9,7 @@ import { LecturaEnVivo } from "@/components/LecturaEnVivo";
 import { LecturaTaza } from "@/components/LecturaTaza";
 import { LecturaHuevo } from "@/components/LecturaHuevo";
 import { LecturaTabaco } from "@/components/LecturaTabaco";
+import { LecturaVelas } from "@/components/LecturaVelas";
 import { LecturaQuiromancia } from "@/components/LecturaQuiromancia";
 import { rotuloCarta, imagenCarta } from "@/components/CartaVisual";
 import { TiradaInteractiva, type CartaRevelada } from "@/components/TiradaInteractiva";
@@ -27,7 +28,7 @@ import { SiguientePaso } from "@/components/SiguientePaso";
 import type { ResultadoChino } from "@/lib/chino";
 import { VistaChino } from "@/components/VistaChino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
-import { TONO_COLOR, type EntradaVelas } from "@/lib/velas";
+import type { EntradaVelas } from "@/lib/velas";
 import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
 import { Aura } from "@/components/Aura";
 import type { ResultadoSinastria } from "@/lib/astro/sinastria";
@@ -96,7 +97,6 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         </>
       )}
       {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
-      {esVelas && <VistaVelas entrada={lectura.entrada as unknown as EntradaVelas} urlFoto={urlFoto} t={t} />}
       {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} t={t} />}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
@@ -109,6 +109,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           mano={lectura.entrada.mano === "izquierda" ? "izquierda" : "derecha"}
           dominante={lectura.entrada.dominante === "izquierda" ? "izquierda" : "derecha"}
         />
+      ) : esVelas ? (
+        <LecturaVelas id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} entrada={lectura.entrada as unknown as EntradaVelas} />
       ) : esTabaco ? (
         <LecturaTabaco id={lectura.id} estadoInicial={lectura.estado} textoInicial={lectura.interpretacion} urlFoto={urlFoto} />
       ) : esHuevo ? (
@@ -307,37 +309,6 @@ function VistaSueno({ entrada, resultado, t }: { entrada: EntradaSueno; resultad
         {entrada.recurrente && <span className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{t.suenos.recurrente}</span>}
         {entrada.fecha && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{entrada.fecha}</span>}
         {resultado.previos?.length > 0 && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{plantilla(t.suenos.conDiario, { n: resultado.previos.length })}</span>}
-      </div>
-    </section>
-  );
-}
-
-function VistaVelas({ entrada, urlFoto, t }: { entrada: EntradaVelas; urlFoto: string | null; t: Diccionario }) {
-  const intenciones = t.velas.intenciones as Record<string, { nombre: string }>;
-  const colores = t.velas.colores as Record<string, { nombre: string }>;
-  const senales = t.velas.senales as Record<string, string>;
-  return (
-    <section className="tarjeta grid gap-4 p-4 sm:grid-cols-[minmax(0,320px)_1fr] sm:p-6">
-      {urlFoto && (
-        <div>
-          {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
-          <img src={urlFoto} alt={t.velas.tuVela} className="w-full rounded-xl" />
-        </div>
-      )}
-      <div className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.velas.tuVela}</p>
-        <p className="flex items-center gap-2 text-sm">
-          <span className="inline-block h-4 w-4 rounded-full border border-white/20" style={{ background: TONO_COLOR[entrada.color] }} aria-hidden />
-          {colores[entrada.color]?.nombre} · {intenciones[entrada.intencion]?.nombre}
-        </p>
-        {entrada.senales?.length > 0 && (
-          <div className="flex flex-wrap gap-2 text-xs">
-            {entrada.senales.map((s) => (
-              <span key={s} className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{senales[s] ?? s}</span>
-            ))}
-          </div>
-        )}
-        {entrada.pregunta && <p className="text-sm text-texto-suave">«{entrada.pregunta}»</p>}
       </div>
     </section>
   );
