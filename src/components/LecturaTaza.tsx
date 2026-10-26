@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LecturaEnVivo } from "./LecturaEnVivo";
+import { FotoAnotada } from "./FotoAnotada";
 import { ZONAS, separarFiguras, type AnexoTaza, type FiguraTaza, type ZonaTaza } from "@/lib/oraculos/taza";
 import { useT } from "@/lib/i18n/cliente";
 import { plantilla } from "@/lib/i18n/formato";
@@ -20,52 +21,6 @@ function Rumbo({ va, t }: { va?: FiguraTaza["va"]; t?: TCafe }) {
       <span aria-hidden>{va === "sube" ? "↑" : "↓"}</span>
       <span className="sr-only">{t.va[va]}</span>
     </span>
-  );
-}
-
-/** Foto de la taza con un número sobre cada figura; tocar uno la resalta y muestra qué anuncia. */
-function TazaAnotada({ urlFoto, alt, figuras, activa, elegir, cafe }: { urlFoto: string; alt: string; figuras: FiguraTaza[]; activa: number | null; elegir: (i: number | null) => void; cafe?: TCafe }) {
-  return (
-    <div className="space-y-3">
-      <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-borde">
-        {/* eslint-disable-next-line @next/next/no-img-element -- foto privada firmada */}
-        <img src={urlFoto} alt={alt} className="block w-full" />
-        {figuras.map((f, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => elegir(activa === i ? null : i)}
-            className={`taza-marca absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 text-sm font-bold tabular-nums transition ${activa === i ? "border-white bg-oro text-noche scale-125" : "border-oro bg-noche/80 text-oro-suave"}`}
-            style={{ left: `${f.x}%`, top: `${f.y}%`, animationDelay: `${0.3 + i * 0.25}s` }}
-            aria-label={`${i + 1}. ${f.nombre}`}
-            aria-pressed={activa === i}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-      {figuras.length > 0 && (
-        <ol className="space-y-1.5 text-sm">
-          {figuras.map((f, i) => (
-            <li key={i}>
-              <button
-                type="button"
-                onClick={() => elegir(activa === i ? null : i)}
-                onMouseEnter={() => elegir(i)}
-                className={`flex w-full items-baseline gap-2 rounded-lg px-2 py-1 text-left transition ${activa === i ? "bg-oro/15" : "hover:bg-white/5"}`}
-              >
-                <span className="font-semibold tabular-nums text-oro">{i + 1}.</span>
-                <span className="min-w-0">
-                  <span className="text-texto first-letter:uppercase">{f.nombre}</span>
-                  <Rumbo va={f.va} t={cafe} />
-                  {f.sentido && <span className="text-texto-suave"> · {f.sentido}</span>}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
   );
 }
 
@@ -213,7 +168,7 @@ export function LecturaTaza({ id, tipo, estadoInicial, textoInicial, urlFoto }: 
         <aside className="space-y-2 md:sticky md:top-24 md:self-start">
           <h2 className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{figuras.length ? textos.figurasTitulo : tuTaza}</h2>
           {figuras.length > 0 && <p className="text-xs text-texto-suave">{textos.figurasNota}</p>}
-          {urlFoto ? <TazaAnotada urlFoto={urlFoto} alt={tuTaza} figuras={figuras} activa={activa} elegir={setActiva} cafe={cafe} /> : <p className="text-sm text-texto-suave">—</p>}
+          {urlFoto ? <FotoAnotada urlFoto={urlFoto} alt={tuTaza} marcas={figuras} activa={activa} elegir={setActiva} extra={(f) => <Rumbo va={f.va} t={cafe} />} /> : <p className="text-sm text-texto-suave">—</p>}
         </aside>
         <section className="tarjeta p-6 sm:p-8">
           <LecturaEnVivo

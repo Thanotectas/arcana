@@ -16,6 +16,7 @@ import type { FuenteCruce } from "../cruce";
 import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
 import { instruccionFiguras } from "../oraculos/taza";
+import { INSTRUCCION_SENALES } from "../oraculos/huevo";
 import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { resumenAura, TRADICION_AURA, type ResultadoAura } from "../aura";
@@ -298,9 +299,10 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
           instruccionFiguras(true)
         : `Lee el huevo de esta limpia (foto adjunta del vaso). Mira la imagen con detalle antes de escribir.\n\n${resumenHuevo(e)}\n\n` +
           `Estructura: ## Lo que veo en el vaso (la yema, la clara, burbujas, hilos, manchas y figuras, con su posición: arriba, abajo, alrededor), ## Señal por señal (su sentido tradicional y lo que dice de tu energía), ## Lo que la limpia se llevó (lo que soltaste y cómo puedes sentirte en los próximos días), ${anuncio("## Lo que el huevo anuncia")}, ## Cómo cerrar la limpia (qué hacer con el agua y el huevo, y un gesto de protección sencillo para esta semana). ` +
-          `Extensión: 600 a 850 palabras.`,
+          `Extensión: 600 a 850 palabras.\n\n` +
+          INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
-      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3400, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium" },
     };
   }
 

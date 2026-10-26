@@ -626,6 +626,27 @@ body {
   .cafe-anillo { animation: none; }
 }
 
+/* Huevo: el vaso dibujado */
+.huevo-hilo { stroke-dasharray: 1; animation: chino-trazo 1.6s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.huevo-burbuja { animation: huevo-burbuja 3.2s ease-in-out infinite; }
+@keyframes huevo-burbuja {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50% { transform: translateY(-7px); opacity: 0.5; }
+}
+.huevo-nube { animation: huevo-nube 5s ease-in-out infinite; }
+@keyframes huevo-nube {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.huevo-flota { animation: huevo-flota 4s ease-in-out infinite; }
+@keyframes huevo-flota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .huevo-hilo, .huevo-burbuja, .huevo-nube, .huevo-flota { animation: none; }
+}
+
 /* Quiromancia: el mapa de la mano */
 .mano-linea {
   stroke-dasharray: 1;
