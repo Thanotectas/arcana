@@ -1,7 +1,8 @@
-import { signoPorId, imagenSigno } from "@/lib/zodiaco";
-import { NOMBRES_CUERPO, SIMBOLOS_CUERPO } from "@/lib/astro/efemerides";
-import { NOMBRES_ASPECTO, SIMBOLOS_ASPECTO } from "@/lib/astro/carta";
-import type { Dimension, PuntoSinastria, ResultadoSinastria } from "@/lib/astro/sinastria";
+import { SIGNOS, signoPorId, imagenSigno, compatibilidadSignos, type Elemento } from "@/lib/zodiaco";
+import { SIMBOLOS_CUERPO, type Cuerpo } from "@/lib/astro/efemerides";
+import { SIMBOLOS_ASPECTO, calcularCarta, type DatosNacimiento, type TipoAspecto } from "@/lib/astro/carta";
+import type { AspectoSinastria, Dimension, PuntoSinastria, ResultadoSinastria } from "@/lib/astro/sinastria";
+import { nombres as nombresAstro, separar } from "./CartaDetalle";
 import type { Diccionario } from "@/lib/i18n/diccionarios";
 import { plantilla } from "@/lib/i18n/formato";
 
@@ -20,11 +21,15 @@ const texto = (s: string) => `${s}︎`;
  * ámbar tensa), el balance de elementos frente a frente y en qué casa del
  * otro cae cada planeta personal.
  */
-export function VistaSinastria({ resultado: r, t }: { resultado: ResultadoSinastria; t: Diccionario }) {
+export function VistaSinastria({ resultado: r, entrada, t }: { resultado: ResultadoSinastria; entrada?: { a?: DatosNacimiento; b?: DatosNacimiento }; t: Diccionario }) {
   const s = t.sinastria;
   const nombres = s.dimensiones as Record<Dimension, string>;
+  const n = nombresAstro(t);
   const simbolo = (p: PuntoSinastria) => (p === "ascendente" ? "AC" : texto(SIMBOLOS_CUERPO[p]));
-  const nombre = (p: PuntoSinastria) => (p === "ascendente" ? t.astral.ascendente : NOMBRES_CUERPO[p]);
+  const nombre = (p: PuntoSinastria) => (p === "ascendente" ? t.astral.ascendente : n.cuerpo(p));
+  const casas = t.astral.rueda.casas;
+  // Con los datos de nacimiento se recalculan las dos cartas para la rueda doble (las lecturas guardan solo los signos).
+  const cartas = entrada?.a && entrada?.b ? [calcularCarta(entrada.a), calcularCarta(entrada.b)] : null;
 
   return (
     <section className="space-y-6">
@@ -35,32 +40,42 @@ export function VistaSinastria({ resultado: r, t }: { resultado: ResultadoSinast
           <h2 className="font-display mb-2 text-2xl">{s.dimensionesTitulo}</h2>
           <Radar valores={DIMENSIONES.map((d) => ({ nombre: nombres[d], valor: r.dimensiones[d] }))} />
         </div>
-        <div className="tarjeta p-5">
-          <h2 className="font-display mb-1 text-2xl">{s.hilosTitulo}</h2>
-          <p className="mb-2 text-xs text-texto-suave">{s.hilosNota}</p>
-          {r.aspectos.length ? <Hilos r={r} simbolo={simbolo} /> : <p className="text-sm text-texto-suave">{s.sinAspectos}</p>}
+        <div className="tarjeta space-y-3 p-5">
+          <div>
+            <h2 className="font-display text-2xl">{s.quimicaTitulo}</h2>
+            <p className="text-xs text-texto-suave">{s.quimicaNota}</p>
+          </div>
+          <Quimica r={r} t={t} />
         </div>
+      </div>
+
+      {cartas && (
+        <div className="tarjeta space-y-3 p-5 sm:p-6">
+          <div>
+            <h2 className="font-display text-2xl">{s.ruedaTitulo}</h2>
+            <p className="text-xs text-texto-suave">{plantilla(s.ruedaNota, { a: r.a.nombre, b: r.b.nombre })}</p>
+          </div>
+          <RuedaDoble
+            a={cartas[0].planetas.filter((p) => p.cuerpo !== "nodo_norte").map((p) => ({ cuerpo: p.cuerpo, longitud: p.longitud }))}
+            b={cartas[1].planetas.filter((p) => p.cuerpo !== "nodo_norte").map((p) => ({ cuerpo: p.cuerpo, longitud: p.longitud }))}
+            aspectos={r.aspectos}
+            nombreA={r.a.nombre}
+            nombreB={r.b.nombre}
+            t={t}
+          />
+        </div>
+      )}
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <UneTrabajar titulo={s.uneTitulo} vacio={s.sinUne} aspectos={r.aspectos.filter((a) => a.aporte >= 0).slice(0, 4)} color={ARMONICO} r={r} nombre={nombre} t={t} />
+        <UneTrabajar titulo={s.trabajarTitulo} vacio={s.sinTrabajar} aspectos={r.aspectos.filter((a) => a.aporte < 0).slice(0, 4)} color={TENSO} r={r} nombre={nombre} t={t} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="tarjeta p-5">
-          <h2 className="font-display mb-3 text-2xl">{s.aspectosTitulo}</h2>
-          {r.aspectos.length ? (
-            <ul className="space-y-1.5 text-sm">
-              {r.aspectos.slice(0, 8).map((a, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 border-t border-borde pt-1.5 first:border-0">
-                  <span>
-                    {nombre(a.a)} <span className="text-texto-suave">{SIMBOLOS_ASPECTO[a.tipo]} {NOMBRES_ASPECTO[a.tipo].toLowerCase()}</span> {nombre(a.b)}
-                  </span>
-                  <span className="shrink-0" style={{ color: a.aporte >= 0 ? ARMONICO : TENSO }}>
-                    {a.aporte >= 0 ? s.armonico : s.tenso} · {a.orbe}°
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-texto-suave">{s.sinAspectos}</p>
-          )}
+          <h2 className="font-display mb-1 text-2xl">{s.hilosTitulo}</h2>
+          <p className="mb-2 text-xs text-texto-suave">{s.hilosNota}</p>
+          {r.aspectos.length ? <Hilos r={r} simbolo={simbolo} /> : <p className="text-sm text-texto-suave">{s.sinAspectos}</p>}
         </div>
         <div className="tarjeta space-y-5 p-5">
           <div>
@@ -70,11 +85,14 @@ export function VistaSinastria({ resultado: r, t }: { resultado: ResultadoSinast
           {r.solapamientos.length > 0 && (
             <div>
               <h3 className="font-display mb-2 text-xl">{s.casasTitulo}</h3>
-              <ul className="flex flex-wrap gap-2 text-xs">
+              <ul className="space-y-2 text-sm">
                 {r.solapamientos.map((o, i) => (
-                  <li key={i} className="rounded-full border border-borde bg-superficie-2/60 px-3 py-1">
-                    <span className="text-oro-suave">{texto(SIMBOLOS_CUERPO[o.cuerpo])}</span>{" "}
-                    {plantilla(s.casaDe, { planeta: NOMBRES_CUERPO[o.cuerpo], de: o.de === "a" ? r.a.nombre : r.b.nombre, en: o.de === "a" ? r.b.nombre : r.a.nombre, n: o.casa })}
+                  <li key={i} className="flex gap-2">
+                    <span className="text-oro-suave">{texto(SIMBOLOS_CUERPO[o.cuerpo])}</span>
+                    <span>
+                      {plantilla(s.casaDe, { planeta: n.cuerpo(o.cuerpo), de: o.de === "a" ? r.a.nombre : r.b.nombre, en: o.de === "a" ? r.b.nombre : r.a.nombre, n: o.casa })}
+                      <span className="block text-xs text-texto-suave">{casas[o.casa - 1]}</span>
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -88,6 +106,7 @@ export function VistaSinastria({ resultado: r, t }: { resultado: ResultadoSinast
 
 /** Las dos monedas y, entre ellas, el anillo dorado que se llena hasta la afinidad. */
 function Afinidad({ r, t }: { r: ResultadoSinastria; t: Diccionario }) {
+  const n = nombresAstro(t);
   const persona = (p: ResultadoSinastria["a"]) => {
     const sol = signoPorId(p.sol);
     const luna = signoPorId(p.luna);
@@ -98,9 +117,9 @@ function Afinidad({ r, t }: { r: ResultadoSinastria; t: Diccionario }) {
         {sol && <img src={imagenSigno(sol.id)} alt="" width={104} height={104} className="moneda-signo" />}
         <p className="font-display mt-2 text-xl">{p.nombre}</p>
         <p className="mt-1 flex flex-wrap justify-center gap-x-2 text-xs text-texto-suave">
-          {sol && <span>{texto("☉")} {texto(sol.simbolo)} {sol.nombre}</span>}
-          {luna && <span>{texto("☽")} {texto(luna.simbolo)} {luna.nombre}</span>}
-          {asc && <span>AC {texto(asc.simbolo)} {asc.nombre}</span>}
+          {sol && <span>{texto("☉")} {texto(sol.simbolo)} {n.signo(sol.id)}</span>}
+          {luna && <span>{texto("☽")} {texto(luna.simbolo)} {n.signo(luna.id)}</span>}
+          {asc && <span>AC {texto(asc.simbolo)} {n.signo(asc.id)}</span>}
         </p>
       </div>
     );
@@ -272,6 +291,177 @@ function Elementos({ r, t }: { r: ResultadoSinastria; t: Diccionario }) {
           </span>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** Cómo se llevan dos elementos: el mismo, complementarios (fuego-aire, tierra-agua), retadores (fuego-agua, tierra-aire) o neutros. */
+function relacion(x: Elemento, y: Elemento) {
+  if (x === y) return "mismo";
+  const par = [x, y].sort().join("-");
+  if (par === "aire-fuego" || par === "agua-tierra") return "complementa";
+  if (par === "agua-fuego" || par === "aire-tierra") return "reto";
+  return "neutro";
+}
+
+/** Soles, lunas y Venus con Marte cruzados: los dos signos, su afinidad y cómo se llevan sus elementos. */
+function Quimica({ r, t }: { r: ResultadoSinastria; t: Diccionario }) {
+  const s = t.sinastria;
+  const n = nombresAstro(t);
+  const pares = [
+    { titulo: s.pares.soles, x: r.a.sol, y: r.b.sol, cx: "sol", cy: "sol" },
+    { titulo: s.pares.lunas, x: r.a.luna, y: r.b.luna, cx: "luna", cy: "luna" },
+    { titulo: plantilla(s.pares.venusMarte, { a: r.a.nombre, b: r.b.nombre }), x: r.a.venus, y: r.b.marte, cx: "venus", cy: "marte" },
+    { titulo: plantilla(s.pares.venusMarte, { a: r.b.nombre, b: r.a.nombre }), x: r.b.venus, y: r.a.marte, cx: "venus", cy: "marte" },
+  ] as const;
+  return (
+    <ul className="space-y-3">
+      {pares.map((p, i) => {
+        const sx = signoPorId(p.x);
+        const sy = signoPorId(p.y);
+        if (!sx || !sy) return null;
+        const afinidad = compatibilidadSignos(sx, sy);
+        const rel = relacion(sx.elemento, sy.elemento);
+        return (
+          <li key={i} className="aparecer text-sm" style={{ animationDelay: `${i * 120}ms` }}>
+            <p className="text-xs uppercase tracking-widest text-texto-suave">{p.titulo}</p>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="w-28 shrink-0 truncate" style={{ color: COLOR_ELEMENTO[sx.elemento] }}>
+                {texto(SIMBOLOS_CUERPO[p.cx])} {texto(sx.simbolo)} {n.signo(sx.id)}
+              </span>
+              <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                <span className="tarot-barra block h-full rounded-full bg-gradient-to-r from-violeta to-oro" style={{ width: `${afinidad}%` }} />
+              </span>
+              <span className="w-28 shrink-0 truncate text-right" style={{ color: COLOR_ELEMENTO[sy.elemento] }}>
+                {n.signo(sy.id)} {texto(sy.simbolo)} {texto(SIMBOLOS_CUERPO[p.cy])}
+              </span>
+            </div>
+            <p className="mt-0.5 text-xs text-texto-suave">
+              <span className="font-semibold text-oro-suave">{afinidad}%</span> · {s.relaciones[rel]}
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** El tema de la vida real que toca un par de planetas (Sol–Luna, Venus–Marte, Saturno…). */
+function tema(x: PuntoSinastria, y: PuntoSinastria, t: Diccionario) {
+  const temas = t.sinastria.temas as Record<string, string>;
+  const directo = temas[`${x}-${y}`] ?? temas[`${y}-${x}`];
+  if (directo) return directo;
+  if (x === "ascendente" || y === "ascendente") return temas.ascendente;
+  const lento = (["saturno", "pluton", "neptuno", "urano", "jupiter"] as const).find((p) => p === x || p === y);
+  return lento ? temas[lento] : temas.otro;
+}
+
+/** Una columna de aspectos (los que unen o los que piden trabajo), con lo que significan en la vida real. */
+function UneTrabajar({ titulo, vacio, aspectos, color, r, nombre, t }: { titulo: string; vacio: string; aspectos: AspectoSinastria[]; color: string; r: ResultadoSinastria; nombre: (p: PuntoSinastria) => string; t: Diccionario }) {
+  const s = t.sinastria;
+  const aspectosNombres = t.astral.aspectosNombres as Record<TipoAspecto, string>;
+  return (
+    <div className="tarjeta p-5">
+      <h2 className="font-display mb-3 flex items-center gap-2 text-2xl">
+        <span className="h-3 w-3 rounded-full" style={{ background: color }} aria-hidden />
+        {titulo}
+      </h2>
+      {aspectos.length ? (
+        <ul className="space-y-3 text-sm">
+          {aspectos.map((a, i) => (
+            <li key={i} className="aparecer border-t border-borde pt-2 first:border-0 first:pt-0" style={{ animationDelay: `${i * 100}ms` }}>
+              <p>
+                {plantilla(s.de, { planeta: nombre(a.a), nombre: r.a.nombre })}{" "}
+                <span style={{ color }}>{texto(SIMBOLOS_ASPECTO[a.tipo])} {aspectosNombres[a.tipo].toLowerCase()}</span>{" "}
+                {plantilla(s.de, { planeta: nombre(a.b), nombre: r.b.nombre })}
+                <span className="text-xs text-texto-suave"> · {a.orbe}°</span>
+              </p>
+              <p className="text-texto-suave">{tema(a.a, a.b, t)}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-texto-suave">{vacio}</p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Las dos cartas en un mismo zodiaco: los planetas de una persona por dentro
+ * (oro), los de la otra por fuera (violeta) y, en el centro, las cuerdas de
+ * sus aspectos cruzados.
+ */
+function RuedaDoble({ a, b, aspectos, nombreA, nombreB, t }: { a: { cuerpo: Cuerpo; longitud: number }[]; b: { cuerpo: Cuerpo; longitud: number }[]; aspectos: AspectoSinastria[]; nombreA: string; nombreB: string; t: Diccionario }) {
+  const n = nombresAstro(t);
+  const punto = (lon: number, radio: number) => {
+    const ang = ((180 + lon) * Math.PI) / 180;
+    return [r2(radio * Math.cos(ang)), r2(-radio * Math.sin(ang))] as const;
+  };
+  const RA = 104;
+  const RB = 146;
+  const RC = 84;
+  const lon = (lista: typeof a, c: PuntoSinastria) => lista.find((p) => p.cuerpo === c)?.longitud;
+  const cuerdas = aspectos.filter((x) => x.a !== "ascendente" && x.b !== "ascendente").slice(0, 14);
+  return (
+    <div className="space-y-3">
+      <svg viewBox="-215 -215 430 430" className="mx-auto w-full max-w-[30rem]" role="img" aria-label={t.sinastria.ruedaTitulo}>
+        <circle r="206" fill="#120c22" stroke="rgba(241,217,154,0.45)" />
+        <circle r="178" fill="none" stroke="rgba(241,217,154,0.45)" />
+        {SIGNOS.map((sg, i) => {
+          const [x1, y1] = punto(i * 30, 178);
+          const [x2, y2] = punto(i * 30, 206);
+          const [gx, gy] = punto(i * 30 + 15, 192);
+          return (
+            <g key={sg.id}>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(241,217,154,0.35)" />
+              <text x={gx} y={gy} textAnchor="middle" dominantBaseline="central" fontSize="16" fill={COLOR_ELEMENTO[sg.elemento]}>
+                <title>{n.signo(sg.id)}</title>
+                {texto(sg.simbolo)}
+              </text>
+            </g>
+          );
+        })}
+        <circle r={(RA + RB) / 2} fill="none" stroke="rgba(183,165,255,0.3)" strokeDasharray="3 5" />
+        <circle r={RC} fill="#1a1233" stroke="rgba(241,217,154,0.25)" />
+        {cuerdas.map((x, i) => {
+          const la = lon(a, x.a);
+          const lb = lon(b, x.b);
+          if (la == null || lb == null) return null;
+          const [x1, y1] = punto(la, RC);
+          const [x2, y2] = punto(lb, RC);
+          return (
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={x.aporte >= 0 ? ARMONICO : TENSO} strokeWidth={Math.min(3.5, 0.8 + Math.abs(x.aporte))} strokeOpacity={0.75} strokeLinecap="round" pathLength={1} className="trazo-aspecto" style={{ animationDelay: `${600 + i * 80}ms` }} />
+          );
+        })}
+        {(
+          [
+            [a, RA, "#f1d99a", 0],
+            [b, RB, "#b7a5ff", 300],
+          ] as const
+        ).map(([lista, radio, color, retraso]) =>
+          // En el anillo de adentro las monedas ocupan más grados.
+          separar(lista, radio === RA ? 15 : 11).map((p, i) => {
+            const [x, y] = punto(p.dibujo, radio);
+            const [ex, ey] = punto(p.longitud, radio === RA ? RC : 178);
+            const [fx, fy] = punto(p.longitud, radio === RA ? RC + 7 : 171);
+            return (
+              <g key={`${radio}-${p.cuerpo}`} className="aparecer" style={{ animationDelay: `${retraso + i * 60}ms` }}>
+                <line x1={ex} y1={ey} x2={fx} y2={fy} stroke={color} strokeWidth="1.5" />
+                <circle cx={x} cy={y} r="13" fill="#150f26" stroke={color} strokeWidth="1.2" />
+                <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize="14" fill={color}>
+                  <title>{n.cuerpo(p.cuerpo)}</title>
+                  {texto(SIMBOLOS_CUERPO[p.cuerpo])}
+                </text>
+              </g>
+            );
+          }),
+        )}
+      </svg>
+      <p className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm">
+        <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full border border-oro bg-[#150f26]" />{nombreA}</span>
+        <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full border border-violeta-suave bg-[#150f26]" />{nombreB}</span>
+      </p>
     </div>
   );
 }

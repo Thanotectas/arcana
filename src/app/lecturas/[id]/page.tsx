@@ -33,6 +33,7 @@ import type { EntradaVelas } from "@/lib/velas";
 import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
 import { Aura } from "@/components/Aura";
 import type { ResultadoSinastria } from "@/lib/astro/sinastria";
+import type { DatosNacimiento } from "@/lib/astro/carta";
 import type { FuenteCruce } from "@/lib/cruce";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -98,7 +99,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         </>
       )}
       {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
-      {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} t={t} />}
+      {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} entrada={lectura.entrada as { a?: DatosNacimiento; b?: DatosNacimiento }} t={t} />}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
       {esQuiromancia ? (

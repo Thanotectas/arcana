@@ -8,19 +8,32 @@ import type { Diccionario } from "@/lib/i18n/diccionarios";
 const glifo = (s: string) => `${s}︎`;
 const r2 = (v: number) => Math.round(v * 100) / 100;
 
-/** Longitudes de dibujo separadas al menos `minimo` grados, para que los símbolos cercanos no se monten. */
-function separar<T extends { longitud: number }>(ps: T[], minimo: number): (T & { dibujo: number })[] {
-  const orden = [...ps].sort((x, y) => x.longitud - y.longitud);
-  const out: (T & { dibujo: number })[] = [];
-  for (const p of orden) {
-    const prev = out.at(-1);
-    let d = p.longitud;
-    if (prev && d - prev.dibujo < minimo) d = prev.dibujo + minimo;
-    out.push({ ...p, dibujo: d });
+/**
+ * Longitudes de dibujo separadas al menos `minimo` grados, para que los
+ * símbolos cercanos no se monten: separa los pares demasiado juntos por igual
+ * hacia ambos lados, alrededor de todo el círculo (también entre Piscis y Aries).
+ */
+export function separar<T extends { longitud: number }>(ps: T[], minimo: number): (T & { dibujo: number })[] {
+  const out = ps.map((p) => ({ ...p, dibujo: p.longitud }));
+  if (out.length < 2) return out;
+  for (let vuelta = 0; vuelta < 80; vuelta++) {
+    out.sort((x, y) => x.dibujo - y.dibujo);
+    let movido = false;
+    for (let i = 0; i < out.length; i++) {
+      const x = out[i];
+      const y = out[(i + 1) % out.length];
+      const hueco = y.dibujo - x.dibujo + (i === out.length - 1 ? 360 : 0);
+      if (hueco < minimo - 0.01) {
+        const d = (minimo - hueco) / 2;
+        x.dibujo -= d;
+        y.dibujo += d;
+        movido = true;
+      }
+    }
+    for (const p of out) p.dibujo = ((p.dibujo % 360) + 360) % 360;
+    if (!movido) break;
   }
-  // Un grupo que se corrió demasiado se recentra sobre su posición real.
-  const corrimiento = out.length ? (out.reduce((s, p) => s + (p.dibujo - p.longitud), 0) / out.length) * 0.5 : 0;
-  return out.map((p) => ({ ...p, dibujo: p.dibujo - corrimiento }));
+  return out;
 }
 
 export const COLOR_ELEMENTO: Record<string, string> = { fuego: "#ff8a5b", tierra: "#9ad07f", aire: "#8fc7ff", agua: "#b28dff" };
