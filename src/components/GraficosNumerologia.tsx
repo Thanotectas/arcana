@@ -1,6 +1,7 @@
 import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "@/lib/numerologia";
 import type { Diccionario } from "@/lib/i18n/diccionarios";
 import { plantilla } from "@/lib/i18n/formato";
+import type { Cuadricula, Deuda, Etapa, Flecha, Nombre } from "@/lib/numerologia-avanzada";
 
 export const CLAVES_NUMEROLOGIA = ["caminoDeVida", "expresion", "almaOImpulso", "personalidad", "cumpleanos", "anioPersonal"] as const;
 type Clave = (typeof CLAVES_NUMEROLOGIA)[number];
@@ -150,6 +151,245 @@ export function FichaNumero({ clave, valor, t, retraso = 0 }: { clave: Clave; va
       <p className="mt-1 text-sm font-medium">{t.numerologia.numeros[clave]}</p>
       <p className="text-xs text-texto-suave">{SIGNIFICADO_NUMERO[valor]?.titulo}</p>
       {esMaestro(valor) && <p className="mt-1 text-[10px] uppercase tracking-widest text-violeta-suave">{t.numerologia.maestro}</p>}
+    </div>
+  );
+}
+
+/** Celda de cada dígito en la cuadrícula: columnas 1-2-3, 4-5-6, 7-8-9, con el 3, el 6 y el 9 arriba. */
+const celda = (d: number) => {
+  const col = Math.floor((d - 1) / 3);
+  const fila = 2 - ((d - 1) % 3);
+  return [70 + col * 80, 70 + fila * 80] as const;
+};
+
+/**
+ * Cuadrícula de Pitágoras: los dígitos de la fecha en el cuadro de 3×3, con
+ * las líneas llenas (fuerzas) trazadas en oro y las vacías (lo que se
+ * aprende) punteadas; debajo, el nombre y el sentido de cada flecha.
+ */
+export function CuadriculaPitagoras({ cuadro, t }: { cuadro: Cuadricula; t: Diccionario }) {
+  const n = t.numerologia;
+  const flechas = n.flechas as Record<Flecha, { plena: { nombre: string; texto: string }; vacia: { nombre: string; texto: string } }>;
+  const linea = (f: Flecha) => {
+    const [a, , c] = f.split("").map(Number);
+    const [x1, y1] = celda(a);
+    const [x2, y2] = celda(c);
+    const dx = (x2 - x1) / 160;
+    const dy = (y2 - y1) / 160;
+    return { x1: x1 - dx * 26, y1: y1 - dy * 26, x2: x2 + dx * 26, y2: y2 + dy * 26 };
+  };
+  return (
+    <div className="grid items-center gap-6 md:grid-cols-[minmax(0,17rem)_1fr]">
+      <svg viewBox="0 0 330 280" className="mx-auto w-full max-w-[17rem]" role="img" aria-label={n.cuadriculaTitulo}>
+        {[0, 1, 2].map((fila) =>
+          [0, 1, 2].map((col) => <rect key={`${fila}${col}`} x={32 + col * 80} y={32 + fila * 80} width={76} height={76} rx={10} fill="#150f26" stroke="rgba(241,217,154,0.3)" />),
+        )}
+        {(["mente", "alma", "cuerpo"] as const).map((k, i) => (
+          <text key={k} x={276} y={74 + i * 80} fontSize={11} letterSpacing="0.1em" fill="#b7a5ff">{n.filas[k].toUpperCase()}</text>
+        ))}
+        {cuadro.vacias.map((f) => {
+          const l = linea(f);
+          return <line key={f} {...l} stroke="#b7a5ff" strokeOpacity={0.6} strokeWidth={2} strokeDasharray="3 6" strokeLinecap="round" />;
+        })}
+        {cuadro.llenas.map((f, i) => {
+          const l = linea(f);
+          return (
+            <g key={f}>
+              <line {...l} stroke="#f1d99a" strokeOpacity={0.3} strokeWidth={9} strokeLinecap="round" />
+              <line {...l} stroke="#f1d99a" strokeWidth={3} strokeLinecap="round" pathLength={1} className="trazo-aspecto" style={{ animationDelay: `${300 + i * 250}ms` }} />
+            </g>
+          );
+        })}
+        {Array.from({ length: 9 }, (_, i) => i + 1).map((d) => {
+          const [x, y] = celda(d);
+          const veces = cuadro.cuenta[d];
+          return (
+            <g key={d}>
+              {veces > 0 && <circle cx={x} cy={y} r={24} fill="#2a1a5e" stroke="#f1d99a" strokeOpacity={0.6} />}
+              <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={veces > 2 ? 16 : 21} fontWeight={700} letterSpacing={veces > 1 ? "0.06em" : undefined} fill={veces ? "#f1d99a" : "rgba(236,230,247,0.2)"}>
+                {veces ? String(d).repeat(veces) : d}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="space-y-3 text-sm">
+        {cuadro.llenas.length === 0 && cuadro.vacias.length === 0 && <p className="text-texto-suave">{n.sinFlechas}</p>}
+        {cuadro.llenas.map((f) => (
+          <div key={f} className="flex gap-3">
+            <span className="mt-0.5 text-oro" aria-hidden>✦</span>
+            <p>
+              <span className="text-oro-suave">{flechas[f].plena.nombre}</span> <span className="text-xs text-texto-suave">({f.split("").join("-")})</span>
+              <span className="block text-texto">{flechas[f].plena.texto}</span>
+            </p>
+          </div>
+        ))}
+        {cuadro.vacias.map((f) => (
+          <div key={f} className="flex gap-3">
+            <span className="mt-0.5 text-violeta-suave" aria-hidden>○</span>
+            <p>
+              <span className="text-violeta-suave">{flechas[f].vacia.nombre}</span> <span className="text-xs text-texto-suave">({f.split("").join("-")})</span>
+              <span className="block text-texto">{flechas[f].vacia.texto}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Las cuatro etapas de la vida: una cordillera con un pico por pináculo (más
+ * alto cuanto mayor el número), el desafío de cada etapa debajo y la etapa
+ * actual encendida con la marca de la edad.
+ */
+export function EtapasVida({ etapas, edad, t }: { etapas: Etapa[]; edad: number | null; t: Diccionario }) {
+  const n = t.numerologia;
+  const temas = n.temas as Record<string, string>;
+  const actual = edad == null ? -1 : etapas.findIndex((e) => edad >= e.desde && (e.hasta == null || edad <= e.hasta));
+  const rango = (e: Etapa) => (e.hasta == null ? plantilla(n.desdeEdad, { n: e.desde }) : plantilla(n.edades, { desde: e.desde, hasta: e.hasta }));
+  return (
+    <div className="space-y-4">
+      <svg viewBox="0 0 640 190" className="w-full" role="img" aria-label={n.etapasTitulo}>
+        <defs>
+          <linearGradient id="num-monte" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#f1d99a" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#f1d99a" stopOpacity="0.05" />
+          </linearGradient>
+          <linearGradient id="num-monte-apagado" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#b7a5ff" stopOpacity="0.28" />
+            <stop offset="1" stopColor="#b7a5ff" stopOpacity="0.03" />
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="150" x2="640" y2="150" stroke="rgba(241,217,154,0.35)" />
+        {etapas.map((e, i) => {
+          const x0 = i * 160;
+          const cima = 150 - (44 + raiz(e.pinaculo) * 9);
+          const es = i === actual;
+          return (
+            <g key={i} className="aparecer" style={{ animationDelay: `${i * 150}ms` }}>
+              <path d={`M ${x0 + 4} 150 Q ${x0 + 50} ${cima + 30} ${x0 + 80} ${cima} Q ${x0 + 110} ${cima + 30} ${x0 + 156} 150 Z`} fill={es ? "url(#num-monte)" : "url(#num-monte-apagado)"} stroke={es ? "#f1d99a" : "rgba(183,165,255,0.5)"} strokeWidth={es ? 1.6 : 1} />
+              <circle cx={x0 + 80} cy={cima - 4} r={19} fill="#150f26" stroke={es ? "#f1d99a" : "#b7a5ff"} strokeWidth={es ? 2 : 1} />
+              <text x={x0 + 80} y={cima - 4} textAnchor="middle" dominantBaseline="central" fontSize={18} fontWeight={700} fill={es ? "#f1d99a" : "#d9d0f5"}>{e.pinaculo}</text>
+              <text x={x0 + 80} y={170} textAnchor="middle" fontSize={12} fill={es ? "#f1d99a" : "rgba(236,230,247,0.6)"}>{rango(e)}</text>
+              {es && edad != null && (
+                <g>
+                  <circle cx={x0 + 12 + 136 * Math.min(1, (edad - e.desde) / Math.max(1, (e.hasta ?? e.desde + 27) - e.desde))} cy={150} r={6} fill="#ffb35c" stroke="#fff1c4" className="num-ciclo-pulso" />
+                </g>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {etapas.map((e, i) => {
+          const es = i === actual;
+          return (
+            <div key={i} className={`rounded-xl border p-4 text-sm ${es ? "border-oro bg-oro/10" : "border-borde bg-superficie-2/60"}`}>
+              <p className="flex items-center justify-between gap-2 text-xs uppercase tracking-widest text-texto-suave">
+                {rango(e)}
+                {es && <span className="shrink-0 whitespace-nowrap rounded-full bg-oro px-2 py-0.5 text-[10px] font-semibold normal-case tracking-normal text-noche">{n.ahora}</span>}
+              </p>
+              <p className="mt-2 text-texto">
+                <span className="text-oro-suave">{n.pinaculo} {e.pinaculo}</span> · {temas[String(e.pinaculo)]}
+              </p>
+              <p className="mt-1 text-texto-suave">
+                <span className="text-violeta-suave">{n.desafio} {e.desafio}</span> · {n.desafios[e.desafio]}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Lo que dice el nombre: una barra por número con cuántas letras lo valen;
+ * los que faltan quedan como lecciones kármicas y el que más se repite brilla
+ * como pasión oculta. Debajo, las lecciones, la pasión y las deudas kármicas.
+ */
+export function NombreNumeros({ plano, deudas, t }: { plano: Nombre; deudas: Deuda[]; t: Diccionario }) {
+  const n = t.numerologia;
+  const temas = n.temas as Record<string, string>;
+  const deudaTexto = n.deudaTexto as Record<string, string>;
+  const max = Math.max(1, ...plano.cuenta.slice(1));
+  return (
+    <div className="grid items-start gap-6 md:grid-cols-[minmax(0,18rem)_1fr]">
+      <div className="flex h-44 items-end justify-between gap-1.5" aria-hidden>
+        {Array.from({ length: 9 }, (_, i) => i + 1).map((d, i) => {
+          const v = plano.cuenta[d];
+          const pasion = plano.pasion.includes(d);
+          return (
+            <div key={d} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+              <span className="text-xs tabular-nums text-texto-suave">{v || ""}</span>
+              {v ? (
+                <div className="num-barra w-full rounded-t-md" style={{ height: `${(v / max) * 100}%`, background: pasion ? "#f1d99a" : "rgba(183,165,255,0.55)", animationDelay: `${i * 60}ms` }} />
+              ) : (
+                <div className="h-6 w-full rounded-md border border-dashed border-violeta-suave/70" />
+              )}
+              <span className={`text-base font-semibold tabular-nums ${pasion ? "text-oro" : v ? "text-texto" : "text-violeta-suave"}`}>{d}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="space-y-4 text-sm">
+        {plano.pasion.length > 0 && (
+          <div>
+            <p className="text-xs uppercase tracking-widest text-texto-suave">{n.pasion}</p>
+            <p className="mt-1 text-oro-suave">
+              {plano.pasion.map((d) => `${d} · ${temas[String(d)]}`).join(" / ")}
+            </p>
+            <p className="text-texto-suave">{n.pasionNota}</p>
+          </div>
+        )}
+        <div>
+          <p className="text-xs uppercase tracking-widest text-texto-suave">{n.lecciones}</p>
+          {plano.lecciones.length ? (
+            <ul className="mt-1 space-y-1">
+              {plano.lecciones.map((d) => (
+                <li key={d} className="text-texto">
+                  <span className="text-violeta-suave">{d}</span> · {n.leccion[d]}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-1 text-texto">{n.sinLecciones}</p>
+          )}
+        </div>
+        {deudas.length > 0 && (
+          <div>
+            <p className="text-xs uppercase tracking-widest text-texto-suave">{n.deudas}</p>
+            <ul className="mt-1 space-y-1">
+              {deudas.map((d) => (
+                <li key={d} className="text-texto">
+                  <span className="text-oro-suave">{d}</span> · {deudaTexto[String(d)]}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** El mes y el día personal de hoy, con su tema. */
+export function MesDiaPersonal({ mes, dia, t }: { mes: number; dia: number; t: Diccionario }) {
+  const n = t.numerologia;
+  const temas = n.temas as Record<string, string>;
+  return (
+    <div className="mt-4 grid grid-cols-2 gap-3 border-t border-borde pt-4 text-center text-sm">
+      <div>
+        <p className="text-3xl font-semibold tabular-nums text-[#ffb35c]">{mes}</p>
+        <p className="text-texto">{plantilla(n.mesPersonal, { n: mes })}</p>
+        <p className="text-xs text-texto-suave">{temas[String(mes)]}</p>
+      </div>
+      <div>
+        <p className="text-3xl font-semibold tabular-nums text-oro-suave">{dia}</p>
+        <p className="text-texto">{plantilla(n.diaPersonal, { n: dia })}</p>
+        <p className="text-xs text-texto-suave">{temas[String(dia)]}</p>
+      </div>
     </div>
   );
 }

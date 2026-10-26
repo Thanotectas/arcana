@@ -21,7 +21,8 @@ import { TIRADAS, POSICIONES_I18N, cartasDeTirada, type CartaTirada, type TipoTi
 import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { signoPorId, imagenSigno } from "@/lib/zodiaco";
 import type { PerfilNumerologico } from "@/lib/numerologia";
-import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia } from "@/components/GraficosNumerologia";
+import { cuadricula, deudasKarmicas, edad, etapas, hoyColombia, mesYDia, planoNombre } from "@/lib/numerologia-avanzada";
+import { CLAVES_NUMEROLOGIA, CicloNumerologia, CuadriculaPitagoras, EtapasVida, FichaNumero, MandalaNumerologia, MesDiaPersonal, NombreNumeros } from "@/components/GraficosNumerologia";
 import { VistaIChing } from "@/components/VistaIChing";
 import type { ResultadoIChing } from "@/lib/iching";
 import { SiguientePaso } from "@/components/SiguientePaso";
@@ -80,7 +81,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         <VistaTarot tipo={lectura.tipo as TipoTirada} entrada={lectura.entrada} resultado={lectura.resultado} nueva={lectura.estado !== "lista"} idioma={idioma} />
       )}
       {lectura.tipo === "carta_astral" && <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />}
-      {lectura.tipo === "numerologia" && <VistaNumerologia resultado={lectura.resultado as unknown as PerfilNumerologico} t={t} />}
+      {lectura.tipo === "numerologia" && <VistaNumerologia resultado={lectura.resultado as unknown as PerfilNumerologico} entrada={lectura.entrada} t={t} />}
       {lectura.tipo === "compatibilidad" && <VistaCompatibilidad resultado={lectura.resultado} t={t} />}
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
@@ -225,7 +226,12 @@ function VistaTarot({
   return <TiradaInteractiva cartas={cartas} ocultas={nueva} estilo={MAZOS[mazo].estilo} />;
 }
 
-function VistaNumerologia({ resultado, t }: { resultado: PerfilNumerologico; t: Diccionario }) {
+function VistaNumerologia({ resultado, entrada, t }: { resultado: PerfilNumerologico; entrada: Record<string, unknown>; t: Diccionario }) {
+  const nombre = String(entrada.nombre ?? "");
+  const fecha = String(entrada.fecha ?? "");
+  const hoy = hoyColombia();
+  const vida = etapas(fecha);
+  const { mes, dia } = mesYDia(resultado.anioPersonal, hoy);
   return (
     <section className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
@@ -237,6 +243,8 @@ function VistaNumerologia({ resultado, t }: { resultado: PerfilNumerologico; t: 
         <div className="tarjeta flex flex-col justify-center p-5">
           <h2 className="font-display mb-3 text-2xl">{t.numerologia.cicloTitulo}</h2>
           <CicloNumerologia anio={resultado.anioPersonal} t={t} />
+          <p className="mt-4 text-center text-xs uppercase tracking-[0.25em] text-violeta-suave">{t.numerologia.mesTitulo}</p>
+          <MesDiaPersonal mes={mes} dia={dia} t={t} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -244,6 +252,33 @@ function VistaNumerologia({ resultado, t }: { resultado: PerfilNumerologico; t: 
           <FichaNumero key={k} clave={k} valor={resultado[k]} t={t} retraso={i * 90} />
         ))}
       </div>
+      {vida && (
+        <div className="tarjeta space-y-4 p-5 sm:p-6">
+          <div>
+            <h2 className="font-display text-2xl">{t.numerologia.etapasTitulo}</h2>
+            <p className="text-xs text-texto-suave">{t.numerologia.etapasNota}</p>
+          </div>
+          <EtapasVida etapas={vida} edad={edad(fecha, hoy)} t={t} />
+        </div>
+      )}
+      {/^\d{4}-\d{2}-\d{2}$/.test(fecha) && (
+        <div className="tarjeta space-y-4 p-5 sm:p-6">
+          <div>
+            <h2 className="font-display text-2xl">{t.numerologia.cuadriculaTitulo}</h2>
+            <p className="text-xs text-texto-suave">{t.numerologia.cuadriculaNota}</p>
+          </div>
+          <CuadriculaPitagoras cuadro={cuadricula(fecha)} t={t} />
+        </div>
+      )}
+      {nombre && (
+        <div className="tarjeta space-y-4 p-5 sm:p-6">
+          <div>
+            <h2 className="font-display text-2xl">{t.numerologia.nombreTitulo}</h2>
+            <p className="text-xs text-texto-suave">{t.numerologia.nombreNota}</p>
+          </div>
+          <NombreNumeros plano={planoNombre(nombre)} deudas={deudasKarmicas(nombre, fecha)} t={t} />
+        </div>
+      )}
     </section>
   );
 }

@@ -9,7 +9,8 @@ import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { useT } from "@/lib/i18n/cliente";
 import { textoErrorLectura } from "@/lib/i18n/errores";
-import { CLAVES_NUMEROLOGIA, CicloNumerologia, FichaNumero, MandalaNumerologia } from "./GraficosNumerologia";
+import { CLAVES_NUMEROLOGIA, CicloNumerologia, CuadriculaPitagoras, FichaNumero, MandalaNumerologia, NombreNumeros } from "./GraficosNumerologia";
+import { cuadricula, deudasKarmicas, planoNombre } from "@/lib/numerologia-avanzada";
 
 /**
  * Numerología en vivo: los números aparecen mientras la persona escribe, con
@@ -29,6 +30,9 @@ export function NumerologiaInteractiva({ nombreInicial, fechaInicial }: { nombre
     [nombre, fecha, fechaValida],
   );
   const pasos = useMemo(() => (fechaValida ? pasoFecha(fecha) : null), [fecha, fechaValida]);
+  const cuadro = useMemo(() => (fechaValida ? cuadricula(fecha) : null), [fecha, fechaValida]);
+  const plano = useMemo(() => planoNombre(nombre), [nombre]);
+  const deudas = useMemo(() => (fechaValida ? deudasKarmicas(nombre, fecha) : []), [nombre, fecha, fechaValida]);
   const sumaTodas = pasoSuma(letras.map((l) => l.valor));
   const sumaVocales = pasoSuma(letras.filter((l) => l.vocal).map((l) => l.valor));
   const sumaConsonantes = pasoSuma(letras.filter((l) => !l.vocal).map((l) => l.valor));
@@ -82,6 +86,22 @@ export function NumerologiaInteractiva({ nombreInicial, fechaInicial }: { nombre
             {CLAVES_NUMEROLOGIA.map((k, i) => (
               <FichaNumero key={k} clave={k} valor={perfil[k]} t={t} retraso={i * 80} />
             ))}
+          </div>
+          {cuadro && (
+            <div className="space-y-3 rounded-xl border border-borde bg-superficie-2/40 p-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-violeta-suave">{t.numerologia.cuadriculaTitulo}</p>
+                <p className="text-xs text-texto-suave">{t.numerologia.cuadriculaNota}</p>
+              </div>
+              <CuadriculaPitagoras cuadro={cuadro} t={t} />
+            </div>
+          )}
+          <div className="space-y-3 rounded-xl border border-borde bg-superficie-2/40 p-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-violeta-suave">{t.numerologia.nombreTitulo}</p>
+              <p className="text-xs text-texto-suave">{t.numerologia.nombreNota}</p>
+            </div>
+            <NombreNumeros plano={plano} deudas={deudas} t={t} />
           </div>
         </div>
       ) : (

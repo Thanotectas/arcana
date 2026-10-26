@@ -681,6 +681,15 @@ body {
   .vela-llama, .vela-inquieta { animation: none; }
 }
 
+/* Numerología: las barras del nombre crecen desde abajo */
+.num-barra { transform-origin: bottom; animation: num-barra 0.8s cubic-bezier(0.2, 0.8, 0.3, 1) backwards; }
+@keyframes num-barra {
+  from { transform: scaleY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .num-barra { animation: none; }
+}
+
 /* Quiromancia: el mapa de la mano */
 .mano-linea {
   stroke-dasharray: 1;

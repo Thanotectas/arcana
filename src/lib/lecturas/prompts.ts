@@ -6,6 +6,7 @@ import { TIRADAS, resumenTirada, type CartaTirada, type TipoTirada } from "../ta
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import { calcularCarta, resumenCarta, type DatosNacimiento } from "../astro/carta";
 import { SIGNIFICADO_NUMERO, type PerfilNumerologico } from "../numerologia";
+import { resumenNumerologiaAvanzada } from "../numerologia-avanzada";
 import { signoPorId } from "../zodiaco";
 import { esIdioma, IDIOMA_PREDETERMINADO, type Idioma } from "../i18n/idiomas";
 import { INSTRUCCION_ANEXO, resumenQuiromancia, type EntradaQuiromancia } from "../quiromancia";
@@ -120,9 +121,9 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Interpreta este perfil numerológico pitagórico.\n\nNombre: ${datoDeUsuario(entrada.nombre, 120)}\nFecha de nacimiento: ${String(entrada.fecha ?? "")}\n` +
         `Camino de vida: ${describir(perfil.caminoDeVida)}\nNúmero de expresión: ${describir(perfil.expresion)}\n` +
         `Impulso del alma: ${describir(perfil.almaOImpulso)}\nPersonalidad: ${describir(perfil.personalidad)}\n` +
-        `Número de cumpleaños: ${describir(perfil.cumpleanos)}\nAño personal actual: ${perfil.anioPersonal}\n\n` +
-        `Estructura: una sección por número (## Camino de vida N, etc.), cómo interactúan entre sí, ${anuncio("## Lo que trae tu año personal")} (apóyate sobre todo en el año personal), y un cierre. Extensión: 750 a 950 palabras.`,
-      opciones: { idioma, effort: "low", maxTokens: 3000 },
+        `Número de cumpleaños: ${describir(perfil.cumpleanos)}\nAño personal actual: ${perfil.anioPersonal}\n${resumenNumerologiaAvanzada(String(entrada.nombre ?? ""), String(entrada.fecha ?? ""), perfil.anioPersonal)}\n\n` +
+        `Estructura: una sección por número (## Camino de vida N, etc.), cómo interactúan entre sí, ## Tu etapa actual (el pináculo y el desafío de la etapa en que está la persona, y lo que viene en la siguiente), ## Fuerzas y lecciones (las flechas de su cuadrícula, las lecciones kármicas, la pasión oculta y, si hay, la deuda kármica, sin tono fatalista), ${anuncio("## Lo que trae tu año personal")} (apóyate sobre todo en el año y el mes personal), y un cierre. Extensión: 900 a 1150 palabras.`,
+      opciones: { idioma, effort: "low", maxTokens: 3800 },
     };
   }
 
