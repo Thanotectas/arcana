@@ -2,7 +2,9 @@ VIDEO 22 — "NOCHE DE BRUJAS CON SIBILA EN VIVO" (anuncio del directo del sába
 30 s, vertical 1080×1920. Animación propia con datos astronómicos reales de la app: la carta astral de Valentina
 (14/03/1995 10:30 Medellín: Sol en Piscis, Luna en Leo, Ascendente Géminis) dibujándose planeta por planeta, y la
 sinastría de Laura (Leo) y Andrés (Géminis) con los hilos entre sus planetas, 84 % de afinidad y las cuatro
-dimensiones. Cierre con el QR a miarcana.com/yt/vivo. Música ambiental sintetizada (sin derechos de terceros).
+dimensiones. Cierre con el QR a miarcana.com/yt/vivo. Música ambiental sintetizada (sin derechos de terceros) y voz de
+Marcela (ElevenLabs) en cuatro frases: 0,4 s apertura, 5 s carta, 14,8 s sinastría, 24,6 s cierre; la música baja
+mientras habla. Los mp3 están en marketing/prompts/video-22-directo-31-octubre/voz/.
 Archivos: marketing/videos/22-directo-31-octubre.mp4 y 22-directo-31-octubre-whatsapp.mp4 (720p, < 2 MB).
 Fuente de la animación: marketing/prompts/video-22-directo-31-octubre/ (escena.html + cuadros.js).
 Calendario sugerido: publicar el miércoles 28 y el viernes 30; historia el sábado 31 en la mañana y a las 7:30 p.m.
