@@ -365,7 +365,7 @@ recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no
   noche y varía el saludo y el cierre; la invitación a suscribirse la dice con sus palabras (cada cuarta
   lectura). Las frases de espera son 12 (`FRASES_PUENTE`) y su audio se guarda en Storage
   (`redes/en-vivo/puentes/`), así recargar el escenario no gasta voz.
-- Migración `0041_en_vivo_carta_facebook.sql` (tipos `carta` y `sinastria`, origen `facebook` y columnas
+- Migración `0041_en_vivo_carta_facebook.sql`, aplicada el 27 de octubre de 2026 (tipos `carta` y `sinastria`, origen `facebook` y columnas
   de Facebook en `en_vivo_estado`). Sin ella, los pedidos de carta o sinastría se leen como numerología.
 
 ### Facebook al mismo tiempo (26 oct 2026)
