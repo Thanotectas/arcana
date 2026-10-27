@@ -819,6 +819,20 @@ body {
   50% { transform: scale(1.06); opacity: 1; }
 }
 .aura-respira { animation: respirar 6s ease-in-out infinite; }
+/* El aura por capas: cada halo respira a su ritmo y los centros laten */
+.aura-capa { transform-box: fill-box; transform-origin: center; animation: aura-capa 7s ease-in-out infinite; }
+@keyframes aura-capa {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.aura-chakra { animation: aura-chakra 3.2s ease-in-out infinite; }
+@keyframes aura-chakra {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aura-capa, .aura-chakra { animation: none; }
+}
 .aura-respira-lenta { animation: respirar 9s ease-in-out infinite reverse; }
 @media (prefers-reduced-motion: reduce) {
   .aura-respira, .aura-respira-lenta { animation: none; }

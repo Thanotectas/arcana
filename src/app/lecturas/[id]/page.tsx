@@ -30,8 +30,8 @@ import type { ResultadoChino } from "@/lib/chino";
 import { VistaChino } from "@/components/VistaChino";
 import type { EntradaSueno, ResultadoSueno } from "@/lib/suenos";
 import type { EntradaVelas } from "@/lib/velas";
-import { COLORES_AURA, type ResultadoAura } from "@/lib/aura";
-import { Aura } from "@/components/Aura";
+import type { ResultadoAura } from "@/lib/aura";
+import { VistaAura } from "@/components/VistaAura";
 import type { ResultadoSinastria } from "@/lib/astro/sinastria";
 import type { DatosNacimiento } from "@/lib/astro/carta";
 import type { FuenteCruce } from "@/lib/cruce";
@@ -345,32 +345,6 @@ function VistaSueno({ entrada, resultado, t }: { entrada: EntradaSueno; resultad
         {entrada.recurrente && <span className="rounded-full bg-oro/15 px-3 py-1 text-oro-suave">{t.suenos.recurrente}</span>}
         {entrada.fecha && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{entrada.fecha}</span>}
         {resultado.previos?.length > 0 && <span className="rounded-full bg-white/5 px-3 py-1 text-texto-suave">{plantilla(t.suenos.conDiario, { n: resultado.previos.length })}</span>}
-      </div>
-    </section>
-  );
-}
-
-function VistaAura({ resultado, t }: { resultado: ResultadoAura; t: Diccionario }) {
-  const nombres = t.aura.colores as Record<string, { nombre: string; rasgos: string }>;
-  const orden = [...COLORES_AURA].sort((a, b) => resultado.puntajes[b] - resultado.puntajes[a]);
-  return (
-    <section className="tarjeta grid gap-6 p-6 md:grid-cols-[260px_1fr]">
-      <Aura principal={resultado.principal} secundario={resultado.secundario} />
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-violeta-suave">{t.aura.tuAura}</p>
-          <p className="font-display text-3xl text-oro-suave">{nombres[resultado.principal]?.nombre} <span className="text-texto-suave">+</span> {nombres[resultado.secundario]?.nombre}</p>
-          <p className="text-sm text-texto-suave">{nombres[resultado.principal]?.rasgos}</p>
-        </div>
-        <ul className="space-y-1.5">
-          {orden.map((c) => (
-            <li key={c} className="flex items-center gap-3 text-sm">
-              <span className="w-20 shrink-0 text-texto-suave">{nombres[c]?.nombre}</span>
-              <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10"><span className="block h-full rounded-full" style={{ width: `${resultado.puntajes[c]}%`, background: `var(--aura-${c})` }} /></span>
-              <span className="w-8 text-right text-xs text-texto-suave">{resultado.puntajes[c]}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
