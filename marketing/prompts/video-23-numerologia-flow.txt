@@ -1,0 +1,67 @@
+VIDEO 23 — "TU NÚMERO" (numerología con Sibila). Google Flow (Veo), 2 clips de 8 s, vertical 9:16.
+Lleva a miarcana.com/numerologia (1 crédito): camino de vida, expresión, impulso del alma y año personal a partir del
+nombre y la fecha. Gancho de temporada: 2027 suma 11 (2+0+2+7), un número maestro.
+Protagonista: Sibila, en su mesa de siempre. Los prompts van en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- "Ingredientes a video" (Ingredients to video): sube sibila-retrato.jpg (su cara) y, si quieres, sibila-escena.jpg (la
+  mesa). Vertical 9:16, 8 s.
+- Clip 2 con "Extender" (Extend) desde el clip 1, para que Sibila, la luz y la mesa no cambien.
+- Sonido: solo ambiente (velas, el roce de la pluma, un tintineo suave). Sin música y sin voces: la voz la ponemos con
+  Marcela (ElevenLabs).
+- En el video NO deben verse números ni letras legibles: los números reales (la suma de la fecha y el 11) los pongo
+  yo en el montaje. Por eso el clip 2 termina en un plano cenital quieto del pergamino.
+
+==================== CLIP 1 · "La fecha" (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight. Sibila, the woman from the reference image (same face, same long dark
+hair, same deep violet dress with golden embroidery), sits at her dark wooden reading table covered with an indigo
+velvet cloth, with lit candles, a small brass bowl and dried flowers around her. In front of her lies a sheet of old
+parchment. She dips a golden quill into a tiny inkwell and writes a short line on the parchment with calm, elegant
+movements. As she writes, each stroke begins to glow softly in gold, and tiny sparks of golden light rise from the
+ink and float in the air in front of her, one after another, like little fireflies. She lifts her gaze from the
+paper and watches the floating lights with a knowing, gentle smile. Slow push-in from a medium shot to a close-up of
+her face lit by the golden glow.
+Sound: candles crackling softly, the scratch of the quill, a faint crystalline chime as each spark rises. No music,
+no voices.
+The writing on the parchment is never readable: soft, blurred strokes of light only. No legible text, no numbers, no
+letters, no logos.
+
+==================== CLIP 2 · "El número" (8 s, Extender desde el clip 1) ====================
+Continue the same scene with the same woman, dress, table and candlelight. The golden sparks floating in front of
+Sibila slowly spiral together in the air and merge into a single bright orb of golden light, glowing like a small
+sun. Sibila opens her hand beneath it; the orb descends gently and hovers just above her palm, and a soft circle of
+nine small points of light appears around it, like a delicate halo. She looks straight into the camera with a warm,
+wise expression and gives a slight nod, as if revealing a secret. Then she lowers her hand and the orb settles onto
+the center of the parchment, where it softly pulses. For the last 3 seconds the camera is a fixed top-down shot of
+the parchment on the indigo velvet, with the golden glow pulsing in the center and the circle of nine soft lights
+around it; nothing moves except the glow, no hands in frame.
+Sound: a deep, warm resonant tone as the sparks merge, then candles only. No music, no voices.
+No legible text, no numbers, no letters, no symbols written on the parchment, no logos.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración de siempre) ====================
+Cuatro frases por separado (≈ 24 s en total), como en el video 22:
+1-fecha.mp3 (≈ 6 s, sobre el clip 1 mientras escribe):
+"Tu fecha de nacimiento guarda un número. Súmala, dígito por dígito… hasta que quede uno solo."
+2-camino.mp3 (≈ 5 s, cuando las chispas se juntan):
+"Ese es tu camino de vida: lo que viniste a aprender en esta vida."
+3-once.mp3 (≈ 7 s, cuando el orbe baja a su mano y mira a cámara):
+"Y el dos mil veintisiete suma once… un número maestro. Un año para escuchar tu intuición, y atreverte."
+4-cierre.mp3 (≈ 5 s, en el plano cenital final):
+"¿Qué número te acompaña a ti? Descúbrelo en mi arcana punto com."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Clip 1: sobre las chispas aparecen los dígitos de una fecha de ejemplo y su suma, animados con los cálculos reales:
+  14 · 03 · 1995 → 1+4+0+3+1+9+9+5 = 32 → 3+2 = 5 ("Camino de vida 5: libertad, cambio, aventura").
+- Clip 2: en el orbe, "2 + 0 + 2 + 7 = 11" y el rótulo "2027 · año universal 11 · número maestro".
+- En el plano cenital: los números del 1 al 9 dorados en el círculo de nueve luces, con el 11 en el centro.
+- Rótulos: "¿Cuál es tu número?" · "Suma tu fecha de nacimiento" · "2027 suma 11".
+- Cierre: "Numerología · Tu camino de vida y tu año personal" + miarcana.com/numerologia + QR a
+  miarcana.com/yt/numerologia.
+
+==================== SI ALGO SALE MAL ====================
+- Aparecen números o letras en el pergamino o en el aire: repite agregando "the parchment shows only blurred glowing
+  strokes; the floating lights are round sparks, never digits or letters".
+- Cambia la cara de Sibila: vuelve a subir sibila-retrato.jpg y escribe "keep exactly the face from the reference".
+- El orbe queda raro en la mano: pide "the orb floats a few centimeters above her open palm, not touching it".
+- El final cenital se mueve: genera solo ese plano aparte (4–8 s), "fixed top-down shot, static camera", sin Sibila.
+- Sale oscuro o tenebroso: "warm golden candlelight, serene and luminous atmosphere, nothing scary".
