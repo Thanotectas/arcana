@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+html, body { margin: 0; background: transparent; }
+</style></head><body>
+<svg id="c" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const ORO = "#f1d99a", ORO2 = "#d9b45a", VIO = "#b7a5ff", TXT = "#ece6f7";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const suave = (x) => x * x * (3 - 2 * x);
+const salida = (x) => 1 - Math.pow(1 - x, 3);
+const ventana = (t, a, b, f = 0.4) => Math.min(suave(prog(t, a, a + f)), 1 - suave(prog(t, b - f, b)));
+const defs = `<defs>
+  <filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="s" x="-20%" y="-50%" width="140%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.85"/></filter>
+  <radialGradient id="cielo" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#2a1660"/><stop offset="0.5" stop-color="#140b30"/><stop offset="1" stop-color="#0b0716"/></radialGradient>
+  <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f1d99a" stop-opacity="0.4"/><stop offset="1" stop-color="#8b6cf6" stop-opacity="0"/></radialGradient>
+</defs>`;
+const tx = (x, y, s, o = {}) => { const { tam = 60, fam = "Cormorant", peso = 600, color = ORO, op = 1, estilo = "normal", esp = 0, filtro = "s" } = o;
+  return `<text x="${x}" y="${y}" font-family="${fam}" font-size="${tam}" font-weight="${peso}" font-style="${estilo}" fill="${color}" opacity="${op.toFixed(3)}" text-anchor="middle" letter-spacing="${esp}" style="font-variant-numeric: lining-nums; font-feature-settings: 'lnum' 1" xml:space="preserve" filter="url(#${filtro})">${s}</text>`; };
+// Franja oscura suave detrás de los textos para que se lean sobre el video.
+const franja = (y, h, op) => `<rect x="0" y="${y}" width="1080" height="${h}" fill="#0b0716" opacity="${(0.55 * op).toFixed(3)}"/>`;
+
+function pintar(t) {
+  let s = defs;
+  // 0–3: gancho arriba
+  const g = ventana(t, 0.3, 3.4);
+  if (g > 0) { s += franja(120, 190, g) + tx(540, 235, "¿Cuál es tu número?", { tam: 96, color: "#fff", op: g }); }
+  // 3.2–10.4: la fecha y su suma
+  const f = ventana(t, 3.2, 10.5);
+  if (f > 0) {
+    s += franja(1330, 470, f);
+    s += tx(540, 1440, "14 · 03 · 1995", { tam: 92, color: "#fff", op: suave(prog(t, 3.2, 3.8)) * f, esp: 4 });
+    const dig = ["1", "4", "0", "3", "1", "9", "9", "5"];
+    const n = Math.floor(clamp((t - 4.4) / 0.18, 0, 8));
+    const suma = dig.slice(0, n).join(" + ");
+    s += tx(540, 1550, suma + (t > 6.0 ? " = 32" : ""), { tam: 62, color: ORO, op: f * (n > 0 ? 1 : 0) });
+    if (t > 7.0) s += tx(540, 1660, "3 + 2 = 5", { tam: 78, color: ORO, op: suave(prog(t, 7.0, 7.5)) * f, filtro: "b" });
+    if (t > 8.1) s += tx(540, 1750, "Camino de vida 5 · libertad, cambio, aventura", { tam: 40, fam: "Inter", peso: 600, color: TXT, op: suave(prog(t, 8.1, 8.6)) * f });
+  }
+  // 12.8–16.9: el año 2027
+  const a = ventana(t, 12.8, 16.95, 0.35);
+  if (a > 0) {
+    s += franja(120, 260, a);
+    const piezas = ["2", "+ 0", "+ 2", "+ 7"]; const k = Math.floor(clamp((t - 13.0) / 0.35, 0, 4));
+    s += tx(540, 250, piezas.slice(0, k).join(" ") + (t > 14.6 ? " = 11" : ""), { tam: 100, color: "#fff", op: a });
+    if (t > 14.9) s += tx(540, 335, "número maestro", { tam: 50, estilo: "italic", color: ORO, op: suave(prog(t, 14.9, 15.4)) * a });
+  }
+  // 16.96–20.2: plano cenital, el 11 en el orbe y los nueve números alrededor
+  const z = ventana(t, 16.96, 20.3, 0.3);
+  if (z > 0) {
+    const cx = 530, cy = 1000;
+    for (let i = 1; i <= 9; i++) {
+      const q = salida(prog(t, 17.1 + i * 0.09, 17.6 + i * 0.09)); const ang = -Math.PI / 2 + ((i - 1) * 2 * Math.PI) / 9;
+      s += tx(cx + 300 * Math.cos(ang), cy + 300 * Math.sin(ang) + 22, String(i), { tam: 76, color: "#fff", op: q * z, filtro: "b" });
+    }
+    const q11 = salida(prog(t, 17.4, 18.2));
+    s += `<circle cx="${cx}" cy="${cy}" r="150" fill="url(#halo)" opacity="${(q11 * z).toFixed(2)}"/>`;
+    s += tx(cx, cy + 60, "11", { tam: 190 * (0.7 + 0.3 * q11), color: "#fff", op: q11 * z, filtro: "b" });
+    s += franja(1560, 200, z) + tx(540, 1650, "2027 · año universal 11", { tam: 70, color: "#fff", op: suave(prog(t, 17.8, 18.3)) * z });
+    s += tx(540, 1725, "un año para escuchar tu intuición", { tam: 44, estilo: "italic", color: ORO, op: suave(prog(t, 18.2, 18.7)) * z });
+  }
+  // 20–26: cierre
+  const c = suave(prog(t, 19.9, 20.5));
+  if (c > 0) {
+    s += `<g opacity="${c.toFixed(3)}"><rect width="1080" height="1920" fill="url(#cielo)"/>`;
+    s += `<image href="file:///home/user/arcana/public/marca/icono-arcana.svg" x="460" y="230" width="160" height="160"/>`;
+    s += tx(540, 540, "¿Qué número", { tam: 104, color: "#fff", filtro: "b" }) + tx(540, 650, "te acompaña?", { tam: 104, color: "#fff", filtro: "b" });
+    s += tx(540, 750, "Numerología · tu camino de vida y tu año personal", { tam: 38, fam: "Inter", peso: 600, color: VIO });
+    const qq = suave(prog(t, 20.6, 21.3));
+    s += `<g opacity="${qq.toFixed(2)}"><rect x="330" y="840" width="420" height="420" rx="28" fill="${ORO}" filter="url(#b)"/><svg x="350" y="860" width="380" height="380" viewBox="${window.QRVB}">${window.QR}</svg></g>`;
+    s += tx(540, 1330, "Escanéalo y descubre tu número", { tam: 36, fam: "Inter", color: VIO, op: qq });
+    s += tx(540, 1480, "Tu nombre y tu fecha de nacimiento: 1 crédito", { tam: 38, fam: "Inter", color: TXT, op: suave(prog(t, 21.2, 21.8)) });
+    s += tx(540, 1660, "miarcana.com", { tam: 84, color: ORO, op: suave(prog(t, 21.6, 22.2)), filtro: "b" });
+    s += "</g>";
+  }
+  document.getElementById("c").innerHTML = s;
+}
+window.pintar = pintar;
+</script></body></html>
