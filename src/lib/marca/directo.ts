@@ -5,8 +5,8 @@
  * código de la noche (null si no hay oferta).
  */
 export const PROXIMO_DIRECTO = {
-  inicio: "2026-10-31T20:00:00-05:00",
-  fin: "2026-10-31T21:00:00-05:00",
+  inicio: "2026-11-01T20:00:00-05:00",
+  fin: "2026-11-01T21:00:00-05:00",
   // Enlace del canal en vivo: siempre lleva al directo activo, aunque haya que crear otra emisión.
   url: "https://www.youtube.com/@miarcana/live",
   codigo: { codigo: "SIBILA", creditosExtra: 2 } as { codigo: string; creditosExtra: number } | null,
