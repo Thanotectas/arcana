@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1080px; height: 1080px; overflow: hidden; }
+body { background: radial-gradient(ellipse at 50% 30%, #2a1660 0%, #140b30 55%, #0b0716 100%); color: #ece6f7; font-family: Inter; font-variant-numeric: lining-nums; }
+.marco { position: absolute; inset: 28px; border: 2px solid rgba(217,180,90,0.45); border-radius: 36px; }
+.estrellas { position: absolute; inset: 0; }
+.marca { position: absolute; top: 62px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 14px; font-family: Cormorant; font-size: 44px; color: #f1d99a; }
+.marca img { width: 54px; height: 54px; }
+.etiqueta { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 22px; letter-spacing: 7px; color: #b7a5ff; font-weight: 600; }
+h1 { position: absolute; top: 172px; width: 100%; margin: 0; text-align: center; font-family: Cormorant; font-weight: 600; font-size: 82px; line-height: 0.98; color: #f1d99a; text-shadow: 0 0 30px rgba(241,217,154,0.35); }
+.centro { position: absolute; top: 365px; left: 0; right: 0; height: 400px; display: flex; justify-content: center; align-items: center; }
+.texto { position: absolute; top: 790px; width: 100%; padding: 0 110px; text-align: center; font-size: 30px; line-height: 1.35; color: #ece6f7; }
+.boton { position: absolute; top: 880px; left: 50%; transform: translateX(-50%); padding: 20px 46px; border-radius: 999px; background: linear-gradient(180deg, #f1d99a, #d9b45a); color: #1a1033; font-weight: 600; font-size: 32px; box-shadow: 0 0 40px rgba(241,217,154,0.45); white-space: nowrap; }
+.web { position: absolute; top: 976px; width: 100%; text-align: center; font-family: Cormorant; font-size: 40px; color: #f1d99a; }
+.carta { width: 186px; height: 318px; border-radius: 16px; border: 4px solid rgba(241,217,154,0.8); background-size: cover; background-position: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+.moneda { width: 190px; height: 190px; border-radius: 50%; background-size: cover; box-shadow: 0 0 40px rgba(241,217,154,0.4); }
+</style></head>
+<body>
+<svg class="estrellas" width="1080" height="1080" id="est"></svg>
+<div class="marco"></div>
+<div class="marca"><img src="file:///home/user/arcana/public/marca/icono-arcana.svg" alt="">Arcana</div>
+<div class="etiqueta" id="etiqueta"></div>
+<h1 id="titulo"></h1>
+<div class="centro" id="centro"></div>
+<div class="texto" id="texto"></div>
+<div class="boton" id="boton"></div>
+<div class="web" id="web"></div>
+<script>
+const az = (s) => { const x = Math.sin(s * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+document.getElementById("est").innerHTML = Array.from({ length: 140 }, (_, i) => `<circle cx="${az(i) * 1080}" cy="${az(i + 500) * 1080}" r="${0.6 + az(i + 9) * 1.6}" fill="#fff" opacity="${0.2 + az(i + 3) * 0.6}"/>`).join("");
+const R = "file:///home/user/arcana/public/cartas/rider/", S = "file:///home/user/arcana/public/signos/";
+const pendulo = `<svg viewBox="0 0 200 230" width="370" height="425"><defs><linearGradient id="cr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1d99a"/><stop offset="0.5" stop-color="#b39cf7"/><stop offset="1" stop-color="#5b3fd1"/></linearGradient></defs>
+  <ellipse cx="100" cy="200" rx="66" ry="16" fill="none" stroke="rgba(241,217,154,0.55)" stroke-width="1.6" stroke-dasharray="4 5"/>
+  <path d="M152 192 l10 8 l-12 4" fill="none" stroke="#f1d99a" stroke-width="2"/>
+  <circle cx="100" cy="12" r="5" fill="#f1d99a"/><g transform="rotate(14 100 12)"><line x1="100" y1="12" x2="100" y2="150" stroke="rgba(236,230,247,0.85)" stroke-width="1.6"/>
+  <path d="M100 148 L114 166 L100 200 L86 166 Z" fill="url(#cr)" stroke="#f1d99a" stroke-width="1.2" style="filter: drop-shadow(0 0 10px rgba(241,217,154,0.7))"/></g></svg>`;
+const V = {
+  tarot: { etiqueta: "CARTA DEL DÍA", titulo: "¿Qué te dice<br>hoy el tarot?", texto: "Saca tu carta y Sibila te la interpreta para tu día.", boton: "Tu carta del día es gratis", web: "miarcana.com/fb/tarot",
+    centro: `<div class="carta" style="background-image:url(${R}la-estrella.webp);transform:rotate(-10deg) translate(40px,20px)"></div><div class="carta" style="background-image:url(${R}el-sol.webp);z-index:2;transform:scale(1.08)"></div><div class="carta" style="background-image:url(${R}la-rueda-de-la-fortuna.webp);transform:rotate(10deg) translate(-40px,20px)"></div>` },
+  pendulo: { etiqueta: "PÉNDULO", titulo: "¿Sí o no?<br>Pregúntale al péndulo", texto: "Haz tu pregunta y Sibila te explica su respuesta.", boton: "Gratis una vez al día", web: "miarcana.com/fb/pendulo", centro: pendulo },
+  astral: { etiqueta: "CARTA ASTRAL", titulo: "Tu Sol, tu Luna<br>y tu Ascendente", texto: "Con tu fecha, hora y ciudad: cálculo astronómico real.", boton: "Calcula tu carta gratis", web: "miarcana.com/fb/carta-astral",
+    centro: `<div style="position:relative;width:400px;height:400px">${["aries","tauro","geminis","cancer","leo","virgo","libra","escorpio","sagitario","capricornio","acuario","piscis"].map((s, i) => { const a = (i / 12) * 2 * Math.PI - Math.PI / 2; return `<div class="moneda" style="position:absolute;width:86px;height:86px;left:${200 + 160 * Math.cos(a) - 43}px;top:${200 + 160 * Math.sin(a) - 43}px;background-image:url(${S}${s}.webp)"></div>`; }).join("")}<div style="position:absolute;left:150px;top:150px;width:100px;height:100px;display:flex;align-items:center;justify-content:center;font-size:80px;color:#f1d99a;text-shadow:0 0 30px #f1d99a">✦</div></div>` },
+  pareja: { etiqueta: "COMPATIBILIDAD", titulo: "¿Son compatibles?", texto: "Sus dos signos, o sus dos cartas completas, frente a frente.", boton: "Descúbrelo en Arcana", web: "miarcana.com/fb/compatibilidad",
+    centro: `<div class="moneda" style="background-image:url(${S}leo.webp)"></div><div style="margin:0 34px;font-size:96px;color:#ff7b9c;text-shadow:0 0 30px rgba(255,123,156,0.7)">♥</div><div class="moneda" style="background-image:url(${S}geminis.webp)"></div>` },
+};
+const v = V[new URLSearchParams(location.search).get("v") || "tarot"];
+for (const k of ["etiqueta", "titulo", "texto", "boton", "web", "centro"]) document.getElementById(k).innerHTML = v[k];
+if (!v.texto) document.getElementById("texto").remove();
+document.querySelector("h1").style.top = v.titulo.includes("<br>") ? "172px" : "200px";
+</script>
+</body></html>
