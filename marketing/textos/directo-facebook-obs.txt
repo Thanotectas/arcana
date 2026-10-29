@@ -1,5 +1,12 @@
 SIBILA EN VIVO TAMBIÉN EN FACEBOOK — CÓMO CONFIGURARLO EN OBS (una sola vez)
 
+⚠️ REQUISITO DE FACEBOOK (comprobado el 29 de octubre de 2026): para transmitir en vivo, Meta exige que la página
+«Mi Arcana» tenga al menos 60 días de antigüedad y al menos 100 seguidores. Mientras no los cumpla, Live Producer dice
+«Aún no puedes transmitir en vivo» y los botones salen en gris. Hasta entonces el directo va solo por YouTube y en
+Facebook se publica el enlace del directo de YouTube. Para llegar a 100: invitar amigos a seguir la página
+(página → «Invitar»). La fecha de creación está en la página → Información → Transparencia de la página.
+
+
 La misma imagen y voz de Sibila sale a YouTube y a la página de Facebook «Mi Arcana» al mismo tiempo.
 Sibila lee las preguntas de los dos lados (en pantalla dice «· Facebook» cuando viene de allá).
 
