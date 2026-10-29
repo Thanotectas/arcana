@@ -50,13 +50,16 @@ const NOMBRE_TIPO: Record<TipoLectura, string> = {
 };
 
 /** Lo que se puede pedir en el chat: el recuadro de arriba lo va mostrando por turnos mientras no hay lectura. */
+// La carta astral y la sinastría salen la mitad del tiempo: son lo que el directo impulsa.
 const INSTRUCCIONES = [
-  { titulo: "Tarot · tres cartas para ti", ejemplo: "Leo, ¿me sale el trabajo?" },
   { titulo: "Tu carta astral, dibujada en vivo", ejemplo: "carta astral 14/03/1985 10:30 Medellín" },
   { titulo: "Sinastría · sus dos cielos juntos", ejemplo: "sinastría 14/03/1985 y 22/08/1990" },
+  { titulo: "Tarot · tres cartas para ti", ejemplo: "Leo, ¿me sale el trabajo?" },
+  { titulo: "Carta astral · sin la hora también", ejemplo: "carta astral 03/07/1992 Bogotá" },
+  { titulo: "Sinastría · ¿son compatibles?", ejemplo: "sinastría 25/11/1989 y 09/02/1994" },
   { titulo: "Horóscopo · tu cielo de hoy", ejemplo: "horóscopo Piscis" },
-  { titulo: "Numerología · lo que trae tu año", ejemplo: "mi año 14/03/1985" },
   { titulo: "Aura · el color de tu energía", ejemplo: "aura: ando muy cansada" },
+  { titulo: "Numerología · lo que trae tu año", ejemplo: "mi año 14/03/1985" },
 ];
 /** Frases de espera de Sibila (FRASES_PUENTE en src/lib/en-vivo.ts). */
 const FRASES_PUENTE = 12;

@@ -10,7 +10,7 @@ import { SIGNOS, type Signo } from "@/lib/zodiaco";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
-import { PAQUETE_PRUEBA, PAQUETES } from "@/lib/creditos";
+import { PAQUETES } from "@/lib/creditos";
 import { codigoVigente } from "@/lib/pagos/codigos";
 import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
 import { TELEGRAM } from "@/lib/marca/redes";
@@ -497,29 +497,30 @@ export const FRASES_PUENTE = 12;
 /**
  * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez y
  * el audio queda guardado en Storage, así recargar el escenario no gasta voz).
- * Explican cómo pedir cada lectura, el precio de la tirada de prueba, la
- * invitación a suscribirse y, si hay un código de oferta vigente, cómo usarlo.
+ * Impulsan sobre todo la carta astral y la sinastría (la mitad de las frases,
+ * cada una con otro ángulo), recuerdan que la persona elige qué lectura pedir,
+ * invitan a suscribirse y, si hay un código de oferta vigente, dicen cómo usarlo.
  */
 export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
-  const prueba = precioHablado(PAQUETE_PRUEBA.precioCOP);
   const paquete = PAQUETES[0];
   const oferta = codigo
     ? `Y esta noche hay regalo: con el código ${codigoDicho(codigo.codigo)}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
     : "";
   const telegram = TELEGRAM.activo ? " Y si quieres tu carta cada mañana, búscame en Telegram: Mi Arcana Bot." : "";
+  // La mitad impulsa la carta astral y la sinastría, cada una con otro ángulo para que no suene repetida.
   const frases = [
-    "Bienvenidas, bienvenidos. Soy Sibila. Escribe en el chat tu signo y tu pregunta, y saco tres cartas para ti.",
-    "¿Quieres ver tu carta astral dibujada aquí, en vivo? Escribe carta astral, tu fecha de nacimiento, la hora y la ciudad donde naciste.",
-    `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y una tirada completa de tres cartas, con calma y por escrito, cuesta ${prueba}. ${oferta}`.trim(),
-    "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos.",
-    "Si quieres saber qué te trae tu año, escribe mi año y tu fecha de nacimiento. Los números también hablan.",
+    "Bienvenidas, bienvenidos. Soy Sibila. Esta noche tú eliges: tu carta astral dibujada en vivo, tu sinastría con alguien especial, o una pregunta para las cartas. Escríbelo en el chat.",
+    "¿Quieres ver tu carta astral dibujada aquí, planeta por planeta? Escribe carta astral, tu fecha de nacimiento, la hora y la ciudad donde naciste.",
+    "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos, con los hilos que los unen.",
+    `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y allí también te espera tu carta astral completa, explicada casa por casa. ${oferta}`.trim(),
+    "No necesitas saber nada de astrología: solo tu fecha, tu hora y tu ciudad. Escribe carta astral y mira cómo aparece tu cielo en la pantalla.",
     `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo.${telegram}`,
-    "Escribe horóscopo y tu signo, y te muestro cómo está el cielo hoy para ti: dónde anda la Luna y qué área de tu vida mueve.",
-    "Las cartas no deciden por ti: te muestran el camino. Escribe tu pregunta en el chat y la miramos juntas.",
-    "¿De qué color está tu energía hoy? Escribe aura y cuéntame cómo te sientes, y te digo el color que veo.",
-    `Si quieres una lectura más profunda, con más cartas y con calma, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
-    "¿Tu taza de chocolate o la palma de tu mano? Escanea el código de la pantalla, sube la foto, y aquí la miramos.",
-    "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe tu signo y tu pregunta, que ya te llega el turno.",
+    "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
+    "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
+    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si quieres que mire tu taza o tu mano, escanea el código de la pantalla y sube la foto.",
+    `Si quieres una lectura más profunda, con calma y por escrito, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
+    "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
+    "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",
   ];
   return frases.slice(0, FRASES_PUENTE);
 }
