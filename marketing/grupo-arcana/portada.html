@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:Cormorant;src:url(../../src/app/fuentes/CormorantGaramond-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Cormorant;src:url(../../src/app/fuentes/CormorantGaramond-Italic.ttf);font-style:italic}
+@font-face{font-family:Inter;src:url(../../src/app/fuentes/Inter-Medium.ttf);font-weight:500}
+@font-face{font-family:Inter;src:url(../../src/app/fuentes/Inter-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Simbolos;src:url(../../src/app/fuentes/NotoSansSymbols2.ttf)}
+html,body{margin:0;width:1640px;height:856px;overflow:hidden}
+body{font-family:Inter;color:#ece6f7;background:radial-gradient(ellipse at 50% 40%,#3a2380 0%,#1a1036 50%,#0b0716 100%);position:relative}
+#est{position:absolute;inset:0}
+.sib{position:absolute;left:80px;top:213px;width:380px;height:380px;border-radius:50%;overflow:hidden;border:4px solid #f1d99a;box-shadow:0 0 60px #f1d99a55,0 0 0 14px #f1d99a14}
+.sib img{width:100%;height:100%;object-fit:cover}
+.t{position:absolute;left:500px;width:660px;top:200px;text-align:center}
+.eti{font-size:22px;letter-spacing:.38em;color:#b7a5ff;text-transform:uppercase}
+h1{font-family:Cormorant;font-weight:600;font-size:88px;line-height:1;margin:18px 0 0;color:#f1d99a;text-shadow:0 0 34px #f1d99a55}
+.sub{font-family:Cormorant;font-style:italic;font-size:40px;margin:22px 0 0}
+.dir{display:inline-block;margin-top:30px;padding:12px 26px;border-radius:999px;border:1.5px solid #f1d99a88;background:#f1d99a14;font-size:24px;font-weight:600;color:#fff;white-space:nowrap}
+.rueda{position:absolute;right:40px;top:150px;width:420px;height:420px}
+.carta{position:absolute;width:135px;border-radius:12px;box-shadow:0 14px 40px #000a;border:2px solid #f1d99a99}
+.logo{position:absolute;left:96px;bottom:40px;display:flex;align-items:center;gap:12px;font-family:Cormorant;font-size:34px;color:#f1d99a}
+.logo img{width:46px}
+</style></head><body><svg id="est" width="1640" height="856"></svg>
+<div class="sib"><img src="../../public/marca/sibila/base.jpg"></div>
+<div class="t"><div class="eti">Comunidad Arcana</div><h1>Carta Astral<br>y Tarot en Español</h1><p class="sub">Aprende, pregunta y comparte con Sibila</p><div class="dir">🔮 En vivo cada domingo · 8 p.m. (Colombia)</div></div>
+<svg class="rueda" viewBox="-240 -240 480 480" id="rueda"></svg>
+<img class="carta" src="../../public/cartas/arcana/el-cosmos.webp" style="right:290px;top:540px;transform:rotate(-12deg)">
+<img class="carta" src="../../public/cartas/arcana/el-despertar.webp" style="right:170px;top:520px;transform:rotate(4deg)">
+<img class="carta" src="../../public/cartas/arcana/el-encuentro.webp" style="right:50px;top:550px;transform:rotate(16deg)">
+<div class="logo"><img src="../../public/marca/icono-arcana.svg">miarcana.com</div>
+<script>
+let e="";for(let i=0;i<170;i++){const x=(i*733)%1640,y=(i*397)%856,r=((i*7)%5)*0.3+0.4;e+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#fff" opacity="'+(0.25+((i*13)%7)/10)+'"/>'}document.getElementById("est").innerHTML=e;
+const S=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"],C=["#ff8a5b","#9ad07f","#8fc7ff","#b28dff"];
+const p=(a,r)=>[r*Math.cos(a),-r*Math.sin(a)];let s='<circle r="232" fill="#120c22aa" stroke="#d9b45a" stroke-width="3"/><circle r="190" fill="none" stroke="#d9b45a" stroke-width="1.5"/><circle r="120" fill="#1a1233" stroke="#b7a5ff55"/>';
+for(let i=0;i<12;i++){const a=(180+i*30)*Math.PI/180,[x1,y1]=p(a,190),[x2,y2]=p(a,232),[gx,gy]=p(a+15*Math.PI/180,211);s+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#d9b45a99"/><text x="'+gx+'" y="'+gy+'" font-family="Simbolos" font-size="26" fill="'+C[i%4]+'" text-anchor="middle" dominant-baseline="central">'+S[i]+'︎</text>'}
+const P=[[20,"☉"],[115,"☽"],[160,"☿"],[205,"♀"],[290,"♂"],[330,"♃"],[65,"♄"]];P.forEach(([l,g])=>{const a=(180+l)*Math.PI/180,[x,y]=p(a,155);s+='<circle cx="'+x+'" cy="'+y+'" r="17" fill="#150f26" stroke="#f1d99a"/><text x="'+x+'" y="'+y+'" font-family="Simbolos" font-size="20" fill="#f1d99a" text-anchor="middle" dominant-baseline="central">'+g+'︎</text>'});
+[[0,4,"#8fc7ff"],[1,3,"#ff7b9c"],[2,5,"#8fc7ff"],[0,6,"#f1d99a"],[3,6,"#ff7b9c"]].forEach(([i,j,c])=>{const a=(180+P[i][0])*Math.PI/180,b=(180+P[j][0])*Math.PI/180,[x1,y1]=p(a,118),[x2,y2]=p(b,118);s+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="2.2" opacity=".85"/>'});
+document.getElementById("rueda").innerHTML=s;
+</script></body></html>

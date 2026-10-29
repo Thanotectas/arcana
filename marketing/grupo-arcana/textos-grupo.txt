@@ -1,0 +1,97 @@
+GRUPO DE FACEBOOK «Carta Astral y Tarot en Español · Arcana»
+Se crea DESDE la página Mi Arcana (así el grupo queda vinculado y la página es la administradora).
+Imágenes: portada-grupo-1640x856.png (portada del grupo) y evento-domingo-1-noviembre-1920x1005.png (evento).
+Fuentes: portada.html y evento.html.
+
+══ CONFIGURACIÓN ══
+Nombre: Carta Astral y Tarot en Español · Arcana
+Privacidad: Público (cualquiera ve las publicaciones; ayuda a que crezca y aparezca en búsquedas)
+Visible: Sí
+Ubicación: Colombia
+Etiquetas/temas: Astrología, Tarot, Espiritualidad, Numerología
+Aprobación de publicaciones: ACTIVADA las primeras semanas (evita spam y vendedores de «amarres»)
+
+══ DESCRIPCIÓN ══
+🔮 Un espacio en español para aprender y conversar sobre carta astral, sinastría, tarot y numerología, sin miedo y sin juicios.
+
+Aquí puedes:
+✨ Preguntar por tu Sol, tu Luna y tu Ascendente
+💞 Compartir lo que te dice la sinastría con esa persona
+🃏 Comentar la carta del día y aprender a leer el tarot
+🔢 Descubrir tu número de vida
+
+Cada domingo a las 8:00 p.m. (Colombia) Sibila, la astróloga de Arcana, lee EN VIVO: tú escribes tu fecha, hora y ciudad en el chat y ve dibujarse tu carta astral en pantalla. El enlace del directo siempre está en la publicación fijada.
+
+Lecturas de entretenimiento y reflexión personal. Nada de lo que se publica aquí reemplaza la opinión de un médico, abogado o profesional de la salud mental.
+🌙 miarcana.com
+
+══ REGLAS (Facebook deja poner título + descripción a cada una) ══
+1. Respeto ante todo
+   Todas las creencias y signos son bienvenidos. No se permiten burlas, insultos ni comentarios sobre el cuerpo o la vida de otras personas.
+2. Sin miedo ni amenazas
+   No se publican «trabajos», amarres, maldiciones ni mensajes que asusten («si no haces esto te va a pasar…»). Aquí la astrología y el tarot se usan para conocerse, no para atemorizar.
+3. Nada de ventas ni spam
+   No se permite publicar servicios, números de WhatsApp, enlaces de pago ni ofrecer lecturas por privado. Los mensajes privados no solicitados con ofertas son motivo de expulsión.
+4. Cuida tus datos
+   Para hablar de tu carta basta con la fecha, la hora y la ciudad. Nunca compartas tu número de cédula, dirección ni datos bancarios, y desconfía de quien te los pida.
+5. La salud va con el médico
+   Las lecturas son entretenimiento y reflexión personal. Si tienes un tema de salud, legal o emocional delicado, busca a un profesional.
+6. Publicaciones con sentido
+   Comparte preguntas, experiencias y aprendizajes de astrología, tarot, numerología y espiritualidad. Las publicaciones que no tengan relación con el tema pueden ser eliminadas.
+
+══ PREGUNTAS DE INGRESO (máximo 3) ══
+1. ¿Cuál es tu signo solar? (y si lo sabes, tu Luna y tu Ascendente)   → respuesta escrita
+2. ¿Qué te gustaría aprender aquí?   → opción múltiple: Carta astral / Sinastría (compatibilidad) / Tarot / Numerología / Rituales y limpias
+3. ¿Aceptas las reglas del grupo, incluida la de no vender ni hacer spam?   → casilla «Acepto las reglas del grupo»
+(No pedir fecha de nacimiento ni teléfono en las preguntas: son datos personales.)
+
+══ PUBLICACIÓN DE BIENVENIDA (fijarla como «Destacada») ══
+🌙 ¡Bienvenida, bienvenido a Carta Astral y Tarot en Español!
+
+Este grupo nace de Arcana para que aprendamos juntos a leer el cielo y las cartas, con calma y sin miedo.
+
+Para empezar, preséntate en los comentarios 👇
+✨ Tu signo solar
+🌙 Tu Luna y tu Ascendente (si no los sabes, dinos y te ayudamos)
+🔮 ¿Qué te trajo aquí: la carta astral, el tarot, la sinastría o la numerología?
+
+📅 Cada domingo a las 8:00 p.m. (Colombia) · 7:00 p.m. (México) Sibila lee EN VIVO y tú eliges: tu carta astral dibujada en pantalla o la sinastría con esa persona. Es gratis.
+👉 Activa el recordatorio del próximo directo: https://youtube.com/live/tFyKvAmk5H8
+
+Lee las reglas en «Información» y ¡que las estrellas te acompañen! 💜
+
+══ EVENTO DEL DOMINGO (Crear → Evento → En línea → Enlace externo) ══
+Imagen: evento-domingo-1-noviembre-1920x1005.png
+Nombre: 🔮 Sibila EN VIVO · Tu carta astral dibujada en pantalla
+Fecha y hora: domingo 1 de noviembre de 2026, 8:00 p.m. – 9:00 p.m. (hora de Colombia)
+Tipo: En línea → Enlace externo → https://youtube.com/live/tFyKvAmk5H8
+Descripción:
+Este domingo Sibila, la astróloga de Arcana, lee EN VIVO y tú eliges qué leer:
+✨ Tu carta astral, dibujada en pantalla planeta por planeta → escribe en el chat de YouTube «carta astral + tu fecha, hora y ciudad de nacimiento»
+💞 Tu sinastría con esa persona, sus dos cielos y su afinidad → «sinastría + las dos fechas»
+También tarot, aura y numerología. Gratis.
+🕗 8:00 p.m. Colombia, Perú y Ecuador · 7:00 p.m. México · 10:00 p.m. Argentina
+Marca «Asistiré» y te llega el aviso. En YouTube toca «Recordarme».
+Lecturas de entretenimiento y reflexión personal.
+
+══ RUTINA SEMANAL (10 minutos al día; publicar desde el grupo como «Mi Arcana») ══
+LUNES · Energía de la semana
+  «🌙 Energía de la semana del [fecha]: [tránsito principal en una frase]. ¿Cómo la sientes en tu signo? Cuéntanos 👇»
+MARTES · Carta del día
+  Una carta del tarot de Arcana (public/cartas/arcana/) + «¿Qué te dice a ti esta carta? Interpreta antes de leer la respuesta en los comentarios».
+MIÉRCOLES · Pregunta para conversar
+  «¿Qué signo te ha costado más entender en el amor y por qué? 💞» / «¿Tu Ascendente se nota más que tu Sol?» (preguntas abiertas: son las que más comentarios generan)
+JUEVES · Aprende en 1 minuto
+  Una imagen educativa (como 06-trio-esencial.png o 05-numero-de-vida.png) con una explicación corta.
+VIERNES · Ritual o encuesta
+  Un ritual sencillo y amable (vela, intención, agua de luna) o una encuesta: «¿Qué leemos el domingo: carta astral o sinastría?».
+SÁBADO · Recordatorio del directo
+  «Mañana 8 p.m. 🔮 Trae tu fecha, hora y ciudad» + el evento.
+DOMINGO · Directo
+  7:30 p.m. «En 30 minutos» · 8:00 p.m. «🔴 ¡Ya estamos EN VIVO!» con el enlace · al día siguiente: «Gracias por venir, ¿qué te pareció tu carta?».
+
+Consejos:
+- Responde TODOS los comentarios las primeras semanas: un grupo nuevo crece por conversación.
+- Invita primero a tus contactos y a quienes comentan en la página (Facebook sugiere «Invitar a seguidores de la página»).
+- En los otros grupos donde participas, no pongas el enlace del grupo en publicaciones (lo borran); compártelo solo cuando alguien pregunte.
+- Sibila (la app) NO responde dentro de los grupos: los comentarios del grupo se contestan a mano.
