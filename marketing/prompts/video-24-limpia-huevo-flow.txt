@@ -1,0 +1,73 @@
+VIDEO 24 — "LA LIMPIA CON HUEVO" (Sibila hace una limpia y lee el vaso). Google Flow (Veo), 2 clips de 8 s, vertical 9:16.
+Lleva a miarcana.com/huevo (3 créditos): la persona se pasa el huevo, lo rompe en un vaso de agua, lo fotografía y
+Sibila lee la yema, la clara, las burbujas y los hilos. Es la tradición curandera de México, Colombia, Perú y el Caribe.
+Tono: cálido, sereno, protector; NADA de miedo, brujería ni "trabajos". Los prompts van en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- "Ingredientes a video" (Ingredients to video): sube sibila-retrato.jpg (su cara). La consultante la describe el texto.
+- Vertical 9:16, 8 s. El clip 2 con "Extender" (Extend) desde el clip 1, para que las dos mujeres, la luz y la mesa no
+  cambien.
+- Sonido: solo ambiente (velas, un susurro de hierbas, el crujido del huevo, el agua). Sin música y sin voces: la voz la
+  ponemos con Marcela (ElevenLabs).
+- El final del clip 2 es un primer plano QUIETO del vaso: ahí pongo yo los rótulos que señalan cada señal.
+
+==================== CLIP 1 · "La limpia" (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight, serene and protective atmosphere. Sibila, the woman from the reference
+image (same face, same long dark hair, same deep violet dress with golden embroidery), stands beside a young Latina
+woman in her late twenties with curly brown hair and a simple cream blouse, who sits on a wooden chair with her eyes
+closed and her hands resting on her lap, calm and relaxed. Around them: lit candles, a small bundle of fresh rosemary
+and rue tied with red thread, and a clear glass of water on a wooden table covered with an indigo velvet cloth.
+Sibila holds a white egg in her right hand and slowly passes it a few centimeters above the young woman's head, then
+down along her shoulders and arms, in gentle circular movements, murmuring softly with her eyes half closed. A faint
+warm golden haze follows the egg as it moves. The young woman breathes out slowly and her shoulders relax. Slow
+camera movement around them, from a medium shot to a closer shot of the egg and Sibila's hands.
+Sound: candles crackling, a soft whisper, rustling herbs. No music, no understandable words.
+No text, no letters, no logos. Nothing scary or dark: warm, golden, caring.
+
+==================== CLIP 2 · "El vaso" (8 s, Extender desde el clip 1) ====================
+Continue the same scene with the same two women, clothes, table and candlelight. Sibila turns to the table and
+gently cracks the egg on the rim of the clear glass of water and opens it with both hands; the raw egg drops into the
+water. Close-up of the glass: the whole yolk sinks slowly to the bottom, a few tiny bubbles rise around it, and thin
+translucent threads of egg white slowly climb toward the surface like little candles. Sibila leans in and looks at
+the glass with attention, then looks up at the young woman and gives her a warm, reassuring smile; the young woman
+opens her eyes and smiles back, relieved. For the last 3 seconds: a fixed, static close-up of the glass on the indigo
+velvet, lit from behind by the candles, with the yolk at the bottom, the small bubbles and the rising threads clearly
+visible; the camera does not move and no hands are in frame.
+Sound: the soft crack of the egg, water, candles. No music, no voices.
+No text, no letters, no logos. The egg looks natural and clean (no blood, nothing dark or frightening).
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración de siempre) ====================
+Cuatro frases por separado (≈ 24 s en total):
+1-limpia.mp3 (≈ 6 s, mientras pasa el huevo):
+"El huevo recoge lo que cargas: el cansancio, las preocupaciones… y las miradas pesadas."
+2-vaso.mp3 (≈ 5 s, cuando rompe el huevo en el agua):
+"Luego se rompe en un vaso de agua… y el vaso habla."
+3-senales.mp3 (≈ 8 s, sobre el primer plano del vaso):
+"Las burbujas son cargas que se fueron. Los hilos que suben, tensión que soltaste. Y la yema entera al fondo… es energía limpia."
+4-cierre.mp3 (≈ 5 s, en el cierre):
+"Fotografía tu vaso, y yo te lo leo en mi arcana punto com."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Clip 1: rótulos "La limpia con huevo" · "Una tradición de nuestras abuelas".
+- Primer plano del vaso: tres rótulos con líneas finas doradas que señalan cada cosa: "Burbujas → cargas que se
+  fueron", "Hilos que suben → tensión que soltaste", "Yema entera al fondo → energía limpia".
+- Cierre: "Limpia con huevo · Sibila lee tu vaso" + "Pasa el huevo · rómpelo en agua · fotografía el vaso" +
+  miarcana.com/huevo + QR a miarcana.com/yt/huevo. Aviso pequeño: "Ritual tradicional y simbólico. Ante un malestar que
+  no pasa, consulta a un médico."
+
+==================== SI ALGO SALE MAL ====================
+- La consultante cambia entre clips: repite su descripción completa al inicio del clip 2.
+- Cambia la cara de Sibila: vuelve a subir sibila-retrato.jpg y escribe "keep exactly the face from the reference".
+- El huevo sale con sangre o con aspecto feo: agrega "fresh, clean egg, bright golden yolk, clear egg white".
+- No se ven los hilos ni las burbujas: genera solo el primer plano del vaso aparte (4–8 s), "macro shot of a clear
+  glass of water with a raw egg at the bottom, small bubbles and thin white threads rising, static camera, candlelight
+  from behind".
+- Sale tenebroso: "warm golden candlelight, serene and luminous atmosphere, caring and protective, nothing scary".
+- Aparecen letras o símbolos: "no text, no letters, no symbols anywhere".
+
+==================== OTRAS IDEAS PARA LOS SIGUIENTES (aún sin video) ====================
+- Lectura del café: Sibila voltea la taza sobre el plato y lee la borra (aves, caminos, peces). Muy visual.
+- Revolución solar "Predicciones 2027": el Sol vuelve a su lugar el día de tu cumpleaños; ideal en noviembre y
+  diciembre (6 créditos, la lectura más cara).
+- Péndulo gratis: pregunta de sí o no y el péndulo gira; gancho perfecto para llevar gente nueva.
+- Baraja española y Lenormand: ya tenemos las ilustraciones propias para mostrar en el montaje.
