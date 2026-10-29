@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+html, body { margin: 0; background: transparent; }
+</style></head><body>
+<svg id="c" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const ORO = "#f1d99a", VIO = "#b7a5ff", TXT = "#ece6f7";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const suave = (x) => x * x * (3 - 2 * x);
+const ventana = (t, a, b, f = 0.4) => Math.min(suave(prog(t, a, a + f)), 1 - suave(prog(t, b - f, b)));
+const defs = `<defs>
+  <filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="s" x="-20%" y="-50%" width="140%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.85"/></filter>
+  <radialGradient id="cielo" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#2a1660"/><stop offset="0.5" stop-color="#140b30"/><stop offset="1" stop-color="#0b0716"/></radialGradient>
+  <clipPath id="circ"><circle cx="540" cy="470" r="210"/></clipPath>
+</defs>`;
+const tx = (x, y, s, o = {}) => { const { tam = 60, fam = "Cormorant", peso = 600, color = ORO, op = 1, estilo = "normal", anchor = "middle", filtro = "s" } = o;
+  return `<text x="${x}" y="${y}" font-family="${fam}" font-size="${tam}" font-weight="${peso}" font-style="${estilo}" fill="${color}" opacity="${op.toFixed(3)}" text-anchor="${anchor}" style="font-variant-numeric: lining-nums" xml:space="preserve" filter="url(#${filtro})">${s}</text>`; };
+const franja = (y, h, op) => `<rect x="0" y="${y}" width="1080" height="${h}" fill="#0b0716" opacity="${(0.55 * op).toFixed(3)}"/>`;
+/** Rótulo con línea dorada que señala un punto del vaso. */
+function rotulo(t, t0, caja, punto, titulo, sub) {
+  const q = suave(prog(t, t0, t0 + 0.5)) * (1 - suave(prog(t, 22.4, 22.75)));
+  if (q <= 0) return "";
+  const [x, y, w] = caja, h = 118;
+  const ax = x + w / 2 < punto[0] ? x + w : x, ay = y + h / 2;
+  const L = Math.hypot(punto[0] - ax, punto[1] - ay), d = suave(prog(t, t0 + 0.2, t0 + 0.9));
+  return `<g opacity="${q.toFixed(3)}">
+    <line x1="${ax}" y1="${ay}" x2="${(ax + (punto[0] - ax) * d).toFixed(1)}" y2="${(ay + (punto[1] - ay) * d).toFixed(1)}" stroke="${ORO}" stroke-width="3" filter="url(#b)"/>
+    <circle cx="${punto[0]}" cy="${punto[1]}" r="${(9 * d).toFixed(1)}" fill="none" stroke="${ORO}" stroke-width="3" filter="url(#b)"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#0b0716" opacity="0.78" stroke="${ORO}" stroke-opacity="0.6" stroke-width="2"/>
+    ${tx(x + w / 2, y + 50, titulo, { tam: 46, color: ORO, filtro: "" })}
+    ${tx(x + w / 2, y + 92, sub, { tam: 30, fam: "Inter", peso: 500, color: TXT, filtro: "" })}
+  </g>`;
+}
+function pintar(t) {
+  let s = defs;
+  const i = ventana(t, 0.3, 4.2);
+  if (i > 0) s += franja(110, 220, i) + tx(540, 215, "La limpia con huevo", { tam: 96, color: "#fff", op: i, filtro: "b" }) + tx(540, 290, "una tradición de nuestras abuelas", { tam: 48, estilo: "italic", color: ORO, op: suave(prog(t, 0.8, 1.4)) * i });
+  const p = ventana(t, 4.6, 7.8);
+  if (p > 0) s += franja(1640, 150, p) + tx(540, 1735, "Se pasa por el cuerpo, de la cabeza a los pies", { tam: 38, fam: "Inter", peso: 600, color: TXT, op: p });
+  const r = ventana(t, 8.4, 11.3);
+  if (r > 0) s += franja(1640, 150, r) + tx(540, 1735, "Se rompe en un vaso con agua…", { tam: 42, fam: "Inter", peso: 600, color: TXT, op: r });
+  if (t > 12.9 && t < 22.8) {
+    s += franja(110, 150, ventana(t, 12.9, 22.75)) + tx(540, 210, "…y el vaso habla", { tam: 84, color: "#fff", op: ventana(t, 12.9, 22.75), filtro: "b" });
+    s += rotulo(t, 13.2, [40, 720, 340], [444, 940], "Burbujas", "cargas que se fueron");
+    s += rotulo(t, 15.4, [690, 600, 350], [560, 880], "Hilos que suben", "tensión que soltaste");
+    s += rotulo(t, 18.7, [250, 1560, 580], [530, 1400], "Yema entera al fondo", "energía limpia");
+  }
+  const c = suave(prog(t, 22.6, 23.2));
+  if (c > 0) {
+    s += `<g opacity="${c.toFixed(3)}"><rect width="1080" height="1920" fill="url(#cielo)"/>`;
+    s += `<circle cx="540" cy="470" r="240" fill="#f1d99a" opacity="0.12" filter="url(#b)"/><image href="file:///home/user/arcana/marketing/imagenes/sibila-retrato.jpg" x="330" y="260" width="420" height="420" preserveAspectRatio="xMidYMid slice" clip-path="url(#circ)"/><circle cx="540" cy="470" r="212" fill="none" stroke="${ORO}" stroke-width="5" filter="url(#b)"/>`;
+    s += tx(540, 790, "Sibila lee tu vaso", { tam: 92, color: "#fff", filtro: "b" });
+    s += tx(540, 860, "Pasa el huevo · rómpelo en agua · fotografía el vaso", { tam: 34, fam: "Inter", peso: 600, color: VIO });
+    const qq = suave(prog(t, 23.4, 24.1));
+    s += `<g opacity="${qq.toFixed(2)}"><rect x="350" y="930" width="380" height="380" rx="26" fill="${ORO}" filter="url(#b)"/><svg x="368" y="948" width="344" height="344" viewBox="${window.QRVB}">${window.QR}</svg></g>`;
+    s += tx(540, 1375, "Escanéalo y envía tu foto", { tam: 34, fam: "Inter", color: VIO, op: qq });
+    s += tx(540, 1530, "miarcana.com/huevo", { tam: 80, color: ORO, op: suave(prog(t, 24.0, 24.6)), filtro: "b" });
+    s += tx(540, 1770, "Ritual tradicional y simbólico. Ante un malestar que no pasa, consulta a un médico.", { tam: 24, fam: "Inter", color: "#a99fbf", op: suave(prog(t, 24.3, 24.9)), filtro: "" });
+    s += "</g>";
+  }
+  document.getElementById("c").innerHTML = s;
+}
+window.pintar = pintar;
+</script></body></html>
