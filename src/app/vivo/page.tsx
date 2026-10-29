@@ -2,27 +2,67 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { escenarioActivo } from "@/lib/en-vivo";
+import { PROXIMO_DIRECTO, ZONA_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
 import { FormularioVivo } from "@/components/FormularioVivo";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sibila en vivo",
-  description: "Envía la foto de tu taza de chocolate o de tu mano y Sibila la lee en el directo de Arcana en YouTube.",
+  description: "Sibila lee en vivo en YouTube: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. Activa el recordatorio o envía la foto de tu taza o de tu mano.",
 };
 
-/** Página del QR del directo: subir la foto de la taza o de la mano para «Sibila en vivo». */
+/**
+ * Página del QR del directo: antes muestra la fecha, el recordatorio de YouTube
+ * y cómo pedir cada lectura; durante el directo, el botón para entrar y el
+ * formulario para subir la foto de la taza o de la mano.
+ */
 export default async function PaginaVivo() {
   const activo = await escenarioActivo(getSupabaseAdmin()).catch(() => false);
+  const estado = estadoDirecto();
+  const inicio = new Date(PROXIMO_DIRECTO.inicio);
+  const fecha = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, weekday: "long", day: "numeric", month: "long" }).format(inicio);
+  const hora = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(inicio);
   return (
     <div className="mx-auto max-w-md space-y-6 py-6">
       <div className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Sibila en vivo</p>
         <h1 className="mt-2 font-display text-4xl font-semibold text-oro-suave">Tu lectura en el directo</h1>
-        <p className="mt-2 text-texto-suave">Envía la foto de tu taza de chocolate o de tu mano y Sibila la lee en voz alta en el directo de YouTube.</p>
+        <p className="mt-2 text-texto-suave">Sibila lee en vivo en YouTube y tú eliges: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. También puedes enviarle la foto de tu taza o de tu mano.</p>
       </div>
-      {activo ? (
-        <div className="tarjeta p-5">
-          <FormularioVivo />
+      {activo || estado === "en-vivo" ? (
+        <>
+          {/* Durante el directo: entrar a verlo es lo primero; la foto, después. */}
+          <a href={PROXIMO_DIRECTO.url} target="_blank" rel="noopener noreferrer" className="boton boton-primario flex w-full justify-center text-lg">
+            ▶ Entrar al directo en YouTube
+          </a>
+          {activo && (
+            <div className="tarjeta p-5">
+              <FormularioVivo />
+            </div>
+          )}
+        </>
+      ) : estado === "proximo" ? (
+        <div className="tarjeta space-y-4 p-5 text-center">
+          <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">Próximo directo</p>
+          <p className="font-display text-3xl text-oro-suave first-letter:uppercase">{fecha}</p>
+          <p className="text-texto">{hora} · hora de Colombia · en YouTube</p>
+          <a href={PROXIMO_DIRECTO.emision ?? PROXIMO_DIRECTO.url} target="_blank" rel="noopener noreferrer" className="boton boton-primario flex w-full justify-center">
+            🔔 Activar el recordatorio en YouTube
+          </a>
+          <p className="text-xs text-texto-suave">En YouTube pulsa «Notificarme»: te avisa cuando empiece. A esa hora, este mismo enlace te lleva al directo.</p>
+          <div className="space-y-2 border-t border-borde pt-4 text-left text-sm">
+            <p className="text-xs uppercase tracking-widest text-texto-suave">Tú eliges qué leer · escríbelo en el chat</p>
+            <p>
+              <span className="text-oro-suave">Tu carta astral</span>, dibujada en pantalla: <span className="text-texto-suave">carta astral 14/03/1990 10:30 Bogotá</span>
+            </p>
+            <p>
+              <span className="text-oro-suave">Tu sinastría</span> con esa persona: <span className="text-texto-suave">sinastría 14/03/1990 y 22/08/1992</span>
+            </p>
+            <p>
+              <span className="text-oro-suave">Tarot, aura o mi año</span>: <span className="text-texto-suave">tu signo y tu pregunta</span>
+            </p>
+            <p className="text-texto-suave">El día del directo, aquí mismo podrás subir la foto de tu taza o de tu mano.</p>
+          </div>
         </div>
       ) : (
         <div className="tarjeta space-y-3 p-5 text-center">

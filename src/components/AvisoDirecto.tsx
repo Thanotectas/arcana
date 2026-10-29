@@ -28,7 +28,7 @@ export function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
   const dia = dias === 0 ? t.hoy : dias === 1 ? t.manana : fecha.charAt(0).toUpperCase() + fecha.slice(1);
   const hora = new Intl.DateTimeFormat(locale, { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(inicio);
   const enVivo = estado === "en-vivo";
-  const { video, codigo, url } = PROXIMO_DIRECTO;
+  const { video, codigo, url, emision } = PROXIMO_DIRECTO;
 
   return (
     <section className="tarjeta mx-auto grid max-w-4xl items-center gap-6 overflow-hidden p-5 sm:grid-cols-[14rem_1fr] sm:gap-8 sm:p-6">
@@ -55,7 +55,7 @@ export function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
           </p>
         )}
         <div className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start">
-          <a href={url} target="_blank" rel="noopener noreferrer" className="boton boton-primario">
+          <a href={enVivo ? url : (emision ?? url)} target="_blank" rel="noopener noreferrer" className="boton boton-primario">
             {enVivo ? t.entrar : t.recordatorio}
           </a>
           <Link href="/vivo" className="boton boton-secundario">{t.subirFoto}</Link>
