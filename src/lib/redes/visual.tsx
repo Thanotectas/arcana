@@ -8,6 +8,7 @@ import { COLORES_AURA, type ColorAura } from "@/lib/aura";
 import { COLORES, TONO_COLOR, type ColorVela } from "@/lib/velas";
 import { auraComoDataUri, cartaComoDataUri, monedaComoDataUri, webpComoDataUri } from "@/lib/marca/imagenes";
 import type { DatosTarjeta } from "@/lib/marca/tarjeta";
+import { ruedaTerminada, type RuedaAnimada } from "./rueda-animada";
 
 /**
  * Imagen principal de una publicación del agente de redes. La columna `carta`
@@ -22,7 +23,13 @@ import type { DatosTarjeta } from "@/lib/marca/tarjeta";
  *   vela/verde            una vela encendida
  *   hexagrama/101101      seis líneas, de abajo hacia arriba
  *   numeros/3·7·11        tres números
+ *   espanola/oros-1       carta de la baraja española (o lenormand/l24)
+ *   runas/algiz           piedra de una runa
+ *   pendulo               péndulo de cristal
+ *   huevo                 huevo en un vaso de agua
  *   luna                  luna creciente
+ *   astral/2026-11-02     el cielo de esa fecha dibujándose (rueda-animada.ts)
+ *   sinastria/1990-03-14+1992-08-22  dos cielos de ejemplo y sus hilos
  *   glifo/✋              un símbolo grande
  *
  * El reel (`reel-publicacion.tsx`) lo dibuja en grande; la tarjeta fija
@@ -30,6 +37,10 @@ import type { DatosTarjeta } from "@/lib/marca/tarjeta";
  */
 export type Visual =
   | { tipo: "carta"; mazo: IdMazo; id: string }
+  | { tipo: "imagen"; carpeta: "cartas/espanola" | "cartas/lenormand" | "runas"; id: string }
+  | { tipo: "pendulo" }
+  | RuedaAnimada
+  | { tipo: "huevo" }
   | { tipo: "moneda"; carpeta: "signos" | "animales"; id: string }
   | { tipo: "rueda"; carpeta: "signos" | "animales" }
   | { tipo: "duo"; a: string; b: string; glifo: string }
@@ -42,6 +53,7 @@ export type Visual =
   | { tipo: "glifo"; glifo: string };
 
 const ID = /^[a-z0-9-]{1,40}$/;
+const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const esSigno = (id: string) => SIGNOS.some((s) => s.id === id);
 const esAnimal = (id: string) => (ANIMALES as readonly string[]).includes(id);
 const esMazo = (id: string): id is IdMazo => id === "arcana" || id in MAZOS;
@@ -79,8 +91,23 @@ export function interpretarVisual(carta: string | null, simbolos: string[]): Vis
       if (numeros.length) return { tipo: "numeros", numeros };
       break;
     }
+    case "espanola":
+    case "lenormand":
+      if (ID.test(a)) return { tipo: "imagen", carpeta: `cartas/${tipo}`, id: a };
+      break;
+    case "runas":
+      if (ID.test(a)) return { tipo: "imagen", carpeta: "runas", id: a };
+      break;
+    case "pendulo":
+    case "huevo":
     case "luna":
-      return { tipo: "luna" };
+      return { tipo };
+    case "astral":
+      if (FECHA.test(a)) return { tipo, fecha: a };
+      break;
+    case "sinastria":
+      if (FECHA.test(a) && FECHA.test(b)) return { tipo, a, b };
+      break;
     case "glifo":
       if (resto) return { tipo: "glifo", glifo: [...resto][0] };
       break;
@@ -112,6 +139,51 @@ export function lunaSvg(lado: number) {
     <circle cx="${c + r * 0.95}" cy="${c - r * 0.9}" r="${lado * 0.018}" fill="#fff6d8"/>
     <circle cx="${c + r * 1.25}" cy="${c - r * 0.35}" r="${lado * 0.011}" fill="#fff6d8"/>
     <circle cx="${c + r * 0.7}" cy="${c + r * 0.75}" r="${lado * 0.014}" fill="#fff6d8"/>
+  </svg>`;
+}
+
+/** Péndulo de cristal colgando de su cadena, en un cuadrado de `lado` px. */
+export function penduloSvg(lado: number) {
+  const c = lado / 2;
+  const punta = lado * 0.84;
+  const cuerpo = lado * 0.58;
+  const ancho = lado * 0.13;
+  const eslabones = Array.from({ length: 9 }, (_, i) => `<ellipse cx="${c}" cy="${lado * 0.08 + i * lado * 0.042}" rx="${lado * 0.009}" ry="${lado * 0.02}" fill="none" stroke="#d9b45a" stroke-width="${lado * 0.005}"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${lado}" height="${lado}" viewBox="0 0 ${lado} ${lado}">
+    <defs>
+      <radialGradient id="halo" cx="50%" cy="70%" r="50%"><stop offset="0" stop-color="#b7a5ff" stop-opacity="0.55"/><stop offset="0.6" stop-color="#8b6cf6" stop-opacity="0.15"/><stop offset="1" stop-color="#8b6cf6" stop-opacity="0"/></radialGradient>
+      <linearGradient id="cristal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3edff"/><stop offset="0.45" stop-color="#b7a5ff"/><stop offset="1" stop-color="#5b3fd0"/></linearGradient>
+      <linearGradient id="oro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c9992e"/><stop offset="0.5" stop-color="#fff2c4"/><stop offset="1" stop-color="#c9992e"/></linearGradient>
+    </defs>
+    <circle cx="${c}" cy="${lado * 0.68}" r="${lado * 0.34}" fill="url(#halo)"/>
+    ${eslabones}
+    <rect x="${c - ancho * 0.35}" y="${lado * 0.45}" width="${ancho * 0.7}" height="${lado * 0.05}" rx="${lado * 0.01}" fill="url(#oro)"/>
+    <path d="M ${c - ancho} ${cuerpo} L ${c} ${lado * 0.5} L ${c + ancho} ${cuerpo} L ${c} ${punta} Z" fill="url(#cristal)" stroke="#f3edff" stroke-opacity="0.7" stroke-width="${lado * 0.004}"/>
+    <path d="M ${c - ancho} ${cuerpo} L ${c + ancho} ${cuerpo} M ${c} ${lado * 0.5} L ${c} ${punta}" stroke="#ffffff" stroke-opacity="0.45" stroke-width="${lado * 0.003}"/>
+    <circle cx="${c - ancho * 0.35}" cy="${cuerpo - lado * 0.025}" r="${lado * 0.012}" fill="#ffffff" fill-opacity="0.8"/>
+  </svg>`;
+}
+
+/** Huevo dentro de un vaso de agua, en un cuadrado de `lado` px. */
+export function huevoSvg(lado: number) {
+  const c = lado / 2;
+  const arriba = lado * 0.18;
+  const abajo = lado * 0.86;
+  const ancho = lado * 0.42;
+  const agua = lado * 0.36;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${lado}" height="${lado}" viewBox="0 0 ${lado} ${lado}">
+    <defs>
+      <radialGradient id="halo" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#f1d99a" stop-opacity="0.4"/><stop offset="1" stop-color="#f1d99a" stop-opacity="0"/></radialGradient>
+      <linearGradient id="agua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3ff" stop-opacity="0.35"/><stop offset="1" stop-color="#6aa8e8" stop-opacity="0.25"/></linearGradient>
+      <radialGradient id="yema" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#f0a21f"/></radialGradient>
+    </defs>
+    <circle cx="${c}" cy="${lado * 0.55}" r="${lado * 0.45}" fill="url(#halo)"/>
+    <path d="M ${c - ancho / 2} ${arriba} L ${c - ancho * 0.42} ${abajo} Q ${c} ${abajo + lado * 0.03} ${c + ancho * 0.42} ${abajo} L ${c + ancho / 2} ${arriba}" fill="none" stroke="#ece6f7" stroke-opacity="0.75" stroke-width="${lado * 0.007}"/>
+    <path d="M ${c - ancho * 0.475} ${agua} L ${c - ancho * 0.42} ${abajo} Q ${c} ${abajo + lado * 0.03} ${c + ancho * 0.42} ${abajo} L ${c + ancho * 0.475} ${agua} Z" fill="url(#agua)"/>
+    <ellipse cx="${c}" cy="${agua}" rx="${ancho * 0.475}" ry="${lado * 0.018}" fill="#dff1ff" fill-opacity="0.35"/>
+    <path d="M ${c - lado * 0.1} ${lado * 0.5} q ${lado * 0.03} ${-lado * 0.08} ${lado * 0.1} ${-lado * 0.1} q ${lado * 0.09} ${lado * 0.02} ${lado * 0.1} ${lado * 0.12}" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="${lado * 0.004}"/>
+    <ellipse cx="${c + lado * 0.01}" cy="${lado * 0.72}" rx="${lado * 0.07}" ry="${lado * 0.06}" fill="url(#yema)"/>
+    <ellipse cx="${c - lado * 0.015}" cy="${lado * 0.705}" rx="${lado * 0.02}" ry="${lado * 0.012}" fill="#fff6d8" fill-opacity="0.8"/>
   </svg>`;
 }
 
@@ -162,6 +234,15 @@ export async function visualParaTarjeta(v: Visual): Promise<Pick<DatosTarjeta, "
       return { imagenes: [await svgComoPng(velaSvg(v.color, 260))], monedas: true, simbolos: ["✦"] };
     case "luna":
       return { imagenes: [await svgComoPng(lunaSvg(260))], monedas: true, simbolos: ["✦"] };
+    case "imagen":
+      return { imagenes: [await webpComoDataUri(join(process.cwd(), "public", v.carpeta, `${v.id}.webp`), v.carpeta === "runas" ? { lado: 300 } : { alto: 527 })].filter(Boolean), monedas: v.carpeta === "runas", simbolos: ["✦"] };
+    case "pendulo":
+      return { imagenes: [await svgComoPng(penduloSvg(300))], monedas: true, simbolos: ["◈"] };
+    case "astral":
+    case "sinastria":
+      return { imagenes: [await ruedaTerminada(v, 420)], monedas: true, simbolos: ["☉"] };
+    case "huevo":
+      return { imagenes: [await svgComoPng(huevoSvg(300))], monedas: true, simbolos: ["✦"] };
     case "hexagrama":
       return { hexagrama: v.lineas, simbolos: ["☰"] };
     case "numeros":
@@ -179,6 +260,8 @@ export interface VisualReel {
   fondo: React.ReactNode;
   /** Capa de 1080×1080 (transparente) que gira despacio alrededor del centro, si la hay. */
   anillo?: React.ReactNode;
+  /** Rueda que se dibuja sola: secuencia de fotogramas centrada en CENTRO_REEL (rueda-animada.ts). */
+  animacion?: RuedaAnimada;
 }
 
 /** Resplandor suave (los degradados radiales de CSS salen planos en el motor de imágenes: se dibuja en SVG). */
@@ -207,8 +290,11 @@ function Imagen({ src, lado, x = CENTRO_REEL.x, y = CENTRO_REEL.y, sombra = true
 /** Dibuja el visual en grande para el reel. */
 export async function visualParaReel(v: Visual): Promise<VisualReel> {
   switch (v.tipo) {
-    case "carta": {
-      const uri = await webpComoDataUri(join(process.cwd(), "public", "cartas", v.mazo, `${v.id}.webp`), { alto: 860 });
+    case "carta":
+    case "imagen": {
+      const archivo = v.tipo === "carta" ? join(process.cwd(), "public", "cartas", v.mazo, `${v.id}.webp`) : join(process.cwd(), "public", v.carpeta, `${v.id}.webp`);
+      if (v.tipo === "imagen" && v.carpeta === "runas") return { fondo: (<>{await halo(480)}<Imagen src={await webpComoDataUri(archivo, { lado: 640 })} lado={640} /></>) };
+      const uri = await webpComoDataUri(archivo, { alto: 860 });
       if (!uri) return visualParaReel({ tipo: "glifo", glifo: "✦" });
       const { width: ancho = 573 } = await sharp(Buffer.from(uri.split(",")[1], "base64")).metadata();
       return {
@@ -253,6 +339,13 @@ export async function visualParaReel(v: Visual): Promise<VisualReel> {
       return { fondo: <Imagen src={await svgComoPng(velaSvg(v.color, 900))} lado={900} sombra={false} /> };
     case "luna":
       return { fondo: <Imagen src={await svgComoPng(lunaSvg(900))} lado={900} sombra={false} /> };
+    case "pendulo":
+      return { fondo: <Imagen src={await svgComoPng(penduloSvg(900))} lado={900} sombra={false} /> };
+    case "astral":
+    case "sinastria":
+      return { fondo: await halo(560, "#8b6cf6", 0.4), animacion: v };
+    case "huevo":
+      return { fondo: <Imagen src={await svgComoPng(huevoSvg(900))} lado={900} sombra={false} /> };
     case "hexagrama":
       return {
         fondo: (

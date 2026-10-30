@@ -87,7 +87,7 @@ interface Funcion {
 
 const FUNCIONES: Funcion[] = [
   { clave: "tarot", tipo: "producto", ruta: "/tarot", costo: COSTOS.tarot_tres, visual: "rider/la-estrella", simbolos: ["✦"] },
-  { clave: "astral", tipo: "producto", ruta: "/carta-astral", costo: COSTOS.carta_astral, visual: "rueda/signos", simbolos: ["☉"] },
+  { clave: "astral", tipo: "producto", ruta: "/carta-astral", costo: COSTOS.carta_astral, visual: "astral", simbolos: ["☉"] },
   { clave: "chocolate", tipo: "guia", ruta: "/rituales#chocolate", nombre: "Lectura del chocolate", visual: "glifo/☕", simbolos: ["☕"] },
   { clave: "suenos", tipo: "producto", ruta: "/suenos", costo: COSTOS.suenos, visual: "luna", simbolos: ["✦"] },
   { clave: "chino", tipo: "producto", ruta: "/calendario-chino", costo: COSTOS.chino, visual: "rueda/animales", simbolos: ["✦"] },
@@ -95,7 +95,7 @@ const FUNCIONES: Funcion[] = [
   { clave: "quiromancia", tipo: "producto", ruta: "/quiromancia", costo: COSTOS.quiromancia, visual: "glifo/✋", simbolos: ["✋"] },
   { clave: "numerologia", tipo: "producto", ruta: "/numerologia", costo: COSTOS.numerologia, visual: "numeros", simbolos: ["✦"] },
   { clave: "mano", tipo: "guia", ruta: "/rituales#mano", nombre: "Lectura de la mano", visual: "glifo/✋", simbolos: ["✋"] },
-  { clave: "sinastria", tipo: "producto", ruta: "/sinastria", costo: COSTOS.sinastria, visual: "duo", simbolos: ["✦"] },
+  { clave: "sinastria", tipo: "producto", ruta: "/sinastria", costo: COSTOS.sinastria, visual: "sinastria", simbolos: ["✦"] },
   { clave: "iching", tipo: "producto", ruta: "/iching", costo: COSTOS.iching, visual: "hexagrama", simbolos: ["☰"] },
   { clave: "luna", tipo: "guia", ruta: "/luna", nombre: "Calendario lunar", visual: "luna", simbolos: ["✦"] },
   { clave: "aura", tipo: "producto", ruta: "/aura", costo: COSTOS.aura, visual: "aura", simbolos: ["✦"] },
@@ -106,7 +106,22 @@ const FUNCIONES: Funcion[] = [
   { clave: "tabaco", tipo: "guia", ruta: "/rituales#tabaco", nombre: "Lectura del tabaco", visual: "glifo/♨", simbolos: ["♨"] },
   { clave: "chocolate-lectura", tipo: "producto", ruta: "/chocolate", costo: COSTOS.chocolate, visual: "glifo/☕", simbolos: ["☕"] },
   { clave: "tabaco-lectura", tipo: "producto", ruta: "/tabaco", costo: COSTOS.tabaco, visual: "glifo/♨", simbolos: ["♨"] },
+  { clave: "pendulo", tipo: "producto", ruta: "/pendulo", costo: COSTOS.pendulo, visual: "pendulo", simbolos: ["◈"] },
+  { clave: "runas", tipo: "producto", ruta: "/runas", costo: COSTOS.runas, visual: "runas", simbolos: ["✦"] },
+  { clave: "astral-lectura", tipo: "producto", ruta: "/carta-astral", costo: COSTOS.carta_astral, visual: "astral", simbolos: ["☉"] },
+  { clave: "baraja", tipo: "producto", ruta: "/baraja-espanola", costo: COSTOS.baraja_espanola, visual: "espanola", simbolos: ["✦"] },
+  { clave: "cafe", tipo: "producto", ruta: "/cafe", costo: COSTOS.cafe, visual: "glifo/☕", simbolos: ["☕"] },
+  { clave: "maya", tipo: "producto", ruta: "/calendario-maya", costo: COSTOS.maya, visual: "glifo/☀", simbolos: ["☀"] },
+  { clave: "sinastria-lectura", tipo: "producto", ruta: "/sinastria", costo: COSTOS.sinastria, visual: "sinastria", simbolos: ["♡"] },
+  { clave: "lenormand", tipo: "producto", ruta: "/lenormand", costo: COSTOS.lenormand, visual: "lenormand", simbolos: ["✦"] },
+  { clave: "huevo", tipo: "producto", ruta: "/huevo", costo: COSTOS.huevo, visual: "huevo", simbolos: ["✦"] },
+  { clave: "revolucion", tipo: "producto", ruta: "/revolucion-solar", costo: COSTOS.revolucion_solar, visual: "astral", simbolos: ["☉"] },
 ];
+
+/** Runas con imagen en public/runas (las del Futhark antiguo). */
+const RUNAS = ["fehu", "uruz", "thurisaz", "ansuz", "raidho", "kenaz", "gebo", "wunjo", "hagalaz", "nauthiz", "isa", "jera", "eihwaz", "perthro", "algiz", "sowilo", "tiwaz", "berkano", "ehwaz", "mannaz", "laguz", "ingwaz", "dagaz", "othala"];
+const PALOS = ["oros", "copas", "espadas", "bastos"];
+const NUMEROS_ESPANOLA = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
 
 /** Clave del módulo en `portada.modulos` y en `rituales.guias`. */
 function claveModulo(f: Funcion) {
@@ -144,6 +159,19 @@ function visualDe(f: Funcion, n: number, fecha: string): string {
     }
     case "vela":
       return `vela/${INTENCION_VELA[((n % INTENCION_VELA.length) + INTENCION_VELA.length) % INTENCION_VELA.length]}`;
+    case "astral":
+      return `astral/${fecha}`;
+    case "sinastria": {
+      // Dos fechas de nacimiento de ejemplo que cambian cada semana (mediodía, sin hora exacta).
+      const nacimiento = (anio: number, dias: number) => new Date(Date.UTC(anio, 0, 1) + (((dias % 365) + 365) % 365) * DIA).toISOString().slice(0, 10);
+      return `sinastria/${nacimiento(1988 + (((n % 9) + 9) % 9), n * 37 + 40)}+${nacimiento(1990 + (((n * 5) % 9) + 9) % 9, n * 53 + 170)}`;
+    }
+    case "runas":
+      return `runas/${RUNAS[((n % RUNAS.length) + RUNAS.length) % RUNAS.length]}`;
+    case "espanola":
+      return `espanola/${PALOS[((n % 4) + 4) % 4]}-${NUMEROS_ESPANOLA[(((n * 3) % 10) + 10) % 10]}`;
+    case "lenormand":
+      return `lenormand/l${(((n * 7) % 36) + 36) % 36 + 1}`;
     case "numeros": {
       const reducir = (v: number) => {
         while (v > 9 && v !== 11 && v !== 22) v = String(v).split("").reduce((a, c) => a + Number(c), 0);
@@ -206,7 +234,10 @@ export async function encargosSemana(lunes: string): Promise<Encargo[]> {
         encargos.push({ tipo: "guia", fecha, etiqueta: nombre, contexto: `Guía gratuita "${nombre}" en miarcana.com${f.ruta}. ${detalle} No exige registro.`, enlace: `miarcana.com${f.ruta.split("#")[0]}`, simbolos: f.simbolos, carta: visual, pie: "Guía gratis, sin registro" });
       } else {
         const costo = f.costo ?? 1;
-        encargos.push({ tipo: "producto", fecha, etiqueta: nombre, contexto: `Lectura "${nombre}": ${m?.texto ?? ""} Cuesta ${costo} crédito${costo === 1 ? "" : "s"} (un crédito desde ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}). Enlace miarcana.com${f.ruta}.`, enlace: `miarcana.com${f.ruta}`, simbolos: f.simbolos, carta: visual, pie: `${costo} crédito${costo === 1 ? "" : "s"} · 3 de regalo al registrarte` });
+        // Las lecturas sin costo (el péndulo) se presentan como gratis una vez al día.
+        const precio = costo === 0 ? "Es gratis, una vez al día, con tu cuenta" : `Cuesta ${costo} crédito${costo === 1 ? "" : "s"} (un crédito desde ${formatoCOP(PAQUETE_PRUEBA.precioCOP)})`;
+        const pie = costo === 0 ? "Gratis una vez al día" : `${costo} crédito${costo === 1 ? "" : "s"} · 3 de regalo al registrarte`;
+        encargos.push({ tipo: "producto", fecha, etiqueta: nombre, contexto: `Lectura "${nombre}": ${m?.texto ?? ""} ${precio}. Enlace miarcana.com${f.ruta}.`, enlace: `miarcana.com${f.ruta}`, simbolos: f.simbolos, carta: visual, pie });
       }
       continue;
     }

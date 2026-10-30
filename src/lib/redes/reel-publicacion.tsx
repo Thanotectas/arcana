@@ -8,6 +8,7 @@ import type { Database } from "@/types/database";
 import { simboloDataUri } from "@/lib/marca/simbolo";
 import { ALTO, ANCHO, BUCKET, FPS, asegurarBucket, ejecutar, estrellas, png, rutaFfmpeg } from "./reel";
 import { CENTRO_REEL, interpretarVisual, visualParaReel } from "./visual";
+import { LIENZO, cuadrosRueda } from "./rueda-animada";
 import type { PublicacionProgramada } from "./calendario";
 import { filtroAudio, frases, narrar, tiemposConVoz } from "./voz";
 
@@ -78,7 +79,7 @@ async function capas(p: Datos) {
     2400,
   );
 
-  return { fondo, anillo, cabecera, texto, cta, capaEstrellas };
+  return { fondo, anillo, cabecera, texto, cta, capaEstrellas, animacion: visual.animacion };
 }
 
 /** Genera el MP4 del reel de la publicación y lo devuelve como Buffer. */
@@ -95,12 +96,16 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
       ...(c.anillo ? ([["anillo.png", c.anillo]] as [string, Buffer][]) : []),
     ];
     await Promise.all(archivos.map(([nombre, datos]) => writeFile(join(dir, nombre), datos)));
+    // La rueda que se dibuja sola (carta astral, sinastría) va como secuencia de fotogramas.
+    const rueda = c.animacion ? await cuadrosRueda(dir, c.animacion, FPS) : null;
     const voz = await narrar(dir, [frases(p.titulo, p.extracto), frases(p.etiqueta, p.pie, "Te espero en miarcana.com")]);
-    const tiempos = tiemposConVoz(voz, { inicio: 0.9, cierreMinimo: 8.5, duracionMinima: DURACION });
+    // Con rueda, el cierre espera a que termine de dibujarse.
+    const tiempos = tiemposConVoz(voz, { inicio: 0.9, cierreMinimo: rueda ? Math.max(8.5, rueda.segundos + 0.5) : 8.5, duracionMinima: rueda ? Math.max(DURACION, rueda.segundos + 4) : DURACION });
     const duracion = tiempos.duracion;
     const salida = join(dir, "reel.mp4");
     const marcos = FPS * duracion;
     const indiceAudio = archivos.length;
+    const indiceRueda = archivos.length + 4 + (voz ? voz.archivos.length : 0);
     const filtro = [
       `[0:v]scale=${ANCHO * 2}:${ALTO * 2},zoompan=z='1+0.08*on/${marcos}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${ANCHO}x${ALTO}:fps=${FPS},fade=t=in:st=0:d=0.8[base]`,
       `[1:v]format=rgba,fade=t=in:st=0.5:d=0.7:alpha=1[cab]`,
@@ -109,7 +114,10 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
       `[4:v]format=rgba[est]`,
       // La rueda gira una vuelta cada 80 s y aparece con el fondo.
       ...(c.anillo ? [`[5:v]format=rgba,rotate=a='t*${(2 * Math.PI) / 80}':c=none:ow=iw:oh=ih,fade=t=in:st=0.3:d=1:alpha=1[ani]`] : []),
-      `[base][est]overlay=x=0:y='-t*28':eval=frame[b1]`,
+      `[base][est]overlay=x=0:y='-t*28':eval=frame[b0]`,
+      ...(rueda
+        ? [`[${indiceRueda}:v]format=rgba,tpad=stop_mode=clone:stop_duration=${duracion}[rue]`, `[b0][rue]overlay=x=0:y=${CENTRO_REEL.y - LIENZO.centro}:eof_action=repeat[b1]`]
+        : [`[b0]null[b1]`]),
       ...(c.anillo ? [`[b1][ani]overlay=x=${CENTRO_REEL.x - 540}:y=${CENTRO_REEL.y - 540}[b1r]`] : []),
       `[${c.anillo ? "b1r" : "b1"}][cab]overlay=0:0[b2]`,
       `[b2][txt]overlay=0:0[b3]`,
@@ -125,6 +133,7 @@ export async function generarReelPublicacion(p: Datos): Promise<Buffer> {
         ...archivos.flatMap(([nombre]) => imagen(nombre)),
         ...tono(110), ...tono(164.81), ...tono(220), ...tono(277.18),
         ...(voz ? voz.archivos.flatMap((a) => ["-i", a]) : []),
+        ...(rueda ? ["-framerate", String(FPS), "-i", rueda.patron] : []),
         "-filter_complex", filtro,
         "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p", "-r", String(FPS),
