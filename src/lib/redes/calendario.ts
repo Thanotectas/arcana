@@ -17,7 +17,8 @@ import { fechaBogota } from "./carta-dia";
  * Agente de redes: calendario editorial semanal. Cada día de la semana tiene
  * un tipo de publicación; el contexto (qué guía, qué producto, qué luna) sale
  * de los datos de la app y Sibila escribe el titular, la frase y el pie.
- * Nada se publica sin aprobación en /admin/redes.
+ * Salen solas a mediodía (ver `autoAprobar`); en /admin/redes se editan o se
+ * descartan antes.
  */
 export type TipoPublicacion = Database["public"]["Tables"]["publicaciones_programadas"]["Row"]["tipo"];
 export type PublicacionProgramada = Database["public"]["Tables"]["publicaciones_programadas"]["Row"];
@@ -44,6 +45,15 @@ export const NOMBRE_TIPO: Record<TipoPublicacion, string> = {
 };
 
 const DIA = 86_400_000;
+
+/**
+ * Las publicaciones del agente salen solas: nacen aprobadas y, el día que les
+ * toca, también se publican las que quedaron en borrador. Para que todo vuelva
+ * a pasar por aprobación: REDES_AUTO_APROBAR=0 en Vercel.
+ */
+export function autoAprobar() {
+  return process.env.REDES_AUTO_APROBAR !== "0";
+}
 
 /** Lunes (AAAA-MM-DD) de la semana que contiene la fecha dada. */
 export function lunesDe(fecha: string) {
@@ -340,7 +350,7 @@ export async function generarSemana(admin: SupabaseClient<Database>, lunes: stri
   for (const e of encargos) {
     const r = redacciones.find((x) => x.fecha === e.fecha);
     if (!r) continue;
-    filas.push({ semana: lunes, fecha: e.fecha, tipo: e.tipo, etiqueta: e.etiqueta, titulo: r.titulo, extracto: r.extracto, texto: r.texto, simbolos: e.simbolos, carta: e.carta, enlace: e.enlace, pie: e.pie });
+    filas.push({ estado: autoAprobar() ? "aprobada" : "borrador", semana: lunes, fecha: e.fecha, tipo: e.tipo, etiqueta: e.etiqueta, titulo: r.titulo, extracto: r.extracto, texto: r.texto, simbolos: e.simbolos, carta: e.carta, enlace: e.enlace, pie: e.pie });
   }
   if (!filas.length) throw new Error("Sibila no redactó ninguna publicación");
   // upsert por si dos corridas coinciden: la unicidad (fecha, tipo) protege.

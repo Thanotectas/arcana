@@ -4,6 +4,7 @@ import type { Database } from "@/types/database";
 import { instagramConfigurado, publicarImagen, publicarReel } from "./instagram";
 import { facebookConfigurado, publicarFotoFacebook, publicarVideoFacebook } from "./facebook";
 import { fechaBogota } from "./carta-dia";
+import { autoAprobar } from "./calendario";
 import { reelPublicacion } from "./reel-publicacion";
 import type { PublicacionProgramada } from "./calendario";
 
@@ -88,6 +89,8 @@ export async function publicarProgramada(admin: SupabaseClient<Database>, id: st
  */
 export async function publicarVencidas(admin: SupabaseClient<Database>, hoy = fechaBogota()): Promise<ResultadoPublicacion[]> {
   const desde = new Date(Date.parse(`${hoy}T12:00:00Z`) - 2 * 86_400_000).toISOString().slice(0, 10);
+  // Con publicación automática, el borrador de hoy también sale (solo «Descartar» lo detiene).
+  if (autoAprobar()) await admin.from("publicaciones_programadas").update({ estado: "aprobada" }).eq("estado", "borrador").eq("fecha", hoy);
   const { data: filas } = await admin
     .from("publicaciones_programadas")
     .select("id, estado, fecha")

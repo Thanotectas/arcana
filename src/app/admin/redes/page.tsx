@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { NOMBRE_TIPO, fechaLargaEs, lunesDe, sumarDias, type PublicacionProgramada } from "@/lib/redes/calendario";
+import { NOMBRE_TIPO, autoAprobar, fechaLargaEs, lunesDe, sumarDias, type PublicacionProgramada } from "@/lib/redes/calendario";
 import { urlImagenPublicacion } from "@/lib/redes/publicar";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { instagramConfigurado } from "@/lib/redes/instagram";
@@ -100,7 +100,8 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Administración</p>
         <h1 className="font-display text-4xl font-semibold">Agente de redes</h1>
         <p className="mt-2 text-texto-suave">
-          Sibila escribe cada semana una publicación por día, cada una sobre una función de la app (lecturas, guías, signo, luna); aquí apruebas, editas o descartas. Lo aprobado sale a mediodía (hora de Bogotá) como reel en{" "}
+          Sibila escribe cada semana una publicación por día, cada una sobre una función de la app (lecturas, guías, signo, luna).{" "}
+          {autoAprobar() ? "Salen solas: si una no te gusta, edítala o descártala antes de su día." : "Aquí apruebas, editas o descartas."} Salen a mediodía (hora de Bogotá) como reel en{" "}
           {instagramConfigurado() ? "Instagram" : <span className="text-peligro">Instagram (sin configurar)</span>} y{" "}
           {facebookConfigurado() ? "Facebook" : <span className="text-peligro">Facebook (sin configurar)</span>}. La carta del día sigue saliendo sola a las 7:00.
         </p>

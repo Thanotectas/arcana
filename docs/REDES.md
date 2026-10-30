@@ -51,7 +51,10 @@ de imágenes los pinta planos; un estilo con valor `undefined` lo rompe.
    lista y el botón "Revisar y aprobar". También se puede generar desde el panel.
 2. **Aprobación** en `/admin/redes` (solo correos de `ADMIN_CORREOS`; el resto
    recibe 404). Se puede editar título, frase, pie y redes; aprobar, guardar,
-   descartar, volver a borrador, publicar ahora o reintentar.
+   descartar, volver a borrador, publicar ahora o reintentar. Desde el 30 oct
+   2026 salen **solas** (`autoAprobar`): nacen aprobadas y el borrador del día
+   también se publica; solo «Descartar» detiene una. `REDES_AUTO_APROBAR=0`
+   vuelve a la aprobación manual.
 3. **Publicación**: la corrida de las 17:00 UTC (mediodía en Bogotá) publica lo
    aprobado cuya fecha ya llegó (hasta dos días de atraso) con
    `publicarVencidas`. Cada fila se reserva (`publicando`) para no duplicar; las
@@ -64,6 +67,10 @@ de imágenes los pinta planos; un estilo con valor `undefined` lo rompe.
    se fabrica otro) y se reutiliza. Si falla cualquier paso se publica la
    imagen fija; `REDES_REEL=0` publica solo imágenes. `resultados[red].formato`
    dice qué salió. Vista previa por publicación en el panel ("Ver el reel").
+   Carta astral, sinastría y revolución solar usan la **rueda que se dibuja
+   sola** (`rueda-animada.ts`: fotogramas SVG → PNG con sharp, glifos como
+   trazos con fontkit y `NotoSansSymbols-Astro.woff2`), superpuesta con ffmpeg;
+   el cierre espera a que termine de dibujarse.
 5. **Imagen de respaldo**: `/api/redes/publicacion?id=UUID` (1080×1350,
    `imagenTarjeta`) con el mismo visual. Meta la descarga por URL pública;
    `v=` evita cachés viejas.
