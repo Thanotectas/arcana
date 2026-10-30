@@ -29,6 +29,7 @@ export function BotonesAutomaticas() {
         <Boton valor="historia">Publicar la historia de hoy</Boton>
         <Boton valor="carrusel">Publicar el carrusel de la semana</Boton>
         <Boton valor="kit">Enviarme el kit de TikTok de hoy</Boton>
+        <Boton valor="canal">Enviarme el kit del canal de WhatsApp</Boton>
       </div>
     </form>
   );

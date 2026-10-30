@@ -6,6 +6,7 @@ import { facebookConfigurado, publicarHistoriaFacebook, publicarVariasFotosFaceb
 import { publicarUnaVez, type Resultado } from "./reservas";
 import { contenidoGuardado, redactarCarrusel, semanaDelCarrusel, urlsLaminas } from "./carrusel";
 import { enviarKitTiktok, piezasDelDia } from "./kit-tiktok";
+import { enviarKitCanal, piezasCanal } from "./kit-canal";
 import { cartaDelDia, fechaBogota } from "./carta-dia";
 import { reelCartaDelDia } from "./reel";
 import { textoShortPublicacion, textoShortYoutube } from "./carta-dia";
@@ -18,7 +19,7 @@ import { privacidadYoutube, subirShort, youtubeConectado } from "./youtube";
  * historia diaria de la carta del día, carrusel semanal de signos y kit de
  * TikTok por correo y Short diario en YouTube. Cada una se registra en
  * `publicaciones_redes` para no repetirse. Variables para apagarlas:
- * REDES_HISTORIA=0, REDES_CARRUSEL=0, REDES_KIT_TIKTOK=0, REDES_YOUTUBE=0.
+ * REDES_HISTORIA=0, REDES_CARRUSEL=0, REDES_KIT_TIKTOK=0, REDES_KIT_CANAL=0, REDES_YOUTUBE=0.
  */
 function sitio() {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
@@ -57,6 +58,14 @@ export async function kitTiktok(admin: SupabaseClient<Database>, fecha = fechaBo
   if (process.env.REDES_KIT_TIKTOK === "0") return { apagado: true };
   const piezas = await piezasDelDia(admin, fecha);
   const correo = await publicarUnaVez(admin, "correo", "kit_tiktok", fecha, () => enviarKitTiktok(fecha, piezas));
+  return { fecha, piezas: piezas.length, correo };
+}
+
+/** Correo con lo del día listo para el canal de WhatsApp (no se puede publicar ahí de forma automática). */
+export async function kitCanal(admin: SupabaseClient<Database>, fecha = fechaBogota()) {
+  if (process.env.REDES_KIT_CANAL === "0") return { apagado: true };
+  const piezas = await piezasCanal(admin, fecha);
+  const correo = await publicarUnaVez(admin, "correo", "kit_canal", fecha, () => enviarKitCanal(fecha, piezas));
   return { fecha, piezas: piezas.length, correo };
 }
 

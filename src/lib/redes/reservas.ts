@@ -9,7 +9,7 @@ import type { Database } from "@/types/database";
  * minutos en 'pendiente'), se retoma.
  */
 export type RedRegistro = "instagram" | "facebook" | "correo" | "youtube" | "telegram";
-export type TipoRegistro = "carta_dia" | "historia" | "carrusel" | "kit_tiktok" | "publicacion";
+export type TipoRegistro = "carta_dia" | "historia" | "carrusel" | "kit_tiktok" | "kit_canal" | "publicacion";
 export type Resultado = { publicada: string } | { omitida: string } | { error: string };
 
 export async function reservar(admin: SupabaseClient<Database>, red: RedRegistro, tipo: TipoRegistro, fecha: string): Promise<number | null> {

@@ -10,7 +10,7 @@ import { reelCartaDelDia } from "./reel";
 import { reelPublicacion } from "./reel-publicacion";
 import { metaConfigurado, suscribirPagina } from "./meta";
 import { actualizarMetricas } from "./metricas";
-import { carruselSemanal, historiaDelDia, kitTiktok } from "./automaticas";
+import { carruselSemanal, historiaDelDia, kitCanal, kitTiktok } from "./automaticas";
 import { probarVoz } from "./voz";
 import { ejecutarRutas } from "@/lib/cron";
 
@@ -194,6 +194,11 @@ export async function accionAutomatica(_prev: EstadoAdminRedes, formData: FormDa
       if ("apagado" in r) return { error: "El kit está apagado (REDES_KIT_TIKTOK=0)." };
       hayError = "error" in r.correo;
       mensaje = `Kit de TikTok de hoy (${r.piezas} video${r.piezas === 1 ? "" : "s"}): ${describir(r.correo) === "publicada" ? "enviado a tu correo" : describir(r.correo)}`;
+    } else if (cual === "canal") {
+      const r = await kitCanal(admin);
+      if ("apagado" in r) return { error: "El kit del canal está apagado (REDES_KIT_CANAL=0)." };
+      hayError = "error" in r.correo;
+      mensaje = `Kit del canal de WhatsApp de hoy (${r.piezas} publicaci${r.piezas === 1 ? "ón" : "ones"}): ${describir(r.correo) === "publicada" ? "enviado a tu correo" : describir(r.correo)}`;
     } else {
       return { error: "Acción desconocida." };
     }
