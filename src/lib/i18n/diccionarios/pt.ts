@@ -69,6 +69,7 @@ export const pt: Diccionario = {
     precios: "Preços",
     siguenos: "Siga-nos",
     whatsapp: "Fale conosco",
+    canal: "Canal do WhatsApp",
   },
   lecturas: {
     nombres: {

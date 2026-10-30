@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getT } from "@/lib/i18n/servidor";
-import { MENSAJE_INSTAGRAM, REDES, TELEGRAM, WHATSAPP } from "@/lib/marca/redes";
+import { CANAL_WHATSAPP, MENSAJE_INSTAGRAM, REDES, TELEGRAM, WHATSAPP } from "@/lib/marca/redes";
 import { IconoRed } from "./IconoRed";
 
 export async function PiePagina() {
@@ -26,6 +26,10 @@ export async function PiePagina() {
                 <span>{t.pie.whatsapp}</span>
               </a>
             )}
+            <a href={CANAL_WHATSAPP.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-exito/40 px-3 py-1.5 text-exito transition hover:border-exito hover:text-texto" title={CANAL_WHATSAPP.nombre}>
+              <IconoRed id="whatsapp" className="h-4 w-4" />
+              <span>{t.pie.canal}</span>
+            </a>
             {TELEGRAM.activo && (
               <a href={TELEGRAM.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-full border border-borde px-3 py-1.5 transition hover:border-oro/50 hover:text-oro-suave" title={`Telegram ${TELEGRAM.usuario}`}>
                 <IconoRed id="telegram" className="h-4 w-4" />

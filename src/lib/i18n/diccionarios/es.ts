@@ -71,6 +71,7 @@ export const es = {
     precios: "Precios",
     siguenos: "Síguenos",
     whatsapp: "Escríbenos",
+    canal: "Canal de WhatsApp",
   },
   lecturas: {
     nombres: {

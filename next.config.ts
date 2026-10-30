@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@react-pdf/renderer", "@ffmpeg-installer/ffmpeg"],
   // Enlace corto al grupo de Facebook «Carta Astral y Tarot en Español · Arcana».
   async redirects() {
-    return [{ source: "/grupo", destination: "https://www.facebook.com/groups/881840954952633", permanent: false }];
+    return [
+      { source: "/grupo", destination: "https://www.facebook.com/groups/881840954952633", permanent: false },
+      { source: "/canal", destination: "https://whatsapp.com/channel/0029Vb8bJ1b2UPBE8HCj9L0o", permanent: false },
+    ];
   },
   async headers() {
     return [
