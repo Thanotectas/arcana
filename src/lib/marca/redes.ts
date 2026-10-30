@@ -26,5 +26,8 @@ export const WHATSAPP = {
 const BOT_TELEGRAM = (process.env.NEXT_PUBLIC_TELEGRAM_BOT ?? "").replace(/^@/, "").trim();
 export const TELEGRAM = { activo: Boolean(BOT_TELEGRAM), usuario: BOT_TELEGRAM ? `@${BOT_TELEGRAM}` : "", url: BOT_TELEGRAM ? `https://t.me/${BOT_TELEGRAM}` : "" } as const;
 
+/** Grupo de Facebook de la comunidad; miarcana.com/grupo redirige aquí (next.config.ts). */
+export const GRUPO_FACEBOOK = { nombre: "Carta Astral y Tarot en Español · Arcana", corto: "miarcana.com/grupo", url: "https://www.facebook.com/groups/881840954952633" } as const;
+
 /** Mensaje directo de Instagram (lo responde Sibila): respaldo de la atención por WhatsApp. */
 export const MENSAJE_INSTAGRAM = { usuario: "@miarcana.oficial", url: "https://ig.me/m/miarcana.oficial" } as const;

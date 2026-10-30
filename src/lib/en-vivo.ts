@@ -514,7 +514,7 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos, con los hilos que los unen.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y allí también te espera tu carta astral completa, explicada casa por casa. ${oferta}`.trim(),
     "No necesitas saber nada de astrología: solo tu fecha, tu hora y tu ciudad. Escribe carta astral y mira cómo aparece tu cielo en la pantalla.",
-    `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo.${telegram}`,
+    `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo. Y para seguir aprendiendo durante la semana, únete a nuestro grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.${telegram}`,
     "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
     "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
     "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si quieres que mire tu taza o tu mano, escanea el código de la pantalla y sube la foto.",
@@ -594,7 +594,7 @@ export async function despedida(admin: Admin) {
       ? "A quienes no alcancé a leer, gracias por la paciencia: tu pregunta merece calma. Hazla en mi arcana punto com, donde tu carta del día es gratis, todos los días."
       : "Recuerda que tu carta del día es gratis, todos los días, en mi arcana punto com.",
     codigo ? `Y el código ${codigoDicho(codigo.codigo)} sigue valiendo esta noche: cualquier paquete trae ${codigo.creditos_extra} créditos más.` : "",
-    "Si te gustó, suscríbete al canal y activa la campanita, para que te avise del próximo directo.",
+    "Si te gustó, suscríbete al canal y activa la campanita, para que te avise del próximo directo. Y durante la semana te espero en nuestro grupo de Facebook: mi arcana punto com, barra, grupo.",
     "Que las cartas te sean favorables. Buenas noches.",
   ];
   const texto = partes.filter(Boolean).join(" ");

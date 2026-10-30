@@ -477,9 +477,9 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         {/* Pie */}
         <div className={`absolute bottom-5 left-0 right-0 text-center text-2xl text-violeta-suave ${escena ? "bg-black/40 py-2" : ""}`}>
           {cierre !== "abierto" ? (
-            <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
+            <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Únete al grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
           ) : (
-            <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦</>
+            <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦</>
           )}
         </div>
 

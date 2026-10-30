@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { escenarioActivo } from "@/lib/en-vivo";
 import { PROXIMO_DIRECTO, ZONA_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
 import { FormularioVivo } from "@/components/FormularioVivo";
+import { GRUPO_FACEBOOK } from "@/lib/marca/redes";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -88,6 +89,13 @@ export default async function PaginaVivo() {
           </p>
         </div>
       )}
+      {/* La comunidad: para seguir aprendiendo entre un directo y otro. */}
+      <a href={GRUPO_FACEBOOK.url} target="_blank" rel="noopener noreferrer" className="tarjeta block space-y-1 p-5 text-center transition hover:border-oro/40">
+        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">Comunidad Arcana</p>
+        <p className="font-display text-2xl text-oro-suave">{GRUPO_FACEBOOK.nombre}</p>
+        <p className="text-sm text-texto-suave">Nuestro grupo de Facebook para preguntar por tu Sol, tu Luna y tu Ascendente, comentar la carta del día y enterarte del próximo directo.</p>
+        <p className="pt-1 text-sm font-semibold text-texto">Unirme al grupo →</p>
+      </a>
       <p className="text-center text-xs text-texto-suave">Lecturas de entretenimiento y reflexión personal.</p>
     </div>
   );
