@@ -9,6 +9,7 @@ export async function PiePagina() {
     <footer className="border-t border-borde py-8 text-sm text-texto-suave">
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:px-6">
         <nav className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/que-carta-eres" className="text-oro-suave hover:text-texto">{t.pie.testCarta}</Link>
           <Link href="/significado-tarot" className="hover:text-texto">{t.pie.guiaTarot}</Link>
           <Link href="/signos-zodiacales" className="hover:text-texto">{t.pie.guiaSignos}</Link>
           <Link href="/compatibilidad-signos" className="hover:text-texto">{t.pie.guiaCompatibilidad}</Link>

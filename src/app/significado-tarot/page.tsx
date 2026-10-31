@@ -43,6 +43,13 @@ export default function PaginaSignificadoTarot() {
           del día a día. Toca una carta para ver su significado, en el amor, en el trabajo y cuando sale invertida.
         </p>
       </header>
+      <Link href="/que-carta-eres" className="tarjeta flex items-center justify-between gap-4 border-oro/40 bg-oro/5 p-5 transition hover:border-oro">
+        <span>
+          <span className="font-display block text-2xl">¿Qué carta del tarot eres tú?</span>
+          <span className="text-sm text-texto-suave">Test gratis de 6 preguntas: descubre tu arcano mayor.</span>
+        </span>
+        <span className="text-oro-suave">Hacer el test →</span>
+      </Link>
 
       <section>
         <h2 className="font-display text-3xl">Los 22 arcanos mayores</h2>

@@ -75,6 +75,7 @@ export const es = {
     guiaTarot: "Significado de las cartas",
     guiaSignos: "Signos del zodiaco",
     guiaCompatibilidad: "Compatibilidad de signos",
+    testCarta: "¿Qué carta del tarot eres?",
   },
   lecturas: {
     nombres: {

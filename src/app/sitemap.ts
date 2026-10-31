@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { MAZO } from "@/lib/tarot/deck";
 import { SIGNOS } from "@/lib/zodiaco";
+import { RESULTADOS } from "@/lib/seo/test-carta";
 import { slugPareja, todasLasParejas } from "@/lib/seo/compatibilidad";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
@@ -18,6 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/horoscopo", 0.9, "daily"),
     ...SIGNOS.map((s) => url(`/horoscopo/${s.id}`, 0.8, "daily")),
     url("/luna", 0.8, "weekly"),
+    url("/que-carta-eres", 0.9, "weekly"),
+    ...Object.keys(RESULTADOS).map((c) => url(`/que-carta-eres/${c}`, 0.4)),
     url("/significado-tarot", 0.9),
     ...MAZO.map((c) => url(`/significado-tarot/${c.id}`, 0.7)),
     url("/signos-zodiacales", 0.9),
