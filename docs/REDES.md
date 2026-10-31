@@ -138,6 +138,16 @@ lecturas. Los pies de las publicaciones y de la carta del día invitan a
   insultos y «PASAR_A_PERSONA» para avisar por correo a `correosAdmin()`.
   `REDES_RESPUESTAS=0` deja de responder sin quitar el webhook (queda
   registrado como omitida).
+- **Fotos** (desde el 31 oct 2026): si un mensaje directo (Messenger o
+  Instagram) o un comentario de Facebook trae una foto, Sibila la descarga
+  (solo de los servidores de Meta, reducida a 1280 px) y da una lectura corta y
+  gratis de la limpia con huevo con Sonnet (`instruccionFoto`, ≤ 550
+  caracteres, sin miedo ni salud), invitando a la completa en
+  miarcana.com/huevo; con otra lectura (café, chocolate, mano, velas, tabaco)
+  invita a su página. El texto guardado empieza con `[foto]`, así se cuentan
+  sin otra columna: tope de 50 fotos al día (`REDES_FOTOS_DIA`); pasado el tope,
+  con `REDES_FOTOS=0` o si la descarga falla, responde una frase fija sin IA.
+  Los comentarios de Instagram no admiten fotos.
 - **Configuración en Meta** (app de Arcana, la misma de WhatsApp):
   1. Productos: añadir **Webhooks**; objeto *Instagram* → suscribir `comments`
      y `messages`; objeto *Page* → `feed` y `messages`. URL
@@ -156,7 +166,7 @@ lecturas. Los pies de las publicaciones y de la carta del día invitan a
      Configuración → Mensajes → "Permitir acceso a mensajes" activado.
 - Variables: `META_PAGE_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN` (con
   respaldo en las de Facebook/WhatsApp), `FB_PAGE_ID`, `IG_USER_ID`,
-  `REDES_RESPUESTAS`.
+  `REDES_RESPUESTAS`, `REDES_FOTOS`, `REDES_FOTOS_DIA`.
 
 ### Id de la página (17 oct 2026)
 

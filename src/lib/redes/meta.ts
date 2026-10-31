@@ -136,6 +136,8 @@ export interface Interaccion {
   remitente: string | null;
   objetoId: string | null;
   texto: string;
+  /** URL de la foto que acompaña el comentario o el mensaje (la primera), si la hay. */
+  imagen?: string;
 }
 
 interface Cambio {
@@ -153,13 +155,15 @@ interface Cambio {
     comment_id?: string;
     post_id?: string;
     message?: string;
+    /** Foto adjunta a un comentario de Facebook. */
+    photo?: string;
   };
 }
 
 interface Mensajeria {
   sender?: { id?: string };
   recipient?: { id?: string };
-  message?: { mid?: string; text?: string; is_echo?: boolean };
+  message?: { mid?: string; text?: string; is_echo?: boolean; attachments?: { type?: string; payload?: { url?: string } }[] };
 }
 
 export interface AvisoMeta {
@@ -167,7 +171,11 @@ export interface AvisoMeta {
   entry?: { id?: string; changes?: Cambio[]; messaging?: Mensajeria[] }[];
 }
 
-/** Extrae los comentarios y mensajes ajenos del aviso; descarta lo propio y lo que no es texto. */
+/**
+ * Extrae los comentarios y mensajes ajenos del aviso; descarta lo propio y lo
+ * que no trae texto ni foto (audios, stickers, reacciones). Lo que llega solo
+ * con foto queda con el texto vacío y la URL en `imagen`.
+ */
 export function extraerInteracciones(aviso: AvisoMeta): Interaccion[] {
   const red: RedMeta | null = aviso.object === "instagram" ? "instagram" : aviso.object === "page" ? "facebook" : null;
   if (!red) return [];
@@ -180,14 +188,15 @@ export function extraerInteracciones(aviso: AvisoMeta): Interaccion[] {
       if (red === "instagram" && c.field === "comments" && v.id && v.text && v.from?.id && !propios.has(v.from.id)) {
         lista.push({ red, tipo: "comentario", idMeta: v.id, remitenteId: v.from.id, remitente: v.from.username ?? null, objetoId: v.media?.id ?? null, texto: v.text });
       }
-      if (red === "facebook" && c.field === "feed" && v.item === "comment" && v.verb === "add" && v.comment_id && v.message && v.from?.id && !propios.has(v.from.id)) {
-        lista.push({ red, tipo: "comentario", idMeta: v.comment_id, remitenteId: v.from.id, remitente: v.from.name ?? null, objetoId: v.post_id ?? null, texto: v.message });
+      if (red === "facebook" && c.field === "feed" && v.item === "comment" && v.verb === "add" && v.comment_id && (v.message || v.photo) && v.from?.id && !propios.has(v.from.id)) {
+        lista.push({ red, tipo: "comentario", idMeta: v.comment_id, remitenteId: v.from.id, remitente: v.from.name ?? null, objetoId: v.post_id ?? null, texto: v.message ?? "", ...(v.photo ? { imagen: v.photo } : {}) });
       }
     }
     for (const m of entrada.messaging ?? []) {
-      const texto = m.message?.text?.trim();
-      if (!m.message?.mid || !texto || m.message.is_echo || !m.sender?.id || propios.has(m.sender.id)) continue;
-      lista.push({ red, tipo: "mensaje", idMeta: m.message.mid, remitenteId: m.sender.id, remitente: null, objetoId: null, texto });
+      const texto = m.message?.text?.trim() ?? "";
+      const imagen = m.message?.attachments?.find((a) => a.type === "image" && a.payload?.url)?.payload?.url;
+      if (!m.message?.mid || (!texto && !imagen) || m.message.is_echo || !m.sender?.id || propios.has(m.sender.id)) continue;
+      lista.push({ red, tipo: "mensaje", idMeta: m.message.mid, remitenteId: m.sender.id, remitente: null, objetoId: null, texto, ...(imagen ? { imagen } : {}) });
     }
   }
   return lista;

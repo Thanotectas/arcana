@@ -1,7 +1,8 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import { generarTexto } from "@/lib/ia";
+import sharp from "sharp";
+import { generarTexto, type ImagenEntrada } from "@/lib/ia";
 import { SIGNOS, type Signo } from "@/lib/zodiaco";
 import { horoscopoDelDia } from "@/lib/horoscopo";
 import { hechos } from "@/lib/whatsapp/sibila";
@@ -14,7 +15,9 @@ import { enviarMensajeDirecto, responderComentario, type Interaccion } from "./m
  * Sibila responde en Instagram y Facebook: a los comentarios de las
  * publicaciones (si alguien comenta su signo, con una línea de su horóscopo
  * de hoy) y a los mensajes directos (como en WhatsApp, con los hechos de
- * Arcana). Nunca hace lecturas; invita a la carta del día gratis.
+ * Arcana). No hace lecturas de texto; invita a la carta del día gratis. Si
+ * llega la foto de una limpia con huevo, da una lectura corta y gratis del
+ * vaso e invita a la completa en miarcana.com/huevo.
  */
 const MARCA_OMITIR = "«OMITIR»";
 const MARCA_HUMANO = "«PASAR_A_PERSONA»";
@@ -23,6 +26,14 @@ const MARCA_HUMANO = "«PASAR_A_PERSONA»";
 const MAXIMO_DIA = { comentario: 200, mensaje: 150 } as const;
 /** Respuestas a una misma persona en una misma publicación por día. */
 const MAXIMO_POR_PERSONA_Y_PUBLICACION = 2;
+/** Fotos que Sibila lee al día entre todas las redes (cada una cuesta unos centavos). REDES_FOTOS_DIA lo cambia; REDES_FOTOS=0 lo apaga. */
+const MAXIMO_FOTOS_DIA = Number(process.env.REDES_FOTOS_DIA) || 50;
+/** Prefijo del texto guardado cuando la interacción trae foto (así se cuentan sin otra columna). */
+const MARCA_FOTO = "[foto]";
+/** Respuesta sin IA cuando no se puede leer la foto (tope del día, lectura apagada, descarga fallida). */
+const RESPUESTA_FOTO_FIJA = "¡Recibí tu foto! 💛 Para que la lea con calma, súbela en miarcana.com/huevo y te digo lo que soltaste y lo que viene para ti.";
+/** Hosts de donde Meta sirve las fotos adjuntas; cualquier otra URL se ignora. */
+const HOSTS_FOTOS = ["fbcdn.net", "fbsbx.com", "cdninstagram.com", "facebook.com", "instagram.com"];
 /** Mensajes directos previos que entran como contexto. */
 const CONTEXTO = 10;
 
@@ -44,6 +55,45 @@ Reglas:
 - Si el mensaje es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
 - No inventes precios ni funciones. No pidas datos sensibles.
 - Responde en el idioma en que te escriben (español por defecto). Tutea.`;
+
+const instruccionFoto = (tipo: Interaccion["tipo"]) => `Te mandaron una foto en ${tipo === "comentario" ? "un comentario público" : "un mensaje directo"} de Arcana. Eres Sibila.
+Si la foto es un huevo abierto dentro de un vaso o recipiente con agua (una limpia con huevo):
+- Haz una lectura corta y gratis: de 3 a 5 frases, máximo 550 caracteres. Nombra lo que de verdad se ve (la yema: entera, color, dónde quedó; la clara: hilos, picos, velos, burbujas, nubes, columnas, espirales, figuras; el agua: limpia o turbia) y lo que se interpreta en la tradición de la limpia, con palabras propias y variadas: no empieces siempre igual ni repitas fórmulas.
+- Incluye un anuncio de lo que viene, suave y concreto (es probable, se anuncia, en las próximas semanas), siempre con salida y en positivo.
+- Nunca hables de «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni de nada que asuste; nada de salud, enfermedades, embarazos, muertes ni dinero garantizado. Si se ve sangre o algo inquietante, léelo con calma como una carga que salió; si la persona dice que se siente mal, sugiere ver a un médico.
+- Cierra invitando a la lectura completa, con más detalle, en miarcana.com/huevo.
+Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: borra de café en una taza → miarcana.com/cafe; taza de chocolate → miarcana.com/chocolate; palma de la mano → miarcana.com/quiromancia; restos de velas → miarcana.com/velas; tabaco → miarcana.com/tabaco.
+Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
+Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
+Texto plano: sin títulos, listas ni markdown, sin enlaces con https. Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
+
+/** Descarga la foto adjunta (solo de los servidores de Meta) y la deja en JPEG de máximo 1280 px, para gastar menos. */
+async function descargarFoto(url: string): Promise<ImagenEntrada | null> {
+  try {
+    const host = new URL(url).hostname;
+    if (!HOSTS_FOTOS.some((h) => host === h || host.endsWith(`.${h}`))) return null;
+    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+    if (!res.ok) return null;
+    const datos = Buffer.from(await res.arrayBuffer());
+    if (!datos.length || datos.length > 15_000_000) return null;
+    const jpeg = await sharp(datos).rotate().resize(1280, 1280, { fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer();
+    return { mediaType: "image/jpeg", base64: jpeg.toString("base64") };
+  } catch (e) {
+    console.error("[redes sibila] foto:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+/** Fotos leídas hoy por Sibila en todas las redes. */
+async function fotosHoy(admin: SupabaseClient<Database>) {
+  const { count } = await admin
+    .from("interacciones_redes")
+    .select("id", { count: "exact", head: true })
+    .gte("creado_en", `${fechaBogota()}T05:00:00.000Z`)
+    .eq("estado", "respondida")
+    .like("texto", `${MARCA_FOTO}%`);
+  return count ?? 0;
+}
 
 function sinAcentos(t: string) {
   return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -118,7 +168,8 @@ async function avisarHumano(i: Interaccion, hilo: { rol: string; contenido: stri
  * Sibila, la publica y la guarda. Devuelve qué hizo.
  */
 export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
-  const { error } = await admin.from("interacciones_redes").insert({ red: i.red, tipo: i.tipo, id_meta: i.idMeta, remitente_id: i.remitenteId, remitente: i.remitente, objeto_id: i.objetoId, texto: i.texto.slice(0, 4000) });
+  const textoGuardado = (i.imagen ? `${MARCA_FOTO} ${i.texto}` : i.texto).trim();
+  const { error } = await admin.from("interacciones_redes").insert({ red: i.red, tipo: i.tipo, id_meta: i.idMeta, remitente_id: i.remitenteId, remitente: i.remitente, objeto_id: i.objetoId, texto: textoGuardado.slice(0, 4000) });
   if (error) {
     if (error.code === "23505") return "duplicado";
     throw new Error(`guardar interacción: ${error.message}`);
@@ -159,9 +210,20 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     entrada = `Comentario de ${i.remitente ? `@${i.remitente}` : "una persona"} en ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»${signo ? `\n(Menciona el signo ${signo.nombre}.)` : ""}`;
   }
 
+  // La foto (una limpia con huevo, casi siempre): lectura corta con la imagen, dentro del tope diario.
+  let foto: ImagenEntrada | null = null;
+  let respuestaFija = false;
+  if (i.imagen) {
+    if (process.env.REDES_FOTOS === "0" || (await fotosHoy(admin)) >= MAXIMO_FOTOS_DIA) respuestaFija = true;
+    else foto = await descargarFoto(i.imagen);
+    if (!foto && !i.texto.trim()) respuestaFija = true;
+  }
+
   let respuesta: string;
   try {
-    respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
+    if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo)}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto] });
+    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;
@@ -176,7 +238,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("omitida", { detalle: "respuesta vacía" });
     return "vacio";
   }
-  if (i.tipo === "comentario") respuesta = respuesta.slice(0, 300);
+  if (i.tipo === "comentario") respuesta = respuesta.slice(0, foto ? 700 : 300);
 
   try {
     if (i.tipo === "comentario") await responderComentario(i.red, i.idMeta, respuesta);
