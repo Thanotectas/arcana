@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+html, body { margin: 0; background: transparent; }
+</style></head><body>
+<svg id="c" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const ORO = "#f1d99a";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const suave = (x) => x * x * (3 - 2 * x);
+const ventana = (t, a, b, f = 0.45) => Math.min(suave(prog(t, a, a + f)), 1 - suave(prog(t, b - f, b)));
+const defs = `<defs><filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="s" x="-20%" y="-50%" width="140%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="8" flood-color="#000" flood-opacity="0.9"/></filter></defs>`;
+const tx = (x, y, s, o = {}) => { const { tam = 60, color = ORO, op = 1, estilo = "normal", filtro = "s" } = o;
+  return `<text x="${x}" y="${y}" font-family="Cormorant" font-size="${tam}" font-weight="600" font-style="${estilo}" fill="${color}" opacity="${op.toFixed(3)}" text-anchor="middle" xml:space="preserve" filter="url(#${filtro})">${s}</text>`; };
+window.pintar = (t) => {
+  let s = defs;
+  const a = ventana(t, 0.4, 3.3);
+  if (a > 0) s += tx(540, 1450, "Esta carta", { tam: 110, color: "#fff", op: a, filtro: "b" }) + tx(540, 1570, "llegó a ti por algo…", { tam: 92, estilo: "italic", op: a, filtro: "b" });
+  const b = ventana(t, 3.4, 5.6);
+  if (b > 0) s += `<rect x="0" y="1720" width="1080" height="130" fill="#0b0716" opacity="${(0.55*b).toFixed(3)}"/>` + tx(540, 1805, "¿Qué te dicen las cartas hoy?", { tam: 78, color: "#fff", op: b, filtro: "b" });
+  const c = suave(prog(t, 6.4, 7.0));
+  if (c > 0) {
+    s += `<rect x="0" y="1370" width="1080" height="360" fill="#0b0716" opacity="${(0.6*c).toFixed(3)}"/>`;
+    s += tx(540, 1450, "Nada llega a ti por casualidad", { tam: 70, estilo: "italic", color: "#fff", op: c, filtro: "b" });
+    s += tx(540, 1600, "miarcana.com", { tam: 120, op: suave(prog(t, 8.6, 9.2)), filtro: "b" });
+    s += tx(540, 1680, "tu carta te está esperando", { tam: 50, estilo: "italic", op: suave(prog(t, 9.0, 9.6)) });
+  }
+  document.getElementById("c").innerHTML = s;
+};
+</script></body></html>
