@@ -8,7 +8,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requerirAdmin } from "@/lib/admin";
 import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
-import { BUCKET_FOTOS, escenarioActivo, type TipoLectura } from "@/lib/en-vivo";
+import { BUCKET_FOTOS, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 
 export interface EstadoEnVivo {
@@ -64,7 +64,9 @@ export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormDa
   await requerirAdmin();
   const autor = String(formData.get("autor") ?? "").trim().slice(0, 40);
   const texto = String(formData.get("texto") ?? "").trim().slice(0, 300);
-  const tipo = String(formData.get("tipo") ?? "tarot") as TipoLectura;
+  const elegido = String(formData.get("tipo") ?? "auto");
+  // «auto» clasifica el texto igual que el chat (carta astral, sinastría, aura…); lo que pide foto queda en tarot.
+  const tipo = (elegido === "auto" ? (tipoDeMensaje(texto) ?? "tarot") : elegido) as TipoLectura;
   if (!autor || texto.length < 3 || !TIPOS.includes(tipo)) return { error: "Escribe el nombre, el tipo y la consulta." };
   const { error } = await getSupabaseAdmin().from("en_vivo_preguntas").insert({ origen: "manual", tipo, autor, texto, signo: detectarSigno(texto)?.id ?? null });
   if (error) return { error: error.message };

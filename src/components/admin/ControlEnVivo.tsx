@@ -38,7 +38,8 @@ export function PreguntaManual() {
     <form action={enviar} className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
         <input name="autor" placeholder="Nombre" maxLength={40} required className="campo" />
-        <select name="tipo" className="campo" defaultValue="tarot">
+        <select name="tipo" className="campo" defaultValue="auto">
+          <option value="auto">Según lo que escribas (como en el chat)</option>
           <option value="tarot">Tarot</option>
           <option value="aura">Aura</option>
           <option value="numerologia">Numerología</option>
