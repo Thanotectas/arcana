@@ -73,6 +73,7 @@ export const pt: Diccionario = {
     guiaTarot: "Significado das cartas",
     guiaSignos: "Signos do zodíaco",
     guiaCompatibilidad: "Compatibilidade de signos",
+    matrizDestino: "Matriz do Destino",
     testCarta: "Qual carta do tarô é você?",
   },
   lecturas: {

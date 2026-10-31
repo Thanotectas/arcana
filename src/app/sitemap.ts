@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/luna", 0.8, "weekly"),
     url("/que-carta-eres", 0.9, "weekly"),
     ...Object.keys(RESULTADOS).map((c) => url(`/que-carta-eres/${c}`, 0.4)),
+    url("/matriz-del-destino", 0.8),
     url("/significado-tarot", 0.9),
     ...MAZO.map((c) => url(`/significado-tarot/${c.id}`, 0.7)),
     url("/signos-zodiacales", 0.9),

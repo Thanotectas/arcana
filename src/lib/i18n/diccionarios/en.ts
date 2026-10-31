@@ -76,6 +76,7 @@ export const en: Diccionario = {
     guiaTarot: "Tarot card meanings",
     guiaSignos: "Zodiac signs",
     guiaCompatibilidad: "Sign compatibility",
+    matrizDestino: "Destiny Matrix",
     testCarta: "Which tarot card are you?",
   },
   lecturas: {
