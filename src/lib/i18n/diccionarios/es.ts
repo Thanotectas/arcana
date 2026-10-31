@@ -72,6 +72,9 @@ export const es = {
     siguenos: "Síguenos",
     whatsapp: "Escríbenos",
     canal: "Canal de WhatsApp",
+    guiaTarot: "Significado de las cartas",
+    guiaSignos: "Signos del zodiaco",
+    guiaCompatibilidad: "Compatibilidad de signos",
   },
   lecturas: {
     nombres: {

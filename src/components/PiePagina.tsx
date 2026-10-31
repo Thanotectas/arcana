@@ -8,6 +8,13 @@ export async function PiePagina() {
   return (
     <footer className="border-t border-borde py-8 text-sm text-texto-suave">
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:px-6">
+        <nav className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/significado-tarot" className="hover:text-texto">{t.pie.guiaTarot}</Link>
+          <Link href="/signos-zodiacales" className="hover:text-texto">{t.pie.guiaSignos}</Link>
+          <Link href="/compatibilidad-signos" className="hover:text-texto">{t.pie.guiaCompatibilidad}</Link>
+          <Link href="/horoscopo" className="hover:text-texto">{t.nav.horoscopo}</Link>
+          <Link href="/luna" className="hover:text-texto">{t.luna.titulo}</Link>
+        </nav>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <nav className="flex gap-4">
             <Link href="/terminos" className="hover:text-texto">{t.pie.terminos}</Link>

@@ -70,6 +70,9 @@ export const pt: Diccionario = {
     siguenos: "Siga-nos",
     whatsapp: "Fale conosco",
     canal: "Canal do WhatsApp",
+    guiaTarot: "Significado das cartas",
+    guiaSignos: "Signos do zodíaco",
+    guiaCompatibilidad: "Compatibilidade de signos",
   },
   lecturas: {
     nombres: {

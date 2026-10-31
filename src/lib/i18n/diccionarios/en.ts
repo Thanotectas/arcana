@@ -73,6 +73,9 @@ export const en: Diccionario = {
     siguenos: "Follow us",
     whatsapp: "Chat with us",
     canal: "WhatsApp channel",
+    guiaTarot: "Tarot card meanings",
+    guiaSignos: "Zodiac signs",
+    guiaCompatibilidad: "Sign compatibility",
   },
   lecturas: {
     nombres: {
