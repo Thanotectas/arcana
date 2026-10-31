@@ -106,8 +106,11 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
   if (!chat) {
     // Buscar el directo activo como mucho cada 30 s.
     if (estado?.buscado_en && ahora - Date.parse(estado.buscado_en) < 30_000) return { conectado: true, directo: false, nuevas: 0 };
-    const r = await api<{ items?: { snippet?: { liveChatId?: string } }[] }>("liveBroadcasts?part=snippet&broadcastStatus=active&broadcastType=all&maxResults=5", token);
-    chat = r.datos.items?.find((i) => i.snippet?.liveChatId)?.snippet?.liveChatId ?? null;
+    const r = await api<{ items?: { snippet?: { liveChatId?: string; actualStartTime?: string } }[] }>("liveBroadcasts?part=snippet&broadcastStatus=active&broadcastType=all&maxResults=5", token);
+    // Si quedó otro directo abierto (una prueba anterior), se lee el que empezó más tarde.
+    const activos = (r.datos.items ?? []).filter((i) => i.snippet?.liveChatId);
+    activos.sort((x, y) => Date.parse(y.snippet?.actualStartTime ?? "") - Date.parse(x.snippet?.actualStartTime ?? "") || 0);
+    chat = activos[0]?.snippet?.liveChatId ?? null;
     pagina = null;
     await admin.from("en_vivo_estado").upsert({ id: 1, live_chat_id: chat, page_token: null, buscado_en: new Date().toISOString(), actualizado_en: new Date().toISOString() }, { onConflict: "id" });
     if (!r.ok) return { conectado: true, directo: false, nuevas: 0, detalle: r.datos.error?.message ?? `YouTube ${r.status}` };
