@@ -21,7 +21,7 @@ import type { GraficoVivo } from "@/lib/en-vivo-graficos";
 /**
  * «Sibila en vivo»: directos de YouTube donde Sibila lee el tarot a quien
  * escribe en el chat su signo y su pregunta (tarot, aura, numerología u
- * horóscopo) o sube en /vivo la foto de su taza de chocolate o de su mano. OBS transmite la página
+ * horóscopo) o sube en /vivo la foto de su taza de chocolate, de su mano o de su limpia con huevo. OBS transmite la página
  * /en-vivo/escenario (con la clave del panel); esa página pide aquí la
  * siguiente lectura mientras suena la anterior. El servidor lee el chat del
  * directo activo del canal conectado, encola las preguntas, filtra las que no
@@ -186,12 +186,18 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
 // ───────────────────────── Lecturas ─────────────────────────
 
 export type TipoLectura = PreguntaEnVivo["tipo"];
+/** Marca de la limpia con huevo guardada como «chocolate» cuando falta la migración 0043. */
+export const MARCA_HUEVO = "[huevo] ";
+/** La consulta, con el tipo «huevo» resuelto aunque haya entrado con la marca. */
+function normalizar<T extends { tipo: TipoLectura; texto: string }>(p: T): T {
+  return p.tipo === "chocolate" && p.texto.startsWith(MARCA_HUEVO.trim()) ? { ...p, tipo: "huevo", texto: p.texto.slice(MARCA_HUEVO.trim().length).trim() } : p;
+}
 export const BUCKET_FOTOS = "redes";
 
-/** Qué lectura pide un mensaje del chat; null si necesita foto (taza o mano: van por /vivo). */
+/** Qué lectura pide un mensaje del chat; null si necesita foto (taza, mano o huevo: van por /vivo). */
 export function tipoDeMensaje(texto: string): TipoLectura | null {
   const t = texto.toLowerCase();
-  if (/chocolate|taza|pocillo|\bmano\b|palma|\bpalm\b|\bhand\b|\bcup\b|x[ií]cara|\bm[aã]o\b/.test(t)) return null;
+  if (/chocolate|taza|pocillo|\bmano\b|palma|\bpalm\b|\bhand\b|\bcup\b|x[ií]cara|\bm[aã]o\b|\bhuevo|limpia/.test(t)) return null;
   // Carta astral y sinastría se dibujan en pantalla: necesitan la fecha (o las dos fechas).
   const fechas = fechasEn(t).length;
   if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
@@ -325,7 +331,8 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
       };
     }
     case "chocolate":
-    case "mano": {
+    case "mano":
+    case "huevo": {
       const url = p.imagen ? admin.storage.from(BUCKET_FOTOS).getPublicUrl(p.imagen).data.publicUrl : "";
       const res = url ? await fetch(url, { cache: "no-store" }) : null;
       if (!res?.ok) throw new Error("No se pudo leer la foto.");
@@ -333,7 +340,9 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
       return {
         entrada: base.join("\n"),
         sistema:
-          p.tipo === "chocolate"
+          p.tipo === "huevo"
+            ? `${SISTEMA_EN_VIVO}\nLectura de la limpia con huevo: mira la foto del vaso con agua y el huevo abierto. Nombra lo que de verdad se ve (la yema: entera, color, dónde quedó; la clara: hilos, picos, velos, burbujas, nubes, columnas o figuras; el agua: limpia o turbia) y qué se interpreta en la tradición de la limpia, y anuncia algo concreto y en positivo. Nunca hables de «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni de salud, enfermedades, embarazos o muerte; si se ve sangre o algo inquietante, léelo con calma como una carga que salió. Si la foto no muestra un huevo abierto en un vaso o recipiente con agua, o muestra personas, responde OMITIR.`
+            : p.tipo === "chocolate"
             ? `${SISTEMA_EN_VIVO}\nLectura del chocolate: mira la foto del fondo de su taza o pocillo, describe dos o tres figuras que forman los restos y qué anuncian. Si la foto no muestra el fondo de una taza con restos, o muestra personas, responde OMITIR.`
             : `${SISTEMA_EN_VIVO}\nLectura de la mano: mira la palma y lee dos o tres líneas o montes que se vean (corazón, cabeza, vida, destino) y qué anuncian. Nunca hables de salud ni de cuánto vivirá. Si la foto no muestra la palma de una mano, o muestra algo más, responde OMITIR.`,
         imagenes: [{ mediaType: "image/jpeg", base64: foto }],
@@ -359,7 +368,7 @@ export interface LecturaEnVivo {
   signo: string | null;
   pregunta: string;
   cartas: CartaEnVivo[] | null;
-  /** URL pública de la foto (taza o mano). */
+  /** URL pública de la foto (taza, mano o vaso de la limpia). */
   imagen: string | null;
   color: string | null;
   numero: number | null;
@@ -416,7 +425,8 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
 
     const signo = p.signo ? SIGNOS.find((s) => s.id === p.signo) ?? null : null;
     try {
-      const prep = await preparar(admin, p, signo);
+      const q = normalizar(p);
+      const prep = await preparar(admin, q, signo);
       // Para que no suene automático: cómo empezaron y cerraron las últimas lecturas de la noche.
       const { data: previas } = await admin.from("en_vivo_preguntas").select("lectura").eq("estado", "leida").gte("leida_en", inicioDia.toISOString()).order("leida_en", { ascending: false }).limit(5);
       const yaDijiste = (previas ?? [])
@@ -450,11 +460,11 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       await admin.from("en_vivo_preguntas").update({ estado: "leida", lectura: texto, cartas: prep.extra.cartas, leida_en: new Date().toISOString() }).eq("id", p.id);
       return {
         id: p.id,
-        tipo: p.tipo,
+        tipo: q.tipo,
         origen: p.origen,
         autor: p.autor,
         signo: signo?.nombre ?? null,
-        pregunta: p.texto,
+        pregunta: q.texto,
         imagen: p.imagen ? admin.storage.from(BUCKET_FOTOS).getPublicUrl(p.imagen).data.publicUrl : null,
         color,
         ...prep.extra,
@@ -520,7 +530,7 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo. Y para seguir aprendiendo durante la semana, únete a nuestro grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.${telegram}`,
     "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
     "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
-    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si quieres que mire tu taza o tu mano, escanea el código de la pantalla y sube la foto.",
+    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si te hiciste una limpia con huevo, o quieres que mire tu taza o tu mano, escanea el código de la pantalla y sube la foto: yo la leo aquí, en vivo.",
     `Si quieres una lectura más profunda, con calma y por escrito, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
     "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
     "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",

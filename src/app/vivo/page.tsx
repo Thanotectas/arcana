@@ -9,7 +9,7 @@ import { GRUPO_FACEBOOK, CANAL_WHATSAPP } from "@/lib/marca/redes";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sibila en vivo",
-  description: "Sibila lee en vivo en YouTube: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. Activa el recordatorio o envía la foto de tu taza o de tu mano.",
+  description: "Sibila lee en vivo en YouTube: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. Activa el recordatorio o envía la foto de tu limpia con huevo, tu taza o tu mano.",
 };
 
 /**
@@ -28,7 +28,7 @@ export default async function PaginaVivo() {
       <div className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Sibila en vivo</p>
         <h1 className="mt-2 font-display text-4xl font-semibold text-oro-suave">Tu lectura en el directo</h1>
-        <p className="mt-2 text-texto-suave">Sibila lee en vivo en YouTube y tú eliges: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. También puedes enviarle la foto de tu taza o de tu mano.</p>
+        <p className="mt-2 text-texto-suave">Sibila lee en vivo en YouTube y tú eliges: tu carta astral dibujada en pantalla, tu sinastría, tarot o aura. También puedes enviarle la foto de tu limpia con huevo, de tu taza o de tu mano.</p>
       </div>
       {activo || estado === "en-vivo" ? (
         <>
@@ -62,7 +62,7 @@ export default async function PaginaVivo() {
             <p>
               <span className="text-oro-suave">Tarot, aura o mi año</span>: <span className="text-texto-suave">tu signo y tu pregunta</span>
             </p>
-            <p className="text-texto-suave">El día del directo, aquí mismo podrás subir la foto de tu taza o de tu mano.</p>
+            <p className="text-texto-suave">El día del directo, aquí mismo podrás subir la foto de tu limpia con huevo, de tu taza o de tu mano.</p>
           </div>
         </div>
       ) : (

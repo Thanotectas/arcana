@@ -12,7 +12,7 @@ import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
 
-const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", carta: "Carta astral", sinastria: "Sinastría" };
+const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", huevo: "Huevo", carta: "Carta astral", sinastria: "Sinastría" };
 const ORIGEN: Record<string, string> = { chat: "YouTube", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)" };
 
 /** Control de «Sibila en vivo»: dirección del escenario para OBS, estado, fila de consultas y lecturas. */
@@ -44,7 +44,7 @@ export default async function PaginaAdminEnVivo() {
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Administración</p>
         <h1 className="font-display text-4xl font-semibold">Sibila en vivo</h1>
         <p className="mt-2 text-texto-suave">
-          Directos de YouTube donde Sibila lee en voz alta: tarot, aura, numerología y horóscopo a quien escribe en el chat, y la taza de chocolate o la mano de quien sube la foto en{" "}
+          Directos de YouTube donde Sibila lee en voz alta: tarot, aura, numerología y horóscopo a quien escribe en el chat, y la limpia con huevo, la taza de chocolate o la mano de quien sube la foto en{" "}
           <a href="/vivo" className="text-oro-suave underline">miarcana.com/vivo</a> (el QR sale en pantalla).
         </p>
       </div>

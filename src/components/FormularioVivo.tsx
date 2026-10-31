@@ -17,9 +17,14 @@ async function achicar(archivo: File): Promise<Blob> {
   return new Promise((listo, falla) => lienzo.toBlob((b) => (b ? listo(b) : falla(new Error("foto"))), "image/jpeg", 0.85));
 }
 
-/** Formulario de /vivo: la foto de la taza o de la mano para que Sibila la lea en el directo. */
+/** Formulario de /vivo: la foto de la taza, de la mano o del vaso de la limpia para que Sibila la lea en el directo. */
+const OPCIONES = {
+  huevo: { icono: "🥚", nombre: "Mi limpia con huevo", ayuda: "Toma la foto del vaso de lado, a la altura del agua y con buena luz, que se vean la yema y los hilos de la clara." },
+  chocolate: { icono: "☕", nombre: "Mi taza de chocolate", ayuda: "Tómate el chocolate, inclina la taza y toma la foto desde arriba, con buena luz, mostrando el fondo con los restos." },
+  mano: { icono: "✋", nombre: "Mi mano", ayuda: "Abre la palma de tu mano dominante, con buena luz, y toma la foto de frente. Solo la mano." },
+} as const;
 export function FormularioVivo() {
-  const [tipo, setTipo] = useState<"chocolate" | "mano">("chocolate");
+  const [tipo, setTipo] = useState<keyof typeof OPCIONES>("huevo");
   const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(async (prev, fd) => {
     const foto = fd.get("foto");
     if (foto instanceof File && foto.size) {
@@ -36,17 +41,17 @@ export function FormularioVivo() {
 
   return (
     <form action={enviar} className="space-y-5">
-      <div className="grid grid-cols-2 gap-3">
-        {(["chocolate", "mano"] as const).map((t) => (
+      <div className="grid grid-cols-3 gap-3">
+        {(Object.keys(OPCIONES) as (keyof typeof OPCIONES)[]).map((t) => (
           <label key={t} className={`cursor-pointer rounded-2xl border p-4 text-center transition ${tipo === t ? "border-oro bg-oro/10 text-oro-suave" : "border-borde text-texto-suave"}`}>
             <input type="radio" name="tipo" value={t} checked={tipo === t} onChange={() => setTipo(t)} className="sr-only" />
-            <span className="block text-3xl">{t === "chocolate" ? "☕" : "✋"}</span>
-            <span className="mt-1 block font-semibold">{t === "chocolate" ? "Mi taza de chocolate" : "Mi mano"}</span>
+            <span className="block text-3xl">{OPCIONES[t].icono}</span>
+            <span className="mt-1 block text-sm font-semibold">{OPCIONES[t].nombre}</span>
           </label>
         ))}
       </div>
       <p className="text-sm text-texto-suave">
-        {tipo === "chocolate" ? "Tómate el chocolate, inclina la taza y toma la foto desde arriba, con buena luz, mostrando el fondo con los restos." : "Abre la palma de tu mano dominante, con buena luz, y toma la foto de frente. Solo la mano."}
+        {OPCIONES[tipo].ayuda}
       </p>
       <label className="block space-y-1 text-sm">
         <span className="text-texto-suave">Foto</span>

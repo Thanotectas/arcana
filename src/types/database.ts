@@ -227,7 +227,7 @@ type EnVivoPreguntaRow = {
   id: number;
   mensaje_id: string | null;
   origen: "chat" | "manual" | "pagina" | "facebook";
-  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria";
+  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo";
   imagen: string | null;
   huella: string | null;
   autor: string;

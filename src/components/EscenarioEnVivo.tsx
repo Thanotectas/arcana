@@ -15,7 +15,7 @@ interface Carta {
   posicion: string;
 }
 
-type TipoLectura = "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria";
+type TipoLectura = "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo";
 
 interface Lectura {
   clase: "lectura";
@@ -45,6 +45,7 @@ const NOMBRE_TIPO: Record<TipoLectura, string> = {
   horoscopo: "Horóscopo",
   chocolate: "Lectura del chocolate",
   mano: "Lectura de la mano",
+  huevo: "Limpia con huevo",
   carta: "Carta astral",
   sinastria: "Sinastría",
 };
@@ -341,7 +342,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         <div className={`absolute flex items-center gap-5 rounded-3xl border border-oro/30 bg-black/45 p-4 ${escena ? "left-[1190px] right-[56px] top-[770px]" : "bottom-[245px] left-16 w-[560px] p-5"}`}>
           <div className={`shrink-0 overflow-hidden rounded-xl ${escena ? "h-[120px] w-[120px]" : "h-[150px] w-[150px]"}`} dangerouslySetInnerHTML={{ __html: qr }} />
           <p className={`leading-snug text-texto ${escena ? "text-xl" : "text-2xl"}`}>
-            ¿Tu <span className="text-oro-suave">taza de chocolate</span> o tu <span className="text-oro-suave">mano</span>? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span>
+            ¿Tu <span className="text-oro-suave">limpia con huevo</span>, tu taza o tu mano? Sube la foto en <span className="text-oro-suave">miarcana.com/vivo</span>
           </p>
         </div>
         )}
@@ -435,7 +436,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           </div>
         ) : (
           <div className={`absolute ${derecha} flex items-center justify-center ${escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: escena ? "scale(0.82)" : undefined }}>
-            {(tipo === "chocolate" || tipo === "mano") && lectura.imagen && (
+            {(tipo === "chocolate" || tipo === "mano" || tipo === "huevo") && lectura.imagen && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={lectura.imagen} alt="" className="h-[440px] max-w-[720px] rounded-3xl border-4 border-oro/70 object-cover shadow-[0_30px_80px_rgba(0,0,0,0.6)]" />
             )}
@@ -479,7 +480,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           {cierre !== "abierto" ? (
             <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Únete al grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
           ) : (
-            <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦</>
+            <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Huevo, taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦</>
           )}
         </div>
 

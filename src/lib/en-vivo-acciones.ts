@@ -8,7 +8,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requerirAdmin } from "@/lib/admin";
 import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
-import { BUCKET_FOTOS, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
+import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 
 export interface EstadoEnVivo {
@@ -19,13 +19,14 @@ export interface EstadoEnVivo {
 const POR_HORA = 2;
 
 /**
- * Foto de la taza de chocolate o de la mano enviada desde /vivo durante un
+ * Foto de la taza de chocolate, de la mano o del vaso de la limpia con huevo enviada desde /vivo durante un
  * directo: se limpia (sin metadatos, máximo 1.024 px), se guarda y entra a la
  * cola de Sibila. Solo mientras el escenario está transmitiendo, y máximo dos
  * por hora por persona.
  */
 export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
-  const tipo = formData.get("tipo") === "mano" ? "mano" : "chocolate";
+  const elegido = formData.get("tipo");
+  const tipo: TipoLectura = elegido === "mano" ? "mano" : elegido === "huevo" ? "huevo" : "chocolate";
   const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 40);
   const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 200);
   const foto = formData.get("foto");
@@ -51,10 +52,13 @@ export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData):
   const ruta = `en-vivo/fotos/${randomUUID()}.jpg`;
   const { error: errorSubida } = await admin.storage.from(BUCKET_FOTOS).upload(ruta, limpia, { contentType: "image/jpeg", cacheControl: "300" });
   if (errorSubida) return { error: "No se pudo guardar la foto. Intenta de nuevo." };
-  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina", tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, imagen: ruta, huella });
+  const fila = { origen: "pagina" as const, tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, imagen: ruta, huella };
+  let { error } = await admin.from("en_vivo_preguntas").insert(fila);
+  // Sin la migración 0043 no existe el tipo «huevo»: entra como chocolate con la marca y se lee igual.
+  if (error?.code === "23514" && tipo === "huevo") ({ error } = await admin.from("en_vivo_preguntas").insert({ ...fila, tipo: "chocolate", texto: `${MARCA_HUEVO}${pregunta}`.trim() }));
   if (error) return { error: "No se pudo enviar. Intenta de nuevo." };
   const { count: antes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
-  return { mensaje: `¡Listo, ${nombre}! Tu ${tipo === "mano" ? "mano" : "taza"} está en la fila${antes && antes > 1 ? ` (hay ${antes - 1} antes de ti)` : ""}. Mira el directo: Sibila te va a nombrar.` };
+  return { mensaje: `¡Listo, ${nombre}! Tu ${tipo === "mano" ? "mano" : tipo === "huevo" ? "vaso" : "taza"} está en la fila${antes && antes > 1 ? ` (hay ${antes - 1} antes de ti)` : ""}. Mira el directo: Sibila te va a nombrar.` };
 }
 
 const TIPOS: TipoLectura[] = ["tarot", "aura", "numerologia", "horoscopo", "carta", "sinastria"];
