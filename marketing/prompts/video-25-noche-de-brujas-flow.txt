@@ -1,0 +1,56 @@
+VIDEO 25 — "RITUAL DE NOCHE DE BRUJAS" (31 de octubre). Google Flow (Veo), 2 clips de 8 s, vertical 9:16.
+Contenido de valor (enseña un ritual sencillo de protección para esta noche) con invitación suave al directo.
+SIN CARAS: solo manos, velas y objetos (en los videos 23 y 24 Flow cambió la cara de Sibila). Tono: mágico, cálido y
+sereno; nada de terror. Une Halloween con el Día de Todos los Santos y de Muertos (flores de cempasúchil).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- "Texto a video", vertical 9:16, 8 s. El clip 2 con "Extender" (Extend) desde el clip 1 para que la mesa y la luz sigan
+  iguales.
+- Sonido: solo ambiente (velas, fósforo, papel, viento suave). Sin música y sin voces: la voz la ponemos con Marcela.
+- El clip 2 termina en un plano QUIETO de la mesa: ahí van el título y la invitación al directo.
+
+==================== CLIP 1 · "El círculo" (8 s) ====================
+Vertical 9:16, cinematic close-up, Halloween night, warm and magical candlelight, cozy and mystical, not scary. A dark
+wooden table covered with a deep indigo velvet cloth. Only a woman's hands are visible (elegant, with a thin gold ring
+and a violet sleeve with golden embroidery). The hands slowly pour coarse white salt from a small brass bowl, drawing a
+complete circle on the velvet. Inside the circle stand two candles: one white and one violet. The hands strike a match
+and light the white candle, then the violet one; the flames rise softly. Around the circle: sprigs of fresh rosemary,
+a few bright orange marigold flowers, and in the soft-focus background a small carved pumpkin glowing warmly from the
+inside, with a light mist drifting near the table. Slow, smooth camera push-in toward the two flames.
+Sound: the scrape of the match, crackling flames, a soft breeze. No music, no voices.
+No faces, no text, no letters, no logos. Warm, golden, serene, nothing frightening.
+
+==================== CLIP 2 · "Lo que se va" (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same table, same circle of salt, same white and violet candles, same pumpkin and marigolds,
+same hands and sleeve. The hands hold a small folded piece of paper, bring one corner to the flame of the white candle
+and place it on a small ceramic plate inside the circle, where it burns gently; a thin ribbon of smoke rises and
+curls toward the candles. Then the hands place one orange marigold flower in front of the circle, as an offering,
+and withdraw. For the last 3 seconds: a fixed, static shot of the whole table from slightly above: the salt circle,
+the two candles burning, the plate with ashes, the marigolds and the glowing pumpkin in soft focus behind, with gentle
+mist; the camera does not move and no hands are in frame.
+Sound: paper crackling as it burns, flames, a soft breeze. No music, no voices.
+No faces, no text, no letters, no logos. The paper burns calmly on the plate (safe, small flame).
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración) ====================
+Cuatro frases por separado (≈ 24 s):
+1-velo.mp3 (≈ 5 s, al empezar el clip 1):
+"Esta noche, el velo entre los mundos se hace delgado. Haz conmigo este ritual de protección."
+2-circulo.mp3 (≈ 6 s, mientras se dibuja el círculo y se encienden las velas):
+"Un círculo de sal… una vela blanca para protegerte, y una morada para despertar tu intuición."
+3-papel.mp3 (≈ 7 s, mientras arde el papel):
+"Escribe en un papel lo que quieres dejar atrás, y quémalo con cuidado. Lo que se va en humo… ya no vuelve."
+4-cierre.mp3 (≈ 5 s, sobre el plano quieto):
+"Y mañana, domingo, a las ocho de la noche… te leo en vivo."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Gancho del primer segundo (texto grande): "Haz esto esta noche 🕯️"
+- Pasos en pantalla: "1 · Un círculo de sal" · "2 · Vela blanca (protección) y morada (intuición)" ·
+  "3 · Quema lo que quieres dejar atrás" · "4 · Una flor para tus ancestros".
+- Plano final: "Noche de brujas · Ritual de protección" + "Mañana, domingo 1 de noviembre, 8:00 p.m. · Sibila en vivo"
+  + "YouTube @miarcana". Aviso pequeño: "Nunca dejes velas encendidas sin vigilancia."
+
+==================== SI ALGO SALE MAL ====================
+- Aparece una cara: agrega "extreme close-up of the hands only, the person is out of frame".
+- Sale tenebroso: "warm golden candlelight, cozy and magical, nothing scary".
+- El papel hace una llama grande: "a small, calm flame; the paper burns slowly on the ceramic plate".
+- Aparecen letras en el papel: "the paper is folded, nothing written is visible".
