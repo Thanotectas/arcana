@@ -3,7 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import sharp from "sharp";
 import { generarTexto, type ImagenEntrada } from "@/lib/ia";
-import { SIGNOS, type Signo } from "@/lib/zodiaco";
+import { SIGNOS, signoPorLongitud, type Signo } from "@/lib/zodiaco";
+import { posiciones } from "@/lib/astro/efemerides";
 import { horoscopoDelDia } from "@/lib/horoscopo";
 import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
@@ -56,6 +57,21 @@ Reglas:
 - No inventes precios ni funciones. No pidas datos sensibles.
 - Responde en el idioma en que te escriben (español por defecto). Tutea.`;
 
+/**
+ * El cielo de hoy en una línea (fase y signo de la Luna, Mercurio retrógrado),
+ * para que Sibila pueda conectar la lectura con el momento en vez de sonar a fórmula.
+ */
+export function cieloDeHoy(ahora = new Date()) {
+  const pos = posiciones(ahora);
+  const sol = pos.find((p) => p.cuerpo === "sol")!.longitud;
+  const luna = pos.find((p) => p.cuerpo === "luna")!.longitud;
+  const angulo = (((luna - sol) % 360) + 360) % 360;
+  const fase = angulo < 22 || angulo >= 338 ? "Luna nueva" : angulo < 158 ? "Luna creciente" : angulo < 202 ? "Luna llena" : "Luna menguante";
+  const mercurio = pos.find((p) => p.cuerpo === "mercurio");
+  const retro = mercurio?.retrogrado ? ` Mercurio está retrógrado en ${signoPorLongitud(mercurio.longitud).nombre} (tiempo de retomar conversaciones y revisar lo pendiente).` : "";
+  return `${fase} en ${signoPorLongitud(luna).nombre}.${retro}`;
+}
+
 /** Formas de empezar una lectura de foto: se elige una al azar para que no suenen todas iguales. */
 const ENFOQUES_FOTO = [
   "Empieza por la figura que más llama la atención, como si la señalaras.",
@@ -68,6 +84,8 @@ const ENFOQUES_FOTO = [
 const instruccionFoto = (tipo: Interaccion["tipo"], enfoque: number, gancho: boolean) => `Te mandaron una foto en ${tipo === "comentario" ? "un comentario público" : "un mensaje directo"} de Arcana. Eres Sibila.
 Si la foto es un huevo abierto dentro de un vaso o recipiente con agua (una limpia con huevo):
 - Haz una lectura corta y gratis: de 3 a 5 frases, máximo 550 caracteres. Nombra lo que de verdad se ve (la yema: entera, color, dónde quedó; la clara: hilos, picos, velos, burbujas, nubes, columnas, espirales, figuras; el agua: limpia o turbia) y lo que se interpreta en la tradición de la limpia, con palabras propias y variadas: no empieces siempre igual ni repitas fórmulas.
+- Que se sienta suya, no una fórmula: nombra al menos dos detalles que solo están en esa foto (dónde quedó cada cosa, hacia qué lado se inclina, cuántos picos o burbujas, el color exacto) y, si la persona escribió algo, retómalo con sus palabras.
+- Habla con el conocimiento de quien de verdad lee: si encaja, explica en media frase por qué una figura significa lo que significa, o conecta la lectura con el cielo de hoy (${cieloDeHoy()}). Nada de frases que le sirvan a cualquiera.
 - Sé honesta: si el vaso muestra cargas, dilo claro y en concreto (cansancio, preocupación por dinero o trabajo, un roce con alguien cercano, una etapa pesada, mal dormir), sin suavizarlo todo. Lo difícil siempre va con una salida: qué hacer y cuándo se alivia. Si el vaso está tranquilo, dilo también.
 - Incluye un anuncio de lo que viene, concreto y verosímil (es probable, se anuncia, en las próximas semanas): una conversación, una noticia, alguien que reaparece, un cambio.
 - Nunca hables de «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni de nada que asuste; nada de salud, enfermedades, embarazos, muertes ni dinero garantizado. Si se ve sangre o algo inquietante, léelo con calma como una carga que salió; si la persona dice que se siente mal, sugiere ver a un médico.
