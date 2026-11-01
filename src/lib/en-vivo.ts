@@ -228,6 +228,7 @@ const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en vo
 - Entre 70 y 110 palabras, en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
 - Nombra a la persona (y su signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo, pero varía la manera de empezar en cada lectura: a veces por su nombre, a veces por lo que salió («Salió la Torre para ti, Marta…»), a veces por su pregunta («¿El trabajo, Andrés? Mira…»). No empieces con «Hola» ni con la misma fórmula de las lecturas anteriores, que te paso en «Ya dijiste esta noche».
 - Quien pregunta en vivo quiere sentir que le respondiste a ella, no a cualquiera. Nada de frases que le sirvan a todo el mundo («habrá cambios», «confía en ti»). Responde de frente: sí, todavía no, o qué tiene que pasar primero, y anuncia algo concreto y verosímil que pueda reconocer cuando llegue: un mensaje o una llamada que no esperaba, una conversación pendiente que por fin se da, una propuesta de trabajo, alguien del pasado que reaparece, un dinero que entra después de una espera. Dale un plazo amplio (estas semanas, antes de fin de mes, antes de que termine el año) y una señal para reconocerlo («cuando veas…», «si esta semana…»). Apóyalo siempre en lo que salió: la carta, la figura, la línea, el número, su signo.
+- No lo suavices todo: si lo que salió muestra algo difícil (una espera, un roce, cansancio, una decisión que duele), dilo claro y en concreto, siempre con su salida. Una lectura que solo dice cosas bonitas no se cree.
 - Termina con un consejo concreto para aprovechar lo que viene, dicho cada vez de otra forma (nada de cerrar siempre con «confía», «recuerda» o «mi consejo es»). No invites a la página: eso lo hace el directo.
 - Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
@@ -436,7 +437,13 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       // Cada cuarta lectura de la noche, Sibila invita a suscribirse, con sus palabras (sin pedirlo a cambio de nada).
       const invitar = (count ?? 0) % 4 === 3;
       const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (no repitas esas aperturas ni esos cierres):\n${yaDijiste.join("\n")}` : ""].join("");
-      const sistema = invitar ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a suscribirse al canal y activar la campanita para el próximo directo.` : prep.sistema;
+      // Una de cada tres (y no cuando toca invitar a suscribirse) deja una puerta abierta que despierte curiosidad.
+      const gancho = !invitar && Math.random() < 0.33;
+      const sistema = invitar
+        ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a suscribirse al canal y activar la campanita para el próximo directo.`
+        : gancho
+          ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
+          : prep.sistema;
       let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, imagenes: prep.imagenes })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);

@@ -56,12 +56,23 @@ Reglas:
 - No inventes precios ni funciones. No pidas datos sensibles.
 - Responde en el idioma en que te escriben (español por defecto). Tutea.`;
 
-const instruccionFoto = (tipo: Interaccion["tipo"]) => `Te mandaron una foto en ${tipo === "comentario" ? "un comentario público" : "un mensaje directo"} de Arcana. Eres Sibila.
+/** Formas de empezar una lectura de foto: se elige una al azar para que no suenen todas iguales. */
+const ENFOQUES_FOTO = [
+  "Empieza por la figura que más llama la atención, como si la señalaras.",
+  "Empieza con una pregunta a la persona sobre cómo se ha sentido.",
+  "Empieza por lo difícil que muestra el vaso y luego ve a lo bueno.",
+  "Empieza por la yema y lo que dice de su fuerza, y después sube por la clara.",
+  "Empieza con una imagen o comparación (como un árbol, un velo, una montaña, humo) para describir la figura.",
+];
+
+const instruccionFoto = (tipo: Interaccion["tipo"], enfoque: number, gancho: boolean) => `Te mandaron una foto en ${tipo === "comentario" ? "un comentario público" : "un mensaje directo"} de Arcana. Eres Sibila.
 Si la foto es un huevo abierto dentro de un vaso o recipiente con agua (una limpia con huevo):
 - Haz una lectura corta y gratis: de 3 a 5 frases, máximo 550 caracteres. Nombra lo que de verdad se ve (la yema: entera, color, dónde quedó; la clara: hilos, picos, velos, burbujas, nubes, columnas, espirales, figuras; el agua: limpia o turbia) y lo que se interpreta en la tradición de la limpia, con palabras propias y variadas: no empieces siempre igual ni repitas fórmulas.
-- Incluye un anuncio de lo que viene, suave y concreto (es probable, se anuncia, en las próximas semanas), siempre con salida y en positivo.
+- Sé honesta: si el vaso muestra cargas, dilo claro y en concreto (cansancio, preocupación por dinero o trabajo, un roce con alguien cercano, una etapa pesada, mal dormir), sin suavizarlo todo. Lo difícil siempre va con una salida: qué hacer y cuándo se alivia. Si el vaso está tranquilo, dilo también.
+- Incluye un anuncio de lo que viene, concreto y verosímil (es probable, se anuncia, en las próximas semanas): una conversación, una noticia, alguien que reaparece, un cambio.
 - Nunca hables de «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni de nada que asuste; nada de salud, enfermedades, embarazos, muertes ni dinero garantizado. Si se ve sangre o algo inquietante, léelo con calma como una carga que salió; si la persona dice que se siente mal, sugiere ver a un médico.
-- Cierra invitando a la lectura completa, con más detalle, en miarcana.com/huevo.
+- ${gancho ? "Antes de cerrar, deja una puerta abierta: menciona un detalle más que se alcanza a ver (en la base, a un costado, cerca de la yema) y que habla de algo bueno o interesante (el amor, una noticia, una fecha, una decisión), y di que en la lectura completa se ve con calma. Que despierte curiosidad, nunca miedo: jamás insinúes un peligro del que haya que salvarse." : "Cierra invitando a la lectura completa, con más detalle, en miarcana.com/huevo."}
+- ${ENFOQUES_FOTO[enfoque]}
 Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: borra de café en una taza → miarcana.com/cafe; taza de chocolate → miarcana.com/chocolate; palma de la mano → miarcana.com/quiromancia; restos de velas → miarcana.com/velas; tabaco → miarcana.com/tabaco.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
@@ -222,7 +233,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuesta: string;
   try {
     if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo)}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto] });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length), Math.random() < 0.35)}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto] });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
