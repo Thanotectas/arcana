@@ -196,7 +196,7 @@ export interface OpcionesDirecto {
  * borradores o directa), sube el archivo en un solo trozo (hasta 64 MB) y
  * registra el envío. Devuelve la fila guardada.
  */
-export async function enviarVideoTiktok(admin: Admin, video: string, modo: "borrador" | "directo", opciones?: OpcionesDirecto): Promise<PublicacionTiktok> {
+export async function enviarVideoTiktok(admin: Admin, video: string, modo: "borrador" | "directo", opciones?: OpcionesDirecto, etiqueta?: string): Promise<PublicacionTiktok> {
   if (!videoPermitido(video)) throw new Error("Ese video no es del almacenamiento de Arcana.");
   const token = await tokenVigente(admin);
   const res = await fetch(video.split("?")[0], { cache: "no-store" });
@@ -228,7 +228,7 @@ export async function enviarVideoTiktok(admin: Admin, video: string, modo: "borr
 
   const { data: fila, error } = await admin
     .from("publicaciones_tiktok")
-    .insert({ publish_id: inicio.publish_id, modo, titulo: opciones?.titulo ?? null, video: video.split("?")[0], privacidad: opciones?.privacidad ?? null, estado: "enviando" })
+    .insert({ publish_id: inicio.publish_id, modo, titulo: opciones?.titulo ?? etiqueta ?? null, video: video.split("?")[0], privacidad: opciones?.privacidad ?? null, estado: "enviando" })
     .select("*")
     .single();
   if (error) throw new Error(`registrar envío: ${error.message}`);
@@ -261,4 +261,45 @@ export async function actualizarEstadoTiktok(admin: Admin, p: Pick<PublicacionTi
   };
   await admin.from("publicaciones_tiktok").update(cambios).eq("id", p.id);
   return cambios;
+}
+
+/** La app está configurada y la cuenta de la marca conectada. */
+export async function tiktokListo(admin: Admin) {
+  return tiktokConfigurado() && Boolean(await cuentaTiktok(admin));
+}
+
+/**
+ * Manda cada video a los borradores de TikTok una sola vez: si ese archivo
+ * ya se envió (y no falló), no se repite aunque la rutina corra dos veces.
+ */
+export async function enviarABorradores(admin: Admin, piezas: { titulo: string; video: string }[]) {
+  const enviados: string[] = [];
+  const errores: string[] = [];
+  for (const p of piezas) {
+    const video = p.video.split("?")[0];
+    const { data: previo } = await admin.from("publicaciones_tiktok").select("id").eq("video", video).neq("estado", "error").limit(1);
+    if (previo?.length) continue;
+    try {
+      await enviarVideoTiktok(admin, video, "borrador", undefined, p.titulo);
+      enviados.push(p.titulo);
+    } catch (e) {
+      errores.push(`${p.titulo}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  return { enviados, errores };
+}
+
+/** Pregunta a TikTok por los envíos de la última semana que siguen en proceso. */
+export async function refrescarEstadosTiktok(admin: Admin) {
+  const desde = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const { data } = await admin.from("publicaciones_tiktok").select("id, publish_id").in("estado", ["enviando", "procesando"]).gte("creado_en", desde).limit(20);
+  const errores: string[] = [];
+  for (const p of data ?? []) {
+    try {
+      await actualizarEstadoTiktok(admin, p);
+    } catch (e) {
+      errores.push(e instanceof Error ? e.message : String(e));
+    }
+  }
+  return { revisados: data?.length ?? 0, errores };
 }

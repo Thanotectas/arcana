@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requerirAdmin } from "@/lib/admin";
 import { BUCKET, asegurarBucket } from "./reel";
 import { videoDeFuente } from "./fuentes-video";
-import { actualizarEstadoTiktok, desconectarTiktok, enviarVideoTiktok, infoCreador, videoPermitido, type InfoCreador } from "./tiktok";
+import { desconectarTiktok, refrescarEstadosTiktok, enviarVideoTiktok, infoCreador, videoPermitido, type InfoCreador } from "./tiktok";
 
 export interface EstadoPrepararTiktok {
   error?: string;
@@ -98,20 +98,10 @@ export async function accionEnviarTiktok(_prev: EstadoEnvioTiktok, formData: For
 /** Pregunta a TikTok por los envíos que siguen en proceso. */
 export async function accionEstadosTiktok(): Promise<EstadoEnvioTiktok> {
   await requerirAdmin();
-  const admin = getSupabaseAdmin();
-  const desde = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const { data } = await admin.from("publicaciones_tiktok").select("id, publish_id").in("estado", ["enviando", "procesando"]).gte("creado_en", desde).limit(20);
-  const errores: string[] = [];
-  for (const p of data ?? []) {
-    try {
-      await actualizarEstadoTiktok(admin, p);
-    } catch (e) {
-      errores.push(e instanceof Error ? e.message : String(e));
-    }
-  }
+  const { revisados, errores } = await refrescarEstadosTiktok(getSupabaseAdmin());
   revalidatePath("/admin/redes");
   if (errores.length) return { error: errores.slice(0, 2).join(" · ") };
-  return { mensaje: data?.length ? `${data.length} envío${data.length === 1 ? "" : "s"} revisado${data.length === 1 ? "" : "s"}.` : "No hay envíos en proceso." };
+  return { mensaje: revisados ? `${revisados} envío${revisados === 1 ? "" : "s"} revisado${revisados === 1 ? "" : "s"}.` : "No hay envíos en proceso." };
 }
 
 export async function accionDesconectarTiktok(): Promise<EstadoEnvioTiktok> {

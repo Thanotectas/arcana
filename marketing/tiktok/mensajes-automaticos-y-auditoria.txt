@@ -1,0 +1,132 @@
+TIKTOK DE ARCANA (@miarcana4): MENSAJES AUTOMÁTICOS Y REVISIÓN DE LA APP
+Actualizado el 1 de noviembre de 2026
+
+════════════════════════════════════════
+PARTE 1 · MENSAJES AUTOMÁTICOS (los activas tú en la app, 10 minutos)
+════════════════════════════════════════
+
+ANTES: pasar a cuenta de empresa (si aún es personal)
+TikTok → Perfil → ☰ → Configuración y privacidad → Cuenta → Cambiar a cuenta de empresa →
+categoría «Servicios personales» o «Medios y entretenimiento».
+(No pierdes seguidores ni videos. Ojo: en cuenta de empresa la biblioteca de sonidos es la
+«comercial»; los sonidos en tendencia de música famosa pueden no aparecer.)
+
+DÓNDE SE ACTIVAN
+Perfil → ☰ → Herramientas para empresas (Business Suite) → Mensajes automáticos.
+Hay dos: «Mensaje de bienvenida» y «Respuestas por palabras clave». Si tu versión de TikTok
+muestra límite de caracteres, usa la versión corta de cada uno.
+
+── 1. MENSAJE DE BIENVENIDA (cuando alguien te escribe por primera vez) ──
+¡Hola! 💜 Soy Sibila, de Arcana. Aquí puedes hacer tu lectura de tarot, carta astral o limpia
+con huevo en miarcana.com (tu primera lectura es gratis). Escríbeme una palabra y te mando
+lo que necesitas:
+🥚 VASO · 🔮 TAROT · ✨ CARTA · 💞 PAREJA · 🔴 DIRECTO
+
+Versión corta:
+¡Hola! 💜 Soy Sibila. Escribe VASO, TAROT, CARTA, PAREJA o DIRECTO y te mando lo tuyo 🔮
+
+Preguntas sugeridas (si te deja agregar botones):
+· ¿Cómo leen mi vaso de la limpia con huevo?
+· ¿Cómo hago una lectura de tarot?
+· ¿Cuándo es el próximo directo?
+
+── 2. RESPUESTAS POR PALABRA CLAVE ──
+(Pon varias palabras por respuesta: con y sin tilde, en singular y plural.)
+
+Palabras: vaso, huevo, limpia, limpieza
+🥚 Para leer tu vaso: pasa el huevo por tu cuerpo, rómpelo en un vaso con agua y tómale una
+foto con buena luz. Súbela en miarcana.com/huevo y Sibila te lo lee al momento (yema, clara,
+burbujas, hilos). En el directo de los domingos también leo vasos en vivo 💜
+
+Palabras: tarot, tirada, cartas, lectura
+🔮 Haz tu tirada en miarcana.com/tarot: eliges tu pregunta, sacas tus cartas y Sibila te las
+interpreta juntas. Tu primera lectura es gratis ✨ ¿Ya sabes qué carta eres? Test de 1 minuto:
+miarcana.com/que-carta-eres
+
+Palabras: carta astral, carta natal, ascendente, luna, signo
+✨ Tu carta astral completa (Sol, Luna, ascendente y tus 10 planetas) en miarcana.com/carta-astral.
+Solo necesitas tu fecha, hora y lugar de nacimiento. Y tu horóscopo de hoy, gratis:
+miarcana.com/horoscopo
+
+Palabras: pareja, amor, compatibilidad, sinastria, sinastría
+💞 Para saber cómo es tu relación de verdad: miarcana.com/sinastria compara las dos cartas
+astrales. Si solo quieres ver la compatibilidad de sus signos (gratis): miarcana.com/compatibilidad-signos
+
+Palabras: directo, en vivo, vivo, live, horario
+🔴 Hago directo los domingos a las 8 p.m. (Colombia) en YouTube: @miarcana. Sube tu pregunta o
+la foto de tu vaso antes en miarcana.com/vivo y la leo en vivo 💜
+
+Palabras: precio, cuanto, cuánto, costo, pago, creditos, créditos
+💜 Tu primera lectura es gratis. Después funciona con créditos (desde paquetes pequeños); los
+ves en miarcana.com/creditos. En Colombia pagas con tarjeta, PSE o Nequi; desde otros países, con tarjeta o PayPal.
+
+Palabras: gratis, regalo, codigo, código
+🎁 Tu primera lectura es gratis en miarcana.com. Y en el canal de WhatsApp regalo códigos cada
+viernes: miarcana.com/canal
+
+CONSEJO: los mensajes automáticos no reemplazan responder tú. Contesta los primeros comentarios
+de cada video en la primera hora (mejor con video) y deja lo automático para los mensajes
+privados.
+
+
+════════════════════════════════════════
+PARTE 2 · LO QUE YA HACE ARCANA CON TIKTOK
+════════════════════════════════════════
+- La cuenta @miarcana4 está conectada desde el 19 de octubre (el permiso dura hasta octubre de 2027).
+- DESDE HOY: cada mañana el reel de la carta del día y el de la publicación del día llegan SOLOS
+  a tus borradores de TikTok (te sale una notificación). Abres, eliges un sonido en tendencia,
+  pegas el texto del correo y publicas. El correo del kit sigue llegando con los textos.
+- El estado de cada envío se actualiza solo cada mañana (y con el botón en /admin/redes).
+- Para apagar los borradores automáticos: variable REDES_TIKTOK_BORRADORES=0 en Vercel.
+
+
+════════════════════════════════════════
+PARTE 3 · REVISIÓN (AUDITORÍA) DE LA APP PARA PUBLICAR DIRECTO
+════════════════════════════════════════
+Sin la revisión, TikTok solo deja publicar directo en PRIVADO. Con ella, Arcana puede publicar
+el video ya listo (público) desde /admin/redes, sin pasar por borradores.
+Ojo: TikTok exige que cada publicación la confirme una persona (elegir quién lo ve, aceptar la
+confirmación de música). Por eso la revisión permite «publicar con un clic desde el panel», no
+publicar sin que nadie lo vea. Los borradores automáticos de arriba siguen siendo lo más cómodo.
+
+PASOS (en developers.tiktok.com, con la cuenta con la que creaste la app):
+1. Manage apps → tu app de Arcana → revisa que esté completo:
+   · Icono (1024×1024: usa public/marca/icono-512.png agrandado o el logo).
+   · Descripción: «Arcana es una plataforma de lecturas de tarot y astrología. Esta integración
+     permite al equipo de Arcana publicar en su propia cuenta de TikTok los videos que produce.»
+   · Términos: https://miarcana.com/terminos · Privacidad: https://miarcana.com/privacidad
+   · Web: https://miarcana.com
+   · Productos: Login Kit y Content Posting API (con «Direct Post» activado).
+   · Redirect URI: https://miarcana.com/api/tiktok/callback
+2. Graba el video de demostración (1 a 3 minutos, pantalla del computador):
+   a) Entras a miarcana.com/admin/redes (se ve la URL).
+   b) Muestras la sección TikTok conectada con el nombre y la foto de la cuenta.
+   c) Eliges un video → «Publicar directo»: se ve el nombre de la cuenta, el título, el menú
+      «Quién puede ver» SIN opción elegida y lo eliges, los interruptores de comentarios, dúo
+      y stitch, la casilla de contenido comercial y el texto de «Confirmación de uso de música».
+   d) Le das Publicar y muestras el mensaje de que se envió y el estado en la lista.
+   e) Abres TikTok y muestras el video publicado.
+3. Submit for review → pega el enlace del video (súbelo a YouTube como «no listado» o Drive
+   con acceso público) y en «uso de cada permiso» explica:
+   · user.info.basic: mostrar en el panel qué cuenta está conectada.
+   · video.upload: enviar los videos de Arcana a los borradores de su cuenta.
+   · video.publish: publicar los videos de Arcana en su cuenta desde el panel, con las opciones
+     de privacidad y divulgación que elige la persona.
+4. TikTok suele responder en 1 a 2 semanas. Si piden cambios, mándame el correo y lo ajusto.
+
+
+════════════════════════════════════════
+PARTE 4 · RESPONDER COMENTARIOS AUTOMÁTICAMENTE (siguiente paso, opcional)
+════════════════════════════════════════
+La app de arriba NO puede leer ni responder comentarios. Para eso TikTok tiene otra plataforma:
+«TikTok API for Business» (business-api.tiktok.com), solo para cuentas de empresa. Permite leer
+los comentarios de tus videos y responder los principales dentro de las 48 horas. No está claro
+que deje ver la foto que alguien pone en un comentario (como los vasos), así que Sibila
+respondería a lo escrito.
+Si lo quieres:
+1. Pasa la cuenta a empresa (parte 1).
+2. Crea una cuenta de desarrollador en business-api.tiktok.com → My Apps → Create app
+   (redirect: https://miarcana.com/api/tiktok-business/callback) y pide el permiso de
+   comentarios («Comment Management» / TikTok Accounts).
+3. Cuando la aprueben, pon las claves en Vercel (TIKTOK_BUSINESS_APP_ID y
+   TIKTOK_BUSINESS_SECRET; no me las pegues aquí) y yo conecto a Sibila como en Facebook.

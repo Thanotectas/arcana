@@ -193,7 +193,10 @@ export async function accionAutomatica(_prev: EstadoAdminRedes, formData: FormDa
       const r = await kitTiktok(admin);
       if ("apagado" in r) return { error: "El kit está apagado (REDES_KIT_TIKTOK=0)." };
       hayError = "error" in r.correo;
-      mensaje = `Kit de TikTok de hoy (${r.piezas} video${r.piezas === 1 ? "" : "s"}): ${describir(r.correo) === "publicada" ? "enviado a tu correo" : describir(r.correo)}`;
+      const b = r.borradores;
+      const textoBorradores = !b ? "" : b.enviados.length ? ` · ${b.enviados.length} enviado${b.enviados.length === 1 ? "" : "s"} a tus borradores de TikTok` : " · ya estaban en tus borradores de TikTok";
+      if (b?.errores.length) hayError = true;
+      mensaje = `Kit de TikTok de hoy (${r.piezas} video${r.piezas === 1 ? "" : "s"}): ${describir(r.correo) === "publicada" ? "enviado a tu correo" : describir(r.correo)}${textoBorradores}${b?.errores.length ? ` · Error en TikTok: ${b.errores[0]}` : ""}`;
     } else if (cual === "canal") {
       const r = await kitCanal(admin);
       if ("apagado" in r) return { error: "El kit del canal está apagado (REDES_KIT_CANAL=0)." };

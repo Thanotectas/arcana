@@ -12,6 +12,7 @@ import { reelCartaDelDia } from "./reel";
 import { textoShortPublicacion, textoShortYoutube } from "./carta-dia";
 import { reelPublicacion } from "./reel-publicacion";
 import type { PublicacionProgramada } from "./calendario";
+import { enviarABorradores, refrescarEstadosTiktok, tiktokListo } from "./tiktok";
 import { privacidadYoutube, subirShort, youtubeConectado } from "./youtube";
 
 /**
@@ -53,12 +54,24 @@ export async function carruselSemanal(admin: SupabaseClient<Database>, hoy = fec
   return { semana, titulo: contenido.titulo, instagram, facebook };
 }
 
-/** Correo con los reels del día y los textos para subirlos a TikTok. */
+/**
+ * Kit de TikTok: los reels del día llegan solos a los borradores de TikTok
+ * (si la cuenta está conectada; REDES_TIKTOK_BORRADORES=0 lo apaga) y además
+ * un correo con los textos para pegar. De paso actualiza el estado de los
+ * envíos anteriores.
+ */
 export async function kitTiktok(admin: SupabaseClient<Database>, fecha = fechaBogota()) {
   if (process.env.REDES_KIT_TIKTOK === "0") return { apagado: true };
   const piezas = await piezasDelDia(admin, fecha);
-  const correo = await publicarUnaVez(admin, "correo", "kit_tiktok", fecha, () => enviarKitTiktok(fecha, piezas));
-  return { fecha, piezas: piezas.length, correo };
+  let borradores: { enviados: string[]; errores: string[] } | null = null;
+  if (process.env.REDES_TIKTOK_BORRADORES !== "0" && (await tiktokListo(admin).catch(() => false))) {
+    await refrescarEstadosTiktok(admin).catch((e) => console.error("[kit tiktok] estados:", e));
+    borradores = await enviarABorradores(admin, piezas);
+    if (borradores.errores.length) console.error("[kit tiktok] borradores:", borradores.errores);
+  }
+  const enBorradores = borradores ? piezas.length - borradores.errores.length : 0;
+  const correo = await publicarUnaVez(admin, "correo", "kit_tiktok", fecha, () => enviarKitTiktok(fecha, piezas, enBorradores));
+  return { fecha, piezas: piezas.length, borradores, correo };
 }
 
 /** Correo con lo del día listo para el canal de WhatsApp (no se puede publicar ahí de forma automática). */

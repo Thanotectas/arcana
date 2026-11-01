@@ -60,11 +60,13 @@ export async function piezasDelDia(admin: SupabaseClient<Database>, fecha: strin
 }
 
 /** Envía el correo del kit; devuelve el id del envío. */
-export async function enviarKitTiktok(fecha: string, piezas: Pieza[]): Promise<string> {
+export async function enviarKitTiktok(fecha: string, piezas: Pieza[], enBorradores = 0): Promise<string> {
   const [para] = correosAdmin();
   if (!para) throw new Error("No hay correo de administración (ADMIN_CORREOS).");
   if (!piezas.length) throw new Error("No hay reels del día para el kit.");
-  const pasos = "Abre TikTok → + → Subir → elige el video → Sonidos: busca uno en tendencia y bájale el volumen → pega el texto → Publicar.";
+  const pasos = enBorradores
+    ? `${enBorradores === piezas.length ? "Ya están" : `${enBorradores} ya están`} en tus borradores de TikTok: abre TikTok → toca la notificación (o Perfil → Bandeja de entrada) → elige un sonido en tendencia y bájale el volumen → pega el texto → Publicar.`
+    : "Abre TikTok → + → Subir → elige el video → Sonidos: busca uno en tendencia y bájale el volumen → pega el texto → Publicar.";
   const bloques = piezas
     .map(
       (p, i) => `<div style="margin:0 0 22px;padding:18px;border-radius:14px;background:#150f26;border:1px solid #ffffff1f">

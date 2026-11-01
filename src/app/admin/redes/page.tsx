@@ -127,7 +127,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
 
         <h3 className="pt-4 font-semibold">Automáticas</h3>
         <p className="text-sm text-texto-suave">
-          Cada mañana sale también la <strong>historia</strong> de la carta del día (Instagram y Facebook) y te llega el <strong>kit de TikTok</strong> con los videos de ayer y el texto para pegar. Los lunes sale el <strong>carrusel «Tu signo esta semana»</strong>, escrito por Sibila. Si algo ya salió, el botón no lo repite.
+          Cada mañana sale también la <strong>historia</strong> de la carta del día (Instagram y Facebook) y los videos de ayer llegan solos a tus <strong>borradores de TikTok</strong> (y el kit con el texto para pegar, a tu correo). Los lunes sale el <strong>carrusel «Tu signo esta semana»</strong>, escrito por Sibila. Si algo ya salió, el botón no lo repite.
         </p>
         <BotonesAutomaticas />
 
