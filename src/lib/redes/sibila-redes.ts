@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { generarTexto, type ImagenEntrada } from "@/lib/ia";
 import { SIGNOS, signoPorLongitud, type Signo } from "@/lib/zodiaco";
 import { posiciones } from "@/lib/astro/efemerides";
+import { manual } from "@/lib/conocimiento";
 import { horoscopoDelDia } from "@/lib/horoscopo";
 import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
@@ -251,7 +252,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuesta: string;
   try {
     if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length), Math.random() < 0.35)}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto] });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length), Math.random() < 0.35)}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: manual("huevo") });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });

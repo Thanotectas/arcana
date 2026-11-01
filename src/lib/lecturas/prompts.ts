@@ -20,6 +20,7 @@ import type { EntradaSueno, ResultadoSueno } from "../suenos";
 import { resumenSinastria, type ResultadoSinastria } from "../astro/sinastria";
 import { instruccionFiguras } from "../oraculos/taza";
 import { INSTRUCCION_SENALES } from "../oraculos/huevo";
+import { manual } from "../conocimiento";
 import { resumenChocolate, TRADICION_CHOCOLATE, INSTRUCCION_FIGURAS, type EntradaChocolate } from "../chocolate";
 import { resumenVelas, TRADICION_VELAS, type EntradaVelas } from "../velas";
 import { INSTRUCCION_RESTOS } from "../velas/restos";
@@ -314,7 +315,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
           `Extensión: 600 a 850 palabras.\n\n` +
           INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
-      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", ...(esCafe ? {} : { conocimiento: manual("huevo") }) },
     };
   }
 

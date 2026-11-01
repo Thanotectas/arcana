@@ -72,6 +72,8 @@ export interface OpcionesTexto {
   idioma?: Idioma;
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
   imagenes?: ImagenEntrada[];
+  /** Manual de la biblioteca de Sibila para este tema (src/lib/conocimiento); va en caché. */
+  conocimiento?: string;
 }
 
 function instruccionIdioma(idioma: Idioma) {
@@ -113,6 +115,9 @@ export async function generarTexto(
         text: SISTEMA_BASE,
         cache_control: { type: "ephemeral" },
       },
+      ...(opciones.conocimiento
+        ? [{ type: "text" as const, text: `Manual de referencia de Arcana para esta práctica (léelo antes de interpretar; sus reglas mandan):\n\n${opciones.conocimiento}`, cache_control: { type: "ephemeral" as const } }]
+        : []),
       {
         type: "text",
         text: instruccionIdioma(idioma) + (sistemaExtra ? "\n\n" + sistemaExtra : ""),

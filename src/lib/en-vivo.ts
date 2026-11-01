@@ -1,4 +1,5 @@
 import "server-only";
+import { manual } from "@/lib/conocimiento";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -444,7 +445,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
         : gancho
           ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : prep.sistema;
-      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, imagenes: prep.imagenes })).replace(/[#*_>`]/g, "").trim();
+      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : {}) })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {
