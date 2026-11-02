@@ -17,6 +17,7 @@ import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
 import { TELEGRAM } from "@/lib/marca/redes";
 import { createHash } from "node:crypto";
 import { PIDE_CARTA, PIDE_SINASTRIA, fechasEn, prepararCarta, prepararCielo, prepararSinastria } from "@/lib/en-vivo-astro";
+import { sinFechas } from "@/lib/en-vivo-pedidos";
 import type { GraficoVivo } from "@/lib/en-vivo-graficos";
 
 /**
@@ -80,7 +81,7 @@ export function pareceConsulta(texto: string) {
   // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
   return (
     Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
-    /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t) || anioQuePide(t) !== null || PIDE_CARTA.test(t)
+    fechasEn(t).length > 0 || anioQuePide(t) !== null || PIDE_CARTA.test(t) || PIDE_SINASTRIA.test(t)
   );
 }
 
@@ -204,7 +205,7 @@ export function tipoDeMensaje(texto: string): TipoLectura | null {
   if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
   if (fechas >= 1 && PIDE_CARTA.test(t)) return "carta";
   if (/\baura\b/.test(t)) return "aura";
-  if (/numerolog|mi n[uú]mero|my number|meu n[uú]mero|\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t)) return "numerologia";
+  if (fechas >= 1 || /numerolog|mi n[uú]mero|my number|meu n[uú]mero/.test(t)) return "numerologia";
   if (/hor[oó]scop/.test(t)) return "horoscopo";
   return "tarot";
 }
@@ -234,13 +235,10 @@ const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en vo
 - Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
 
-/** Fecha de nacimiento escrita en el mensaje (dd/mm/aaaa), si la hay. */
+/** Fecha de nacimiento escrita en el mensaje (con números o con el mes en letras), si la hay. */
 function fechaEn(texto: string): Date | null {
-  const m = /\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})\b/.exec(texto);
-  if (!m) return null;
-  const anio = Number(m[3].length === 2 ? (Number(m[3]) > 30 ? `19${m[3]}` : `20${m[3]}`) : m[3]);
-  const fecha = new Date(Date.UTC(anio, Number(m[2]) - 1, Number(m[1])));
-  return fecha.getUTCDate() === Number(m[1]) && anio > 1900 && fecha < new Date() ? fecha : null;
+  const [f] = fechasEn(texto);
+  return f ? new Date(`${f}T00:00:00Z`) : null;
 }
 
 /**
@@ -248,7 +246,7 @@ function fechaEn(texto: string): Date | null {
  * «2027»), o null si no pide un año. Solo el actual y los dos siguientes.
  */
 export function anioQuePide(texto: string, hoy = new Date()): number | null {
-  const t = texto.toLowerCase().replace(/\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/g, " ");
+  const t = sinFechas(texto).toLowerCase();
   const actual = hoy.getUTCFullYear();
   const explicito = /\b(20[2-4]\d)\b/.exec(t);
   if (explicito && Number(explicito[1]) >= actual && Number(explicito[1]) <= actual + 2) return Number(explicito[1]);
