@@ -219,9 +219,32 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
       let quietos = 0;
       let puente = 0;
       let despedida = false;
+      // Una frase de espera de Sibila (la voz se guarda: solo se pide la primera vez).
+      const decirPuente = async () => {
+        const i = puente++ % FRASES_PUENTE;
+        let frase = puentes.get(i) ?? null;
+        if (!frase) {
+          const r2 = await pedir("puente", i);
+          if (r2?.clase === "puente") frase = { texto: r2.texto, audio: r2.audio };
+        }
+        if (!frase || !activo) return;
+        puentes.set(i, frase);
+        setSinVoz(!frase.audio);
+        setLectura(null);
+        await hablar(frase.texto, frase.audio);
+        setSubtitulo("");
+      };
+      const PENDIENTE = Symbol("pendiente");
       while (activo) {
-        const r = await (siguiente ?? pedir("lectura"));
+        const peticion = siguiente ?? pedir("lectura");
         siguiente = null;
+        // Mientras Sibila prepara una lectura (Claude y la voz tardan unos segundos), no se queda callada.
+        const pronto = await Promise.race([peticion, esperar(3500).then(() => PENDIENTE)]);
+        let r: Respuesta | null;
+        if (pronto === PENDIENTE) {
+          if (!despedida) await decirPuente();
+          r = await peticion;
+        } else r = pronto;
         if (!activo) break;
         // La despedida suena una sola vez aunque el servidor la repita (sin la migración 0039 no queda marcada).
         if (r?.clase === "despedida" || (r?.clase === "fin" && despedida)) {
@@ -264,23 +287,9 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           continue;
         }
         quietos++;
-        // Sin preguntas: una frase de Sibila cada tres vueltas (unos 25 s).
-        if (quietos % 3 === 1) {
-          const i = puente++ % FRASES_PUENTE;
-          let frase = puentes.get(i) ?? null;
-          if (!frase) {
-            const r2 = await pedir("puente", i);
-            if (r2?.clase === "puente") frase = { texto: r2.texto, audio: r2.audio };
-          }
-          if (frase) {
-            puentes.set(i, frase);
-            setSinVoz(!frase.audio);
-            setLectura(null);
-            await hablar(frase.texto, frase.audio);
-            setSubtitulo("");
-          }
-        }
-        await esperar(8000);
+        // Sin preguntas: Sibila sigue hablando, con una pausa corta entre frase y frase.
+        await decirPuente();
+        await esperar(quietos > 24 ? 6000 : 3000);
       }
     })();
     return () => {
