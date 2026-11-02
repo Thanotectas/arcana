@@ -68,15 +68,16 @@ export interface OpcionesTexto {
   maxTokens?: number;
   /** "premium" usa el modelo grande; por defecto "estandar". */
   nivel?: NivelIA;
-  /** Idioma en que debe escribirse la respuesta. */
-  idioma?: Idioma;
+  /** Idioma en que debe escribirse la respuesta; "auto": el de quien escribe (el directo). */
+  idioma?: Idioma | "auto";
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
   imagenes?: ImagenEntrada[];
   /** Manual de la biblioteca de Sibila para este tema (src/lib/conocimiento); va en caché. */
   conocimiento?: string;
 }
 
-function instruccionIdioma(idioma: Idioma) {
+function instruccionIdioma(idioma: Idioma | "auto") {
+  if (idioma === "auto") return "Escribe TODA la respuesta en el idioma en que escribió la persona (cualquiera: español, portugués, inglés, francés, alemán, italiano…), incluidos los nombres de cartas, signos y planetas con su nombre tradicional en ese idioma. Si no se nota el idioma, en español.";
   return `Escribe TODA la respuesta en ${IDIOMA_PARA_IA[idioma]}, incluidos los títulos. Si los nombres de cartas, signos o planetas llegan en español, tradúcelos al idioma de la respuesta con su nombre tradicional.`;
 }
 
