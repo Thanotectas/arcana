@@ -241,7 +241,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
         // Mientras Sibila prepara una lectura (Claude y la voz tardan unos segundos), no se queda callada.
         const pronto = await Promise.race([peticion, esperar(3500).then(() => PENDIENTE)]);
         let r: Respuesta | null;
-        if (pronto === PENDIENTE) {
+        if (typeof pronto === "symbol") {
           if (!despedida) await decirPuente();
           r = await peticion;
         } else r = pronto;
