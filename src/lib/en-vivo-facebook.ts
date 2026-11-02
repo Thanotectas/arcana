@@ -30,6 +30,23 @@ async function graph<T>(ruta: string, token: string): Promise<T> {
   return datos;
 }
 
+/**
+ * Id del directo que está al aire en la página, o null. Primero con la Live
+ * Video API; si Meta la niega (código 10: la app no tiene ese permiso
+ * revisado), lo busca entre los videos de la página por su live_status,
+ * que solo pide pages_read_engagement.
+ */
+async function buscarDirecto(paginaId: string, token: string): Promise<string | null> {
+  try {
+    const r = await graph<{ data?: { id: string; status?: string }[] }>(`${paginaId}/live_videos?broadcast_status=${encodeURIComponent('["LIVE"]')}&fields=id,status&limit=1`, token);
+    return r.data?.[0]?.id ?? null;
+  } catch (e) {
+    if (!/código 10\b|\(#10\)|live-video-api/i.test(e instanceof Error ? e.message : String(e))) throw e;
+    const r = await graph<{ data?: { id: string; live_status?: string }[] }>(`${paginaId}/videos?fields=id,live_status&limit=10`, token);
+    return r.data?.find((v) => v.live_status === "LIVE")?.id ?? null;
+  }
+}
+
 export interface EstadoFacebook {
   configurado: boolean;
   directo: boolean;
@@ -52,8 +69,7 @@ export async function sincronizarFacebook(admin: Admin): Promise<EstadoFacebook>
   if (!directo) {
     if (estado?.fb_buscado_en && ahora - Date.parse(estado.fb_buscado_en) < 30_000) return { configurado: true, directo: false, nuevas: 0 };
     try {
-      const r = await graph<{ data?: { id: string; status?: string }[] }>(`${pagina.id}/live_videos?broadcast_status=${encodeURIComponent('["LIVE"]')}&fields=id,status&limit=1`, pagina.token);
-      directo = r.data?.[0]?.id ?? null;
+      directo = await buscarDirecto(pagina.id, pagina.token);
       await guardar({ fb_live_id: directo, fb_desde: null, fb_buscado_en: new Date().toISOString(), fb_detalle: null });
     } catch (e) {
       const detalle = e instanceof Error ? e.message : String(e);

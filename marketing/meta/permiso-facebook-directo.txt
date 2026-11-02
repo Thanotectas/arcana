@@ -1,0 +1,81 @@
+LEER LOS COMENTARIOS DEL DIRECTO DE FACEBOOK: QUÉ HACER
+Actualizado el 2 de noviembre de 2026
+
+EL PROBLEMA
+En el directo del 1 de noviembre, Facebook respondió:
+«(#10) To use live-video-api on behalf of people who are not admins, developers and testers of
+your app, your use of this endpoint must be reviewed and approved by Facebook.»
+O sea: la app de Arcana en Meta no tiene aprobada la función «Live Video API», y por eso no
+encontraba el directo de la página para leer sus comentarios.
+
+════════════════════════════════════════
+PASO 0 · YA HECHO: CAMINO ALTERNATIVO (sin revisión)
+════════════════════════════════════════
+Desde hoy, si Meta niega la Live Video API, Arcana busca el directo entre los VIDEOS de la página
+(eso solo pide el permiso pages_read_engagement, que ya usamos para los comentarios de las
+publicaciones) y lee sus comentarios. Puede que con esto ya funcione.
+Cómo probarlo antes del domingo (5 minutos):
+1. En la página de Facebook «Arcana», inicia un video en vivo de prueba (con OBS o desde el
+   celular). Si puedes, en «Público» elige «Solo yo».
+2. Abre miarcana.com/en-vivo/escenario y comenta desde otra cuenta algo como
+   «carta astral 13 febrero 1974 cali».
+3. Si entra en la fila, ya está. Si no, avísame y sigue con los pasos 1 y 2.
+
+════════════════════════════════════════
+PASO 1 · ATAJO (también sin revisión): darle un rol en la app a quien conectó la página
+════════════════════════════════════════
+Meta deja usar la Live Video API sin revisión a las personas con rol en la app (administrador,
+desarrollador o tester). El error dice que el token de la página lo generó una cuenta SIN rol.
+1. Entra a developers.facebook.com con la cuenta que creó la app → Mis apps → la app de Arcana.
+2. Menú izquierdo: «Roles de la app» → «Roles» → «Agregar personas» → «Administrador».
+   Escribe la cuenta de Facebook que administra la página «Arcana» (la que usaste para conectar
+   Meta en Arcana) y acepta la invitación desde esa cuenta (llega a las notificaciones de
+   Facebook o en developers.facebook.com/requests).
+3. Con esa cuenta, vuelve a generar el token de la página igual que la primera vez (Graph API
+   Explorer → tu app → «Obtener token de página» con pages_show_list, pages_read_engagement,
+   pages_read_user_content, pages_manage_posts…) y cámbialo en Vercel
+   (variable META_PAGE_TOKEN; no me lo pegues aquí) y vuelve a desplegar.
+Si la cuenta que conectó la página YA es administradora de la app, este paso no sirve: ve al 2.
+
+════════════════════════════════════════
+PASO 2 · LA REVISIÓN DE META (si los pasos 0 y 1 no bastan)
+════════════════════════════════════════
+Requisitos antes de pedirla:
+· Verificación del negocio: business.facebook.com → Configuración del negocio → Centro de
+  seguridad → «Verificar» (pide RUT o cámara de comercio, o un recibo con el nombre y la
+  dirección del negocio, y un teléfono o dominio). Tarda de 1 a 5 días.
+· En la app (developers.facebook.com → tu app → Configuración → Básica): icono de 1024×1024,
+  categoría, correo de contacto, URL de política de privacidad https://miarcana.com/privacidad,
+  términos https://miarcana.com/terminos y la instrucción de eliminación de datos
+  (puede ser la misma URL de privacidad).
+· La app en modo «En vivo» (Live), no «Desarrollo».
+
+Pedirla:
+1. developers.facebook.com → tu app → «Revisión de la app» → «Permisos y funciones».
+2. Busca «Live Video API» → «Solicitar acceso avanzado». Revisa que pages_read_engagement y
+   pages_read_user_content también tengan acceso avanzado (si no, pídelos en la misma solicitud).
+3. «Descripción del uso» (pégalo así, en inglés, que es como lo revisan):
+   «Arcana (miarcana.com) is a tarot and astrology platform. Every Sunday the Arcana Facebook
+   Page broadcasts a live reading session. Our app reads the comments of the Page's own live
+   video so the host can answer viewers' questions on air (for example, a viewer writes their
+   birth date and the host draws their birth chart on screen). We only access live videos
+   and comments of the Page we manage; we do not store comments beyond the session queue and
+   we never post on behalf of viewers.»
+4. Video de demostración (screencast de 1 a 2 minutos, con la pantalla del computador):
+   a) Inicias el directo en la página «Arcana» (se ve que es la página).
+   b) Desde otra cuenta escribes un comentario en el directo.
+   c) Muestras miarcana.com/en-vivo/escenario: el comentario aparece en la fila con el nombre
+      de quien comentó, y Sibila lo lee en pantalla.
+   d) Cierras el directo.
+   Súbelo a YouTube como «no listado» o directo en el formulario.
+5. Instrucciones para el revisor: «The feature is used by the Page admin only from our internal
+   panel at https://miarcana.com/en-vivo/escenario. The screencast shows the full flow. Test
+   credentials: [usuario y clave de una cuenta de administración de prueba de Arcana]».
+   (Crea una cuenta de prueba con rol de administración en Arcana solo para esto y bórrala
+   después; si no quieres dar acceso, deja solo el video.)
+6. Enviar. Meta suele responder en 2 a 7 días. Si la rechazan, mándame el motivo y lo ajusto.
+
+MIENTRAS TANTO
+Las preguntas que lleguen por Facebook se pueden poner a mano en el escenario (lo que hiciste
+con la carta astral el domingo). Y recuerda decir en el directo: «escríbanlo en el chat de
+YouTube», que ese sí entra solo.
