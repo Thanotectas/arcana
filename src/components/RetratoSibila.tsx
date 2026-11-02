@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 /**
  * Sibila en el directo, sobre la pintura de public/marca/sibila/.
  *
- * Con video (quieta.mp4 y hablando.mp4, misma toma de 1920×1080): el video
+ * Con video (quieta y hablando, .webm y .mp4, misma toma de 1920×1080, hechos en Flow
+ * desde base.jpg y armados de ida y vuelta para que el bucle no salte): el video
  * quieto corre siempre (respira, parpadea, las velas se mueven) y el de
  * «hablando» aparece encima mientras suena su voz y se apaga en las pausas.
  *
@@ -47,11 +48,14 @@ export function RetratoSibila({ nivel = 0, version = "", video = null }: { nivel
 
   if (video) {
     const w = `?v=${video}`;
+    // WebM primero (cualquier Chromium lo reproduce) y MP4 de respaldo. Las velas ya titilan en el video.
     return (
       <div className="absolute inset-0">
-        <video src={`/marca/sibila/quieta.mp4${w}`} poster={`/marca/sibila/base.jpg${v}`} className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline />
+        <video poster={`/marca/sibila/base.jpg${v}`} className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline>
+          <source src={`/marca/sibila/quieta.webm${w}`} type="video/webm" />
+          <source src={`/marca/sibila/quieta.mp4${w}`} type="video/mp4" />
+        </video>
         <video
-          src={`/marca/sibila/hablando.mp4${w}`}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: suena ? 1 : 0, transition: suena ? "opacity 200ms ease" : "opacity 300ms ease 450ms" }}
           autoPlay
@@ -59,8 +63,10 @@ export function RetratoSibila({ nivel = 0, version = "", video = null }: { nivel
           loop
           playsInline
           preload="auto"
-        />
-        <LuzDeVelas />
+        >
+          <source src={`/marca/sibila/hablando.webm${w}`} type="video/webm" />
+          <source src={`/marca/sibila/hablando.mp4${w}`} type="video/mp4" />
+        </video>
       </div>
     );
   }
