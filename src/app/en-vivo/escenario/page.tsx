@@ -23,5 +23,15 @@ export default async function PaginaEscenario({ searchParams }: { searchParams: 
   } catch {
     retrato = null;
   }
-  return <EscenarioEnVivo clave={clave as string} qr={qr} retrato={retrato} />;
+  // Videos de Sibila (quieta.mp4 y hablando.mp4, la misma toma): si están los dos, reemplazan a las imágenes.
+  let video: string | null = null;
+  if (retrato) {
+    try {
+      const fechas = ["quieta", "hablando"].map((n) => statSync(join(process.cwd(), "public", "marca", "sibila", `${n}.mp4`)).mtimeMs);
+      video = String(Math.floor(Math.max(...fechas)));
+    } catch {
+      video = null;
+    }
+  }
+  return <EscenarioEnVivo clave={clave as string} qr={qr} retrato={retrato} video={video} />;
 }

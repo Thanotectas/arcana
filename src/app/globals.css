@@ -992,20 +992,6 @@ body {
   animation: vivo-estrella-frente 3s ease-in-out infinite;
   transform-origin: center;
 }
-@keyframes vivo-parpadeo-retrato {
-  0%,
-  93%,
-  100% {
-    opacity: 0;
-  }
-  95.5%,
-  97% {
-    opacity: 1;
-  }
-}
-.vivo-parpadeo-retrato {
-  animation: vivo-parpadeo-retrato 5.2s linear infinite;
-}
 
 
 /* Numerología: el año personal del ciclo late suave. */
@@ -1282,4 +1268,38 @@ body {
 .vivo-orbita-inversa {
   transform-origin: 50% 50%;
   animation: vivo-orbita 2.4s linear infinite reverse;
+}
+
+/* Retrato de Sibila: la toma respira muy despacio (como una cámara en mano quieta). */
+@keyframes retrato-respira {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.012) translateY(-3px); }
+}
+.retrato-respira {
+  transform-origin: 30% 60%;
+  animation: retrato-respira 6.5s ease-in-out infinite;
+}
+/* Luz de las velas: dos capas con ritmos distintos para que el titileo no se vea repetido. */
+@keyframes velas-titilan {
+  0%, 100% { opacity: 0.75; }
+  9% { opacity: 1; }
+  17% { opacity: 0.6; }
+  31% { opacity: 0.95; }
+  44% { opacity: 0.7; }
+  58% { opacity: 1; }
+  71% { opacity: 0.65; }
+  86% { opacity: 0.9; }
+}
+.velas-titilan {
+  animation: velas-titilan 2.3s linear infinite;
+}
+.velas-titilan-2 {
+  animation: velas-titilan 3.7s linear infinite reverse;
+}
+@keyframes bola-late {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.bola-late {
+  animation: bola-late 4.2s ease-in-out infinite;
 }

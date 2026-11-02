@@ -148,7 +148,7 @@ function Pendulo({ respuesta }: { respuesta: string }) {
  * A la hora de cierre se despide y queda la pantalla final (gracias y
  * suscríbete); si en el panel se corre la hora, vuelve a leer sola.
  */
-export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: string; retrato: string | null }) {
+export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: string; qr: string; retrato: string | null; video?: string | null }) {
   const [escala, setEscala] = useState(1);
   const [lectura, setLectura] = useState<Lectura | null>(null);
   const [volteadas, setVolteadas] = useState(0);
@@ -399,7 +399,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
           background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
-        {escena && <RetratoSibila nivel={nivel} version={retrato ?? ""} />}
+        {escena && <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />}
         <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={escena ? { x: 144, y: 745 } : { x: 64 + 280, y: 180 + 165 }} nivel={nivel} modo={escena ? "escena" : "cielo"} />
         {/* Encabezado */}
         <div className="absolute left-16 right-16 top-10 flex items-center justify-between">
