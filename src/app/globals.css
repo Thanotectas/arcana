@@ -1250,3 +1250,36 @@ body {
     stroke-dashoffset: 0;
   }
 }
+
+/* Péndulo del directo: se balancea desde el punto de arriba; «quieto» se detiene. */
+@keyframes vivo-pendulo {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(16deg); }
+}
+@keyframes vivo-pendulo-calma {
+  0% { transform: rotate(-16deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+.vivo-pendulo {
+  transform-origin: 50% 0;
+  animation: vivo-pendulo 1.8s ease-in-out infinite;
+}
+.vivo-pendulo-calma {
+  transform-origin: 50% 0;
+  animation: vivo-pendulo-calma 3.6s ease-out both;
+}
+/* Giro del péndulo: horario (sí) o antihorario (no). */
+@keyframes vivo-orbita {
+  to { transform: rotate(360deg); }
+}
+.vivo-orbita {
+  transform-origin: 50% 50%;
+  animation: vivo-orbita 2.4s linear infinite;
+}
+.vivo-orbita-inversa {
+  transform-origin: 50% 50%;
+  animation: vivo-orbita 2.4s linear infinite reverse;
+}

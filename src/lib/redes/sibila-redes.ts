@@ -129,17 +129,24 @@ function sinAcentos(t: string) {
   return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-/** Nombres de los signos en inglés y portugués (sin acentos) que no coinciden con el español. */
+/**
+ * Nombres de los signos en inglés, portugués, francés y alemán (sin acentos)
+ * que no coinciden con el español. «Balance» (Libra en francés) se deja fuera:
+ * en inglés y en español es una palabra corriente.
+ */
 const OTROS_NOMBRES: Record<string, string[]> = {
-  tauro: ["taurus", "touro"],
-  geminis: ["gemini", "gemeos"],
-  leo: ["leao"],
-  virgo: ["virgem"],
-  escorpio: ["scorpio", "escorpiao"],
-  sagitario: ["sagittarius"],
-  capricornio: ["capricorn"],
-  acuario: ["aquarius", "aquario"],
-  piscis: ["pisces", "peixes"],
+  aries: ["belier", "widder"],
+  tauro: ["taurus", "touro", "taureau", "stier"],
+  geminis: ["gemini", "gemeos", "gemeaux", "zwillinge"],
+  cancer: ["krebs"],
+  leo: ["leao", "lowe", "loewe"],
+  virgo: ["virgem", "vierge", "jungfrau"],
+  libra: ["waage"],
+  escorpio: ["scorpio", "escorpiao", "scorpion", "skorpion"],
+  sagitario: ["sagittarius", "sagittaire", "schutze", "schuetze"],
+  capricornio: ["capricorn", "capricorne", "steinbock"],
+  acuario: ["aquarius", "aquario", "verseau", "wassermann"],
+  piscis: ["pisces", "peixes", "poissons", "fische"],
 };
 
 /** Signo mencionado en el texto (por nombre, sin acentos, también en inglés o portugués); si hay varios, el que aparece primero. */

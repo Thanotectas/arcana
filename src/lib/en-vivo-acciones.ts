@@ -61,7 +61,7 @@ export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData):
   return { mensaje: `¡Listo, ${nombre}! Tu ${tipo === "mano" ? "mano" : tipo === "huevo" ? "vaso" : "taza"} está en la fila${antes && antes > 1 ? ` (hay ${antes - 1} antes de ti)` : ""}. Mira el directo: Sibila te va a nombrar.` };
 }
 
-const TIPOS: TipoLectura[] = ["tarot", "aura", "numerologia", "horoscopo", "carta", "sinastria"];
+const TIPOS: TipoLectura[] = ["tarot", "aura", "numerologia", "horoscopo", "carta", "sinastria", "pendulo", "iching", "runas", "lenormand", "baraja", "chino"];
 
 /** Consulta agregada a mano desde /admin/en-vivo (pasa primero en la fila). */
 export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
@@ -72,7 +72,10 @@ export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormDa
   // «auto» clasifica el texto igual que el chat (carta astral, sinastría, aura…); lo que pide foto queda en tarot.
   const tipo = (elegido === "auto" ? (tipoDeMensaje(texto) ?? "tarot") : elegido) as TipoLectura;
   if (!autor || texto.length < 3 || !TIPOS.includes(tipo)) return { error: "Escribe el nombre, el tipo y la consulta." };
-  const { error } = await getSupabaseAdmin().from("en_vivo_preguntas").insert({ origen: "manual", tipo, autor, texto, signo: detectarSigno(texto)?.id ?? null });
+  const fila = { origen: "manual" as const, tipo, autor, texto, signo: detectarSigno(texto)?.id ?? null };
+  let { error } = await getSupabaseAdmin().from("en_vivo_preguntas").insert(fila);
+  // Sin la migración 0044 los oráculos nuevos van como tarot con su marca y se leen igual.
+  if (error?.code === "23514" && !TIPOS.slice(0, 6).includes(tipo)) ({ error } = await getSupabaseAdmin().from("en_vivo_preguntas").insert({ ...fila, tipo: "tarot", texto: `[${tipo}] ${texto}` }));
   if (error) return { error: error.message };
   revalidatePath("/admin/en-vivo");
   return { mensaje: "Agregada: es la siguiente que lee Sibila." };

@@ -46,6 +46,12 @@ export function PreguntaManual() {
           <option value="horoscopo">Horóscopo</option>
           <option value="carta">Carta astral (fecha, hora y ciudad)</option>
           <option value="sinastria">Sinastría (dos fechas)</option>
+          <option value="pendulo">Péndulo (sí o no)</option>
+          <option value="iching">I Ching</option>
+          <option value="runas">Runas</option>
+          <option value="lenormand">Lenormand</option>
+          <option value="baraja">Baraja española</option>
+          <option value="chino">Horóscopo chino (año o fecha)</option>
         </select>
       </div>
       <input name="texto" placeholder="Ej: Soy Leo, ¿qué viene en el amor? · carta: 14/03/1985 10:30 Medellín · sinastría: 14/03/1985 y 22/08/1990" maxLength={300} required className="campo w-full" />

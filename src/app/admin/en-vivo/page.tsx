@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sitio } from "@/lib/correo";
-import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoDiario } from "@/lib/en-vivo";
+import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoDiario, normalizar } from "@/lib/en-vivo";
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
@@ -12,15 +12,15 @@ import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
 
-const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", huevo: "Huevo", carta: "Carta astral", sinastria: "Sinastría" };
-const ORIGEN: Record<string, string> = { chat: "YouTube", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)" };
+const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", huevo: "Huevo", carta: "Carta astral", sinastria: "Sinastría", pendulo: "Péndulo", iching: "I Ching", runas: "Runas", lenormand: "Lenormand", baraja: "Baraja", chino: "Chino" };
+const ORIGEN: Record<string, string> = { chat: "YouTube", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)", sistema: "Para todos" };
 
 /** Control de «Sibila en vivo»: dirección del escenario para OBS, estado, fila de consultas y lecturas. */
 export default async function PaginaAdminEnVivo() {
   await requerirAdmin();
   const admin = getSupabaseAdmin();
   const hoy = `${new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date())}T05:00:00.000Z`;
-  const [{ data: estado }, { data: fila }, { data: leidas }, { count: leidasHoy }, conectado, transmitiendo] = await Promise.all([
+  const [{ data: estado }, { data: filaGuardada }, { data: leidasGuardadas }, { count: leidasHoy }, conectado, transmitiendo] = await Promise.all([
     admin.from("en_vivo_estado").select("*").eq("id", 1).maybeSingle(),
     admin.from("en_vivo_preguntas").select("id, origen, tipo, autor, texto, estado, creado_en").in("estado", ["pendiente", "leyendo"]).order("creado_en").limit(30),
     admin.from("en_vivo_preguntas").select("id, origen, tipo, autor, texto, estado, lectura, detalle, leida_en").in("estado", ["leida", "omitida"]).order("leida_en", { ascending: false }).limit(15),
@@ -28,6 +28,9 @@ export default async function PaginaAdminEnVivo() {
     youtubeConectado(admin),
     escenarioActivo(admin),
   ]);
+  // Las guardadas con marca («[pendulo] …», sin la migración 0044) se muestran con su tipo verdadero.
+  const fila = filaGuardada?.map(normalizar);
+  const leidas = leidasGuardadas?.map(normalizar);
   const codigos = await listarCodigos(admin);
   const proximoDomingo = venceSugerido();
   const fechaHora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "no vence");

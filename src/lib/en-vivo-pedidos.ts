@@ -6,8 +6,8 @@
 import { SIGNOS } from "./zodiaco";
 
 export const FECHA = /\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})\b/g;
-export const PIDE_CARTA = /carta\s+(astral|natal)|mapa\s+(astral|natal)|birth\s*chart|natal\s*chart|astral\s*chart/i;
-export const PIDE_SINASTRIA = /sinastr|synastry|compatib/i;
+export const PIDE_CARTA = /carta\s+(astral|natal)|mapa\s+(astral|natal)|birth\s*chart|natal\s*chart|astral\s*chart|th[eè]me\s+(astral|natal)|geburtshoroskop|geburtsbild|radix/i;
+export const PIDE_SINASTRIA = /sinastr|synastr|compatib|kompatib/i;
 
 /** Meses escritos con letras (español, inglés y portugués), con sus abreviaturas. */
 const MESES: [RegExp, number][] = [

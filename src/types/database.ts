@@ -226,8 +226,8 @@ type PublicacionYoutubeRow = {
 type EnVivoPreguntaRow = {
   id: number;
   mensaje_id: string | null;
-  origen: "chat" | "manual" | "pagina" | "facebook";
-  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo";
+  origen: "chat" | "manual" | "pagina" | "facebook" | "sistema";
+  tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo" | "pendulo" | "iching" | "runas" | "lenormand" | "baraja" | "chino";
   imagen: string | null;
   huella: string | null;
   autor: string;

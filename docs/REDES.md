@@ -380,10 +380,32 @@ recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no
   qué escribir para cada lectura.
 - **Que no suene automático**: Sibila recibe cómo empezaron y cerraron sus últimas cinco lecturas de la
   noche y varía el saludo y el cierre; la invitación a suscribirse la dice con sus palabras (cada cuarta
-  lectura). Las frases de espera son 12 (`FRASES_PUENTE`) y su audio se guarda en Storage
+  lectura). Las frases de espera son 14 (`FRASES_PUENTE`) y su audio se guarda en Storage
   (`redes/en-vivo/puentes/`), así recargar el escenario no gasta voz.
 - Migración `0041_en_vivo_carta_facebook.sql`, aplicada el 27 de octubre de 2026 (tipos `carta` y `sinastria`, origen `facebook` y columnas
   de Facebook en `en_vivo_estado`). Sin ella, los pedidos de carta o sinastría se leen como numerología.
+
+### Oráculos nuevos y Sibila nunca calla (2 nov 2026)
+
+- **Oráculos en el chat** (`src/lib/en-vivo-oraculos.ts`): «péndulo: ¿me llama?» (sí o no), «I Ching: …»,
+  «runas …», «Lenormand …», «baraja española …» y «horóscopo chino 1990» (o con fecha de nacimiento; sin
+  año, el año en curso). Se reconocen en español, inglés, portugués, francés y alemán. Cada uno saca su
+  resultado al azar (o lo calcula) y el escenario lo muestra: el péndulo se balancea o gira y aparece
+  SÍ / NO / AÚN NO SE DEFINE / NO ES EL MOMENTO; el hexagrama sube línea por línea; runas, Lenormand y
+  baraja se voltean como las cartas; el chino muestra la moneda del animal.
+- **Relleno honesto** (`lecturaDeRelleno`, `segmentoDeRelleno`): tras tres vueltas sin preguntas el
+  escenario pide `?modo=relleno` y, si nadie espera y hay directo al aire en YouTube o Facebook, Sibila
+  hace un segmento «para todos»: tarot para un signo, péndulo, una tirada en portugués, I Ching,
+  horóscopo de un signo, runas, inglés, Lenormand, baraja, francés y el año chino que viene. Dice para
+  quién es y pide que escriban su propia pregunta; no simula espectadores. Entra a la fila con origen
+  `sistema` (siempre al final) y cuenta para el máximo diario. Tope por noche: `EN_VIVO_RELLENO_MAX`
+  (24; 0 lo apaga).
+- **Después de la despedida** (`frasesCierre`, `?modo=cierre`): mientras la transmisión siga al aire,
+  Sibila repite cinco invitaciones (carta del día, próximo domingo, grupo, Instagram y TikTok, la
+  página) en vez de quedarse en silencio. La voz se guarda en Storage como las frases de espera.
+- Frases de espera nuevas: oráculos y «escríbeme en tu idioma», e Instagram y TikTok.
+- Migración `0044_en_vivo_oraculos.sql` (tipos nuevos y origen `sistema`). Sin ella, los oráculos entran
+  como tarot con la marca «[pendulo] …» y se leen igual, y el relleno no corre.
 
 ### Facebook al mismo tiempo (26 oct 2026)
 

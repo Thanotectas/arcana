@@ -13,9 +13,13 @@ interface Carta {
   id: string;
   nombre: string;
   posicion: string;
+  /** Runas, Lenormand y baraja española traen su imagen; sin ella es una carta Rider. */
+  imagen?: string;
 }
 
-type TipoLectura = "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo";
+type TipoLectura =
+  | "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo"
+  | "pendulo" | "iching" | "runas" | "lenormand" | "baraja" | "chino";
 
 interface Lectura {
   clase: "lectura";
@@ -32,6 +36,10 @@ interface Lectura {
   etiquetaNumero: string | null;
   simbolo: string | null;
   grafico?: GraficoVivo | null;
+  /** Péndulo: SÍ, NO, AÚN NO SE DEFINE o NO ES EL MOMENTO. */
+  respuesta?: string | null;
+  /** I Ching: las seis líneas de abajo hacia arriba (1 = yang). */
+  lineas?: number[] | null;
   texto: string;
   audio: string | null;
 }
@@ -48,6 +56,12 @@ const NOMBRE_TIPO: Record<TipoLectura, string> = {
   huevo: "Limpia con huevo",
   carta: "Carta astral",
   sinastria: "Sinastría",
+  pendulo: "Péndulo",
+  iching: "I Ching",
+  runas: "Runas",
+  lenormand: "Lenormand",
+  baraja: "Baraja española",
+  chino: "Horóscopo chino",
 };
 
 /** Lo que se puede pedir en el chat: el recuadro de arriba lo va mostrando por turnos mientras no hay lectura. */
@@ -61,9 +75,17 @@ const INSTRUCCIONES = [
   { titulo: "Horóscopo · tu cielo de hoy", ejemplo: "horóscopo Piscis" },
   { titulo: "Aura · el color de tu energía", ejemplo: "aura: ando muy cansada" },
   { titulo: "Numerología · lo que trae tu año", ejemplo: "mi año 14/03/1985" },
+  { titulo: "Péndulo · sí o no", ejemplo: "péndulo: ¿me escribe esta semana?" },
+  { titulo: "I Ching · el libro de los cambios", ejemplo: "I Ching: ¿cambio de trabajo?" },
+  { titulo: "Runas · tres piedras para ti", ejemplo: "runas: ¿qué viene en el amor?" },
+  { titulo: "Horóscopo chino · tu animal", ejemplo: "horóscopo chino 1990" },
 ];
 /** Frases de espera de Sibila (FRASES_PUENTE en src/lib/en-vivo.ts). */
-const FRASES_PUENTE = 12;
+const FRASES_PUENTE = 14;
+/** Frases de después de la despedida (frasesCierre en src/lib/en-vivo.ts). */
+const FRASES_CIERRE = 5;
+/** Cuántas vueltas sin preguntas antes de que Sibila haga un segmento «para todos». */
+const VUELTAS_ANTES_DE_RELLENO = 3;
 
 const COLOR_AURA: Record<string, string> = {
   violeta: "#8b6cf6",
@@ -84,6 +106,38 @@ const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function frasesDe(texto: string) {
   return texto.match(/[^.!?¿¡]+[.!?]+|[^.!?]+$/g)?.map((f) => f.trim()).filter(Boolean) ?? [texto];
+}
+
+/**
+ * El péndulo del directo: se balancea mientras duda (AÚN NO SE DEFINE), se
+ * calma y gira en el sentido del reloj (SÍ) o al revés (NO), o se queda
+ * quieto (NO ES EL MOMENTO). La respuesta aparece en grande.
+ */
+function Pendulo({ respuesta }: { respuesta: string }) {
+  const duda = respuesta.startsWith("AÚN");
+  const giro = respuesta === "SÍ" ? "vivo-orbita" : respuesta === "NO" ? "vivo-orbita-inversa" : null;
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative flex h-[330px] w-[340px] justify-center">
+        <div className="absolute left-1/2 top-0 h-3 w-24 -translate-x-1/2 rounded-full bg-oro/60" />
+        <div className={`flex h-[300px] w-[90px] flex-col items-center ${duda ? "vivo-pendulo" : "vivo-pendulo-calma"}`}>
+          <div className="h-[232px] w-[3px] bg-gradient-to-b from-oro/30 to-oro-suave" />
+          <div className="h-[54px] w-[54px] rotate-45 rounded-md border-2 border-oro-suave shadow-[0_0_40px_rgba(241,217,154,0.6)]" style={{ background: "linear-gradient(135deg, #f4f1ff, #8b6cf6 60%, #2a1a5e)" }} />
+        </div>
+        {giro && (
+          <div className="aparecer absolute left-1/2 top-[196px] h-[124px] w-[124px] -translate-x-1/2" style={{ animationDelay: "2.6s" }}>
+            <div className="h-full w-full rounded-full border-2 border-dashed border-oro/50" />
+            <div className={`absolute inset-0 ${giro}`}>
+              <span className="absolute left-1/2 top-[-9px] h-4 w-4 -translate-x-1/2 rounded-full bg-oro-suave shadow-[0_0_18px_rgba(241,217,154,0.9)]" />
+            </div>
+          </div>
+        )}
+      </div>
+      <p className={`aparecer mt-8 text-center font-display text-oro-suave ${respuesta.length > 4 ? "text-[64px]" : "text-[130px]"} leading-none`} style={{ animationDelay: "3s" }}>
+        {respuesta}
+      </p>
+    </div>
+  );
 }
 
 /**
@@ -121,7 +175,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
   }, []);
 
   const pedir = useCallback(
-    async (modo: "lectura" | "puente", i = 0): Promise<Respuesta | null> => {
+    async (modo: "lectura" | "puente" | "relleno" | "cierre", i = 0): Promise<Respuesta | null> => {
       try {
         const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
         if (res.status === 401) {
@@ -219,6 +273,22 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
       let quietos = 0;
       let puente = 0;
       let despedida = false;
+      let vueltaCierre = 0;
+      const cierres = new Map<number, { texto: string; audio: string | null }>();
+      // Después de la despedida Sibila sigue invitando (carta del día, grupo, redes) mientras la transmisión siga al aire.
+      const decirCierre = async () => {
+        const i = vueltaCierre++ % FRASES_CIERRE;
+        let frase = cierres.get(i) ?? null;
+        if (!frase) {
+          const r2 = await pedir("cierre", i);
+          if (r2?.clase === "puente") frase = { texto: r2.texto, audio: r2.audio };
+        }
+        if (!frase || !activo) return;
+        cierres.set(i, frase);
+        setSinVoz(!frase.audio);
+        await hablar(frase.texto, frase.audio);
+        setSubtitulo("");
+      };
       // Una frase de espera de Sibila (la voz se guarda: solo se pide la primera vez).
       const decirPuente = async () => {
         const i = puente++ % FRASES_PUENTE;
@@ -236,7 +306,8 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
       };
       const PENDIENTE = Symbol("pendiente");
       while (activo) {
-        const peticion = siguiente ?? pedir("lectura");
+        // Tras unas vueltas sin preguntas se pide un segmento «para todos» (el servidor lo hace solo si nadie espera).
+        const peticion = siguiente ?? pedir(quietos >= VUELTAS_ANTES_DE_RELLENO ? "relleno" : "lectura");
         siguiente = null;
         // Mientras Sibila prepara una lectura (Claude y la voz tardan unos segundos), no se queda callada.
         const pronto = await Promise.race([peticion, esperar(3500).then(() => PENDIENTE)]);
@@ -257,12 +328,15 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
             setSubtitulo("");
           }
           setCierre("fin");
-          await esperar(15000);
+          await esperar(4000);
+          await decirCierre();
+          await esperar(6000);
           continue;
         }
         if (r?.clase === "fin") {
           setCierre("fin");
-          await esperar(15000);
+          await decirCierre();
+          await esperar(6000);
           continue;
         }
         if (despedida && r) {
@@ -414,7 +488,7 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
             <p className={`text-texto ${escena ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
             <p className={`text-violeta-suave ${escena ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
           </div>
-        ) : tipo === "tarot" || !lectura ? (
+        ) : !lectura || (Boolean(lectura.cartas?.length) && !lectura.grafico) ? (
         <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
           {cartas.map((c, i) => {
             const visible = Boolean(lectura && c.id && volteadas > i);
@@ -428,7 +502,12 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
                     </div>
                     {c.id && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={`/cartas/rider/${c.id}.webp`} alt={c.nombre} className="absolute inset-0 h-full w-full rounded-2xl border-4 border-oro/80 object-cover" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }} />
+                      <img
+                        src={c.imagen ?? `/cartas/rider/${c.id}.webp`}
+                        alt={c.nombre}
+                        className={`absolute inset-0 h-full w-full rounded-2xl border-4 border-oro/80 ${c.imagen?.startsWith("/runas/") ? "bg-[#120b26] object-contain p-4" : "object-cover"}`}
+                        style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                      />
                     )}
                   </div>
                   {visible && <div key={`${lectura?.id}-${i}`} className="pointer-events-none absolute inset-[-30px] rounded-3xl vivo-destello" />}
@@ -466,6 +545,40 @@ export function EscenarioEnVivo({ clave, qr, retrato }: { clave: string; qr: str
                   <span className="font-display text-[200px] leading-none text-oro-suave">{lectura.numero}</span>
                 </div>
                 <p className="mt-6 text-3xl uppercase tracking-[0.25em] text-violeta-suave">{lectura.etiquetaNumero}</p>
+              </div>
+            )}
+            {tipo === "pendulo" && <Pendulo respuesta={lectura.respuesta ?? ""} />}
+            {tipo === "iching" && lectura.lineas && (
+              <div className="flex flex-col items-center">
+                {/* Las seis líneas aparecen de abajo hacia arriba, como se lanzan las monedas */}
+                <div className="flex flex-col-reverse gap-5">
+                  {lectura.lineas.map((l, i) => (
+                    <div key={i} className="aparecer flex w-[320px] justify-between" style={{ animationDelay: `${0.4 + i * 0.5}s` }}>
+                      {l ? (
+                        <span className="h-8 w-full rounded-md bg-oro-suave shadow-[0_0_24px_rgba(241,217,154,0.45)]" />
+                      ) : (
+                        <>
+                          <span className="h-8 w-[43%] rounded-md bg-oro-suave shadow-[0_0_24px_rgba(241,217,154,0.45)]" />
+                          <span className="h-8 w-[43%] rounded-md bg-oro-suave shadow-[0_0_24px_rgba(241,217,154,0.45)]" />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="aparecer mt-10 text-center font-display text-5xl text-oro-suave" style={{ animationDelay: "3.6s" }}>
+                  {lectura.numero} · {lectura.etiquetaNumero}
+                </p>
+              </div>
+            )}
+            {tipo === "chino" && (
+              <div className="flex flex-col items-center">
+                {lectura.imagen && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={lectura.imagen} alt="" className="h-[340px] w-[340px] rounded-full border-4 border-oro/70 object-cover shadow-[0_30px_80px_rgba(0,0,0,0.6)]" />
+                )}
+                <p className="mt-6 font-display text-6xl text-oro-suave">
+                  {lectura.simbolo} {lectura.etiquetaNumero}
+                </p>
               </div>
             )}
             {tipo === "horoscopo" && (

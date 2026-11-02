@@ -19,6 +19,7 @@ import { createHash } from "node:crypto";
 import { PIDE_CARTA, PIDE_SINASTRIA, fechasEn, prepararCarta, prepararCielo, prepararSinastria } from "@/lib/en-vivo-astro";
 import { sinFechas } from "@/lib/en-vivo-pedidos";
 import type { GraficoVivo } from "@/lib/en-vivo-graficos";
+import { ORACULOS_VIVO, oraculoPedido, prepararOraculo, type OraculoVivo } from "@/lib/en-vivo-oraculos";
 
 /**
  * «Sibila en vivo»: directos de YouTube donde Sibila lee el tarot a quien
@@ -81,7 +82,7 @@ export function pareceConsulta(texto: string) {
   // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
   return (
     Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
-    fechasEn(t).length > 0 || anioQuePide(t) !== null || PIDE_CARTA.test(t) || PIDE_SINASTRIA.test(t)
+    fechasEn(t).length > 0 || anioQuePide(t) !== null || PIDE_CARTA.test(t) || PIDE_SINASTRIA.test(t) || oraculoPedido(t.toLowerCase()) !== null
   );
 }
 
@@ -178,7 +179,14 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
   let { data, error } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
   if (error?.code === "23514") {
     // Sin la migración 0041 no existen los tipos carta y sinastría: se leen como numerología (traen fecha).
-    const viejas = filas.map((f) => (f.tipo === "carta" || f.tipo === "sinastria" ? { ...f, tipo: "numerologia" as const } : f));
+    // Sin la 0044, los oráculos nuevos entran como tarot con su marca («[pendulo] …») y se leen igual.
+    const viejas = filas.map((f) =>
+      f.tipo === "carta" || f.tipo === "sinastria"
+        ? { ...f, tipo: "numerologia" as const }
+        : esOraculo(f.tipo)
+          ? { ...f, tipo: "tarot" as const, texto: `[${f.tipo}] ${f.texto}`.slice(0, 320) }
+          : f,
+    );
     ({ data, error } = await admin.from("en_vivo_preguntas").upsert(viejas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id"));
   }
   if (error) console.error("[en vivo] encolar:", error.message);
@@ -190,9 +198,18 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
 export type TipoLectura = PreguntaEnVivo["tipo"];
 /** Marca de la limpia con huevo guardada como «chocolate» cuando falta la migración 0043. */
 export const MARCA_HUEVO = "[huevo] ";
-/** La consulta, con el tipo «huevo» resuelto aunque haya entrado con la marca. */
-function normalizar<T extends { tipo: TipoLectura; texto: string }>(p: T): T {
-  return p.tipo === "chocolate" && p.texto.startsWith(MARCA_HUEVO.trim()) ? { ...p, tipo: "huevo", texto: p.texto.slice(MARCA_HUEVO.trim().length).trim() } : p;
+const esOraculo = (tipo: string): tipo is OraculoVivo => (ORACULOS_VIVO as string[]).includes(tipo);
+/**
+ * La consulta con su tipo verdadero aunque haya entrado con marca: la limpia con
+ * huevo guardada como «chocolate» (sin la 0043) o un oráculo guardado como
+ * tarot (sin la 0044), con el texto «[pendulo] …».
+ */
+export function normalizar<T extends { tipo: TipoLectura; texto: string }>(p: T): T {
+  const marca = /^\[(huevo|pendulo|iching|runas|lenormand|baraja|chino)\]\s*/.exec(p.texto);
+  if (!marca) return p;
+  const tipo = marca[1] as TipoLectura;
+  const valida = tipo === "huevo" ? p.tipo === "chocolate" : p.tipo === "tarot";
+  return valida ? { ...p, tipo, texto: p.texto.slice(marca[0].length).trim() } : p;
 }
 export const BUCKET_FOTOS = "redes";
 
@@ -200,6 +217,9 @@ export const BUCKET_FOTOS = "redes";
 export function tipoDeMensaje(texto: string): TipoLectura | null {
   const t = texto.toLowerCase();
   if (/chocolate|taza|pocillo|\bmano\b|palma|\bpalm\b|\bhand\b|\bcup\b|x[ií]cara|\bm[aã]o\b|\bhuevo|limpia/.test(t)) return null;
+  // Péndulo, I Ching, runas, Lenormand, baraja española y horóscopo chino (este puede traer fecha).
+  const oraculo = oraculoPedido(t);
+  if (oraculo) return oraculo;
   // Carta astral y sinastría se dibujan en pantalla: necesitan la fecha (o las dos fechas).
   const fechas = fechasEn(t).length;
   if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
@@ -216,6 +236,8 @@ export interface CartaEnVivo {
   id: string;
   nombre: string;
   posicion: string;
+  /** Imagen de la pieza cuando no es una carta Rider (runa, Lenormand, baraja española). */
+  imagen?: string;
 }
 
 function sacarCartas(): CartaEnVivo[] {
@@ -234,6 +256,9 @@ const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en vo
 - Termina con un consejo concreto para aprovechar lo que viene, dicho cada vez de otra forma (nada de cerrar siempre con «confía», «recuerda» o «mi consejo es»). No invites a la página: eso lo hace el directo.
 - Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
+
+/** Lo que se suma a la instrucción en los segmentos «para todos» del relleno. */
+const SEGMENTO_PARA_TODOS = `Esta lectura no es de una persona del chat: es un segmento para todos los que están viendo mientras llegan las preguntas. El campo «Nombre» dice para quién es (un signo, quienes hablan un idioma, o todos). No inventes personas, nombres ni preguntas, y no digas que alguien preguntó. Empieza diciendo para quién es («Para todos los Leo que me ven…», «Para quem me assiste em português…») y háblale al grupo. Al final invita, en una frase y con tus palabras, a escribir en el chat su propia pregunta con su signo, en el idioma que quieran.`;
 
 /** Fecha de nacimiento escrita en el mensaje (con números o con el mes en letras), si la hay. */
 function fechaEn(texto: string): Date | null {
@@ -259,13 +284,26 @@ interface Preparada {
   entrada: string;
   sistema: string;
   imagenes?: ImagenEntrada[];
-  extra: Pick<LecturaEnVivo, "cartas" | "numero" | "etiquetaNumero" | "simbolo" | "grafico">;
+  extra: Pick<LecturaEnVivo, "cartas" | "numero" | "etiquetaNumero" | "simbolo" | "grafico" | "respuesta" | "lineas"> & { imagen?: string };
 }
 
 async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string; simbolo: string; id: string } | null): Promise<Preparada> {
   const base = [`Nombre: «${p.autor}»`, signo ? `Signo: ${signo.nombre}` : "Signo: no lo dijo", p.texto ? `Mensaje: «${p.texto}»` : "Mensaje: (sin pregunta)"];
-  const vacio = { cartas: null, numero: null, etiquetaNumero: null, simbolo: null, grafico: null };
+  const vacio = { cartas: null, numero: null, etiquetaNumero: null, simbolo: null, grafico: null, respuesta: null, lineas: null };
   switch (p.tipo) {
+    case "pendulo":
+    case "iching":
+    case "runas":
+    case "lenormand":
+    case "baraja":
+    case "chino": {
+      const o = prepararOraculo(p.tipo, p.texto);
+      return {
+        entrada: [...base, o.contexto].join("\n"),
+        sistema: `${SISTEMA_EN_VIVO}\n${o.instruccion}`,
+        extra: { ...vacio, cartas: o.piezas, respuesta: o.respuesta, lineas: o.lineas, numero: o.numero, etiquetaNumero: o.etiqueta, simbolo: o.simbolo, ...(o.imagen ? { imagen: o.imagen } : {}) },
+      };
+    }
     case "aura":
       return {
         entrada: base.join("\n"),
@@ -376,6 +414,10 @@ export interface LecturaEnVivo {
   simbolo: string | null;
   /** Carta astral, cielo del horóscopo o sinastría que el escenario dibuja. */
   grafico: GraficoVivo | null;
+  /** Péndulo: la respuesta en grande (SÍ, NO…). */
+  respuesta: string | null;
+  /** I Ching: las seis líneas, de abajo hacia arriba (1 = yang, 0 = yin). */
+  lineas: number[] | null;
   texto: string;
   audio: string | null;
 }
@@ -411,7 +453,8 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
     // esta noche: quien repite puede seguir preguntando, pero si hay fila espera a los nuevos.
     const { data: lista } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("creado_en").limit(30);
     if (!lista?.length) return null;
-    const PRIORIDAD: Record<string, number> = { manual: 0, pagina: 1, chat: 2, facebook: 2 };
+    // Los segmentos «para todos» (origen sistema) solo van cuando no hay nadie más esperando.
+    const PRIORIDAD: Record<string, number> = { manual: 0, pagina: 1, chat: 2, facebook: 2, sistema: 9 };
     const candidatas = [...lista].sort((a, b) => (PRIORIDAD[a.origen] ?? 3) - (PRIORIDAD[b.origen] ?? 3));
     const esChat = (origen: string) => origen === "chat" || origen === "facebook";
     const autoresChat = [...new Set(candidatas.filter((c) => esChat(c.origen)).map((c) => c.autor))];
@@ -438,7 +481,10 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (no repitas esas aperturas ni esos cierres):\n${yaDijiste.join("\n")}` : ""].join("");
       // Una de cada tres (y no cuando toca invitar a suscribirse) deja una puerta abierta que despierte curiosidad.
       const gancho = !invitar && Math.random() < 0.33;
-      const sistema = invitar
+      const paraTodos = p.origen === "sistema" ? `\n${SEGMENTO_PARA_TODOS}` : "";
+      const sistema = paraTodos
+        ? `${prep.sistema}${paraTodos}`
+        : invitar
         ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a suscribirse al canal y activar la campanita para el próximo directo.`
         : gancho
           ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
@@ -485,6 +531,81 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
   return null;
 }
 
+// ───────────────────────── Relleno: segmentos «para todos» ─────────────────────────
+
+/** Cuántos segmentos «para todos» puede haber en una noche (EN_VIVO_RELLENO_MAX, 24 por omisión; 0 los apaga). */
+export function maximoRelleno() {
+  const n = Number(process.env.EN_VIVO_RELLENO_MAX ?? 24);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 24;
+}
+
+interface Segmento {
+  tipo: TipoLectura;
+  autor: string;
+  texto: string;
+  signo: string | null;
+}
+
+/**
+ * El segmento número n de la noche. Rotan oráculos, signos e idiomas para que
+ * quien llega vea de todo: tarot para un signo, péndulo, una tirada en
+ * portugués, I Ching, horóscopo de un signo, runas, inglés, Lenormand, baraja
+ * española, francés y el año chino que viene. No simula espectadores: Sibila
+ * dice para quién es y pide que escriban su propia pregunta.
+ */
+export function segmentoDeRelleno(n: number, hoy = new Date()): Segmento {
+  const dia = Math.floor(hoy.getTime() / 86_400_000);
+  const signo = SIGNOS[(dia * 5 + n * 7) % SIGNOS.length];
+  const paraSigno = `Para todos los ${signo.nombre} ${signo.simbolo}`;
+  const preguntaPendulo = [
+    "Péndulo para todos los que están viendo: ¿llega una buena noticia antes de fin de mes?",
+    "Péndulo para todos: ¿es buen momento para empezar lo que venimos aplazando?",
+    "Péndulo para todos: ¿alguien del pasado vuelve a aparecer estas semanas?",
+  ][Math.floor(n / 11) % 3];
+  const proximoAnio = hoy.getUTCFullYear() + (hoy.getUTCMonth() >= 9 ? 1 : 0);
+  const segmentos: Segmento[] = [
+    { tipo: "tarot", autor: paraSigno, texto: `Tirada para ${signo.nombre}: ¿qué les traen estas semanas en el amor y en el trabajo?`, signo: signo.id },
+    { tipo: "pendulo", autor: "Para todos", texto: preguntaPendulo, signo: null },
+    { tipo: "tarot", autor: "Para quem fala português", texto: "Uma tiragem para todos que estão assistindo em português: o que vem nestas semanas no amor e no trabalho?", signo: null },
+    { tipo: "iching", autor: "Para todos", texto: "I Ching para todos los que están viendo: ¿qué consejo trae esta semana?", signo: null },
+    { tipo: "horoscopo", autor: paraSigno, texto: `Horóscopo de hoy para ${signo.nombre}`, signo: signo.id },
+    { tipo: "runas", autor: "Para todos", texto: "Runas para todos los que están viendo: ¿qué fue, qué es y qué viene antes de fin de mes?", signo: null },
+    { tipo: "tarot", autor: "For everyone watching in English", texto: "A reading for everyone watching in English: what do the coming weeks bring for love and work?", signo: null },
+    { tipo: "lenormand", autor: "Para todos", texto: "Lenormand para todos: ¿qué se mueve esta semana?", signo: null },
+    { tipo: "baraja", autor: "Para todos", texto: "Baraja española para todos los que están viendo: ¿qué pasó, qué pasa y qué viene?", signo: null },
+    { tipo: "tarot", autor: "Pour tous ceux qui regardent en français", texto: "Un tirage pour tous ceux qui regardent en français : que réservent les prochaines semaines en amour et au travail ?", signo: null },
+    { tipo: "chino", autor: "Para todos", texto: `Horóscopo chino: ¿qué trae el año ${proximoAnio} para todos?`, signo: null },
+  ];
+  return segmentos[n % segmentos.length];
+}
+
+/**
+ * Cuando nadie pregunta, Sibila hace un segmento «para todos» en vez de
+ * quedarse callada: si no hay consultas esperando, encola el siguiente
+ * segmento (origen «sistema») y lo lee. Cuenta para el máximo diario y tiene
+ * su propio tope por noche. Sin la migración 0044 no hay origen «sistema» y
+ * simplemente no hace nada (el escenario sigue con sus frases).
+ */
+export async function lecturaDeRelleno(admin: Admin): Promise<LecturaEnVivo | null> {
+  const maximo = maximoRelleno();
+  if (!maximo) return null;
+  const { count: esperando } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "leyendo"]);
+  if (esperando) return siguienteLectura(admin);
+  const { count: hechos } = await admin
+    .from("en_vivo_preguntas")
+    .select("id", { count: "exact", head: true })
+    .eq("origen", "sistema")
+    .gte("creado_en", new Date(Date.now() - 6 * 3_600_000).toISOString());
+  if ((hechos ?? 0) >= maximo) return null;
+  const seg = segmentoDeRelleno(hechos ?? 0);
+  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "sistema", ...seg });
+  if (error) {
+    console.error("[en vivo] relleno:", error.message);
+    return null;
+  }
+  return siguienteLectura(admin);
+}
+
 /** El escenario está transmitiendo si pidió lectura en los últimos 3 minutos. */
 export async function escenarioActivo(admin: Admin) {
   const { data } = await admin.from("en_vivo_estado").select("latido_en").eq("id", 1).maybeSingle();
@@ -511,7 +632,7 @@ function codigoDicho(codigo: string) {
 }
 
 /** Cuántas frases de espera hay: el escenario las recorre en orden (EscenarioEnVivo usa el mismo número). */
-export const FRASES_PUENTE = 12;
+export const FRASES_PUENTE = 14;
 
 /**
  * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez y
@@ -540,6 +661,8 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     `Si quieres una lectura más profunda, con calma y por escrito, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
     "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
     "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",
+    "¿Una pregunta de sí o no? Escribe péndulo y tu pregunta. Y si quieres un consejo más hondo, escribe I Ching, runas o baraja española. Escríbeme en tu idioma: español, português, English, français… yo te leo en el tuyo.",
+    "Para seguirme durante la semana: en Instagram soy miarcana punto oficial, y en TikTok, miarcana cuatro. Allí subo la carta del día, los rituales y los avisos del próximo directo.",
   ];
   return frases.slice(0, FRASES_PUENTE);
 }
@@ -568,6 +691,27 @@ export async function audioPuente(admin: Admin, i: number) {
 }
 
 // ───────────────────────── Cierre del directo ─────────────────────────
+
+/**
+ * Frases que Sibila sigue diciendo después de la despedida, mientras la
+ * transmisión siga al aire, para que no quede en silencio hasta que se corte.
+ * La voz queda guardada en Storage como las frases de espera.
+ */
+export function frasesCierre() {
+  return [
+    "La lectura en vivo de esta noche terminó, pero no te vayas sin tu carta del día: es gratis, todos los días, en mi arcana punto com.",
+    "El próximo domingo vuelvo a leer en vivo. Suscríbete al canal y activa la campanita, para que te avise cuando empiece.",
+    "Durante la semana nos vemos en el grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.",
+    "En Instagram soy miarcana punto oficial, y en TikTok, miarcana cuatro. Allí está la carta del día y los rituales de la semana.",
+    "Si te quedó una pregunta, hazla con calma en mi arcana punto com: allí también te espera tu carta astral completa y tu sinastría.",
+  ];
+}
+
+export async function audioCierre(admin: Admin, i: number) {
+  const frases = frasesCierre();
+  const texto = frases[((i % frases.length) + frases.length) % frases.length];
+  return { texto, audio: await vozGuardada(admin, texto) };
+}
 
 /** Una hora de cierre o una despedida solo cuentan durante tres horas (no afectan otro directo). */
 const VENTANA_CIERRE = 3 * 3_600_000;

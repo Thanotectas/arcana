@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { audioPuente, claveValida, despedida, estadoCierre, latido, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
+import { audioCierre, audioPuente, claveValida, despedida, estadoCierre, latido, lecturaDeRelleno, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
 import { sincronizarFacebook } from "@/lib/en-vivo-facebook";
 
 // Escribir la lectura y narrarla toma unos segundos.
@@ -9,7 +9,9 @@ export const maxDuration = 60;
 /**
  * Lo que pide el escenario de «Sibila en vivo» (OBS): ?modo=lectura trae el
  * chat nuevo (YouTube y Facebook) y devuelve la siguiente lectura (o «espera» si no hay consultas);
- * ?modo=puente&i=N devuelve una frase de Sibila entre lecturas. Protegido con
+ * ?modo=puente&i=N devuelve una frase de Sibila entre lecturas; ?modo=relleno
+ * hace lo mismo que lectura pero, si nadie espera, lee un segmento «para todos»;
+ * ?modo=cierre&i=N devuelve una frase de después de la despedida. Protegido con
  * la clave del escenario (?clave=), que se ve en /admin/en-vivo. Cada pedido
  * marca el latido del escenario (la página /vivo recibe fotos solo si late).
  * Llegada la hora de cierre devuelve una vez la despedida de Sibila y luego
@@ -22,6 +24,9 @@ export async function GET(request: NextRequest) {
   await latido(admin).catch(() => null);
   if (q.get("modo") === "puente") {
     return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
+  }
+  if (q.get("modo") === "cierre") {
+    return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
   }
   const cierre = await estadoCierre(admin).catch(() => "abierto" as const);
   if (cierre === "despedirse") return NextResponse.json({ clase: "despedida", ...(await despedida(admin)) }, { headers: { "Cache-Control": "no-store" } });
@@ -37,6 +42,8 @@ export async function GET(request: NextRequest) {
       return null;
     }),
   ]);
-  const lectura = await siguienteLectura(admin);
+  // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
+  const alAire = Boolean(chat?.directo || facebook?.directo);
+  const lectura = q.get("modo") === "relleno" && alAire ? await lecturaDeRelleno(admin) : await siguienteLectura(admin);
   return NextResponse.json(lectura ? { clase: "lectura", ...lectura, chat, facebook } : { clase: "espera", chat, facebook }, { headers: { "Cache-Control": "no-store" } });
 }
