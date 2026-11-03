@@ -247,7 +247,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Extensión: 600 a 850 palabras.\n\n` +
         INSTRUCCION_TABACO,
       sistemaExtra: TRADICION_TABACO,
-      opciones: { idioma, effort: "medium", maxTokens: 3900, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "medium", maxTokens: 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("tabaco") },
     };
   }
 

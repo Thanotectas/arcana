@@ -507,3 +507,10 @@ principales (la de la vida es vitalidad y cambios, nunca años), secundarias, ma
 delicados. Lo usan la lectura de la mano de la app, la mano del directo y Sibila en redes (adelanto e
 invitación a /quiromancia). En redes, Sibila recibe todos los manuales de `TEMAS_MANUAL` para cualquier foto.
 
+## Manual del tabaco: biblioteca completa (3 nov 2026)
+
+`src/lib/conocimiento/tabaco.md` (preparación sin fumar, lo físico, ceniza, quema, capa, humo, tiempos). Lo usa
+la lectura del tabaco de la app y Sibila en redes (adelanto e invitación a /tabaco). La biblioteca queda en
+cinco manuales: huevo, velas, taza (café y chocolate), mano y tabaco (unas 8.400 palabras, en un bloque en
+caché). En `TRADICION_TABACO` se cambió «alguien que estorba» y «terceras personas» por lecturas sin culpables.
+
