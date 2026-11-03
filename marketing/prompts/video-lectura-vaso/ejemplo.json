@@ -1,0 +1,15 @@
+{
+  "foto": "foto.jpg",
+  "salida": "lectura-vaso.mp4",
+  "encabezado": "LECTURA DE LIMPIA CON HUEVO",
+  "titulo": "Así se lee este vaso",
+  "duracion": 34,
+  "audio": null,
+  "pasos": [
+    { "desde": 5, "hasta": 12, "marca": { "tipo": "ovalo", "x": 0.53, "y": 0.66, "ancho": 0.32, "alto": 0.24 }, "etiqueta": "Yema entera", "texto": "Tu fuerza está intacta" },
+    { "desde": 12, "hasta": 20, "marca": { "tipo": "linea", "puntos": [[0.53, 0.56], [0.52, 0.42], [0.53, 0.26], [0.53, 0.17]] }, "etiqueta": "Columna que sube", "texto": "Una carga grande que sale con fuerza" },
+    { "desde": 20, "hasta": 27, "marca": { "tipo": "ovalo", "x": 0.53, "y": 0.13, "ancho": 0.09, "alto": 0.09 }, "etiqueta": "¿Lo que viene?", "viene": true, "texto": "Y arriba, una señal de lo que llega" },
+    { "desde": 27, "hasta": 30.5, "texto": "Cada vaso cuenta su propia historia" }
+  ],
+  "cierre": { "titulo": "¿Leo el tuyo?", "texto": "Déjame la foto de tu vaso en los comentarios", "pie": "o súbela en miarcana.com/huevo" }
+}

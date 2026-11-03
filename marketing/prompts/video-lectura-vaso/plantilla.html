@@ -1,0 +1,122 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716}
+#fondo{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,#2a1660 0%,#140b30 55%,#0b0716 100%)}
+#est{position:absolute;inset:0}
+#tarjeta{position:absolute;background:#f6efe2;border-radius:18px;box-shadow:0 40px 90px rgba(0,0,0,.65)}
+#tarjeta img{position:absolute;left:22px;top:22px;border-radius:6px}
+#anot{position:absolute;inset:0}
+.e{font-family:"Noto Color Emoji"}
+#titulo{position:absolute;left:60px;right:60px;top:110px;text-align:center}
+#titulo .a{font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:30px}
+#titulo .b{font-family:C;color:#f1d99a;font-size:84px;line-height:1.05;margin-top:10px;text-shadow:0 0 30px rgba(241,217,154,.4)}
+#caja{position:absolute;left:70px;right:70px;top:1360px;min-height:150px;padding:26px 40px;border-radius:36px;background:rgba(11,7,22,.72);border:2px solid rgba(241,217,154,.5);text-align:center;display:flex;align-items:center;justify-content:center;opacity:0}
+#caja div{font-family:C;color:#fff;font-size:66px;line-height:1.08}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:C;color:#f1d99a;font-size:52px}
+#cta{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;padding:0 80px}
+</style></head><body>
+<div id="fondo"></div><svg id="est" width="1080" height="1920"></svg>
+<div id="titulo"><div class="a" id="encabezado"></div><div class="b" id="tit"></div></div>
+<div id="tarjeta"><img id="foto"></div>
+<svg id="anot" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="caja"><div id="txt"></div></div>
+<div id="cta"><div id="ctaT" style="font-family:C;color:#fff;font-size:110px;line-height:1.05"></div><div id="ctaX" style="font-family:CI;color:#f1d99a;font-size:64px;margin-top:20px"></div><div id="ctaP" style="font-family:I;color:#b7a5ff;font-size:36px;margin-top:60px"></div></div>
+<div id="marca">✦ Arcana</div>
+<script src="config.js"></script>
+<script>
+// Video de lectura de un vaso (1080×1920): la foto en una tarjeta, la cámara se acerca a cada detalle,
+// los óvalos y las líneas se dibujan, la caja dice la frase y al final la invitación.
+// Coordenadas de las marcas en fracción de la foto (0,0 arriba a la izquierda).
+const K = window.CONFIG;
+const az = (s) => { const x = Math.sin(s * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const E = Array.from({ length: 180 }, (_, i) => ({ x: az(i) * 1080, y: az(i + 999) * 1920, r: .6 + az(i + 77) * 1.8, f: az(i + 5) * 6.28, v: .6 + az(i + 3) * 1.6 }));
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), pr = (t, a, b) => cl((t - a) / (b - a)), su = (x) => x * x * (3 - 2 * x);
+const ven = (t, a, b, f = .5) => Math.min(su(pr(t, a, a + f)), 1 - su(pr(t, b - f, b)));
+const ORO = "#f1d99a", VIOLETA = "#c9b8ff";
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+document.getElementById("encabezado").textContent = K.encabezado || "LECTURA DE LIMPIA CON HUEVO";
+document.getElementById("tit").innerHTML = esc(K.titulo || "Así se lee este vaso") + ' <span class="e">🥚</span>';
+document.getElementById("ctaT").textContent = K.cierre?.titulo || "¿Leo el tuyo?";
+document.getElementById("ctaX").innerHTML = esc(K.cierre?.texto || "Déjame la foto de tu vaso en los comentarios") + ' <span class="e">👇</span>';
+document.getElementById("ctaP").textContent = K.cierre?.pie || "o súbela en miarcana.com/huevo";
+const img = document.getElementById("foto");
+let FX = 0, FY = 0, FW = 680, FH = 868; // rectángulo de la foto en la pantalla (sin acercamiento)
+window.listo = new Promise((ok) => {
+  img.onload = () => {
+    const maxW = 900, maxH = 940, r = img.naturalWidth / img.naturalHeight;
+    FW = Math.min(maxW, maxH * r); FH = FW / r;
+    const tw = FW + 44, th = FH + 44, tx = (1080 - tw) / 2, ty = 330 + (980 - th) / 2;
+    Object.assign(document.getElementById("tarjeta").style, { left: tx + "px", top: ty + "px", width: tw + "px", height: th + "px", transformOrigin: tw / 2 + "px " + th / 2 + "px" });
+    Object.assign(img.style, { width: FW + "px", height: FH + "px" });
+    FX = tx + 22; FY = ty + 22; ok();
+  };
+  img.src = K.foto;
+});
+const CX = 540, CY = 820; // centro de la tarjeta, alrededor del cual se acerca la cámara
+const px = (m) => [FX + m[0] * FW, FY + m[1] * FH];
+function etiqueta(x, y, t, op, color) {
+  const w = t.length * 19 + 52;
+  x = Math.min(1080 - w / 2 - 20, Math.max(w / 2 + 20, x));
+  return '<g opacity="' + op.toFixed(3) + '"><rect x="' + (x - w / 2) + '" y="' + (y - 32) + '" width="' + w + '" height="56" rx="28" fill="#0b0716" fill-opacity=".82" stroke="' + color + '" stroke-width="2"/><text x="' + x + '" y="' + (y + 7) + '" font-family="I" font-size="29" fill="' + color + '" text-anchor="middle">' + esc(t) + '</text></g>';
+}
+function marca(p, q, op, activa) {
+  // Solo la marca que se está leyendo lleva su etiqueta; las anteriores quedan como trazo tenue.
+  const conEtiqueta = activa;
+  const color = p.viene ? VIOLETA : ORO, m = p.marca, glow = activa ? 'style="filter:drop-shadow(0 0 10px ' + color + ')"' : "";
+  let s = "";
+  if (m.tipo === "linea") {
+    const pts = m.puntos.map(px);
+    const d = "M" + pts.map((c) => c[0].toFixed(1) + " " + c[1].toFixed(1)).join(" L");
+    s += '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="' + (1 - q).toFixed(3) + '" opacity="' + op.toFixed(3) + '" ' + glow + '/>';
+    if (q >= 1 && pts.length > 1) {
+      const [a, b] = [pts[pts.length - 2], pts[pts.length - 1]], ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      const p1 = [b[0] - 30 * Math.cos(ang - .5), b[1] - 30 * Math.sin(ang - .5)], p2 = [b[0] - 30 * Math.cos(ang + .5), b[1] - 30 * Math.sin(ang + .5)];
+      s += '<path d="M' + p1.join(" ") + " L" + b.join(" ") + " L" + p2.join(" ") + '" fill="none" stroke="' + color + '" stroke-width="6" stroke-linecap="round" opacity="' + op.toFixed(3) + '"/>';
+    }
+    // La etiqueta va al lado de la mitad de la línea (del lado con más espacio), para no tapar el final.
+    const mid = pts[Math.floor(pts.length / 2)], lado = mid[0] < 540 ? 1 : -1;
+    if (p.etiqueta && conEtiqueta) s += etiqueta(mid[0] + lado * (p.etiqueta.length * 9.5 + 70), mid[1], p.etiqueta, op * su(pr(q, .8, 1)), color);
+  } else {
+    const [cx, cy] = px([m.x, m.y]), rx = m.ancho * FW / 2, ry = m.alto * FH / 2;
+    const L = 2 * Math.PI * Math.sqrt((rx * rx + ry * ry) / 2);
+    s += '<ellipse cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + ry.toFixed(1) + '" fill="none" stroke="' + color + '" stroke-width="' + (p.viene ? 5 : 6) + '" stroke-dasharray="' + (L * q).toFixed(1) + ' ' + (L + 10).toFixed(1) + '" opacity="' + op.toFixed(3) + '" ' + glow + '/>';
+    if (p.etiqueta && conEtiqueta) { const abajo = cy + ry + 60 < FY + FH; s += etiqueta(cx, abajo ? cy + ry + 44 : cy - ry - 34, (p.viene ? "✦ " : "") + p.etiqueta, op * su(pr(q, .7, 1)), color); }
+  }
+  return s;
+}
+function centro(p) { const m = p.marca; if (!m) return [CX, CY]; if (m.tipo === "linea") { const pts = m.puntos.map(px); return pts[Math.floor(pts.length / 2)]; } return px([m.x, m.y]); }
+window.pintar = (t) => {
+  let e = ""; for (const s of E) { const o = .25 + .75 * (.5 + .5 * Math.sin(t * s.v + s.f)); e += '<circle cx="' + s.x.toFixed(1) + '" cy="' + s.y.toFixed(1) + '" r="' + s.r.toFixed(2) + '" fill="#fff" opacity="' + (o * .7).toFixed(2) + '"/>'; }
+  document.getElementById("est").innerHTML = e;
+  const D = K.duracion, finPasos = K.pasos.length ? K.pasos[K.pasos.length - 1].hasta : D - 4;
+  const ent = su(pr(t, 0, 1)), sal = su(pr(t, finPasos, finPasos + .8));
+  // Acercamiento suave al detalle que se está leyendo.
+  let z = 1 + .04 * pr(t, 0, D), ox = 0, oy = 0;
+  const actual = K.pasos.find((p) => t >= p.desde && t < p.hasta);
+  for (const p of K.pasos) {
+    const q = ven(t, p.desde, p.hasta, .9);
+    if (q > 0 && p.marca) { const [cx, cy] = centro(p); z += .1 * q; ox += -(cx - CX) * .5 * q; oy += -(cy - CY) * .5 * q; }
+  }
+  // Que la tarjeta no se salga de la pantalla: si cabe, se mueve poco; si es más ancha, solo lo que sobra.
+  const cw = (FW + 44) * z, ch = (FH + 44) * z;
+  const limX = Math.abs(1040 - cw) / 2, limY = Math.max(40, Math.abs(1180 - ch) / 2);
+  ox = Math.max(-limX, Math.min(limX, ox)); oy = Math.max(-limY, Math.min(limY, oy));
+  const tj = document.getElementById("tarjeta");
+  tj.style.opacity = (ent * (1 - sal * .85)).toFixed(3);
+  tj.style.transform = "translate(" + ox.toFixed(1) + "px," + oy.toFixed(1) + "px) scale(" + z.toFixed(3) + ") rotate(" + (-1.5 + 1.5 * ent).toFixed(2) + "deg)";
+  let a = '<g opacity="' + (1 - sal * .85).toFixed(3) + '" transform="translate(' + ox.toFixed(1) + ' ' + oy.toFixed(1) + ') translate(' + CX + ' ' + CY + ') scale(' + z.toFixed(3) + ') translate(-' + CX + ' -' + CY + ')">';
+  // Cada marca se dibuja en su turno y queda, más tenue, mientras siguen las demás.
+  for (const p of K.pasos) {
+    if (t < p.desde || !p.marca) continue;
+    const q = su(pr(t, p.desde + .2, p.desde + 1.6)), activa = p === actual;
+    a += marca(p, q, activa ? 1 : .5, activa);
+  }
+  document.getElementById("anot").innerHTML = a + "</g>";
+  const caja = document.getElementById("caja");
+  if (actual && actual.texto) { caja.style.opacity = ven(t, actual.desde, actual.hasta, .4).toFixed(3); document.getElementById("txt").textContent = actual.texto; } else caja.style.opacity = 0;
+  document.getElementById("titulo").style.opacity = (su(pr(t, .2, 1)) * (1 - su(pr(t, (K.pasos[0]?.desde ?? 5) - .6, K.pasos[0]?.desde ?? 5)))).toFixed(3);
+  document.getElementById("cta").style.opacity = su(pr(t, finPasos + .4, finPasos + 1.4)).toFixed(3);
+};
+</script></body></html>
