@@ -482,3 +482,10 @@ Telegram no cambian.
   responde solo con texto. `REDES_FOTO_MARCADA=0` la apaga.
 - El resumen del negocio tiene la sección «Embudo de la semana».
 
+## Manual de velas (3 nov 2026)
+
+`src/lib/conocimiento/velas.md` (llama, humo y hollín, lágrimas, paredes, túneles, formas, mecha, color e
+intención, tiempos, casos delicados), en la misma línea que `TRADICION_VELAS`. Lo usan la lectura de velas de
+la app y Sibila en comentarios y mensajes de Meta: la foto de una vela recibe el mismo adelanto que la del
+huevo (presente, predicción breve, invitación a /velas, foto marcada).
+

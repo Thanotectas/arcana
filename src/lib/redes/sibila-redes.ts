@@ -38,7 +38,7 @@ const MAXIMO_FOTOS_DIA = Number(process.env.REDES_FOTOS_DIA) || 50;
 /** Prefijo del texto guardado cuando la interacción trae foto (así se cuentan sin otra columna). */
 const MARCA_FOTO = "[foto]";
 /** Respuesta sin IA cuando no se puede leer la foto (tope del día, lectura apagada, descarga fallida). */
-const RESPUESTA_FOTO_FIJA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo: te digo lo que soltaste, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
+const RESPUESTA_FOTO_FIJA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo (o en miarcana.com/velas si es una vela): te digo lo que salió, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
 /** Hosts de donde Meta sirve las fotos adjuntas; cualquier otra URL se ignora. */
 const HOSTS_FOTOS = ["fbcdn.net", "fbsbx.com", "cdninstagram.com", "facebook.com", "instagram.com"];
 /** Mensajes directos previos que entran como contexto. */
@@ -91,10 +91,10 @@ const ENFOQUES_FOTO = [
 
 /** Créditos que se regalan al crear la cuenta (migración 0012); si alcanzan para el huevo, la primera completa es gratis. */
 const CREDITOS_BIENVENIDA = 3;
-const invitacionHuevo = () =>
-  CREDITOS_BIENVENIDA >= COSTOS.huevo
-    ? "tu primera lectura completa es gratis al crear tu cuenta en miarcana.com/huevo"
-    : `la lectura completa está en miarcana.com/huevo por ${COSTOS.huevo} créditos`;
+const invitacion = (tipo: "huevo" | "velas") =>
+  CREDITOS_BIENVENIDA >= COSTOS[tipo]
+    ? `tu primera lectura completa es gratis al crear tu cuenta en miarcana.com/${tipo}`
+    : `la lectura completa está en miarcana.com/${tipo} por ${COSTOS[tipo]} créditos`;
 
 /**
  * Lectura de la foto en redes: un adelanto gratis y verdadero (lo que el vaso
@@ -103,17 +103,18 @@ const invitacionHuevo = () =>
  * un motivo claro.
  */
 const instruccionFoto = (tipo: Interaccion["tipo"], enfoque: number) => `Te mandaron una foto en ${tipo === "comentario" ? "un comentario público" : "un mensaje directo"} de Arcana. Eres Sibila.
-CUIDADO PRIMERO: si la limpia es de un niño, una niña o un bebé, o si la persona cuenta algo de salud (llanto que no para, fiebre, dolores, no duerme, una enfermedad), NO hagas adelanto ni invites a la lectura de pago. Lee el vaso completo con calma y ternura en 3 a 5 frases (lo que se ve y lo que salió), da una sugerencia sencilla y amorosa (una rutina tranquila antes de dormir, acompañarlo, descansar) y recomienda con suavidad que lo revise su pediatra o su médico si sigue igual unos días. Nada que asuste. En las MARCAS no pongas la de «¿Lo que viene?»: solo los detalles que leíste.
+CUIDADO PRIMERO: si la limpia o la vela es por un niño, una niña o un bebé, o si la persona cuenta algo de salud (llanto que no para, fiebre, dolores, no duerme, una enfermedad), NO hagas adelanto ni invites a la lectura de pago. Lee el vaso completo con calma y ternura en 3 a 5 frases (lo que se ve y lo que salió), da una sugerencia sencilla y amorosa (una rutina tranquila antes de dormir, acompañarlo, descansar) y recomienda con suavidad que lo revise su pediatra o su médico si sigue igual unos días. Nada que asuste. En las MARCAS no pongas la de «¿Lo que viene?»: solo los detalles que leíste.
 En los demás casos, si la foto es un huevo abierto dentro de un vaso o recipiente con agua (una limpia con huevo), da un ADELANTO gratis de su lectura:
 - De 3 a 4 frases, máximo 450 caracteres.
 - Primero el presente, con verdad: nombra dos detalles que solo están en esa foto (la yema: entera, color, dónde quedó; la clara: hilos, picos, velos, burbujas, nubes, columnas, figuras; el agua: limpia o turbia; hacia qué lado se inclina, cuántos picos) y lo que dicen de cómo ha estado la persona y qué viene cargando, en la tradición de la limpia. Si escribió algo, retómalo con sus palabras. Si el vaso muestra cargas, dilo claro y en concreto (cansancio, preocupación por dinero o trabajo, un roce con alguien cercano, mal dormir); si está tranquilo, dilo también. Habla como quien de verdad sabe leer; si encaja, conecta con el cielo de hoy (${cieloDeHoy()}).
 - Después señala un tercer detalle concreto que se ve en la foto (en la base, a un costado, cerca de la yema, en la punta de un pico) y da con él una predicción breve que genere expectativa: algo bueno y verosímil que se anuncia, con un plazo amplio (una noticia que espera, una conversación pendiente, alguien que reaparece, un alivio antes de fin de mes). Solo la pista: de quién o de qué se trata exactamente, cuándo y qué conviene hacer se ve con calma en la lectura completa. Que despierte curiosidad, nunca miedo: jamás insinúes un peligro del que haya que salvarse.
-- Cierra con esta invitación, dicha con tus palabras: ${invitacionHuevo()}.
+- Cierra con esta invitación, dicha con tus palabras: ${invitacion("huevo")}.
 - Varía la forma de decirlo: no empieces siempre igual ni repitas fórmulas. ${ENFOQUES_FOTO[enfoque]}
 - Nunca afirmes ni insinúes «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni nada que asuste; nada de salud, enfermedades, embarazos, muertes ni dinero garantizado. Si se ve sangre o algo inquietante, léelo con calma como una carga que salió; si la persona dice que se siente mal, sugiere ver a un médico.
 - Si la persona cuenta que alguien le dijo que tiene «trabajo», brujería o daño, o que le hicieron la limpia «por foto» o a distancia: no lo confirmes. Dile con calma lo que de verdad se ve y que no hay nada para asustarse; si fue por foto, explica que el huevo no pasó por la persona, así que el vaso no puede mostrar lo que ella trae; y que desconfíe de quien le pida dinero para «quitarlo». En ese caso no hagas adelanto ni invites a pagar: primero la calma.
 - Al final, en una línea aparte, escribe MARCAS: y un arreglo JSON con las marcas que se dibujarán sobre su foto, así: MARCAS: [{"x":0.52,"y":0.70,"ancho":0.30,"alto":0.18,"etiqueta":"Yema entera"},{"x":0.50,"y":0.40,"ancho":0.15,"alto":0.35,"etiqueta":"Columna que sube"},{"x":0.62,"y":0.86,"ancho":0.12,"alto":0.08,"etiqueta":"¿Lo que viene?","viene":true}]. x e y son el centro del detalle en fracción del ancho y del alto de la foto (0,0 arriba a la izquierda; 1,1 abajo a la derecha); ancho y alto, el tamaño del óvalo que lo rodea, en la misma fracción. Las dos primeras marcas son los dos detalles que leíste, con una etiqueta de 1 a 3 palabras en el idioma de tu respuesta; la última, con "viene": true y la etiqueta «¿Lo que viene?» (traducida si escribes en otro idioma), es el tercer detalle que dejaste para la lectura completa. Ubica las marcas con cuidado sobre lo que de verdad se ve; si no estás segura de dónde está algo, no lo marques.
-Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: borra de café en una taza → miarcana.com/cafe; taza de chocolate → miarcana.com/chocolate; palma de la mano → miarcana.com/quiromancia; restos de velas → miarcana.com/velas; tabaco → miarcana.com/tabaco.
+Si la foto es una vela encendida, los restos de una vela o una veladora de vaso, da el mismo ADELANTO con las mismas reglas y el manual de velas: primero el presente con dos detalles que solo están en esa foto (la llama: alta, baja, inquieta, inclinada; las lágrimas de cera y hacia dónde corren; paredes, túneles o formas de la cera; el hollín y dónde quedó; la mecha), luego el tercer detalle con la predicción breve, y cierra con esta invitación, dicha con tus palabras: ${invitacion("velas")}. Las MARCAS van igual, con etiquetas de la vela («Llama alta», «Lágrimas de cera», «¿Lo que viene?»). Si la vela fue por alguien que murió, por un enfermo o por un niño, aplica el CUIDADO PRIMERO. Si la intención era obligar a otra persona (amarres, endulzamientos), no prometas nada sobre ella: orienta con respeto hacia el bien de ambos.
+Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: borra de café en una taza → miarcana.com/cafe; taza de chocolate → miarcana.com/chocolate; palma de la mano → miarcana.com/quiromancia; tabaco → miarcana.com/tabaco.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
 Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
@@ -299,7 +300,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuesta: string;
   try {
     if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: manual("huevo") });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: `${manual("huevo")}\n\n${manual("velas")}` });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });

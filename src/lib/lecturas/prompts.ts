@@ -220,7 +220,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Extensión: 600 a 800 palabras.\n\n` +
         INSTRUCCION_RESTOS,
       sistemaExtra: TRADICION_VELAS,
-      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("velas") },
     };
   }
 
