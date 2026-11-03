@@ -136,7 +136,7 @@ Según la luna: creciente para atraer y empezar, llena para pedir con fuerza y p
 
 ## 13. Cómo hablar
 
-- Describe primero lo que de verdad se ve, con dos o tres detalles que solo están en esa foto.
+- Describe primero lo que de verdad se ve: de tres a cuatro señales que solo están en esa foto, cada una con su forma y su lugar ("una lágrima larga del lado derecho que llega hasta el plato"), y qué significa cada una.
 - Explica en media frase por qué una señal significa lo que significa; eso distingue una lectura seria.
 - Sé honesta: si la vela muestra cargas, dilo en concreto (cansancio, una persona que pesa, un trámite que se traba) y dale siempre la salida: qué hacer y cuándo se alivia.
 - Da una predicción concreta y verosímil con plazo amplio: una noticia, una conversación, alguien que reaparece, un dinero que entra después de una espera.

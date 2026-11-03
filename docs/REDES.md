@@ -489,3 +489,14 @@ intención, tiempos, casos delicados), en la misma línea que `TRADICION_VELAS`.
 la app y Sibila en comentarios y mensajes de Meta: la foto de una vela recibe el mismo adelanto que la del
 huevo (presente, predicción breve, invitación a /velas, foto marcada).
 
+## Manual de la taza y más detalle en las lecturas (3 nov 2026)
+
+- `src/lib/conocimiento/taza.md`: café (borra) y chocolate: preparación, lo físico, el mapa de la taza (asa,
+  borde, medio, fondo, derecha e izquierda), zonas limpias y espesas, figuras (sin envidias, rivales ni
+  traiciones), señales del chocolate. Lo usan las lecturas de café y chocolate de la app, el chocolate del
+  directo y Sibila en redes (adelanto con invitación a /cafe o /chocolate).
+- Se quitaron de `TRADICION_CAFE`, `TRADICION_HUEVO` y `TRADICION_CHOCOLATE` las lecturas de envidia, rival,
+  engaño y mal de ojo.
+- En redes, el adelanto describe de tres a cuatro figuras con su forma y su lugar (hasta 650 caracteres) y la
+  foto marcada admite hasta cuatro marcas.
+

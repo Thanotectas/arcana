@@ -23,7 +23,7 @@ export interface MarcaFoto {
 
 const entre = (v: unknown, min: number, max: number, defecto: number) => (typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : defecto);
 
-/** Separa la línea «MARCAS: [...]» de la respuesta de Sibila y la valida (hasta 3 marcas). */
+/** Separa la línea «MARCAS: [...]» de la respuesta de Sibila y la valida (hasta 4 marcas). */
 export function leerMarcas(respuesta: string): { texto: string; marcas: MarcaFoto[] } {
   const m = /^\s*MARCAS:\s*(\[[\s\S]*?\])\s*$/im.exec(respuesta);
   if (!m) return { texto: respuesta.trim(), marcas: [] };
@@ -32,7 +32,7 @@ export function leerMarcas(respuesta: string): { texto: string; marcas: MarcaFot
     const crudas = JSON.parse(m[1]) as Record<string, unknown>[];
     const marcas = (Array.isArray(crudas) ? crudas : [])
       .filter((c) => c && typeof c === "object" && typeof c.etiqueta === "string" && c.etiqueta.trim())
-      .slice(0, 3)
+      .slice(0, 4)
       .map((c) => ({
         x: entre(c.x, 0.04, 0.96, 0.5),
         y: entre(c.y, 0.04, 0.96, 0.5),

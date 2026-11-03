@@ -139,7 +139,7 @@ La clara muestra lo que la limpia recogió y cómo salió. Mira su forma, su alt
 - Siempre con salida: qué hacer y cuándo se alivia.
 - Anuncios concretos y verosímiles, con plazos amplios: una conversación pendiente, una noticia o mensaje, alguien que reaparece, un pago o una respuesta que llega, un cambio de casa o de trabajo. Nada de fechas exactas ni certezas absolutas.
 - Explica el porqué cuando ayude ("cuando los picos llegan tan alto…", "la yema habla de tu fuerza…").
-- Nombra detalles que solo están en ese vaso: dónde quedó cada cosa, hacia qué lado se inclina, cuántos picos, el color exacto.
+- Nombra de tres a cuatro figuras o señales que solo están en ese vaso, cada una con su forma y su lugar: dónde quedó cada cosa, hacia qué lado se inclina, cuántos picos, el color exacto, a qué se parece una figura.
 
 ### Nunca
 - Hablar de "trabajos", brujería, maldiciones, daños, amarres ni "mal de ojo" como diagnóstico; tampoco de envidias de alguien concreto.

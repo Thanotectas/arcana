@@ -206,7 +206,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer cada cosa que nombras. Extensión: 800 a 1100 palabras.\n\n` +
         INSTRUCCION_FIGURAS,
       sistemaExtra: TRADICION_CHOCOLATE,
-      opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("taza") },
     };
   }
 
@@ -315,7 +315,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
           `Extensión: 600 a 850 palabras.\n\n` +
           INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
-      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", ...(esCafe ? {} : { conocimiento: manual("huevo") }) },
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
     };
   }
 
