@@ -12,7 +12,9 @@ import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
-import { enviarMensajeDirecto, responderComentario, type Interaccion } from "./meta";
+import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, type Interaccion } from "./meta";
+import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
+import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
 
 /**
@@ -106,10 +108,11 @@ Si la foto es un huevo abierto dentro de un vaso o recipiente con agua (una limp
 - Cierra con esta invitación, dicha con tus palabras: ${invitacionHuevo()}.
 - Varía la forma de decirlo: no empieces siempre igual ni repitas fórmulas. ${ENFOQUES_FOTO[enfoque]}
 - Nunca hables de «trabajos», brujería, daños, maldiciones, mal de ojo ni envidia, ni de nada que asuste; nada de salud, enfermedades, embarazos, muertes ni dinero garantizado. Si se ve sangre o algo inquietante, léelo con calma como una carga que salió; si la persona dice que se siente mal, sugiere ver a un médico.
+- Al final, en una línea aparte, escribe MARCAS: y un arreglo JSON con las marcas que se dibujarán sobre su foto, así: MARCAS: [{"x":0.52,"y":0.70,"ancho":0.30,"alto":0.18,"etiqueta":"Yema entera"},{"x":0.50,"y":0.40,"ancho":0.15,"alto":0.35,"etiqueta":"Columna que sube"},{"x":0.62,"y":0.86,"ancho":0.12,"alto":0.08,"etiqueta":"¿Lo que viene?","viene":true}]. x e y son el centro del detalle en fracción del ancho y del alto de la foto (0,0 arriba a la izquierda; 1,1 abajo a la derecha); ancho y alto, el tamaño del óvalo que lo rodea, en la misma fracción. Las dos primeras marcas son los dos detalles que leíste, con una etiqueta de 1 a 3 palabras en el idioma de tu respuesta; la última, con "viene": true y la etiqueta «¿Lo que viene?» (traducida si escribes en otro idioma), es el tercer detalle que dejaste para la lectura completa. Ubica las marcas con cuidado sobre lo que de verdad se ve; si no estás segura de dónde está algo, no lo marques.
 Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: borra de café en una taza → miarcana.com/cafe; taza de chocolate → miarcana.com/chocolate; palma de la mano → miarcana.com/quiromancia; restos de velas → miarcana.com/velas; tabaco → miarcana.com/tabaco.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
-Texto plano: sin títulos, listas ni markdown, sin enlaces con https. Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
+Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
 
 /** Descarga la foto adjunta (solo de los servidores de Meta) y la deja en JPEG de máximo 1280 px, para gastar menos. */
 async function descargarFoto(url: string): Promise<ImagenEntrada | null> {
@@ -218,6 +221,24 @@ async function avisarHumano(i: Interaccion, hilo: { rol: string; contenido: stri
  * no se responde dos veces), decide si toca responder, pide la respuesta a
  * Sibila, la publica y la guarda. Devuelve qué hizo.
  */
+/** Dibuja las marcas sobre la foto y la deja en el bucket público para adjuntarla; null si algo falla (se responde solo con texto). */
+async function subirFotoMarcada(admin: SupabaseClient<Database>, idMeta: string, foto: Buffer, marcas: MarcaFoto[]): Promise<string | null> {
+  try {
+    const imagen = await anotarFoto(foto, marcas);
+    const ruta = `anotadas/${fechaBogota()}/${idMeta.replace(/[^\w-]/g, "_").slice(0, 80)}.jpg`;
+    const { error } = await admin.storage.from(BUCKET).upload(ruta, imagen, { contentType: "image/jpeg", upsert: true });
+    if (error) throw new Error(error.message);
+    // Las de hace una semana ya cumplieron: se borran (Meta copia la imagen al publicarla).
+    const vieja = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+    const { data: viejas } = await admin.storage.from(BUCKET).list(`anotadas/${vieja}`, { limit: 100 });
+    if (viejas?.length) await admin.storage.from(BUCKET).remove(viejas.map((f) => `anotadas/${vieja}/${f.name}`));
+    return admin.storage.from(BUCKET).getPublicUrl(ruta).data.publicUrl;
+  } catch (e) {
+    console.error("[redes sibila] foto marcada:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
 export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
   const textoGuardado = (i.imagen ? `${MARCA_FOTO} ${i.texto}` : i.texto).trim();
   const { error } = await admin.from("interacciones_redes").insert({ red: i.red, tipo: i.tipo, id_meta: i.idMeta, remitente_id: i.remitenteId, remitente: i.remitente, objeto_id: i.objetoId, texto: textoGuardado.slice(0, 4000) });
@@ -280,6 +301,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;
   }
+  // La foto marcada (óvalos sobre lo que se leyó): se separa la línea MARCAS del texto.
+  let marcas: MarcaFoto[] = [];
+  if (foto) ({ texto: respuesta, marcas } = leerMarcas(respuesta));
   if (respuesta.includes(MARCA_OMITIR)) {
     await marcar("omitida", { detalle: "Sibila decidió no responder" });
     return "omitido";
@@ -294,9 +318,16 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // En Facebook (comentarios públicos) las direcciones van en palabras: Facebook limita los enlaces.
   if (i.tipo === "comentario" && i.red === "facebook") respuesta = sinEnlaces(respuesta);
 
+  // Instagram no admite fotos en las respuestas a comentarios; Facebook y los mensajes directos sí.
+  const conFotoMarcada = marcas.length >= 2 && process.env.REDES_FOTO_MARCADA !== "0" && !(i.tipo === "comentario" && i.red === "instagram");
+  const urlMarcada = foto && conFotoMarcada ? await subirFotoMarcada(admin, i.idMeta, Buffer.from(foto.base64, "base64"), marcas) : null;
+
   try {
-    if (i.tipo === "comentario") await responderComentario(i.red, i.idMeta, respuesta);
-    else await enviarMensajeDirecto(i.remitenteId, respuesta);
+    if (i.tipo === "comentario") await responderComentario(i.red, i.idMeta, respuesta, urlMarcada ?? undefined);
+    else {
+      if (urlMarcada) await enviarImagenDirecta(i.remitenteId, urlMarcada).catch((e) => console.error("[redes sibila] foto marcada por mensaje:", e instanceof Error ? e.message : e));
+      await enviarMensajeDirecto(i.remitenteId, respuesta);
+    }
   } catch (e) {
     await marcar("error", { respuesta, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
     throw e;

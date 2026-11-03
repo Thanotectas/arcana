@@ -468,3 +468,17 @@ comentarios de Facebook (que además reciben la instrucción de no escribir dire
 en Facebook dice «miarcana punto com (enlace en nuestro perfil)». Messenger, Instagram, TikTok, YouTube y
 Telegram no cambian.
 
+## Adelanto de la limpia y foto marcada (3 nov 2026)
+
+- Cuando llega la foto de una limpia (comentario o mensaje), Sibila da un **adelanto** verdadero (el
+  presente: dos detalles de esa foto) y señala un tercer detalle que habla de lo que viene, que deja para
+  la lectura completa en /huevo («tu primera lectura completa es gratis al crear tu cuenta»: los 3
+  créditos de bienvenida alcanzan para el huevo).
+- Además devuelve una línea `MARCAS: [...]` con dónde está cada detalle (fracciones de la foto).
+  `src/lib/redes/foto-anotada.tsx` dibuja óvalos dorados con su etiqueta y uno violeta («¿Lo que viene?»)
+  sobre la foto, con el pie «Leído por Sibila · Arcana», y la sube a `redes/anotadas/<fecha>/` (se borra a
+  la semana). Va adjunta en la respuesta a comentarios de Facebook (`attachment_url`) y en los mensajes
+  directos (Instagram y Messenger); Instagram no admite fotos en respuestas a comentarios. Si algo falla,
+  responde solo con texto. `REDES_FOTO_MARCADA=0` la apaga.
+- El resumen del negocio tiene la sección «Embudo de la semana».
+

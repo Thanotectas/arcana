@@ -67,9 +67,12 @@ async function llamar<T = Record<string, unknown>>(ruta: string, cuerpo?: Record
 export type RedMeta = "instagram" | "facebook";
 
 /** Responde un comentario (Instagram: /replies; Facebook: /comments). Devuelve el id de la respuesta. */
-export async function responderComentario(red: RedMeta, idComentario: string, texto: string): Promise<string> {
+export async function responderComentario(red: RedMeta, idComentario: string, texto: string, imagenUrl?: string): Promise<string> {
   // En Facebook los enlaces en comentarios están limitados: las direcciones van en palabras.
-  const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, { message: red === "facebook" ? sinEnlaces(texto) : texto });
+  // Facebook admite una foto en la respuesta (attachment_url); Instagram solo texto.
+  const cuerpo: Record<string, unknown> = { message: red === "facebook" ? sinEnlaces(texto) : texto };
+  if (red === "facebook" && imagenUrl) cuerpo.attachment_url = imagenUrl;
+  const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, cuerpo);
   return String(r.id ?? "");
 }
 
@@ -77,6 +80,13 @@ export async function responderComentario(red: RedMeta, idComentario: string, te
 export async function enviarMensajeDirecto(destinatario: string, texto: string): Promise<string> {
   const { id } = await paginaMeta();
   const r = await llamar<{ message_id?: string }>(`${id}/messages`, { recipient: { id: destinatario }, messaging_type: "RESPONSE", message: { text: texto } });
+  return String(r.message_id ?? "");
+}
+
+/** Envía una imagen por mensaje directo (Instagram o Messenger), desde una URL pública. */
+export async function enviarImagenDirecta(destinatario: string, url: string): Promise<string> {
+  const { id } = await paginaMeta();
+  const r = await llamar<{ message_id?: string }>(`${id}/messages`, { recipient: { id: destinatario }, messaging_type: "RESPONSE", message: { attachment: { type: "image", payload: { url, is_reusable: false } } } });
   return String(r.message_id ?? "");
 }
 
