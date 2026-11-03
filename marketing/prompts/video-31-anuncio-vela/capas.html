@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent}
+#anot{position:absolute;inset:0}
+.caja{position:absolute;left:70px;right:70px;padding:28px 40px;border-radius:36px;background:rgba(11,7,22,.74);border:2px solid rgba(241,217,154,.6);text-align:center;opacity:0}
+.caja div{font-family:C;color:#fff;font-size:70px;line-height:1.06}
+.caja b{color:#f1d99a;font-weight:inherit}
+#fin{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 38%,#2a1660 0%,#140b30 55%,#0b0716 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#est{position:absolute;inset:0}
+</style></head><body>
+<svg id="anot" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div class="caja" id="c1" style="top:70px;padding:20px 36px"><div style="font-size:64px">¿Prendiste una vela…<br><b>y no sabes leerla?</b></div></div>
+<div class="caja" id="c2" style="top:780px"><div>Tómale una foto a tu vela</div></div>
+<div class="caja" id="c3" style="top:780px"><div><b>Sibila</b> te marca lo que salió</div></div>
+<div class="caja" id="c4" style="top:60px;padding:18px 36px"><div style="font-size:56px">Así te la lee <b>Sibila</b></div></div>
+<div class="caja" id="c5" style="top:930px"><div>Tu primera lectura<br><b>es gratis</b></div></div>
+<div id="fin"><svg id="est" width="1080" height="1920"></svg>
+  <div style="position:relative;font-family:C;color:#f1d99a;font-size:120px;text-shadow:0 0 40px rgba(241,217,154,.45)">✦ Arcana</div>
+  <div style="position:relative;font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:30px;margin-top:10px">SIBILA TE LEE</div>
+  <div style="position:relative;font-family:C;color:#fff;font-size:84px;line-height:1.05;margin-top:90px;padding:0 80px">Tu primera lectura<br>de velas, <span style="color:#f1d99a">gratis</span></div>
+  <div style="position:relative;margin-top:70px;padding:22px 48px;border-radius:999px;border:2px solid #f1d99a;font-family:I;color:#f1d99a;font-size:46px">miarcana.com/velas</div>
+  <div style="position:relative;font-family:CI;color:#ece6f7;font-size:46px;margin-top:50px">Sube la foto de tu vela · al instante</div>
+</div>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const ORO="#f1d99a",VIO="#c9b8ff";
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+document.getElementById("est").innerHTML=Array.from({length:160},(_,i)=>'<circle cx="'+(az(i)*1080).toFixed(0)+'" cy="'+(az(i+999)*1920).toFixed(0)+'" r="'+(.6+az(i+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+3)*.6).toFixed(2)+'"/>').join("");
+function etiqueta(x,y,t,op,c){const w=t.length*21+60;x=Math.min(1080-w/2-24,Math.max(w/2+24,x));return '<g opacity="'+op.toFixed(3)+'"><rect x="'+(x-w/2)+'" y="'+(y-36)+'" width="'+w+'" height="64" rx="32" fill="#0b0716" fill-opacity=".84" stroke="'+c+'" stroke-width="3"/><text x="'+x+'" y="'+(y+9)+'" font-family="I" font-size="32" fill="'+c+'" text-anchor="middle">'+t+'</text></g>'}
+function flecha(x1,y1,x2,y2,q,op,c){const x=x1+(x2-x1)*q,y=y1+(y2-y1)*q;let s='<line x1="'+x1+'" y1="'+y1+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+c+'" stroke-width="7" stroke-linecap="round" opacity="'+op.toFixed(3)+'" style="filter:drop-shadow(0 0 10px '+c+')"/>';
+  if(q>.98){const a=Math.atan2(y2-y1,x2-x1);s+='<path d="M'+(x2-34*Math.cos(a-.5)).toFixed(1)+' '+(y2-34*Math.sin(a-.5)).toFixed(1)+' L'+x2+' '+y2+' L'+(x2-34*Math.cos(a+.5)).toFixed(1)+' '+(y2-34*Math.sin(a+.5)).toFixed(1)+'" fill="none" stroke="'+c+'" stroke-width="7" stroke-linecap="round" opacity="'+op.toFixed(3)+'"/>'}return s}
+function ovalo(cx,cy,rx,ry,q,op,c,w){const L=2*Math.PI*Math.sqrt((rx*rx+ry*ry)/2);return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="none" stroke="'+c+'" stroke-width="'+w+'" stroke-dasharray="'+(L*q).toFixed(1)+' '+(L+10).toFixed(1)+'" opacity="'+op.toFixed(3)+'" style="filter:drop-shadow(0 0 12px '+c+')"/>'}
+// Llama: de arriba hacia la mecha, según el tiempo de la toma de la vela (se va acortando).
+const interp=(v,pts)=>{for(let k=1;k<pts.length;k++){if(v<=pts[k][0]){const [a,ya]=pts[k-1],[b,yb]=pts[k];return ya+(yb-ya)*cl((v-a)/(b-a))}}return pts[pts.length-1][1]};
+window.pintar=(t)=>{
+  const caja=(id,a,b)=>document.getElementById(id).style.opacity=ven(t,a,b).toFixed(3);
+  caja("c1",.25,3.95);caja("c2",4.05,5.25);caja("c3",5.3,7.85);caja("c4",8.0,13.3);caja("c5",13.45,16.75);
+  let a="";
+  const L=ven(t,7.95,13.3,.25);
+  if(L>0){
+    const V=2.4+(t-7.9); // tiempo dentro de la toma de la vela
+    const arriba=interp(V,[[2.6,215],[4.8,380],[7.5,525]]), abajo=708;
+    const q1=su(pr(t,8.0,8.6));a+=ovalo(550,(arriba+abajo)/2,72,(abajo-arriba)/2+20,q1,L,ORO,7)+etiqueta(800,(arriba+abajo)/2,"Llama alta",L*su(pr(t,8.4,8.8)),ORO);
+    const q2=su(pr(t,8.9,9.7));a+=flecha(556,830,556,1400,q2,L,ORO)+etiqueta(800,1150,"Lágrimas de cera",L*su(pr(t,9.3,9.7)),ORO);
+    const q3=su(pr(t,10.2,11.0));a+=ovalo(285,1170,120,440,q3,L,ORO,7)+etiqueta(285,1660,"La forma que dejó",L*su(pr(t,10.6,11.0)),ORO);
+    const q4=su(pr(t,12.0,12.6));a+=ovalo(600,1505,95,48,q4,L,VIO,6)+etiqueta(760,1590,"✦ ¿Lo que viene?",L*su(pr(t,12.4,12.8)),VIO);
+  }
+  document.getElementById("anot").innerHTML=a;
+  document.getElementById("fin").style.opacity=su(pr(t,16.7,17.2)).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
