@@ -12,6 +12,7 @@ import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
 import { enviarMensajeDirecto, responderComentario, type Interaccion } from "./meta";
+import { sinEnlaces } from "./sin-enlaces";
 
 /**
  * Sibila responde en Instagram y Facebook: a los comentarios de las
@@ -245,6 +246,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje directo por ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»`;
   } else {
     entrada = `Comentario de ${i.remitente ? `@${i.remitente}` : "una persona"} en ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»${signo ? `\n(Menciona el signo ${signo.nombre}.)` : ""}`;
+    if (i.red === "facebook") entrada += "\n(Es Facebook: no escribas direcciones web; si invitas, di «miarcana punto com» o «el enlace está en nuestro perfil».)";
   }
 
   // La foto (una limpia con huevo, casi siempre): lectura corta con la imagen, dentro del tope diario.
@@ -276,6 +278,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     return "vacio";
   }
   if (i.tipo === "comentario") respuesta = respuesta.slice(0, foto ? 700 : 300);
+  // En Facebook (comentarios públicos) las direcciones van en palabras: Facebook limita los enlaces.
+  if (i.tipo === "comentario" && i.red === "facebook") respuesta = sinEnlaces(respuesta);
 
   try {
     if (i.tipo === "comentario") await responderComentario(i.red, i.idMeta, respuesta);

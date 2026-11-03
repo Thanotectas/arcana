@@ -107,7 +107,8 @@ function fechaLarga(fecha: string) {
 export function textoCartaDelDia(fecha: string, red: "instagram" | "facebook" = "instagram") {
   const c = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
-  const enlace = red === "facebook" ? "https://miarcana.com/fb" : "miarcana.com/ig (enlace en la biografía)";
+  // En Facebook los enlaces están limitados (2 al mes sin Meta One): la dirección va en palabras.
+  const enlace = red === "facebook" ? "miarcana punto com (enlace en nuestro perfil)" : "miarcana.com/ig (enlace en la biografía)";
   return [
     `✨ Carta del día · ${fechaLarga(fecha)}`,
     `${c.nombre}${mazo === "arcana" ? " · Tarot Arcana, nuestro mazo propio" : ` · ${MAZOS[mazo].nombre}`}`,

@@ -1,6 +1,7 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { resolverPagina, type PaginaResuelta } from "./pagina";
+import { sinEnlaces } from "./sin-enlaces";
 
 /**
  * Comentarios y mensajes directos de Instagram y Facebook (API Graph de Meta):
@@ -67,7 +68,8 @@ export type RedMeta = "instagram" | "facebook";
 
 /** Responde un comentario (Instagram: /replies; Facebook: /comments). Devuelve el id de la respuesta. */
 export async function responderComentario(red: RedMeta, idComentario: string, texto: string): Promise<string> {
-  const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, { message: texto });
+  // En Facebook los enlaces en comentarios están limitados: las direcciones van en palabras.
+  const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, { message: red === "facebook" ? sinEnlaces(texto) : texto });
   return String(r.id ?? "");
 }
 

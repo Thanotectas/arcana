@@ -456,3 +456,15 @@ Las vistas no dicen qué red trae cuentas y pagos; esto sí. Migración `0036_or
   `textoShortYoutube`). Página de Facebook: `https://miarcana.com/fb`. Estados y mensajes de
   WhatsApp: `miarcana.com/wa`. El QR del escenario en vivo apunta a `/yt/vivo`. Para campañas
   puntuales sirve cualquier enlace con `?utm_source=…&utm_medium=…&utm_campaign=…`.
+
+## Facebook sin enlaces (3 nov 2026)
+
+Facebook limita los enlaces en publicaciones y comentarios orgánicos de la página (2 al mes sin Meta One).
+Todo lo que Arcana publica o comenta en Facebook pasa por `sinEnlaces` (`src/lib/redes/sin-enlaces.ts`):
+«miarcana.com/huevo» se escribe «miarcana punto com (sección Limpia con huevo)», /grupo se nombra como el
+grupo de Facebook y t.me/MiArcanaBot como «Telegram (@MiArcanaBot)». Se aplica en `facebook.ts`
+(fotos, videos y carruseles), en `responderComentario` para Facebook y en las respuestas de Sibila a
+comentarios de Facebook (que además reciben la instrucción de no escribir direcciones). La carta del día
+en Facebook dice «miarcana punto com (enlace en nuestro perfil)». Messenger, Instagram, TikTok, YouTube y
+Telegram no cambian.
+

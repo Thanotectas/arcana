@@ -1,5 +1,6 @@
 import "server-only";
 import { resolverPagina } from "./pagina";
+import { sinEnlaces } from "./sin-enlaces";
 
 /**
  * Publicación de fotos y videos en la página de Facebook "Mi Arcana" con la
@@ -29,7 +30,7 @@ export async function publicarFotoFacebook(urlImagen: string, texto: string): Pr
   const res = await fetch(`${API}/${pagina}/photos`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
-    body: new URLSearchParams({ url: urlImagen, message: texto, published: "true" }),
+    body: new URLSearchParams({ url: urlImagen, message: sinEnlaces(texto), published: "true" }),
     cache: "no-store",
   });
   const datos = (await res.json().catch(() => ({}))) as { id?: string; post_id?: string; error?: { message?: string; code?: number } };
@@ -46,7 +47,7 @@ export async function publicarVideoFacebook(urlVideo: string, texto: string): Pr
   const res = await fetch(`${API}/${pagina}/videos`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
-    body: new URLSearchParams({ file_url: urlVideo, description: texto, published: "true" }),
+    body: new URLSearchParams({ file_url: urlVideo, description: sinEnlaces(texto), published: "true" }),
     cache: "no-store",
   });
   const datos = (await res.json().catch(() => ({}))) as { id?: string; error?: { message?: string; code?: number } };
@@ -94,7 +95,7 @@ export async function publicarVariasFotosFacebook(urlsImagenes: string[], texto:
   const { id: pagina } = await resolverPagina(tokenFacebook());
   const ids: string[] = [];
   for (const url of urlsImagenes) ids.push(await subirFotoSinPublicar(url));
-  const r = await llamarPagina<{ id?: string }>(`${pagina}/feed`, { message: texto, attached_media: ids.map((media_fbid) => ({ media_fbid })) });
+  const r = await llamarPagina<{ id?: string }>(`${pagina}/feed`, { message: sinEnlaces(texto), attached_media: ids.map((media_fbid) => ({ media_fbid })) });
   return String(r.id ?? "");
 }
 
