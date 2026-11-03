@@ -39,6 +39,12 @@ export interface ResumenSemanal {
     rendimiento: { porTipo: PromedioTipo[]; mejor: { tipo: string; red: string; fecha: string; vistas: number | null; interacciones: number } | null; interaccionesTotal: number; vistasTotal: number };
     sibila: { respondidas: number; humano: number; visitantes: number };
   };
+  /**
+   * Embudo de la semana: de las cuentas nuevas, cuántas hicieron su primera lectura y
+   * cuántas gastaron los créditos de regalo; de todas las personas, cuántas abrieron
+   * una orden (intentaron pagar) y cuántas pagaron.
+   */
+  embudo: { nuevas: number; conLectura: number; sinCreditos: number; intentaron: number; pagaron: number; noCompletadas: number; huevo: number };
   /** Por dónde llegan: origen (red) de las cuentas nuevas y de quienes pagaron en la semana. */
   origenes: { cuentas: { origen: string; n: number }[]; sinOrigen: number; pagos: { origen: string; n: number; cop: number; usdCentavos: number }[] };
   alertas: string[];
@@ -137,6 +143,20 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   const mejor = [...(metricas ?? [])].sort((a, b) => interacciones(b) - interacciones(a) || (b.vistas ?? 0) - (a.vistas ?? 0))[0];
   const borradores = (agente ?? []).filter((p) => p.estado === "borrador" && p.fecha >= hoy).length;
 
+  // Embudo: cuentas nuevas de la semana → primera lectura → sin créditos de regalo; órdenes abiertas → pagadas.
+  const { data: nuevasPerfiles } = await admin.from("perfiles").select("id, creditos, ilimitado").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const idsNuevas = new Set((nuevasPerfiles ?? []).map((p) => p.id));
+  const { data: todasOrdenes } = await admin.from("ordenes").select("usuario_id, estado").eq("es_prueba", false).gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const embudo: ResumenSemanal["embudo"] = {
+    nuevas: idsNuevas.size,
+    conLectura: new Set(deSemana.filter((l) => l.estado === "lista" && idsNuevas.has(l.usuario_id)).map((l) => l.usuario_id)).size,
+    sinCreditos: (nuevasPerfiles ?? []).filter((p) => p.creditos === 0 && !p.ilimitado).length,
+    intentaron: new Set((todasOrdenes ?? []).map((o) => o.usuario_id)).size,
+    pagaron: new Set((todasOrdenes ?? []).filter((o) => o.estado === "aprobada").map((o) => o.usuario_id)).size,
+    noCompletadas: (todasOrdenes ?? []).filter((o) => o.estado !== "aprobada").length,
+    huevo: deSemana.filter((l) => l.estado === "lista" && l.tipo === "huevo").length,
+  };
+
   // Por dónde llegan (migración 0036): origen de las cuentas nuevas y, para los
   // pagos, el origen del perfil de quien compró. Si la columna no existe aún, se omite.
   const origenes: ResumenSemanal["origenes"] = { cuentas: [], sinOrigen: 0, pagos: [] };
@@ -197,6 +217,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
       },
       sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length, visitantes: visitantes ?? 0 },
     },
+    embudo,
     origenes,
     alertas: [],
   };
@@ -209,6 +230,8 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   if (resumen.redes.agente.borradores) a.push(`${resumen.redes.agente.borradores} borradores del agente esperan aprobación.`);
   if (resumen.correos.errores) a.push(`${resumen.correos.errores} correos no se pudieron enviar.`);
   if (fundadores.activa && diasRestantes <= 7) a.push(`La oferta de fundadores termina en ${diasRestantes} días (${fundadores.restantes} cupos).`);
+  if (resumen.embudo.noCompletadas > 0 && resumen.embudo.pagaron === 0) a.push(`${resumen.embudo.intentaron} personas intentaron pagar y nadie completó el pago: revisar la pasarela (Bold) y el precio.`);
+  else if (resumen.embudo.noCompletadas >= 3) a.push(`${resumen.embudo.noCompletadas} pagos quedaron sin completar esta semana.`);
   if (resumen.cuentas.sinCreditos >= 10) a.push(`${resumen.cuentas.sinCreditos} cuentas están sin créditos: candidatas a un correo con el paquete de 1 crédito.`);
   return resumen;
 }
@@ -224,6 +247,21 @@ function variacion(c: Comparado) {
 
 function usd(centavos: number) {
   return `US$ ${(centavos / 100).toFixed(2)}`;
+}
+
+/** Embudo de compra: cada paso con su porcentaje sobre el anterior, para ver dónde se cae la venta. */
+function filasEmbudo(r: ResumenSemanal): [string, string, string?][] {
+  const e = r.embudo;
+  const pct = (n: number, de: number) => (de ? `${Math.round((n / de) * 100)} % del paso anterior` : undefined);
+  return [
+    ["1. Crearon cuenta", String(e.nuevas)],
+    ["2. Hicieron su primera lectura", String(e.conLectura), pct(e.conLectura, e.nuevas)],
+    ["3. Gastaron los créditos de regalo", String(e.sinCreditos), pct(e.sinCreditos, e.conLectura)],
+    ["4. Intentaron pagar", `${e.intentaron} personas`, "abrieron una orden (todas las cuentas)"],
+    ["5. Pagaron", `${e.pagaron} personas`, pct(e.pagaron, e.intentaron)],
+    ["Pagos sin completar", String(e.noCompletadas), e.noCompletadas ? "pendientes, rechazados o con error" : undefined],
+    ["Lecturas de limpia con huevo", String(e.huevo), "el producto estrella"],
+  ];
 }
 
 /** Cuentas nuevas y pagos de la semana por red de origen (enlaces cortos /yt /ig /tt /fb /wa, utm o Referer). */
@@ -262,6 +300,10 @@ export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [strin
         ...r.ventas.porPaquete.map((p): [string, string] => [`  ${p.paquete}`, String(p.n)]),
         ["Fundadores", r.ventas.fundadores.activa ? `${r.ventas.fundadores.vendidos} de ${OFERTA_FUNDADORES.cupo} vendidos` : "terminada", r.ventas.fundadores.activa ? `${r.ventas.fundadores.diasRestantes} días restantes` : undefined],
       ],
+    },
+    {
+      titulo: "Embudo de la semana",
+      filas: filasEmbudo(r),
     },
     {
       titulo: "Por dónde llegan",
