@@ -489,7 +489,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
         : gancho
           ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : prep.sistema;
-      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, idioma: "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : {}) })).replace(/[#*_>`]/g, "").trim();
+      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, idioma: "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {

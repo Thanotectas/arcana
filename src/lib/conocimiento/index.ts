@@ -9,7 +9,7 @@ import { join } from "node:path";
  * Los manuales son Markdown en esta carpeta; para agregar uno, se crea el
  * archivo y se suma su nombre a TEMAS_MANUAL.
  */
-export const TEMAS_MANUAL = ["huevo", "velas", "taza"] as const;
+export const TEMAS_MANUAL = ["huevo", "velas", "taza", "mano"] as const;
 export type TemaManual = (typeof TEMAS_MANUAL)[number];
 
 const cache = new Map<TemaManual, string>();

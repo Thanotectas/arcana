@@ -145,7 +145,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `Estructura: ## Lo que veo en tu mano, ## Línea de la vida, ## Línea de la cabeza, ## Línea del corazón, ## Línea del destino (o su ausencia), ## Montes y forma de la mano, ${anuncio("## Lo que anuncia tu mano")} (en quiromancia: ramas, islas, cruces y bifurcaciones de las líneas hablan de amores, cambios de rumbo y etapas; nómbralos si se ven), ## Síntesis y consejo. ` +
         `Recuerda: nada de diagnósticos médicos ni de duración de la vida; la línea de la vida habla de vitalidad y cambios, no de años. Extensión: 850 a 1100 palabras.\n\n` +
         INSTRUCCION_ANEXO,
-      opciones: { idioma, effort: "medium", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium" },
+      opciones: { idioma, effort: "medium", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("mano") },
     };
   }
 

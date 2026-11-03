@@ -6,7 +6,7 @@ import { generarTexto, type ImagenEntrada } from "@/lib/ia";
 import { COSTOS } from "@/lib/creditos";
 import { SIGNOS, signoPorLongitud, type Signo } from "@/lib/zodiaco";
 import { posiciones } from "@/lib/astro/efemerides";
-import { manual } from "@/lib/conocimiento";
+import { TEMAS_MANUAL, manual } from "@/lib/conocimiento";
 import { horoscopoDelDia } from "@/lib/horoscopo";
 import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
@@ -91,7 +91,7 @@ const ENFOQUES_FOTO = [
 
 /** Créditos que se regalan al crear la cuenta (migración 0012); si alcanzan para el huevo, la primera completa es gratis. */
 const CREDITOS_BIENVENIDA = 3;
-const invitacion = (tipo: "huevo" | "velas" | "cafe" | "chocolate") =>
+const invitacion = (tipo: "huevo" | "velas" | "cafe" | "chocolate" | "quiromancia") =>
   CREDITOS_BIENVENIDA >= COSTOS[tipo]
     ? `tu primera lectura completa es gratis al crear tu cuenta en miarcana.com/${tipo}`
     : `la lectura completa está en miarcana.com/${tipo} por ${COSTOS[tipo]} créditos`;
@@ -115,7 +115,8 @@ En los demás casos, si la foto es un huevo abierto dentro de un vaso o recipien
 - Al final, en una línea aparte, escribe MARCAS: y un arreglo JSON con las marcas que se dibujarán sobre su foto, así: MARCAS: [{"x":0.52,"y":0.70,"ancho":0.30,"alto":0.18,"etiqueta":"Yema entera"},{"x":0.50,"y":0.40,"ancho":0.15,"alto":0.35,"etiqueta":"Columna que sube"},{"x":0.62,"y":0.86,"ancho":0.12,"alto":0.08,"etiqueta":"¿Lo que viene?","viene":true}]. x e y son el centro del detalle en fracción del ancho y del alto de la foto (0,0 arriba a la izquierda; 1,1 abajo a la derecha); ancho y alto, el tamaño del óvalo que lo rodea, en la misma fracción. Las primeras marcas (dos o tres) son los detalles principales que leíste, con una etiqueta de 1 a 3 palabras en el idioma de tu respuesta; la última, con "viene": true y la etiqueta «¿Lo que viene?» (traducida si escribes en otro idioma), es el tercer detalle que dejaste para la lectura completa. Ubica las marcas con cuidado sobre lo que de verdad se ve; si no estás segura de dónde está algo, no lo marques.
 Si la foto es una vela encendida, los restos de una vela o una veladora de vaso, da el mismo ADELANTO con las mismas reglas y el manual de velas: primero el presente con tres o cuatro señales que solo están en esa foto, cada una con su forma y su lugar (la llama: alta, baja, inquieta, inclinada; las lágrimas de cera y hacia dónde corren; paredes, túneles o formas de la cera; el hollín y dónde quedó; la mecha), luego el tercer detalle con la predicción breve, y cierra con esta invitación, dicha con tus palabras: ${invitacion("velas")}. Las MARCAS van igual, con etiquetas de la vela («Llama alta», «Lágrimas de cera», «¿Lo que viene?»). Si la vela fue por alguien que murió, por un enfermo o por un niño, aplica el CUIDADO PRIMERO. Si la intención era obligar a otra persona (amarres, endulzamientos), no prometas nada sobre ella: orienta con respeto hacia el bien de ambos.
 Si la foto es el interior de una taza de café con borra o de chocolate ya bebido, da el mismo ADELANTO con las mismas reglas y el manual de la taza: describe de tres a cuatro figuras que de verdad se distinguen, cada una con su lugar en el mapa de la taza (cerca del asa o enfrente, en el borde, en el medio o en el fondo, si sube o baja) y su sentido; luego una figura más con la predicción breve, y cierra con esta invitación, dicha con tus palabras: ${invitacion("cafe")} para el café, o ${invitacion("chocolate")} para el chocolate. Las MARCAS van igual, sobre las figuras («Ave que sube», «Corazón», «¿Lo que viene?»). Si no se distinguen figuras, dilo y pide una foto desde arriba con luz.
-Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: palma de la mano → miarcana.com/quiromancia; tabaco → miarcana.com/tabaco.
+Si la foto es la palma de una mano, da el mismo ADELANTO con las mismas reglas y el manual de la mano: describe de tres a cuatro rasgos que de verdad se ven, cada uno con su lugar (la forma de la mano, la línea de la cabeza que baja en curva, una cruz bajo el anular, la línea de la vida que se abre), y qué dice cada uno del carácter y de la etapa que vive; luego un rasgo más con la predicción breve, y cierra con esta invitación, dicha con tus palabras: ${invitacion("quiromancia")}. Las MARCAS van igual, sobre las líneas o marcas («Línea del corazón», «Cruz», «¿Lo que viene?»). Nunca hables de cuánto va a vivir, de enfermedades, de hijos ni de matrimonios.
+Si es otra lectura, da una frase amable de lo que se alcanza a ver e invita a la completa: tabaco → miarcana.com/tabaco.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
 Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
@@ -301,7 +302,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuesta: string;
   try {
     if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: `${manual("huevo")}\n\n${manual("velas")}\n\n${manual("taza")}` });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });

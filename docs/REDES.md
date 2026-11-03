@@ -500,3 +500,10 @@ huevo (presente, predicción breve, invitación a /velas, foto marcada).
 - En redes, el adelanto describe de tres a cuatro figuras con su forma y su lugar (hasta 650 caracteres) y la
   foto marcada admite hasta cuatro marcas.
 
+## Manual de la mano (3 nov 2026)
+
+`src/lib/conocimiento/mano.md`: foto, lo físico, forma de la mano (tierra, aire, fuego, agua), dedos, líneas
+principales (la de la vida es vitalidad y cambios, nunca años), secundarias, marcas, montes, tiempos y casos
+delicados. Lo usan la lectura de la mano de la app, la mano del directo y Sibila en redes (adelanto e
+invitación a /quiromancia). En redes, Sibila recibe todos los manuales de `TEMAS_MANUAL` para cualquier foto.
+
