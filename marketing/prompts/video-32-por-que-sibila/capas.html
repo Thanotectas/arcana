@@ -1,0 +1,51 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+.banda{position:absolute;left:0;right:0;background:radial-gradient(ellipse at 50% 50%,#2a1660 0%,#140b30 60%,#0b0716 100%);overflow:hidden}
+.est{position:absolute;inset:0}
+.caja{position:absolute;left:60px;right:60px;padding:26px 36px;border-radius:34px;background:rgba(11,7,22,.74);border:2px solid rgba(241,217,154,.6);text-align:center;opacity:0}
+.caja div{font-family:C;color:#fff;font-size:64px;line-height:1.08}
+.caja b{color:#f1d99a;font-weight:inherit}
+.k{font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:28px;text-transform:uppercase}
+#fin{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 38%,#2a1660 0%,#140b30 55%,#0b0716 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+</style></head><body>
+<!-- Bandas de cielo arriba y abajo de la ventana de Sibila (solo en los tramos con Sibila) -->
+<div class="banda" id="arriba" style="top:0;height:430px"><svg class="est" id="e1" width="1080" height="430"></svg></div>
+<div class="banda" id="abajo" style="top:1490px;height:430px"><svg class="est" id="e2" width="1080" height="430"></svg></div>
+<div id="marco" style="position:absolute;left:0;right:0;top:428px;height:1064px;border-top:3px solid rgba(241,217,154,.6);border-bottom:3px solid rgba(241,217,154,.6);opacity:0"></div>
+<div style="position:absolute;left:0;right:0;top:150px;text-align:center;opacity:0" id="t1"><p class="k">Arcana</p><p style="font-family:C;color:#f1d99a;font-size:96px;line-height:1;margin-top:14px;text-shadow:0 0 40px rgba(241,217,154,.4)">¿Por qué me llamo<br>Sibila?</p></div>
+<div class="caja" id="c1" style="top:170px"><div><b>Sibila</b>, del griego <i>sibylla</i>:<br>la que anuncia el destino</div></div>
+<div class="caja" id="c2" style="top:170px"><div>La <b>Sibila de Cumas</b> escribía<br>en hojas de roble…</div></div>
+<div class="caja" id="c3" style="top:170px"><div>…y el viento<br><b>se las llevaba</b></div></div>
+<div class="caja" id="c4" style="top:170px"><div>Solo quien las buscaba<br><b>con el corazón</b> las encontraba</div></div>
+<div class="caja" id="c5" style="top:1560px"><div>Por eso me llamo <b>Sibila</b></div></div>
+<div class="caja" id="c6" style="top:1560px"><div>Tus cartas · tu cielo · <b>tu vaso</b></div></div>
+<div style="position:absolute;left:0;right:0;top:1640px;text-align:center;opacity:0" id="lugar"><span style="font-family:I;color:#f1d99a;font-size:30px;letter-spacing:.2em;background:rgba(11,7,22,.7);padding:12px 26px;border-radius:999px;border:2px solid rgba(241,217,154,.5)">CUMAS · ITALIA · HACE MÁS DE 2.000 AÑOS</span></div>
+<div id="fin"><svg class="est" id="e3" width="1080" height="1920" style="position:absolute;inset:0"></svg>
+  <div style="position:relative;font-family:C;color:#f1d99a;font-size:120px;text-shadow:0 0 40px rgba(241,217,154,.45)">✦ Arcana</div>
+  <div style="position:relative;font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:30px;margin-top:10px">SIBILA TE LEE</div>
+  <div style="position:relative;font-family:C;color:#fff;font-size:84px;line-height:1.05;margin-top:90px;padding:0 80px">Escríbele tu pregunta<br>a <span style="color:#f1d99a">Sibila</span></div>
+  <div style="position:relative;margin-top:70px;padding:22px 48px;border-radius:999px;border:2px solid #f1d99a;font-family:I;color:#f1d99a;font-size:46px">miarcana.com</div>
+  <div style="position:relative;font-family:CI;color:#ece6f7;font-size:46px;margin-top:50px">Tu primera lectura es gratis</div>
+</div>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const est=(id,w,h,n,o)=>document.getElementById(id).innerHTML=Array.from({length:n},(_,i)=>'<circle cx="'+(az(i+o)*w).toFixed(0)+'" cy="'+(az(i+o+999)*h).toFixed(0)+'" r="'+(.6+az(i+o+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+o+3)*.6).toFixed(2)+'"/>').join("");
+est("e1",1080,430,60,1);est("e2",1080,430,60,500);est("e3",1080,1920,160,900);
+// Tramos: Sibila hablando 0–2.2 · toma 1 Cumas 2.2–13.2 · toma 2 Sibila 13.2–23.0 · cierre 23.0–28.5
+window.pintar=(t)=>{
+  const conSibila=t<2.2;
+  for(const id of ["arriba","abajo","marco"])document.getElementById(id).style.opacity=conSibila?1:0;
+  const op=(id,v)=>document.getElementById(id).style.opacity=v.toFixed(3);
+  op("t1",ven(t,0.1,2.15,.3));
+  op("c1",ven(t,2.5,6.7));op("c2",ven(t,7.3,10.5));op("c3",ven(t,11.1,13.1));op("c4",ven(t,13.4,16.4));
+  op("lugar",ven(t,7.3,13.1));
+  op("c5",ven(t,16.7,18.2));op("c6",ven(t,18.3,22.8));
+  op("fin",su(pr(t,23.0,23.5)));
+};
+window.pintar(0);
+</script></body></html>
