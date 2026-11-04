@@ -91,6 +91,11 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
       ajustar({ x: o.cx - ew / 2, y: o.cy - o.oh / 2 - eh - 12, w: ew, h: eh }),
       { x: o.cx + o.ow / 2 + 14, y: o.cy - eh / 2, w: ew, h: eh },
       { x: o.cx - o.ow / 2 - ew - 14, y: o.cy - eh / 2, w: ew, h: eh },
+      // Arriba o abajo, corrida hacia un lado (detalle chico entre otros óvalos).
+      ajustar({ x: o.cx - ew * 0.15, y: o.cy - o.oh / 2 - eh - 12, w: ew, h: eh }),
+      ajustar({ x: o.cx - ew * 0.85, y: o.cy - o.oh / 2 - eh - 12, w: ew, h: eh }),
+      ajustar({ x: o.cx - ew * 0.15, y: o.cy + o.oh / 2 + 12, w: ew, h: eh }),
+      ajustar({ x: o.cx - ew * 0.85, y: o.cy + o.oh / 2 + 12, w: ew, h: eh }),
       // Sin espacio afuera (detalle pegado a un borde): dentro del óvalo, abajo o arriba.
       ajustar({ x: o.cx - ew / 2, y: o.cy + o.oh / 2 - eh - 14, w: ew, h: eh }),
       ajustar({ x: o.cx - ew / 2, y: o.cy - o.oh / 2 + 14, w: ew, h: eh }),
@@ -99,9 +104,14 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
     // Afuera no puede tapar otro óvalo; dentro de su propio óvalo sí (solo se evita tapar otras etiquetas).
     const otras = ocupadas.filter((_, j) => j !== i);
     const etiquetas = ocupadas.slice(ovalos.length);
+    // Dentro del óvalo solo si cabe la etiqueta; si no, taparía justo el detalle marcado.
+    const cabeDentro = o.oh >= eh + 28 && o.ow >= ew * 0.7;
+    const afuera = candidatos.slice(0, 8);
+    const adentro = cabeDentro ? candidatos.slice(8) : [];
     const libre =
-      candidatos.slice(0, 4).find((c) => dentro(c) && !otras.some((b) => choca(c, b))) ??
-      candidatos.slice(4).find((c) => dentro(c) && !etiquetas.some((b) => choca(c, b))) ??
+      afuera.find((c) => dentro(c) && !otras.some((b) => choca(c, b))) ??
+      adentro.find((c) => dentro(c) && !etiquetas.some((b) => choca(c, b))) ??
+      afuera.find((c) => dentro(c) && !etiquetas.some((b) => choca(c, b))) ??
       candidatos.find(dentro) ??
       candidatos[0];
     ocupadas.push(libre);
