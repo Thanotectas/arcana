@@ -21,8 +21,8 @@
     "path": "./arcana-upload.keystore",
     "alias": "arcana"
   },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1,
+  "appVersionName": "1.1.0",
+  "appVersionCode": 2,
   "shortcuts": [
     { "name": "Tu cielo hoy", "shortName": "Hoy", "url": "/hoy?app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" },
     { "name": "Carta del día", "shortName": "Carta", "url": "/tarot?tirada=tarot_carta&app=android", "chosenIconUrl": "https://miarcana.com/marca/icono-192.png" }

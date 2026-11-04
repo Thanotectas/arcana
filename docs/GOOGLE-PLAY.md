@@ -130,3 +130,16 @@ Costo de la IA durante la prueba: con el reparto de modelos (Opus solo en carta 
 "Solicitar acceso a producción" se habilita hacia el 19 de octubre si el número no baja de 12 (si baja, el
 contador se reinicia). Respuestas preparadas para el cuestionario de Google en
 `marketing/play-store/respuestas-acceso-produccion.txt`.
+
+## Rechazos del acceso a producción (21 y 27 oct 2026) y plan
+
+Google respondió dos veces «More testing required»: los probadores no estuvieron activos y no se vio que la
+app recogiera comentarios y publicara actualizaciones. Como la app es una TWA, las mejoras de la web no cuentan
+como actualización para Google: hay que subir versiones nuevas a la prueba cerrada (subir `appVersionCode` en
+`android/twa-manifest.json`, correr el workflow y subir el `.aab`) con notas de la versión.
+
+- 4 nov: versión 1.1.0 (código 2). Subirla a la prueba cerrada con sus notas.
+- ~11 nov: versión 1.2.0 (código 3) con lo que digan los probadores.
+- Pedir a los probadores que usen la app varios días por semana y que dejen comentarios privados en Play.
+- Volver a solicitar después de 14 días más de prueba desde el último rechazo (no antes del 10–11 nov) y
+  con 12 probadores activos.
