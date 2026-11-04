@@ -75,6 +75,8 @@ export default async function PaginaAdminEnVivo() {
         <h2 className="font-display text-2xl font-semibold">Escenario para OBS</h2>
         <p className="text-sm text-texto-suave">Esta dirección es secreta: quien la tenga puede mover la fila. Pégala en OBS como fuente de navegador.</p>
         <DireccionEscenario url={url} />
+        <p className="text-sm text-texto-suave">Versión vertical para TikTok LIVE (1080×1920):</p>
+        <DireccionEscenario url={`${url}&formato=vertical`} />
         <ol className="list-decimal space-y-1 pl-5 text-sm text-texto-suave">
           <li>OBS → Fuentes → <strong>+</strong> → <strong>Navegador</strong>. URL: la de arriba. Ancho 1920, alto 1080. Marca «Controlar el audio a través de OBS».</li>
           <li>En YouTube Studio → <strong>Crear → Emitir en directo</strong> → copia la <strong>clave de transmisión</strong>.</li>

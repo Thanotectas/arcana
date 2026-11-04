@@ -148,7 +148,11 @@ function Pendulo({ respuesta }: { respuesta: string }) {
  * A la hora de cierre se despide y queda la pantalla final (gracias y
  * suscríbete); si en el panel se corre la hora, vuelve a leer sola.
  */
-export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: string; qr: string; retrato: string | null; video?: string | null }) {
+export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean }) {
+  // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
+  // los comentarios, solo lo secundario. Misma lógica (voz, fila, oráculos, relleno, cierre).
+  const W = vertical ? 1080 : ANCHO;
+  const H = vertical ? 1920 : ALTO;
   const [escala, setEscala] = useState(1);
   const [lectura, setLectura] = useState<Lectura | null>(null);
   const [volteadas, setVolteadas] = useState(0);
@@ -168,11 +172,11 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
   }, []);
 
   useEffect(() => {
-    const ajustar = () => setEscala(Math.min(window.innerWidth / ANCHO, window.innerHeight / ALTO));
+    const ajustar = () => setEscala(Math.min(window.innerWidth / W, window.innerHeight / H));
     ajustar();
     window.addEventListener("resize", ajustar);
     return () => window.removeEventListener("resize", ajustar);
-  }, []);
+  }, [W, H]);
 
   const pedir = useCallback(
     async (modo: "lectura" | "puente" | "relleno" | "cierre", i = 0): Promise<Respuesta | null> => {
@@ -374,7 +378,10 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
   const tipo = lectura?.tipo ?? "tarot";
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
   const escena = retrato !== null;
-  const derecha = escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
+  // Zona de la lectura: el tercio derecho en horizontal; todo el ancho en vertical.
+  const derecha = vertical ? "left-10 right-10" : escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
+  // Tamaños: en vertical se usan los de la escena (más compactos).
+  const compacto = escena || vertical;
   const cartas = lectura?.cartas ?? [
     { id: "", nombre: "", posicion: "Lo que te rodea" },
     { id: "", nombre: "", posicion: "Lo que se mueve" },
@@ -393,15 +400,51 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
       <div
         className="absolute left-1/2 top-1/2 overflow-hidden text-texto"
         style={{
-          width: ANCHO,
-          height: ALTO,
+          width: W,
+          height: H,
           transform: `translate(-50%, -50%) scale(${escala})`,
           background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
-        {escena && <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />}
-        <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={escena ? { x: 144, y: 745 } : { x: 64 + 280, y: 180 + 165 }} nivel={nivel} modo={escena ? "escena" : "cielo"} />
+        {vertical ? (
+          <>
+            {/* Estrellas de fondo y Sibila en una ventana arriba (la pintura, recortada a su rostro y su pecho) */}
+            <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 400 }} nivel={nivel} modo="cielo" />
+            <div className="absolute left-0 right-0 top-[110px] h-[520px] overflow-hidden border-y-2 border-oro/40" style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+              {escena ? (
+                <div className="absolute" style={{ left: -150, top: -40, width: 1885, height: 1060 }}>
+                  <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center" style={{ background: "radial-gradient(circle, rgba(139,108,246,0.45), rgba(11,7,22,0.9) 70%)" }}>
+                  <div className="vivo-flotar">
+                    <RostroSibila tamano={420} nivel={nivel} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            {escena && <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />}
+            <CieloEnVivo ancho={ANCHO} alto={ALTO} centro={escena ? { x: 144, y: 745 } : { x: 64 + 280, y: 180 + 165 }} nivel={nivel} modo={escena ? "escena" : "cielo"} />
+          </>
+        )}
         {/* Encabezado */}
+        {vertical ? (
+          <div className="absolute left-8 right-8 top-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Marca tamano={52} />
+              <div>
+                <p className="font-display text-4xl leading-none text-oro-suave">Arcana</p>
+                <p className="text-base uppercase tracking-[0.3em] text-violeta-suave">Sibila en vivo</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-red-400/50 bg-red-500/15 px-5 py-2 text-xl font-semibold text-red-200">
+              <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> EN VIVO
+            </div>
+          </div>
+        ) : (
         <div className="absolute left-16 right-16 top-10 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Marca tamano={64} />
@@ -419,9 +462,10 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
             </div>
           </div>
         </div>
+        )}
 
         {/* QR para subir la foto de la taza o de la mano (al cerrar ya no aplica) */}
-        {cierre === "abierto" && (
+        {cierre === "abierto" && !vertical && (
         <div className={`absolute flex items-center gap-5 rounded-3xl border border-oro/30 bg-black/45 p-4 ${escena ? "left-[1190px] right-[56px] top-[770px]" : "bottom-[245px] left-16 w-[560px] p-5"}`}>
           <div className={`shrink-0 overflow-hidden rounded-xl ${escena ? "h-[120px] w-[120px]" : "h-[150px] w-[150px]"}`} dangerouslySetInnerHTML={{ __html: qr }} />
           <p className={`leading-snug text-texto ${escena ? "text-xl" : "text-2xl"}`}>
@@ -431,7 +475,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
         )}
 
         {/* Sibila (el rostro vectorial; sobre la pintura no hace falta) */}
-        {!escena && (
+        {!escena && !vertical && (
         <div className="absolute left-16 top-[180px] flex w-[560px] flex-col items-center">
           <div className="relative flex h-[330px] w-[330px] items-center justify-center">
             {/* Anillos que giran en sentidos opuestos */}
@@ -457,11 +501,11 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
         )}
 
         {/* Pregunta */}
-        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/45 aparecer ${escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
+        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/55 aparecer ${vertical ? "top-[650px] px-7 py-4" : escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
           {cierre !== "abierto" ? (
             <>
               <p className="text-2xl text-violeta-suave">Se acabó el tiempo por esta noche</p>
-              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>Gracias por acompañarnos ✦</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>Gracias por acompañarnos ✦</p>
             </>
           ) : lectura ? (
             <>
@@ -470,32 +514,32 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
                 {lectura.origen === "facebook" ? " · Facebook" : ""}
                 {lectura.signo ? ` · ${lectura.signo}` : ""}
               </p>
-              <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
+              <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
             </>
           ) : (
             <div key={instruccion} className="aparecer">
-              <p className="text-2xl text-violeta-suave">Escribe en el chat · {INSTRUCCIONES[instruccion].titulo}</p>
-              <p className={`mt-2 font-display leading-tight text-oro-suave ${escena ? "text-[36px]" : "text-[44px]"}`}>«{INSTRUCCIONES[instruccion].ejemplo}»</p>
+              <p className="text-2xl text-violeta-suave">{vertical ? "Escribe en los comentarios" : "Escribe en el chat"} · {INSTRUCCIONES[instruccion].titulo}</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>«{INSTRUCCIONES[instruccion].ejemplo}»</p>
             </div>
           )}
         </div>
 
         {/* Lo que se lee: cartas, foto, aura, número o signo (al cerrar, la invitación a suscribirse) */}
         {cierre !== "abierto" ? (
-          <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
-            <Bell className={`text-oro-suave vivo-campana ${escena ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
-            <p className={`font-display leading-tight text-oro-suave ${escena ? "text-[44px]" : "text-[56px]"}`}>Suscríbete y activa la campanita</p>
-            <p className={`text-texto ${escena ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
-            <p className={`text-violeta-suave ${escena ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
+          <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${vertical ? "top-[800px] h-[420px]" : escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
+            <Bell className={`text-oro-suave vivo-campana ${compacto ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
+            <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>Suscríbete y activa la campanita</p>
+            <p className={`text-texto ${compacto ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
+            <p className={`text-violeta-suave ${compacto ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
           </div>
         ) : !lectura || (Boolean(lectura.cartas?.length) && !lectura.grafico) ? (
-        <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
+        <div className={`absolute ${derecha} flex justify-center ${vertical ? "top-[800px] gap-6" : escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
           {cartas.map((c, i) => {
             const visible = Boolean(lectura && c.id && volteadas > i);
             return (
-              <div key={i} className={`flex flex-col items-center ${escena ? "w-[210px]" : "w-[250px]"}`}>
-                <p className={`mb-3 uppercase tracking-[0.2em] text-violeta-suave ${escena ? "text-base" : "text-xl"}`}>{c.posicion}</p>
-                <div className={`relative vivo-carta ${escena ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
+              <div key={i} className={`flex flex-col items-center ${compacto ? "w-[210px]" : "w-[250px]"}`}>
+                <p className={`mb-3 uppercase tracking-[0.2em] text-violeta-suave ${compacto ? "text-base" : "text-xl"}`}>{c.posicion}</p>
+                <div className={`relative vivo-carta ${compacto ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
                   <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: visible ? "rotateY(180deg)" : "none" }}>
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
                       <span className="text-8xl text-oro-suave">✦</span>
@@ -512,18 +556,18 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
                   </div>
                   {visible && <div key={`${lectura?.id}-${i}`} className="pointer-events-none absolute inset-[-30px] rounded-3xl vivo-destello" />}
                 </div>
-                <p className={`mt-3 h-9 font-display text-oro-suave ${escena ? "text-2xl" : "text-3xl"}`}>{visible ? c.nombre : ""}</p>
+                <p className={`mt-3 h-9 font-display text-oro-suave ${compacto ? "text-2xl" : "text-3xl"}`}>{visible ? c.nombre : ""}</p>
               </div>
             );
           })}
         </div>
         ) : lectura.grafico ? (
           // Carta astral, sinastría o cielo del horóscopo: se dibuja a tamaño completo.
-          <div className={`absolute ${derecha} flex justify-center ${escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
-            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={escena ? 440 : 520} />
+          <div className={`absolute ${derecha} flex justify-center ${vertical ? "top-[790px]" : escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
+            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={vertical ? 470 : escena ? 440 : 520} />
           </div>
         ) : (
-          <div className={`absolute ${derecha} flex items-center justify-center ${escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: escena ? "scale(0.82)" : undefined }}>
+          <div className={`absolute ${derecha} flex items-center justify-center ${vertical ? "top-[790px] h-[460px]" : escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: compacto ? "scale(0.82)" : undefined }}>
             {(tipo === "chocolate" || tipo === "mano" || tipo === "huevo") && lectura.imagen && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={lectura.imagen} alt="" className="h-[440px] max-w-[720px] rounded-3xl border-4 border-oro/70 object-cover shadow-[0_30px_80px_rgba(0,0,0,0.6)]" />
@@ -592,12 +636,24 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
 
         {/* Subtítulos */}
         {!(cierre === "fin" && !subtitulo) && (
-        <div className={`absolute bottom-[80px] left-16 flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${escena ? "right-[770px] bg-black/60" : "right-16 bg-black/45"}`}>
-          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${escena ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
+        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? "left-8 right-8 top-[1275px] bg-black/60" : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
+          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
         )}
 
-        {/* Pie */}
+        {/* Pie (en vertical, dos líneas cortas: abajo TikTok pone los comentarios) */}
+        {vertical ? (
+          <div className="absolute bottom-10 left-8 right-8 space-y-2 text-center text-2xl text-violeta-suave">
+            {cierre !== "abierto" ? (
+              <p>✦ Gracias por acompañarnos ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
+            ) : (
+              <>
+                <p>Escribe en los comentarios tu <span className="text-oro-suave">signo y tu pregunta</span></p>
+                <p><span className="text-oro-suave">carta astral</span> + fecha · <span className="text-oro-suave">sinastría</span> + dos fechas · <span className="text-oro-suave">péndulo</span></p>
+              </>
+            )}
+          </div>
+        ) : (
         <div className={`absolute bottom-5 left-0 right-0 text-center text-2xl text-violeta-suave ${escena ? "bg-black/40 py-2" : ""}`}>
           {cierre !== "abierto" ? (
             <>✦ Gracias por acompañarnos ✦ Suscríbete y activa la campanita ✦ Únete al grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span> ✦</>
@@ -605,6 +661,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null }: { clave: s
             <>✦ Tu signo y tu pregunta ✦ <span className="text-oro-suave">carta astral</span> + fecha, hora y ciudad ✦ <span className="text-oro-suave">sinastría</span> + dos fechas ✦ ¿Huevo, taza o mano? <span className="text-oro-suave">miarcana.com/vivo</span> ✦ Grupo: <span className="text-oro-suave">miarcana.com/grupo</span> ✦</>
           )}
         </div>
+        )}
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
         {sinVoz && <div className="absolute left-16 top-[130px] rounded-full bg-red-900/80 px-5 py-2 text-lg text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}

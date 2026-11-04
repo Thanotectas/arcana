@@ -514,3 +514,11 @@ la lectura del tabaco de la app y Sibila en redes (adelanto e invitación a /tab
 cinco manuales: huevo, velas, taza (café y chocolate), mano y tabaco (unas 8.400 palabras, en un bloque en
 caché). En `TRADICION_TABACO` se cambió «alguien que estorba» y «terceras personas» por lecturas sin culpables.
 
+## Escenario vertical para TikTok LIVE (4 nov 2026)
+
+`/en-vivo/escenario?clave=…&formato=vertical` (1080×1920): la misma lógica del escenario (voz, fila, oráculos,
+relleno, cierre) con Sibila arriba en una ventana (el video recortado a su rostro), la pregunta, la lectura y
+los subtítulos en el medio, y abajo —donde TikTok pone los comentarios— solo un pie corto. Sin QR (en TikTok
+se mira desde el mismo celular). La dirección está en /admin/en-vivo. Los comentarios de TikTok no entran solos
+(no hay API oficial): se pasan con «Agregar pregunta a mano».
+
