@@ -1,0 +1,24 @@
+CÓMO ORDENAR ARCANA EN TU COMPUTADOR
+
+1. Crea la carpeta  C:\Users\lualz\Documents\Arcana  (si ya tienes «Arcana Marketing», usa esa misma y cámbiale el nombre a «Arcana»).
+2. Copia dentro de ella estos dos archivos: «Ordenar Arcana.bat» y «ordenar-arcana.ps1».
+3. Haz doble clic en «Ordenar Arcana.bat». La primera vez solo crea las carpetas:
+
+   00 Por ordenar                     ← aquí sueltas todo lo que tengas regado
+   01 Marketing                       ← lo mismo que el repositorio (videos, carruseles, directos, redes, marca…)
+   02 Capturas                        ← pantallazos, por mes
+   03 Documentos (privado)            ← PDF, Word, Excel: Play, Meta, facturas. NUNCA se suben a redes ni al repo
+   04 Audios y voces                  ← ElevenLabs y otros audios
+   05 Clips de Gemini, Flow y Kling   ← los clips crudos que generas
+   06 Fotos para responder (privado)  ← fotos de la gente de los grupos (solo para responderles)
+   07 Videos sueltos
+   08 Imagenes sueltas
+   09 Zips descargados
+
+4. Mueve a «00 Por ordenar» todo lo de Arcana que tengas en Descargas, Escritorio, etc.
+5. Vuelve a hacer doble clic en «Ordenar Arcana.bat»: te muestra cuántos archivos van a cada carpeta y te pregunta
+   antes de mover. No borra nada; si dos archivos se llaman igual, al segundo le agrega (2).
+6. Los paquetes que te manda Claude («Arcana Marketing - …zip») se extraen dentro de C:\Users\lualz\Documents\Arcana:
+   sus archivos caen solos en «01 Marketing», en la misma carpeta que en el repositorio.
+
+Si Windows avisa que el archivo viene de internet: clic derecho en «ordenar-arcana.ps1» → Propiedades → «Desbloquear».

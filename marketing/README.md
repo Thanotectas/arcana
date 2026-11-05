@@ -70,7 +70,16 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 
 ## Cómo se entregan las piezas
 
-Alejandro guarda todo en su PC en `C:\Users\lualz\Documents\Arcana Marketing`. Cada entrega va en **un zip** listo para extraer ahí, con nombres legibles: `Arcana Marketing - AAAA-MM-DD Tema.zip`, que contiene una carpeta `AAAA-MM-DD Tema/` con las piezas (imágenes, video en versión Instagram/TikTok y versión WhatsApp < 10 MB, prompt y textos). El chat solo deja enviar archivos de hasta 30 MB: si el zip es mayor, se parte en `parte 1 de N`, `parte 2 de N`… con la misma estructura de carpetas. Los archivos se envían desde el scratchpad de la sesión (los que están fuera de la carpeta de trabajo de la sesión no se pueden abrir en la app).
+En el PC de Alejandro todo vive en `C:\Users\lualz\Documents\Arcana`, con las carpetas que crea
+`plantillas/organizar-pc/Ordenar Arcana.bat` (00 Por ordenar, 01 Marketing, 02 Capturas, 03 Documentos (privado),
+04 Audios y voces, 05 Clips de Gemini, Flow y Kling, 06 Fotos para responder (privado), 07–09 sueltos). El script
+no borra nada: mueve lo que se ponga en «00 Por ordenar» según el tipo de archivo, preguntando antes.
+
+Las entregas van en zips `Arcana Marketing - AAAA-MM-DD Tema.zip` cuyo contenido empieza por `Arcana/01 Marketing/`
+y sigue la misma ruta que en este repositorio: se extraen dentro de `Documents` y cada archivo cae en su lugar.
+El chat solo deja enviar archivos de hasta 30 MB: si hace falta, se arman varios zips independientes («1 de 2»…),
+cada uno con carpetas completas. Para bajar todo `marketing/` de una vez: GitHub → Code → Download ZIP y copiar
+la carpeta `marketing` del zip como `01 Marketing`. Los archivos se envían desde el scratchpad de la sesión.
 
 ## Identidad rápida
 
