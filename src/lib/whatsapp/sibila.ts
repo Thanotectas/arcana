@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { generarTexto } from "@/lib/ia";
+import { preciosEnMonedas } from "@/lib/monedas";
 import { BONO_PRIMERA_COMPRA, COSTOS, OFERTA_FUNDADORES, PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { diccionario } from "@/lib/i18n/diccionarios";
@@ -38,7 +39,7 @@ export async function hechos() {
   const paquetes = [PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]
     .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${formatoCOP(p.precioCOP)} (≈ ${usd(p.precioUSDCentavos)})${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
     .join("\n");
-  const f = await estadoOfertaFundadores();
+  const [f, enMonedas] = await Promise.all([estadoOfertaFundadores(), preciosEnMonedas([PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO])]);
   const oferta = f.activa
     ? `Oferta de fundadores vigente: el Círculo Arcana a ${formatoCOP(OFERTA_FUNDADORES.precioCOP)} (${usd(OFERTA_FUNDADORES.precioUSDCentavos)}) en lugar de ${formatoCOP(PAQUETE_CIRCULO.precioCOP)}, solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}, hasta el ${fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10))}. Se compra en ${sitio()}/creditos.`
     : "No hay oferta especial vigente.";
@@ -49,6 +50,8 @@ export async function hechos() {
 - Las lecturas cuestan créditos: tirada de tres cartas ${COSTOS.tarot_tres}, Cruz Celta ${COSTOS.tarot_celta}, carta astral ${COSTOS.carta_astral}, numerología ${COSTOS.numerologia}, sueños ${COSTOS.suenos}, lectura de la mano ${COSTOS.quiromancia}, limpia con huevo por foto ${COSTOS.huevo}, chocolate ${COSTOS.chocolate}, velas ${COSTOS.velas}, tabaco ${COSTOS.tabaco}, I Ching ${COSTOS.iching}, calendario chino ${COSTOS.chino}, aura ${COSTOS.aura}, compatibilidad ${COSTOS.compatibilidad}, sinastría ${COSTOS.sinastria}, cruce ${COSTOS.cruce}.
 - Paquetes de créditos (se compran en ${sitio()}/creditos con la cuenta abierta):
 ${paquetes}
+- ${enMonedas}
+- Si preguntan cuánto es en su moneda, da el valor aproximado de esa lista (redondeado, con «aproximadamente») y aclara en media frase que se cobra en pesos colombianos y su banco hace la conversión. Si su moneda no está, dalo en dólares. Nunca digas que no sabes el precio.
 - La primera compra trae ${BONO_PRIMERA_COMPRA} créditos extra de regalo. El Círculo Arcana da 30 días con "tu cielo hoy" cada mañana y preguntas a Sibila sin cobro.
 - ${oferta}
 - Pago con Bold: en Colombia con Nequi, PSE o tarjeta de crédito o débito; desde otros países con tarjeta Visa o Mastercard, se cobra en pesos colombianos y el banco hace la conversión. Los créditos se acreditan solos al aprobarse el pago; si no aparecen en unos minutos, que escriba aquí y una persona lo revisa.
