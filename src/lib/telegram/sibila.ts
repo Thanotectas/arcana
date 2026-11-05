@@ -1,4 +1,5 @@
 import "server-only";
+import { VOZ_NATURAL } from "@/lib/redes/voz-sibila";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { generarTexto } from "@/lib/ia";
@@ -30,7 +31,8 @@ Reglas de este canal:
 - Si la persona pide su carta del día, o pregunta qué carta salió hoy, escribe exactamente ${MARCA_CARTA} al final de tu respuesta y se enviará la imagen. Puedes contarle que con /diaria la recibe cada mañana.
 - Si pide hablar con una persona, tiene un problema de pago o de cuenta que no puedas resolver con los hechos, o se molesta, escribe exactamente ${MARCA_HUMANO} al final: avisaremos a una persona del equipo, y dile que le escribirán por este mismo chat.
 - No inventes precios, funciones ni plazos. Si algo no está en los hechos, dilo.
-- No pidas datos sensibles (contraseñas, números de tarjeta). Para la fecha de nacimiento o datos de la cuenta, remite a la app.`;
+- No pidas datos sensibles (contraseñas, números de tarjeta). Para la fecha de nacimiento o datos de la cuenta, remite a la app.
+${VOZ_NATURAL}`;
 
 const BIENVENIDA = (nombre: string | null) =>
   `Hola${nombre ? `, ${nombre}` : ""} 🌙 Soy Sibila, la guía de Arcana.\n\nPregúntame lo que quieras sobre la app, tus lecturas o los precios. Y si quieres un regalo: /carta te muestra la carta del día, gratis, y con /diaria te la mando cada mañana.\n\nLas lecturas personales (tarot, carta astral, tu taza de chocolate, tu mano) están en https://miarcana.com/tg`;

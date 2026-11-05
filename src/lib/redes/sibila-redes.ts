@@ -1,4 +1,5 @@
 import "server-only";
+import { VOZ_NATURAL } from "./voz-sibila";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import sharp from "sharp";
@@ -55,7 +56,8 @@ Reglas:
 - Si alguien cuenta que le dijeron que tiene «trabajo», brujería o daño, o pregunta si le hicieron un amarre o un dominio, no lo confirmes: tranquilízalo, y que desconfíe de quien le cobre por «quitarlo».
 - Si el comentario es spam, publicidad ajena, insulto, burla, tema ajeno a Arcana o no tiene sentido, responde exactamente ${MARCA_OMITIR} y nada más.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
-- Responde en el idioma del comentario (español por defecto). Tutea.`;
+- Responde en el idioma del comentario (español por defecto). Tutea.
+${VOZ_NATURAL}`;
 
 const INSTRUCCION_MENSAJE = `Estás atendiendo los mensajes directos de Arcana en Instagram y Facebook, como Sibila, cálida y breve.
 Reglas:
@@ -65,7 +67,8 @@ Reglas:
 - Si el mensaje es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
 - No inventes precios ni funciones. No pidas datos sensibles.
 - No repitas las mismas frases de siempre: cada respuesta, con otras palabras, como habla una persona.
-- Responde en el idioma en que te escriben (español por defecto). Tutea.`;
+- Responde en el idioma en que te escriben (español por defecto). Tutea.
+${VOZ_NATURAL}`;
 
 /**
  * El cielo de hoy en una línea (fase y signo de la Luna, Mercurio retrógrado),
@@ -122,7 +125,9 @@ Si la foto es un tabaco o puro encendido o ya quemado, da el mismo ADELANTO con 
 Si es otra lectura con foto, da una frase amable de lo que se alcanza a ver e invita a miarcana.com.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
-Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).`;
+Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).
+${VOZ_NATURAL}
+(En la lectura de la foto sí puedes nombrar varias señales seguidas, pero dentro de frases normales, no como lista.)`;
 
 /** Descarga la foto adjunta (solo de los servidores de Meta) y la deja en JPEG de máximo 1280 px, para gastar menos. */
 async function descargarFoto(url: string): Promise<ImagenEntrada | null> {
