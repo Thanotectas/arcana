@@ -1,0 +1,57 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("file:///home/user/arcana/src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: Inter; src: url("file:///home/user/arcana/src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+html, body { margin: 0; background: transparent; }
+</style></head><body>
+<svg id="c" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const ORO = "#f1d99a", VIO = "#b7a5ff", TXT = "#ece6f7", NAR = "#ffb36b";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const suave = (x) => x * x * (3 - 2 * x);
+const ventana = (t, a, b, f = 0.35) => Math.min(suave(prog(t, a, a + f)), 1 - suave(prog(t, b - f, b)));
+const defs = `<defs>
+  <filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="s" x="-20%" y="-50%" width="140%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#000" flood-opacity="0.9"/></filter>
+  <radialGradient id="cielo" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#3a1a4a"/><stop offset="0.5" stop-color="#170b2c"/><stop offset="1" stop-color="#0b0716"/></radialGradient>
+  <radialGradient id="naranja" cx="50%" cy="100%" r="60%"><stop offset="0" stop-color="#ff8a3d" stop-opacity="0.3"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/></radialGradient>
+  <clipPath id="circ"><circle cx="540" cy="440" r="200"/></clipPath>
+</defs>`;
+const tx = (x, y, s, o = {}) => { const { tam = 60, fam = "Cormorant", peso = 600, color = ORO, op = 1, estilo = "normal", filtro = "s" } = o;
+  return `<text x="${x}" y="${y}" font-family="${fam}" font-size="${tam}" font-weight="${peso}" font-style="${estilo}" fill="${color}" opacity="${op.toFixed(3)}" text-anchor="middle" style="font-variant-numeric: lining-nums" xml:space="preserve" ${filtro ? `filter="url(#${filtro})"` : ""}>${s}</text>`; };
+const franja = (y, h, op) => `<rect x="0" y="${y}" width="1080" height="${h}" fill="#0b0716" opacity="${(0.55 * op).toFixed(3)}"/>`;
+const paso = (t, a, b, n, s) => { const q = ventana(t, a, b); if (q <= 0) return "";
+  return `<g opacity="${q.toFixed(3)}"><rect x="90" y="1600" width="900" height="130" rx="34" fill="#0b0716" opacity="0.72" stroke="${ORO}" stroke-opacity="0.55" stroke-width="2"/>
+    <circle cx="170" cy="1665" r="42" fill="${NAR}" filter="url(#b)"/>${tx(170, 1683, n, { tam: 52, color: "#1a0d24", filtro: "" })}
+    ${tx(585, 1683, s, { tam: 54, color: "#fff", filtro: "" })}</g>`; };
+function pintar(t) {
+  let s = defs;
+  const g = ventana(t, 0.3, 3.8);
+  if (g > 0) s += franja(150, 230, g) + tx(540, 260, "Haz esto esta noche", { tam: 104, color: "#fff", op: g, filtro: "b" }) + tx(540, 340, "ritual de protección de noche de brujas", { tam: 46, estilo: "italic", color: NAR, op: suave(prog(t, 0.8, 1.3)) * g });
+  s += paso(t, 3.6, 6.9, "1", "Un círculo de sal");
+  s += paso(t, 7.2, 12.5, "2", "Vela blanca y vela morada");
+  s += paso(t, 12.9, 16.3, "3", "Quema lo que quieres soltar");
+  s += paso(t, 16.4, 19.8, "4", "Una flor para tus ancestros");
+  const ti = ventana(t, 19.9, 22.9);
+  if (ti > 0) s += franja(150, 230, ti) + tx(540, 265, "Noche de brujas", { tam: 110, color: "#fff", op: ti, filtro: "b" }) + tx(540, 340, "lo que se va en humo… ya no vuelve", { tam: 46, estilo: "italic", color: ORO, op: ti });
+  const c = suave(prog(t, 22.6, 23.2));
+  if (c > 0) {
+    s += `<g opacity="${c.toFixed(3)}"><rect width="1080" height="1920" fill="url(#cielo)"/><rect width="1080" height="1920" fill="url(#naranja)"/>`;
+    s += `<circle cx="540" cy="440" r="230" fill="${ORO}" opacity="0.12" filter="url(#b)"/><image href="file:///home/user/arcana/marketing/marca/sibila-retrato.jpg" x="340" y="240" width="400" height="400" preserveAspectRatio="xMidYMid slice" clip-path="url(#circ)"/><circle cx="540" cy="440" r="202" fill="none" stroke="${ORO}" stroke-width="5" filter="url(#b)"/>`;
+    s += tx(540, 760, "Sibila en vivo", { tam: 104, color: "#fff", filtro: "b" });
+    s += tx(540, 845, "MAÑANA · DOMINGO 1 DE NOVIEMBRE", { tam: 38, fam: "Inter", peso: 600, color: NAR });
+    s += tx(540, 915, "8:00 p.m. · hora de Colombia", { tam: 48, estilo: "italic", color: TXT });
+    const qq = suave(prog(t, 23.4, 24.1));
+    s += `<g opacity="${qq.toFixed(2)}"><rect x="365" y="975" width="350" height="350" rx="24" fill="${ORO}" filter="url(#b)"/><svg x="382" y="992" width="316" height="316" viewBox="${window.QRVB}">${window.QR}</svg></g>`;
+    s += tx(540, 1385, "Escanéalo y activa el recordatorio", { tam: 34, fam: "Inter", color: VIO, op: qq, filtro: "" });
+    s += tx(540, 1500, "YouTube @miarcana", { tam: 56, color: ORO, op: suave(prog(t, 23.8, 24.4)), filtro: "b" });
+    s += tx(540, 1570, "Tu carta astral, tu pregunta y tu sinastría, gratis en el chat", { tam: 32, fam: "Inter", color: TXT, op: suave(prog(t, 24.1, 24.7)), filtro: "" });
+    s += tx(540, 1790, "Nunca dejes velas encendidas sin vigilancia.", { tam: 26, fam: "Inter", color: "#a99fbf", op: suave(prog(t, 24.4, 25.0)), filtro: "" });
+    s += "</g>";
+  }
+  document.getElementById("c").innerHTML = s;
+}
+window.pintar = pintar;
+</script></body></html>

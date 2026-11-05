@@ -412,7 +412,7 @@ recibir varias lecturas en la noche; cuando hay fila, pasa primero quien aún no
 - **Transmisión:** OBS manda la misma señal a YouTube y a la página "Mi Arcana" con el complemento
   «Multiple RTMP Outputs» (obs-multi-rtmp). La clave de Facebook sale de Facebook → Video en vivo →
   Software de transmisión (servidor `rtmps://live-api-s.facebook.com:443/rtmp/`). Guía paso a paso en
-  `marketing/textos/directo-facebook-obs.txt`.
+  `marketing/directos/directo-facebook-obs.txt`.
 - **Comentarios** (`src/lib/en-vivo-facebook.ts`, `sincronizarFacebook`): con el escenario prendido se
   busca el directo de la página (`/{página}/live_videos?broadcast_status=["LIVE"]`, cada 30 s) y se leen
   sus comentarios (`/{live_video}/comments`); los que parecen consulta entran a la fila con origen
