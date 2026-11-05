@@ -288,6 +288,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     hilo = (previos ?? []).reverse().flatMap((m) => [{ rol: "persona", contenido: m.texto }, ...(m.respuesta ? [{ rol: "asistente", contenido: m.respuesta }] : [])]);
     const conversacion = hilo.map((m) => `${m.rol === "persona" ? "Persona" : "Sibila"}: «${m.contenido.replace(/»/g, "”")}»`).join("\n");
     entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje directo por ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»`;
+    // Una vez por conversación: invitar a seguir la cuenta y dejar el enlace de la página (en los mensajes directos sí van enlaces).
+    if (!hilo.some((m) => m.rol === "asistente" && /segu[ií]r|s[ií]gue(nos|me)/i.test(m.contenido)))
+      entrada += `\n(En esta conversación aún no invitaste a seguir la cuenta: al final de tu respuesta, en una frase corta, invita con cariño a seguir a Arcana en ${i.red === "instagram" ? "Instagram" : "Facebook"} y deja el enlace miarcana.com. Si la persona está en duelo o hay un niño o una salud de por medio, no lo hagas.)`;
   } else {
     entrada = `Comentario de ${i.remitente ? `@${i.remitente}` : "una persona"} en ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»${signo ? `\n(Menciona el signo ${signo.nombre}.)` : ""}`;
     if (i.red === "facebook") entrada += "\n(Es Facebook: no escribas direcciones web; si invitas, di «miarcana punto com» o «el enlace está en nuestro perfil».)";
