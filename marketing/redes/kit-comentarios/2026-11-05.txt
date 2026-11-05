@@ -1,0 +1,113 @@
+KIT DE COMENTARIOS · SEMANA DEL 5 AL 11 DE NOVIEMBRE DE 2026
+Para dejar desde Mi Arcana en publicaciones grandes y recientes (menos de 1 hora) de páginas de horóscopo.
+Fórmula: encajar con lo que pide la publicación (cambia la primera frase si hace falta: «Amén 555», «Decretado»,
+«La mentira»…) + un dato real del cielo + un consejo práctico + la firma. Máximo 2 o 3 por página al día.
+Desde el lunes 9 llega solo por correo cada semana (src/lib/redes/kit-comentarios.ts).
+
+EL CIELO (efemérides de Arcana)
+- El Sol en Escorpio hasta el 22 de noviembre (entra en Sagitario).
+- Mercurio retrógrado en Escorpio hasta el 14 de noviembre.
+- Venus retrógrada en Libra hasta el 15 de noviembre.
+- Luna nueva en Escorpio el 9 de noviembre.
+- Marte y Júpiter se juntan en Leo hacia el 16 de noviembre.
+- Luna llena en Géminis el 24 de noviembre.
+
+═══════════════ ESPAÑOL ═══════════════
+
+## Aries
+Aries, aquí va un dato que te va a gustar 🔥 Marte, tu regente, se junta con Júpiter en Leo hacia el 16 de noviembre: tu chispa creativa y tu suerte en el amor se encienden. Empieza eso que vienes postergando ✨ — Sibila, de Arcana 🔮
+
+## Tauro
+Tauro, paciencia unos días más 🌿 Venus, tu regente, retoma su marcha el 15 de noviembre: lo que estaba trabado en pareja o en acuerdos vuelve a moverse. Antes de eso, revisa bien lo que firmas ✨ — Sibila, de Arcana 🔮
+
+## Géminis
+Géminis, tu palabra pesa este mes 💬 Mercurio, tu regente, deja de estar retrógrado el 14 de noviembre: esa conversación que se enredó por fin se aclara. Y el 24 hay Luna llena en tu signo 🌕 — Sibila, de Arcana 🔮
+
+## Cáncer
+Cáncer, el agua está de tu lado 🌙 El 9 de noviembre hay Luna nueva en Escorpio, tu casa del amor y la alegría: escribe esa noche lo que quieres sentir este año y guárdalo cerca ✨ — Sibila, de Arcana 🔮
+
+## Leo
+Leo, tu momento se acerca ☀️ Marte y Júpiter se juntan en tu signo hacia el 16 de noviembre: es de las mejores semanas del año para mostrarte y pedir lo que mereces. No te achiques 🦁 — Sibila, de Arcana 🔮
+
+## Virgo
+Virgo, respira, que ya casi 📝 Mercurio, tu regente, retoma su marcha el 14 de noviembre: los trámites, papeles y mensajes que se atrasaron empiezan a fluir. Hasta entonces, revisa dos veces antes de enviar ✨ — Sibila, de Arcana 🔮
+
+## Libra
+Libra, este mes es para ti ⚖️ Venus retrocede en tu signo hasta el 15 de noviembre: revisa lo que das y lo que recibes. Después, el amor propio sale fortalecido y todo se ve más claro 💛 — Sibila, de Arcana 🔮
+
+## Escorpio
+Escorpio, tu año nuevo empieza ya 🦂 El 9 de noviembre hay Luna nueva en tu signo: esa noche escribe en un papel lo que quieres ver nacer y guárdalo cerca. Y desde el 14 Mercurio deja de enredar tus conversaciones ✨ — Sibila, de Arcana 🔮
+
+## Sagitario
+Sagitario, tu temporada está a la vuelta 🏹 El 22 de noviembre el Sol llega a tu signo, y Júpiter, tu regente, se junta con Marte en Leo hacia el 16: un viaje, un estudio o una idea nueva te cambia el rumbo ✨ — Sibila, de Arcana 🔮
+
+## Capricornio
+Capricornio, no camines solo 🏔️ El Sol en Escorpio pasa por tu casa de los amigos: alguien te tiende la mano este mes. La Luna nueva del 9 es ideal para pedir ayuda o proponer una alianza ✨ — Sibila, de Arcana 🔮
+
+## Acuario
+Acuario, tus relaciones se mueven ⚡ Marte y Júpiter se juntan en Leo, frente a tu signo, hacia el 16 de noviembre: llegan aliados, propuestas o un vínculo que se fortalece. Abre la puerta ✨ — Sibila, de Arcana 🔮
+
+## Piscis
+Piscis, el agua te acompaña 🌊 El Sol en Escorpio te mira en trígono: lo que empieces estas semanas fluye. La Luna nueva del 9 es perfecta para sembrar un sueño: escríbelo esa noche ✨ — Sibila, de Arcana 🔮
+
+## Fuego (Aries, Leo, Sagitario)
+Fuego aquí 🔥 Marte y Júpiter se juntan en Leo hacia el 16 de noviembre: Aries, Leo y Sagitario tienen la mejor energía del año para lanzarse. Lo que empiecen ahora tiene fuerza para durar ✨ — Sibila, de Arcana 🔮
+
+## Tierra (Tauro, Virgo, Capricornio)
+Tierra 🌿 Mercurio y Venus retoman su marcha el 14 y el 15 de noviembre: lo que estaba trabado en dinero, trámites y acuerdos vuelve a moverse. Tauro, Virgo y Capricornio, un poco más de paciencia ✨ — Sibila, de Arcana 🔮
+
+## Aire (Géminis, Libra, Acuario)
+Aire 💨 Venus está en Libra y la Luna llena del 24 cae en Géminis: Géminis, Libra y Acuario, una conversación pendiente se ilumina. Digan lo que sienten, con calma ✨ — Sibila, de Arcana 🔮
+
+## Agua (Cáncer, Escorpio, Piscis)
+Agua 🌊 Luna nueva en Escorpio el 9 de noviembre: Cáncer, Escorpio y Piscis, siembren esa noche su deseo más profundo. Su intuición tiene razón ✨ — Sibila, de Arcana 🔮
+
+═══════════════ FRANÇAIS ═══════════════
+
+## Bélier
+Bélier, voici une nouvelle qui va te plaire 🔥 Mars, ta planète, rejoint Jupiter en Lion vers le 16 novembre : ta créativité et ta chance en amour s'allument. Lance enfin ce projet que tu repousses ✨ — Sibila, d'Arcana 🔮
+
+## Taureau
+Taureau, encore quelques jours de patience 🌿 Vénus, ta planète, reprend sa marche le 15 novembre : ce qui bloquait en couple ou dans les accords se remet en mouvement. D'ici là, relis bien avant de signer ✨ — Sibila, d'Arcana 🔮
+
+## Gémeaux
+Gémeaux, ta parole compte ce mois-ci 💬 Mercure, ta planète, n'est plus rétrograde à partir du 14 novembre : cette conversation qui s'était emmêlée s'éclaircit enfin. Et le 24, Pleine Lune dans ton signe 🌕 — Sibila, d'Arcana 🔮
+
+## Cancer
+Cancer, l'eau est de ton côté 🌙 Le 9 novembre, Nouvelle Lune en Scorpion, ta maison de l'amour et de la joie : ce soir-là, écris ce que tu veux ressentir cette année et garde-le près de toi ✨ — Sibila, d'Arcana 🔮
+
+## Lion
+Lion, ton moment approche ☀️ Mars et Jupiter se rejoignent dans ton signe vers le 16 novembre : l'une des meilleures semaines de l'année pour te montrer et demander ce que tu mérites 🦁 — Sibila, d'Arcana 🔮
+
+## Vierge
+Vierge, respire, c'est presque fini 📝 Mercure, ta planète, reprend sa marche le 14 novembre : papiers, démarches et messages en retard se débloquent. D'ici là, relis deux fois avant d'envoyer ✨ — Sibila, d'Arcana 🔮
+
+## Balance
+Balance, ce mois est pour toi ⚖️ Vénus recule dans ton signe jusqu'au 15 novembre : fais le point sur ce que tu donnes et ce que tu reçois. Ensuite, l'amour de soi sort grandi et tout devient plus clair 💛 — Sibila, d'Arcana 🔮
+
+## Scorpion
+Scorpion, ta nouvelle année commence maintenant 🦂 Le 9 novembre, Nouvelle Lune dans ton signe : ce soir-là, écris sur un papier ce que tu veux voir naître et garde-le près de toi. Et dès le 14, Mercure arrête d'emmêler tes conversations ✨ — Sibila, d'Arcana 🔮
+
+## Sagittaire
+Sagittaire, ta saison arrive 🏹 Le 22 novembre, le Soleil entre dans ton signe, et Jupiter, ta planète, rejoint Mars en Lion vers le 16 : un voyage, des études ou une idée nouvelle changent ta route ✨ — Sibila, d'Arcana 🔮
+
+## Capricorne
+Capricorne, ne marche pas seul 🏔️ Le Soleil en Scorpion traverse ta maison des amis : quelqu'un te tend la main ce mois-ci. La Nouvelle Lune du 9 est idéale pour demander de l'aide ou proposer une alliance ✨ — Sibila, d'Arcana 🔮
+
+## Verseau
+Verseau, tes relations bougent ⚡ Mars et Jupiter se rejoignent en Lion, face à ton signe, vers le 16 novembre : des alliés, des propositions ou un lien qui se renforce. Ouvre la porte ✨ — Sibila, d'Arcana 🔮
+
+## Poissons
+Poissons, l'eau t'accompagne 🌊 Le Soleil en Scorpion te regarde en trigone : ce que tu commences ces semaines coule tout seul. La Nouvelle Lune du 9 est parfaite pour semer un rêve : écris-le ce soir-là ✨ — Sibila, d'Arcana 🔮
+
+## Feu (Bélier, Lion, Sagittaire)
+Feu ici 🔥 Mars et Jupiter se rejoignent en Lion vers le 16 novembre : Bélier, Lion et Sagittaire ont la meilleure énergie de l'année pour se lancer. Ce que vous commencez maintenant a la force de durer ✨ — Sibila, d'Arcana 🔮
+
+## Terre (Taureau, Vierge, Capricorne)
+Terre 🌿 Mercure et Vénus reprennent leur marche les 14 et 15 novembre : ce qui bloquait côté argent, démarches et accords se remet en mouvement. Taureau, Vierge, Capricorne : encore un peu de patience ✨ — Sibila, d'Arcana 🔮
+
+## Air (Gémeaux, Balance, Verseau)
+Air 💨 Vénus est en Balance et la Pleine Lune du 24 tombe en Gémeaux : Gémeaux, Balance et Verseau, une conversation en attente s'éclaire. Dites ce que vous ressentez, avec calme ✨ — Sibila, d'Arcana 🔮
+
+## Eau (Cancer, Scorpion, Poissons)
+Eau 🌊 Nouvelle Lune en Scorpion le 9 novembre : Cancer, Scorpion et Poissons, semez ce soir-là votre vœu le plus profond. Votre intuition a raison ✨ — Sibila, d'Arcana 🔮

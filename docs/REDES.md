@@ -522,3 +522,18 @@ los subtítulos en el medio, y abajo —donde TikTok pone los comentarios— sol
 se mira desde el mismo celular). La dirección está en /admin/en-vivo. Los comentarios de TikTok no entran solos
 (no hay API oficial): se pasan con «Agregar pregunta a mano».
 
+
+## Kit de comentarios de la semana (lunes, por correo)
+
+`src/lib/redes/kit-comentarios.ts` · cron `/api/cron/kit-comentarios` (el orquestador de la mañana lo llama los
+lunes). Calcula el cielo real de la semana con las efemérides (planetas que cambian de signo, retrógrados que
+empiezan o terminan, encuentros de planetas a menos de 2°, lunaciones) y Sibila redacta un comentario por signo
+y por elemento, en español y en francés, con la fórmula que funcionó en páginas grandes de horóscopo: encajar con
+lo que pide la publicación, un dato real del cielo, un consejo práctico y la firma «— Sibila, de Arcana 🔮».
+Llega por correo a la administración. `REDES_KIT_COMENTARIOS=0` lo apaga. Los kits escritos a mano quedan en
+`marketing/redes/kit-comentarios/`.
+
+Comentar en páginas o grupos ajenos se hace a mano: la API de Meta no deja que una página comente en
+publicaciones de otras páginas ni en grupos (la API de grupos se cerró en 2024), y automatizarlo se castiga como
+spam (bloqueos o restricciones de la página). Lo automático es lo propio: carta del día, carrusel de los lunes,
+publicaciones del agente y las respuestas de Sibila a comentarios y mensajes.
