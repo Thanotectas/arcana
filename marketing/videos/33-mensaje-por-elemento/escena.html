@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716;font-variant-numeric:lining-nums}
+#fondo{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,#2a1660 0%,#160d33 55%,#0b0716 100%)}
+#neb{position:absolute;left:-300px;top:-200px;width:1700px;height:2300px;background:radial-gradient(circle at 30% 30%,rgba(139,108,246,.22),transparent 40%),radial-gradient(circle at 75% 65%,rgba(241,217,154,.12),transparent 38%),radial-gradient(circle at 40% 85%,rgba(127,196,240,.12),transparent 35%)}
+svg.e{position:absolute;inset:0}
+.titulo{position:absolute;left:0;right:0;text-align:center}
+.bloque{position:absolute;left:80px;right:150px;opacity:0;display:flex;gap:30px;align-items:flex-start}
+.bloque .ic{flex:none;width:84px;height:84px;margin-top:6px}
+.bloque h2{margin:0;font-family:C;font-size:58px;line-height:1;color:#f1d99a}
+.bloque .s{font-family:I;font-size:24px;letter-spacing:.18em;text-transform:uppercase;margin-top:8px}
+.bloque p{margin:12px 0 0;font-family:IR;font-size:33px;line-height:1.36;color:#ece6f7}
+.bloque b{font-family:I;font-weight:normal}
+#fin{position:absolute;inset:0;opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 50% 40%,#2a1660 0%,#160d33 55%,#0b0716 100%)}
+</style></head><body>
+<div id="fondo"></div><div id="neb"></div><svg class="e" id="est" width="1080" height="1920"></svg>
+<div class="titulo" id="t1" style="top:150px"><div style="font-family:I;font-size:26px;letter-spacing:.38em;color:#b7a5ff">ARCANA · NOVIEMBRE</div>
+  <div style="font-family:C;font-size:84px;line-height:1.02;color:#f1d99a;margin-top:18px;text-shadow:0 0 40px rgba(241,217,154,.35)">Tu mensaje según<br>tu elemento</div></div>
+<div id="bloques"></div>
+<div class="titulo" id="guarda" style="top:1470px;opacity:0;font-family:CI;font-size:44px;color:#b7a5ff">Guárdalo y comenta tu elemento</div>
+<div id="fin">
+  <div style="font-family:C;font-size:120px;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.45)">✦ Arcana</div>
+  <div style="font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:30px;margin-top:10px">SIBILA TE LEE</div>
+  <div style="font-family:C;color:#fff;font-size:78px;line-height:1.08;margin-top:80px;padding:0 90px">¿Cuál es tu elemento?<br><span style="color:#f1d99a">Cuéntamelo abajo</span></div>
+  <div style="margin-top:70px;padding:22px 48px;border-radius:999px;border:2px solid #f1d99a;font-family:I;color:#f1d99a;font-size:46px">miarcana.com</div>
+  <div style="font-family:CI;color:#ece6f7;font-size:44px;margin-top:44px">Tu horóscopo de hoy, gratis</div>
+</div>
+<script>
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const E=[
+ {n:"Fuego",s:"Aries · Leo · Sagitario",c:"#f2a65a",tri:"up",bar:false,t:"Marte y Júpiter se juntan en Leo a mitad de mes. Lo que empieces ahora tiene fuerza para durar: <b style='color:#f2a65a'>no te achiques</b>."},
+ {n:"Tierra",s:"Tauro · Virgo · Capricornio",c:"#8fd19e",tri:"down",bar:true,t:"Mercurio y Venus retoman el paso el 14 y el 15: lo que estaba trabado en dinero y trámites <b style='color:#8fd19e'>vuelve a moverse</b>."},
+ {n:"Aire",s:"Géminis · Libra · Acuario",c:"#b7c8ff",tri:"up",bar:true,t:"Luna llena en Géminis el 24: una conversación pendiente se ilumina. <b style='color:#b7c8ff'>Di lo que sientes</b>, con calma."},
+ {n:"Agua",s:"Cáncer · Escorpio · Piscis",c:"#7fc4f0",tri:"down",bar:false,t:"Luna nueva en Escorpio el 9: siembra tu deseo más profundo. <b style='color:#7fc4f0'>Tu intuición tiene razón</b>."},
+];
+const ic=(e)=>{const p=e.tri==="up"?"42,8 80,76 4,76":"4,8 80,8 42,76";const y=e.tri==="up"?52:32;
+ return `<svg class="ic" viewBox="0 0 84 84"><polygon points="${p}" fill="none" stroke="${e.c}" stroke-width="5" stroke-linejoin="round"/>${e.bar?`<line x1="18" y1="${y}" x2="66" y2="${y}" stroke="${e.c}" stroke-width="5"/>`:""}</svg>`};
+document.getElementById("bloques").innerHTML=E.map((e,i)=>`<div class="bloque" id="b${i}" style="top:${470+i*250}px">${ic(e)}<div><h2>${e.n}</h2><div class="s" style="color:${e.c}">${e.s}</div><p>${e.t}</p></div></div>`).join("");
+const N=140,st=Array.from({length:N},(_,i)=>({x:az(i+1)*1080,y:az(i+500)*1920,r:.7+az(i+9)*1.9,f:az(i+77)*6.28,v:.6+az(i+33)*1.6}));
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+window.pintar=(t)=>{
+  document.getElementById("est").innerHTML=st.map(s=>`<circle cx="${s.x.toFixed(1)}" cy="${((s.y-t*6)%1920+1920)%1920}" r="${s.r.toFixed(1)}" fill="#fff6d8" opacity="${(.25+.55*(.5+.5*Math.sin(s.f+t*s.v*2))).toFixed(2)}"/>`).join("");
+  document.getElementById("neb").style.transform=`translate(${Math.sin(t*.25)*60}px,${Math.cos(t*.2)*50}px) rotate(${t*.6}deg)`;
+  document.getElementById("t1").style.opacity=su(pr(t,0,.6)).toFixed(3);
+  E.forEach((_,i)=>{const a=su(pr(t,1+i*.7,1.6+i*.7));const el=document.getElementById("b"+i);el.style.opacity=a.toFixed(3);el.style.transform=`translateY(${(1-a)*30}px)`;});
+  document.getElementById("guarda").style.opacity=su(pr(t,4.2,4.9)).toFixed(3);
+  document.getElementById("fin").style.opacity=su(pr(t,14.2,14.8)).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
