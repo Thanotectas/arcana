@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+#gancho{position:absolute;inset:0;display:none}
+#gancho .velo{position:absolute;left:0;right:0;top:0;height:1100px;background:linear-gradient(180deg,#0b0716 0%,#0b0716 52%,rgba(11,7,22,.85) 68%,rgba(11,7,22,0) 100%)}
+#gancho .txt{position:absolute;left:70px;right:70px;top:300px;text-align:center;font-family:C;font-size:104px;line-height:1.02;color:#f1d99a;text-shadow:0 0 50px rgba(241,217,154,.45),0 4px 20px rgba(0,0,0,.6)}
+#gancho .sub{position:absolute;left:0;right:0;top:250px;text-align:center;font-family:I;font-size:28px;letter-spacing:.34em;color:#b7a5ff}
+#fin{position:absolute;inset:0;display:none;background:radial-gradient(ellipse at 50% 38%,#2a1660 0%,#160d33 55%,#0b0716 100%);flex-direction:column;align-items:center;justify-content:center;text-align:center}
+</style></head><body>
+<div id="gancho"><div class="velo"></div><div class="sub">ARCANA · SIBILA TE LEE</div><div class="txt" id="g"></div></div>
+<div id="fin"><svg id="est" width="1080" height="1920" style="position:absolute;inset:0"></svg>
+  <div style="position:relative;font-family:C;font-size:116px;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.45)">✦ Arcana</div>
+  <div style="position:relative;font-family:I;color:#b7a5ff;letter-spacing:.3em;font-size:28px;margin-top:8px">SIBILA TE LEE</div>
+  <div id="linea" style="position:relative;font-family:C;color:#fff;font-size:74px;line-height:1.08;margin-top:80px;padding:0 90px"></div>
+  <div style="position:relative;margin-top:60px;padding:22px 48px;border-radius:999px;border:2px solid #f1d99a;font-family:I;color:#f1d99a;font-size:46px">miarcana.com</div>
+  <div style="position:relative;font-family:CI;color:#ece6f7;font-size:46px;margin-top:40px">Tu primera lectura es gratis</div>
+  <div style="position:relative;font-family:I;color:#b7a5ff;font-size:30px;margin-top:60px">Sígueme · Sibila en vivo los domingos</div>
+</div>
+<script>
+const q=new URLSearchParams(location.search);
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+document.getElementById("est").innerHTML=Array.from({length:150},(_,i)=>'<circle cx="'+(az(i+1)*1080).toFixed(0)+'" cy="'+(az(i+900)*1920).toFixed(0)+'" r="'+(.6+az(i+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+3)*.6).toFixed(2)+'"/>').join("");
+if(q.get("que")==="gancho"){document.getElementById("gancho").style.display="block";document.getElementById("g").innerHTML=q.get("texto");}
+else{document.getElementById("fin").style.display="flex";document.getElementById("linea").innerHTML=q.get("texto");}
+</script></body></html>
