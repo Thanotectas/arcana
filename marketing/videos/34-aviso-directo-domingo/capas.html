@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+.banda{position:absolute;left:0;right:0;background:radial-gradient(ellipse at 50% 50%,#2a1660 0%,#140b30 60%,#0b0716 100%);overflow:hidden}
+.c{position:absolute;left:0;right:0;text-align:center}
+.zona{position:absolute;left:60px;right:60px;top:1470px;height:400px;opacity:0;text-align:center}
+.it{display:inline-block;margin:8px 8px;padding:12px 24px;border-radius:999px;border:2px solid rgba(241,217,154,.6);background:rgba(11,7,22,.6);font-family:I;font-size:32px;color:#f1d99a;opacity:0}
+</style></head><body>
+<div class="banda" style="top:0;height:400px"><svg id="e1" width="1080" height="400" style="position:absolute;inset:0"></svg></div>
+<div class="banda" style="top:1440px;height:480px"><svg id="e2" width="1080" height="480" style="position:absolute;inset:0"></svg></div>
+<div style="position:absolute;left:0;right:0;top:398px;height:1044px;border-top:3px solid rgba(241,217,154,.6);border-bottom:3px solid rgba(241,217,154,.6)"></div>
+<div class="c" style="top:90px"><span id="vivo" style="display:inline-flex;align-items:center;gap:14px;padding:12px 30px;border-radius:999px;background:#e0453a;font-family:I;font-size:34px;letter-spacing:.2em;color:#fff"><span id="punto" style="width:18px;height:18px;border-radius:50%;background:#fff"></span>EN VIVO</span></div>
+<div class="c" id="t1" style="top:180px;font-family:C;font-size:92px;line-height:1.02;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.35)">Sibila te lee<br>en directo</div>
+<div class="zona" id="z1"><div style="font-family:IR;font-size:34px;color:#ece6f7;margin-bottom:14px">Escribe tu pregunta en el chat y te leo <b style="font-family:I;color:#f1d99a">gratis</b>:</div>
+  <span class="it" id="i0">Tarot</span><span class="it" id="i1">Carta astral dibujada</span><span class="it" id="i2">Sinastría</span><span class="it" id="i3">Tu número</span><span class="it" id="i4">Péndulo y runas</span></div>
+<div class="zona" id="z2"><div style="font-family:C;font-size:80px;line-height:1;color:#f1d99a">Domingo 8 de noviembre</div>
+  <div style="font-family:I;font-size:40px;color:#fff;margin-top:22px">8:00 p.m. Colombia · Perú · Ecuador</div>
+  <div style="font-family:IR;font-size:32px;color:#b7a5ff;margin-top:14px">7:00 p.m. México · 10:00 p.m. Argentina · Chile</div></div>
+<div class="zona" id="z3"><div style="font-family:C;font-size:70px;line-height:1.05;color:#fff">Sígueme para que<br>te llegue el aviso</div>
+  <div style="display:inline-block;margin-top:26px;padding:16px 40px;border-radius:999px;border:2px solid #f1d99a;font-family:I;font-size:42px;color:#f1d99a">TikTok @miarcana4</div></div>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const est=(id,w,h,n,o)=>document.getElementById(id).innerHTML=Array.from({length:n},(_,i)=>'<circle cx="'+(az(i+o)*w).toFixed(0)+'" cy="'+(az(i+o+999)*h).toFixed(0)+'" r="'+(.6+az(i+o+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+o+3)*.6).toFixed(2)+'"/>').join("");
+est("e1",1080,400,60,3);est("e2",1080,480,70,400);
+window.pintar=(t)=>{
+  document.getElementById("punto").style.opacity=(.35+.65*(.5+.5*Math.sin(t*6))).toFixed(2);
+  document.getElementById("vivo").style.opacity=su(pr(t,0,.4)).toFixed(3);
+  document.getElementById("t1").style.opacity=su(pr(t,.2,.7)).toFixed(3);
+  document.getElementById("z1").style.opacity=ven(t,.6,6.2).toFixed(3);
+  for(let i=0;i<5;i++)document.getElementById("i"+i).style.opacity=su(pr(t,1.3+i*.6,1.7+i*.6)).toFixed(3);
+  document.getElementById("z2").style.opacity=ven(t,6.3,12.6).toFixed(3);
+  document.getElementById("z3").style.opacity=su(pr(t,12.7,13.1)).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
