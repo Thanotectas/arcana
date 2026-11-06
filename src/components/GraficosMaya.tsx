@@ -53,7 +53,7 @@ export function NumeroMaya({ n, vertical = false, color = "#f1d99a", className =
 
 /**
  * Glifo de un kin: el número del tono en puntos y barras y, al lado, el
- * cartucho del sello con su color (rojo, blanco, azul o amarillo) y su pedestal.
+ * medallón ilustrado del sello con su nombre y su color (rojo, blanco, azul o amarillo).
  */
 export function GlifoKin({ sello, tono, idioma, grande = false, destacado = false, sinNumero = false }: { sello: number; tono: number; idioma: Idioma; grande?: boolean; destacado?: boolean; sinNumero?: boolean }) {
   const s = selloPorNumero(sello);
@@ -62,21 +62,20 @@ export function GlifoKin({ sello, tono, idioma, grande = false, destacado = fals
     <div className={`flex items-center ${grande ? "gap-2.5" : "gap-1.5"}`}>
       {!sinNumero && <NumeroMaya n={tono} vertical color={color} className={`${grande ? "h-16" : "h-9"} w-auto shrink-0`} />}
       <div className="flex flex-col items-center">
-        <div
-          className={`flex flex-col items-center justify-center rounded-[38%] border-2 text-center ${grande ? "h-28 w-28 p-2" : "h-[4.6rem] w-[4.6rem] p-1"} ${destacado ? "maya-glifo-vivo" : ""}`}
-          style={{ borderColor: color, background: `radial-gradient(circle at 50% 35%, ${color}40, ${color}12 65%, transparent), #150f2a`, boxShadow: destacado ? `0 0 26px ${color}66` : undefined }}
-        >
-          <span className={`font-display leading-tight text-texto ${grande ? "text-lg" : "text-[0.78rem]"}`}>{s.nombre[idioma]}</span>
-          <span className={`mt-0.5 uppercase tracking-widest ${grande ? "text-[0.65rem]" : "text-[0.55rem]"}`} style={{ color }}>
-            {NOMBRE_COLOR[s.color][idioma]}
-          </span>
-        </div>
-        {/* Pedestal del cartucho, como en los glifos de los días */}
-        <div className="mt-0.5 flex gap-1" aria-hidden>
-          {[0, 1, 2].map((i) => (
-            <span key={i} className={`${grande ? "h-2 w-5" : "h-1.5 w-3"} rounded-b-full`} style={{ background: `${color}88` }} />
-          ))}
-        </div>
+        {/* Medallón del sello (ilustración propia, public/maya/sellos/<n>.webp) con el color de su rumbo */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- imagen local pequeña, sin optimizar */}
+        <img
+          src={`/maya/sellos/${s.numero}.webp`}
+          alt={s.nombre[idioma]}
+          width={grande ? 128 : 80}
+          height={grande ? 128 : 80}
+          className={`rounded-full ${grande ? "h-32 w-32" : "h-20 w-20"} ${destacado ? "maya-glifo-vivo" : ""}`}
+          style={{ boxShadow: destacado ? `0 0 26px ${color}88` : `0 0 10px ${color}33` }}
+        />
+        <span className={`mt-1 font-display leading-tight text-texto ${grande ? "text-lg" : "text-[0.78rem]"}`}>{s.nombre[idioma]}</span>
+        <span className={`uppercase tracking-widest ${grande ? "text-[0.65rem]" : "text-[0.55rem]"}`} style={{ color }}>
+          {NOMBRE_COLOR[s.color][idioma]}
+        </span>
       </div>
     </div>
   );
