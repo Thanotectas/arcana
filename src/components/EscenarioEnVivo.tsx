@@ -44,7 +44,7 @@ interface Lectura {
   audio: string | null;
 }
 
-type Respuesta = Lectura | { clase: "espera" } | { clase: "fin" } | { clase: "puente" | "despedida"; texto: string; audio: string | null };
+type Respuesta = Lectura | { clase: "espera" } | { clase: "fin" } | { clase: "pausa" } | { clase: "ok" } | { clase: "puente" | "despedida"; texto: string; audio: string | null };
 
 const NOMBRE_TIPO: Record<TipoLectura, string> = {
   tarot: "Tarot",
@@ -161,6 +161,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   const [bloqueado, setBloqueado] = useState(false);
   const [aviso, setAviso] = useState("");
   const [sinVoz, setSinVoz] = useState(false);
+  const [pausa, setPausa] = useState(false);
   const [cierre, setCierre] = useState<"abierto" | "despidiendo" | "fin">("abierto");
   const [instruccion, setInstruccion] = useState(0);
   const contexto = useRef<AudioContext | null>(null);
@@ -179,7 +180,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   }, [W, H]);
 
   const pedir = useCallback(
-    async (modo: "lectura" | "puente" | "relleno" | "cierre", i = 0): Promise<Respuesta | null> => {
+    async (modo: "lectura" | "puente" | "relleno" | "cierre" | "estado", i = 0): Promise<Respuesta | null> => {
       try {
         const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
         if (res.status === 401) {
@@ -348,6 +349,13 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           despedida = false;
           setCierre("abierto");
         }
+        if (r?.clase === "pausa") {
+          // Habla el presentador: silencio, sin frases de espera.
+          setPausa(true);
+          await esperar(1500);
+          continue;
+        }
+        setPausa(false);
         if (r?.clase === "lectura") {
           quietos = 0;
           setSinVoz(!r.audio);
@@ -362,6 +370,14 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           siguiente = pedir("lectura");
           await hablar(r.texto, r.audio);
           await esperar(2500);
+          // Si el presentador pidió pausa durante la lectura, la siguiente (ya pedida) espera a que termine.
+          while (activo) {
+            const e = await pedir("estado");
+            if (e?.clase !== "pausa") break;
+            setPausa(true);
+            await esperar(1500);
+          }
+          setPausa(false);
           continue;
         }
         quietos++;
@@ -673,6 +689,11 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
         {sinVoz && <div className="absolute left-16 top-[130px] rounded-full bg-red-900/80 px-5 py-2 text-lg text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
+        {pausa && (
+          <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-full border border-oro/50 bg-black/70 px-6 py-2 text-2xl text-oro-suave ${vertical ? "top-[1200px]" : "bottom-[200px]"}`}>
+            <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> Un momento: te hablan desde la mesa
+          </div>
+        )}
         {bloqueado && <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-5xl text-oro-suave">Toca la pantalla para activar el sonido</div>}
       </div>
     </div>

@@ -553,3 +553,11 @@ Fuente «Enlace» de LIVE Studio con la URL vertical, «Resolución personalizad
 «Mantener siempre activa»; tema «Chats y entrevistas». Las frases de Sibila ya no mencionan el código QR (dicen
 «mi arcana punto com, barra, vivo»), ni precios en pesos («tu primera lectura completa es gratis»), y dicen «sígueme
 y activa las notificaciones» en lugar de «suscríbete al canal».
+
+### Pausa para el presentador (migración 0045)
+
+En /admin/en-vivo, «Pausa para el presentador»: 30 s, 1 min, «hasta reanudar» y «Reanudar». Sibila termina la frase
+que está diciendo y espera en silencio (sin tomar la siguiente consulta ni decir frases de espera), con el aviso «Un
+momento: te hablan desde la mesa», para que el presentador salude o lea la pregunta sin que se crucen las voces.
+Guarda en_vivo_estado.pausa_hasta (supabase/migrations/0045_en_vivo_pausa.sql). Con audífonos, el micrófono no capta
+la voz de Sibila.

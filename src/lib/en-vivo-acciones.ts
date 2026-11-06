@@ -147,3 +147,17 @@ export async function accionCierre(_prev: EstadoEnVivo, formData: FormData): Pro
   const texto = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(cierre);
   return { mensaje: ahora ? "Sibila se despide al terminar la lectura que está en curso." : `Sibila se despide a las ${texto}.` };
 }
+
+/**
+ * Pausa para el presentador: el escenario termina la frase que está diciendo y queda en silencio, sin tomar la
+ * siguiente consulta, hasta que pase el tiempo o se reanude. «segundos» = 0 la quita.
+ */
+export async function accionPausa(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  const segundos = Number(formData.get("segundos") ?? 0);
+  if (!Number.isFinite(segundos) || segundos < 0 || segundos > 3 * 3600) return { error: "Duración no válida." };
+  const hasta = segundos ? new Date(Date.now() + segundos * 1000).toISOString() : null;
+  const { error } = await getSupabaseAdmin().from("en_vivo_estado").update({ pausa_hasta: hasta }).eq("id", 1);
+  if (error) return { error: error.message.includes("pausa_hasta") ? "Falta aplicar la migración 0045 (pausa del presentador)." : error.message };
+  return { mensaje: !segundos ? "Sibila sigue leyendo." : segundos >= 3600 ? "Sibila espera en silencio hasta que toques «Reanudar»." : `Sibila espera en silencio ${segundos} segundos, después de la frase que está diciendo.` };
+}

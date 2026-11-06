@@ -250,6 +250,7 @@ type EnVivoEstadoRow = {
   latido_en: string | null;
   cierre_en: string | null;
   despedida_en: string | null;
+  pausa_hasta: string | null;
   fb_live_id: string | null;
   fb_desde: string | null;
   fb_buscado_en: string | null;
@@ -484,7 +485,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "actualizado_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "actualizado_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };

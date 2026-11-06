@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Clock, Copy, Hand, Send, Ticket, Trash2 } from "lucide-react";
-import { accionAlternarCodigo, accionCierre, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
+import { Clock, Copy, Hand, Mic, Play, Send, Ticket, Trash2 } from "lucide-react";
+import { accionAlternarCodigo, accionCierre, accionPausa, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { Aviso } from "@/components/Aviso";
 
@@ -133,6 +133,31 @@ export function CierreDirecto({ hora }: { hora: string }) {
             <Hand className="h-4 w-4" aria-hidden /> Despedirse ya
           </BotonEnviar>
         </form>
+      </div>
+      {estado.error && <Aviso>{estado.error}</Aviso>}
+      {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
+    </div>
+  );
+}
+
+/** Pausa para el presentador: Sibila queda en silencio para que hable quien la acompaña, sin pisarse las voces. */
+export function PausaPresentador() {
+  const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(accionPausa, {});
+  const boton = (segundos: number, texto: string, icono: React.ReactNode, clase = "boton boton-secundario text-sm") => (
+    <form action={enviar}>
+      <input type="hidden" name="segundos" value={segundos} />
+      <BotonEnviar className={clase} cargando="…">
+        {icono} {texto}
+      </BotonEnviar>
+    </form>
+  );
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-3">
+        {boton(30, "Pausa 30 s", <Mic className="h-4 w-4" aria-hidden />)}
+        {boton(60, "Pausa 1 min", <Mic className="h-4 w-4" aria-hidden />)}
+        {boton(3 * 3600, "Pausa hasta reanudar", <Mic className="h-4 w-4" aria-hidden />)}
+        {boton(0, "Reanudar", <Play className="h-4 w-4" aria-hidden />, "boton boton-primario text-sm")}
       </div>
       {estado.error && <Aviso>{estado.error}</Aviso>}
       {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}

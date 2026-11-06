@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { audioCierre, audioPuente, claveValida, despedida, estadoCierre, latido, lecturaDeRelleno, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
+import { audioCierre, audioPuente, claveValida, despedida, enPausa, estadoCierre, latido, lecturaDeRelleno, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
 import { sincronizarFacebook } from "@/lib/en-vivo-facebook";
 
 // Escribir la lectura y narrarla toma unos segundos.
@@ -15,7 +15,8 @@ export const maxDuration = 60;
  * la clave del escenario (?clave=), que se ve en /admin/en-vivo. Cada pedido
  * marca el latido del escenario (la página /vivo recibe fotos solo si late).
  * Llegada la hora de cierre devuelve una vez la despedida de Sibila y luego
- * «fin» (sin leer más el chat) hasta que se cambie la hora en el panel.
+ * «fin» (sin leer más el chat) hasta que se cambie la hora en el panel. Con la pausa del
+ * presentador puesta devuelve «pausa» (y ?modo=estado solo dice si hay pausa).
  */
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams;
@@ -28,6 +29,9 @@ export async function GET(request: NextRequest) {
   if (q.get("modo") === "cierre") {
     return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
   }
+  // Pausa para el presentador: no se toma la siguiente consulta ni se habla (?modo=estado solo pregunta por la pausa).
+  const pausa = await enPausa(admin).catch(() => false);
+  if (q.get("modo") === "estado" || pausa) return NextResponse.json({ clase: pausa ? "pausa" : "ok" }, { headers: { "Cache-Control": "no-store" } });
   const cierre = await estadoCierre(admin).catch(() => "abierto" as const);
   if (cierre === "despedirse") return NextResponse.json({ clase: "despedida", ...(await despedida(admin)) }, { headers: { "Cache-Control": "no-store" } });
   if (cierre === "terminado") return NextResponse.json({ clase: "fin" }, { headers: { "Cache-Control": "no-store" } });

@@ -705,6 +705,13 @@ export async function audioCierre(admin: Admin, i: number) {
 const VENTANA_CIERRE = 3 * 3_600_000;
 
 /** Hora a la que Sibila se despide: la puesta en /admin/en-vivo o, si no, tres minutos antes del fin del próximo directo. */
+/** ¿El presentador pidió silencio? (sin la migración 0045 nunca hay pausa). */
+export async function enPausa(admin: Admin): Promise<boolean> {
+  const { data, error } = await admin.from("en_vivo_estado").select("pausa_hasta").eq("id", 1).maybeSingle();
+  if (error || !data?.pausa_hasta) return false;
+  return Date.parse(data.pausa_hasta) > Date.now();
+}
+
 export function horaCierre(estado: { cierre_en?: string | null } | null, ahora = Date.now()): number {
   const manual = estado?.cierre_en ? Date.parse(estado.cierre_en) : NaN;
   if (Number.isFinite(manual) && ahora - manual < VENTANA_CIERRE) return manual;

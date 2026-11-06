@@ -6,7 +6,7 @@ import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoD
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
-import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
 export const dynamic = "force-dynamic";
@@ -115,6 +115,12 @@ export default async function PaginaAdminEnVivo() {
           </ul>
         )}
         <CrearCodigo venceSugerido={proximoDomingo} />
+      </section>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">Pausa para el presentador</h2>
+        <p className="text-sm text-texto-suave">Sibila termina la frase que está diciendo y espera en silencio, sin tomar la siguiente consulta, para que hables tú (saludar, leer la pregunta) sin que se crucen las voces.</p>
+        <PausaPresentador />
       </section>
 
       <section className="tarjeta space-y-3 p-5">
