@@ -1,0 +1,35 @@
+SELLOS MAYAS (20) · prompts para Gemini · dos cuadrículas
+Se usan en /calendario-maya (glifo del kin, cruz del oráculo, matriz), en el carrusel del nahual y en el directo.
+Cada sello corresponde también a su nawal k'iche' (Imox = Dragón, Iq' = Viento, Aq'ab'al = Noche…).
+Las cuatro columnas son los cuatro colores del Tzolkin, en orden: rojo, blanco, azul, amarillo.
+Se recortan con el mismo método de las monedas del zodíaco (fondo negro liso) y quedan en public/maya/sellos/<numero>.webp.
+
+══════════════ CUADRÍCULA 1 (sellos 1 a 12) ══════════════
+
+Una sola imagen horizontal, 4 columnas por 3 filas, con 12 medallones redondos del mismo tamaño, centrados en su celda, con buen espacio entre ellos. Fondo negro uniforme y liso, sin degradados ni textura, para poder recortar cada medallón.
+
+Cada medallón es de piedra tallada con un borde dorado grueso decorado con un friso de motivos mayas geométricos (escalones y espirales), y en el centro una figura en bajorrelieve dorado, estilo arte maya clásico pero limpio y elegante, vista frontal, iluminación suave desde arriba a la izquierda. El fondo interior de cada medallón tiene un color según su columna: columna 1 rojo carmesí profundo, columna 2 blanco marfil, columna 3 azul índigo profundo, columna 4 amarillo dorado cálido. Los 12 medallones comparten exactamente el mismo estilo, el mismo dorado y el mismo grosor de borde.
+
+Orden, de izquierda a derecha y de arriba abajo:
+Fila 1: un dragón-cocodrilo maya de perfil con la boca abierta (nacimiento) · el viento: una espiral de aire saliendo de una flor en forma de T · la noche: una pequeña casa maya bajo una luna y estrellas · una semilla de maíz brotando con dos hojas.
+Fila 2: una serpiente emplumada enroscada · un puente de piedra que une dos montañas bajo un arco (el paso entre dos mundos) · una mano abierta con la palma al frente · una estrella de cuatro puntas brillante.
+Fila 3: una luna creciente sobre olas de agua · la cabeza de un perro fiel de perfil · un mono sonriente sentado jugando · el rostro sereno de una persona de perfil con tocado maya.
+
+Muy importante: ninguna letra, número, palabra, calavera ni figura que asuste. Solo la figura de cada sello. Sin marcas de agua. Sin sombras proyectadas fuera del medallón.
+
+══════════════ CUADRÍCULA 2 (sellos 13 a 20) ══════════════
+
+Una sola imagen horizontal, 4 columnas por 2 filas, con 8 medallones redondos del mismo tamaño, centrados en su celda, con buen espacio entre ellos. Fondo negro uniforme y liso, sin degradados ni textura, para poder recortar cada medallón.
+
+[El mismo párrafo de estilo de la cuadrícula 1: piedra tallada, borde dorado con friso maya, figura en bajorrelieve dorado, fondo interior por columna: 1 rojo carmesí, 2 blanco marfil, 3 azul índigo, 4 amarillo dorado. Los 8 iguales en estilo y en dorado, y también iguales a los de la cuadrícula 1.]
+
+Orden, de izquierda a derecha y de arriba abajo:
+Fila 1: un caminante con bastón entre dos columnas, bajo un cielo de estrellas · un sabio con capa y un jaguar a su lado · un águila con las alas abiertas · una lechuza sabia de frente.
+Fila 2: la tierra: una montaña con una espiral en el centro · un espejo redondo de obsidiana con el reflejo de un rayo de luz · una nube de tormenta con un rayo y lluvia · un sol radiante con rostro sereno.
+
+Muy importante: ninguna letra, número, palabra, calavera ni figura que asuste. Sin marcas de agua. Sin sombras proyectadas fuera del medallón.
+
+══════════════ CONSEJOS ══════════════
+- Si Gemini cambia el número de medallones o mezcla el orden, pide: «Mismo estilo, pero exactamente 4 columnas y 3 filas, en este orden: …».
+- Si una figura sale mal (por ejemplo el puente o la lechuza), se regenera sola: «Un solo medallón cuadrado, mismo estilo, fondo negro: …».
+- Guarda las cuadrículas originales en marketing/mazos/fuentes-gemini/sellos-mayas-1.jpg y sellos-mayas-2.jpg.
