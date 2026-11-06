@@ -11,7 +11,6 @@ import { SIGNOS, type Signo } from "@/lib/zodiaco";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
-import { PAQUETES } from "@/lib/creditos";
 import { codigoVigente } from "@/lib/pagos/codigos";
 import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
 import { TELEGRAM } from "@/lib/marca/redes";
@@ -485,7 +484,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const sistema = paraTodos
         ? `${prep.sistema}${paraTodos}`
         : invitar
-        ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a suscribirse al canal y activar la campanita para el próximo directo.`
+        ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a seguir la cuenta y activar las notificaciones para el próximo directo.`
         : gancho
           ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : prep.sistema;
@@ -616,16 +615,6 @@ export async function latido(admin: Admin) {
   await admin.from("en_vivo_estado").upsert({ id: 1, latido_en: new Date().toISOString(), actualizado_en: new Date().toISOString() }, { onConflict: "id" });
 }
 
-/** Precio dicho en voz alta: «mil novecientos pesos» se lee bien; «$ 1.900» no. */
-function precioHablado(pesos: number) {
-  const miles = Math.floor(pesos / 1000);
-  const resto = pesos % 1000;
-  const unidades = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte"];
-  const centenas: Record<number, string> = { 900: "novecientos", 800: "ochocientos", 700: "setecientos", 600: "seiscientos", 500: "quinientos", 400: "cuatrocientos", 300: "trescientos", 200: "doscientos", 100: "cien" };
-  const m = miles === 0 ? "" : miles === 1 ? "mil" : miles <= 20 ? `${unidades[miles]} mil` : `${miles} mil`;
-  return `${m}${resto ? ` ${centenas[resto] ?? resto}` : ""} pesos`.trim();
-}
-
 /** Un código que es una palabra (SIBILA) se dice como palabra; uno con números o largo se deletrea. */
 function codigoDicho(codigo: string) {
   return /^[A-Z]{3,8}$/.test(codigo) ? codigo.charAt(0) + codigo.slice(1).toLowerCase() : codigo.toLowerCase().split("").join(" ");
@@ -642,7 +631,6 @@ export const FRASES_PUENTE = 14;
  * invitan a suscribirse y, si hay un código de oferta vigente, dicen cómo usarlo.
  */
 export function frasesPuente(codigo: { codigo: string; creditos_extra: number } | null) {
-  const paquete = PAQUETES[0];
   const oferta = codigo
     ? `Y esta noche hay regalo: con el código ${codigoDicho(codigo.codigo)}, en mi arcana punto com, cualquier paquete que compres trae ${codigo.creditos_extra} créditos más.`
     : "";
@@ -654,11 +642,11 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos, con los hilos que los unen.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y allí también te espera tu carta astral completa, explicada casa por casa. ${oferta}`.trim(),
     "No necesitas saber nada de astrología: solo tu fecha, tu hora y tu ciudad. Escribe carta astral y mira cómo aparece tu cielo en la pantalla.",
-    `Si te gusta este espacio, suscríbete al canal y activa la campanita: así te aviso cada vez que vuelva a leer en vivo. Y para seguir aprendiendo durante la semana, únete a nuestro grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.${telegram}`,
+    `Si te gusta este espacio, sígueme y activa las notificaciones: así te aviso cada vez que vuelva a leer en vivo. Y para seguir aprendiendo durante la semana, únete a nuestro grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.${telegram}`,
     "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
     "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
-    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si te hiciste una limpia con huevo, o quieres que mire tu taza o tu mano, escanea el código de la pantalla y sube la foto: yo la leo aquí, en vivo.",
-    `Si quieres una lectura más profunda, con calma y por escrito, te espero en mi arcana punto com: ${paquete.creditos} lecturas por ${precioHablado(paquete.precioCOP)}. ${oferta}`.trim(),
+    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha. Y si te hiciste una limpia con huevo, o quieres que mire tu taza o tu mano, entra a mi arcana punto com, barra, vivo, y sube la foto: yo la leo aquí, en vivo.",
+    `Si quieres una lectura más profunda, con calma y por escrito, te espero en mi arcana punto com: al crear tu cuenta, tu primera lectura completa es gratis. ${oferta}`.trim(),
     "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
     "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",
     "¿Una pregunta de sí o no? Escribe péndulo y tu pregunta. Y si quieres un consejo más hondo, escribe I Ching, runas o baraja española. Escríbeme en tu idioma: español, português, English, français… yo te leo en el tuyo.",
@@ -700,7 +688,7 @@ export async function audioPuente(admin: Admin, i: number) {
 export function frasesCierre() {
   return [
     "La lectura en vivo de esta noche terminó, pero no te vayas sin tu carta del día: es gratis, todos los días, en mi arcana punto com.",
-    "El próximo domingo vuelvo a leer en vivo. Suscríbete al canal y activa la campanita, para que te avise cuando empiece.",
+    "El próximo domingo vuelvo a leer en vivo. Sígueme y activa las notificaciones, para que te avise cuando empiece.",
     "Durante la semana nos vemos en el grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.",
     "En Instagram soy miarcana punto oficial, y en TikTok, miarcana cuatro. Allí está la carta del día y los rituales de la semana.",
     "Si te quedó una pregunta, hazla con calma en mi arcana punto com: allí también te espera tu carta astral completa y tu sinastría.",
@@ -757,7 +745,7 @@ export async function despedida(admin: Admin) {
       ? "A quienes no alcancé a leer, gracias por la paciencia: tu pregunta merece calma. Hazla en mi arcana punto com, donde tu carta del día es gratis, todos los días."
       : "Recuerda que tu carta del día es gratis, todos los días, en mi arcana punto com.",
     codigo ? `Y el código ${codigoDicho(codigo.codigo)} sigue valiendo esta noche: cualquier paquete trae ${codigo.creditos_extra} créditos más.` : "",
-    "Si te gustó, suscríbete al canal y activa la campanita, para que te avise del próximo directo. Y durante la semana te espero en nuestro grupo de Facebook: mi arcana punto com, barra, grupo.",
+    "Si te gustó, sígueme y activa las notificaciones, para que te avise del próximo directo. Y durante la semana te espero en nuestro grupo de Facebook: mi arcana punto com, barra, grupo.",
     "Que las cartas te sean favorables. Buenas noches.",
   ];
   const texto = partes.filter(Boolean).join(" ");

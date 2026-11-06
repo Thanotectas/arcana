@@ -423,6 +423,14 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
                 </div>
               )}
             </div>
+            {/* La mesa en vivo: recuadro (16:9) donde LIVE Studio pone, encima, la cámara de las manos, la vela y la baraja.
+                TikTok castiga como «pregrabado» un LIVE sin nada en tiempo real; así se ve que hay alguien, sin mostrar la cara. */}
+            <div className="absolute right-6 top-[392px] h-[230px] w-[392px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
+              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] text-center text-lg text-violeta-suave">Aquí va la cámara de la mesa</div>
+              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> Mi mesa · en vivo
+              </div>
+            </div>
           </>
         ) : (
           <>

@@ -537,3 +537,19 @@ Comentar en páginas o grupos ajenos se hace a mano: la API de Meta no deja que 
 publicaciones de otras páginas ni en grupos (la API de grupos se cerró en 2024), y automatizarlo se castiga como
 spam (bloqueos o restricciones de la página). Lo automático es lo propio: carta del día, carrusel de los lunes,
 publicaciones del agente y las respuestas de Sibila a comentarios y mensajes.
+
+### TikTok LIVE: lo que aprendimos el 5 nov 2026 y la «mesa en vivo»
+
+El primer LIVE (28 min, 50 vistas, 0 comentarios) fue marcado por TikTok como «contenido reproducido»
+(pregrabado): solo se veía la animación de Sibila. Quitaron regalos y recomendaciones de ese LIVE, la apelación se
+negó y descontaron 1 punto de estatus (99/100). Si se repite, la sanción sube. Por eso el escenario vertical tiene un
+recuadro «Mi mesa · en vivo» (16:9, a la derecha de Sibila) donde en TikTok LIVE Studio se pone, ENCIMA de la fuente
+«Enlace», la cámara apuntando a la mesa (manos, vela y baraja; sin cara), ajustada dentro del marco dorado. Además,
+micrófono activo: saludar por su nombre a quien entra y leer en voz alta cada pregunta. TikTok exige tener una cámara
+agregada para iniciar el LIVE desde el computador.
+
+En TikTok las preguntas se pasan a mano (Agregar una consulta en /admin/en-vivo): TikTok no deja leer el chat del LIVE.
+Fuente «Enlace» de LIVE Studio con la URL vertical, «Resolución personalizada» 1080 × 1920, «Activar sonido» y
+«Mantener siempre activa»; tema «Chats y entrevistas». Las frases de Sibila ya no mencionan el código QR (dicen
+«mi arcana punto com, barra, vivo»), ni precios en pesos («tu primera lectura completa es gratis»), y dicen «sígueme
+y activa las notificaciones» en lugar de «suscríbete al canal».
