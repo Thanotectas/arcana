@@ -108,7 +108,10 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
     const cabeDentro = o.oh >= eh + 28 && o.ow >= ew * 0.7;
     const afuera = candidatos.slice(0, 8);
     const adentro = cabeDentro ? candidatos.slice(8) : [];
+    // Primero, un lugar con aire alrededor de los otros óvalos: una etiqueta pegada a otro óvalo parece de ese otro.
+    const holgada = (c: Caja) => ({ x: c.x - 26, y: c.y - 26, w: c.w + 52, h: c.h + 52 });
     const libre =
+      afuera.find((c) => dentro(c) && !otras.some((b, j) => choca(j < ovalos.length - 1 ? holgada(c) : c, b))) ??
       afuera.find((c) => dentro(c) && !otras.some((b) => choca(c, b))) ??
       adentro.find((c) => dentro(c) && !etiquetas.some((b) => choca(c, b))) ??
       afuera.find((c) => dentro(c) && !etiquetas.some((b) => choca(c, b))) ??
