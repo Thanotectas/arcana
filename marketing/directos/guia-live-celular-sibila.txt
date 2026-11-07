@@ -1,0 +1,103 @@
+GUÍA · DIRECTO EN TIKTOK DESDE EL CELULAR CON EL ESCENARIO DE SIBILA
+Actualizado el 7 de noviembre de 2026
+
+LA IDEA
+TikTok transmite la PANTALLA de tu celular (modo «Juegos para móviles»), y en la pantalla está abierto el
+escenario vertical de Sibila. Las preguntas de TikTok las pasas tú a la fila desde un segundo aparato.
+
+QUÉ NECESITAS
+· Celular 1 (el del directo): TikTok + Chrome (o Safari). Ideal con carga y wifi.
+· Celular 2, tablet o computador (el de control): abierto en miarcana.com/admin/en-vivo con tu cuenta.
+· Cargador o batería externa, soporte para el celular 1, audífonos opcionales.
+· Si solo tienes un celular, mira la sección «CON UN SOLO CELULAR» al final.
+
+════════════════════════════════════════
+1 · LA PRUEBA (hazla una vez, el día antes, 10 minutos)
+════════════════════════════════════════
+Lo único que hay que comprobar es que el público escuche la voz de Sibila.
+1. En el aparato de control, abre miarcana.com/admin/en-vivo → «Agregar una consulta» → escribe:
+   Nombre: Prueba · Texto: «Soy Leo, ¿qué viene en el amor?» → agregar.
+2. En el celular 1 abre el escenario vertical (paso 2.1) y espera a que Sibila lea la prueba: debe sonar.
+3. Haz un LIVE corto de prueba (paso 3), deja que Sibila lea otra consulta de prueba y pídele a alguien que
+   entre a verte desde su celular: ¿se oye la voz de Sibila?
+   · Si se oye: listo.
+   · Si NO se oye (pasa en algunos Android, que no comparten el sonido del navegador): sube el volumen del
+     celular al máximo y quita el «silencio» del modo «Juegos para móviles» para que el micrófono tome la voz
+     por el parlante. Hazlo en un cuarto silencioso. Si aun así no se oye bien, usa un computador (OBS o TikTok
+     LIVE Studio) para ese directo.
+4. Al terminar la prueba, en /admin/en-vivo → «En la fila» → vacía la fila para que no queden pruebas.
+
+════════════════════════════════════════
+2 · ANTES DEL DIRECTO (15 minutos antes)
+════════════════════════════════════════
+Celular 1 (el del directo):
+1. Abre miarcana.com/admin/en-vivo y copia la dirección de «Versión vertical para TikTok LIVE (1080×1920)».
+   Pégala en Chrome y deja esa pestaña abierta. Es la ÚNICA pestaña que debe estar abierta.
+2. Activa «No molestar» (todo lo que salga en pantalla lo ve el público: notificaciones, WhatsApp, llamadas).
+3. Brillo alto, bloqueo automático de pantalla en «Nunca» (o el máximo), batería sobre 80 % o conectado.
+4. Pon el celular en el soporte.
+Aparato de control (celular 2 o computador):
+5. Abre miarcana.com/admin/en-vivo. Revisa:
+   · «Cierre»: la hora en que Sibila se despide (pon la hora de fin de tu directo).
+   · «Código de oferta» activo si vas a dar un código (por ejemplo SIBILA).
+   · «En la fila»: vacía (sin pruebas).
+6. Abre también TikTok en el aparato de control (o tenlo a mano) para leer los comentarios de tu directo.
+
+════════════════════════════════════════
+3 · EMPEZAR EL LIVE (celular 1)
+════════════════════════════════════════
+1. TikTok → «+» → «LIVE».
+2. Abajo, desliza entre las opciones y elige «Juegos para móviles» (puede decir «Compartir pantalla» o
+   «Mobile gaming»). Si no aparece, tu cuenta aún no lo tiene habilitado: haz ese directo con cámara
+   (guion-directo-informal.txt) o desde computador.
+3. Título: «🔮 Sibila te lee en vivo · escribe tu nombre, tu signo y tu pregunta»
+4. Toca «Iniciar LIVE». TikTok pide permiso para grabar la pantalla: acepta («Iniciar ahora»).
+5. Sal de TikTok (botón de inicio) y abre Chrome con el escenario. Desde ahora NO toques el celular 1.
+6. Desde el aparato de control, fija un comentario en tu LIVE:
+   «Escribe tu NOMBRE + SIGNO + tu pregunta (amor, trabajo, dinero) y Sibila te lee 🔮
+    Carta astral: escribe "carta astral" + fecha + hora + ciudad ✨ Link en mi perfil»
+
+════════════════════════════════════════
+4 · DURANTE EL DIRECTO (aparato de control)
+════════════════════════════════════════
+Por cada pregunta que llegue en TikTok:
+1. En /admin/en-vivo → «Agregar una consulta»:
+   · Nombre: el nombre que escribió la persona (o su usuario).
+   · Tipo: deja «Según lo que escribas (como en el chat)»: reconoce solo carta astral, sinastría, numerología…
+   · Texto: copia la pregunta tal como la escribió. Ej.: «Soy Leo, ¿qué viene en el amor?» o
+     «carta astral 13 febrero 1974 10:30 Cali».
+2. Agregar. Entra a la fila y Sibila la lee en su turno (primero quien aún no ha tenido lectura).
+3. Responde en TikTok: «¡Anotada, Mariana! Ya vas en la fila 💜» (la gente se queda esperando su turno).
+Si quieres hablar tú (saludar, explicar, leer una pregunta en voz alta):
+4. «Pausa para el presentador» → «Pausa 30 s», «Pausa 1 min» o «Pausa hasta reanudar». Sibila termina la
+   frase y espera en silencio. Cuando acabes, «Reanudar».
+   (Si el sonido de tu voz no sale porque el modo pantalla no comparte micrófono, activa el micrófono en el
+    botón del LIVE antes de empezar.)
+Si hay pocas preguntas: Sibila dice sus frases de espera y hace segmentos «para todos». Tú puedes invitar
+desde los comentarios: «¿Ya hiciste el test de alma vieja? Cuéntame cuántas señales tienes».
+
+════════════════════════════════════════
+5 · CERRAR
+════════════════════════════════════════
+1. A la hora que pusiste en «Cierre», Sibila termina la lectura en curso, dice cuántas consultas leyó y se
+   despide. Queda la pantalla final.
+2. En el celular 1, vuelve a TikTok y toca «Finalizar LIVE».
+3. Guarda el directo y anota: cuántas personas entraron, cuántas preguntaron y cuánto duró.
+
+════════════════════════════════════════
+QUÉ HACER SI…
+════════════════════════════════════════
+· El escenario se queda quieto: recarga la pestaña del celular 1 (desliza hacia abajo). La fila no se pierde.
+· El público dice que no oye a Sibila: sube el volumen del celular 1 y revisa la prueba del paso 1.
+· Entra una llamada: recházala sin abrirla (por eso «No molestar» antes de empezar).
+· Alguien escribe algo ofensivo o de salud, embarazo, muerte, juicios o lotería: no lo pases a la fila.
+· Se te acaba la batería: conecta el cargador sin salir de Chrome.
+
+════════════════════════════════════════
+CON UN SOLO CELULAR (posible, pero con cuidado)
+════════════════════════════════════════
+Puedes pasar las preguntas tú misma cambiando de app, pero el público VE todo lo que abres. Para que no se vea
+el panel de administración: pon «Pausa hasta reanudar», di «un momento, anoto sus preguntas», sal a TikTok
+(que muestra los comentarios), memoriza 3 o 4, vuelve a Chrome, ábrelas en el panel en otra pestaña lo más
+rápido posible, regresa a la pestaña del escenario y «Reanudar». Funciona, pero es incómodo: con dos aparatos
+es mucho mejor.
