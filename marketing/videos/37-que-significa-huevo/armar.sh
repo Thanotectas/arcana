@@ -26,7 +26,7 @@ if [ -n "$VOCES" ]; then
     FILTRO+="[$i]adelay=$ms|$ms[a$i];"
     INI=$(python3 -c "print($INI + ${DUR[$i]})")
   done
-  FILTRO+="$(for i in $(seq 0 9); do printf "[a%d]" $i; done)amix=inputs=10:normalize=0,apad=whole_dur=$TOTAL[a]"
+  FILTRO+="$(for i in $(seq 0 9); do printf "[a%d]" $i; done)amix=inputs=10:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100,apad=whole_dur=$TOTAL[a]"
   ffmpeg -loglevel error -y "${ENTRADAS[@]}" -filter_complex "$FILTRO" -map "[a]" -c:a aac -b:a 160k "$T/voz.m4a"
 else
   ffmpeg -loglevel error -y -f lavfi -i anullsrc=r=44100:cl=stereo -t "$TOTAL" -c:a aac -b:a 64k "$T/voz.m4a"

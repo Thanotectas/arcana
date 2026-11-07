@@ -61,7 +61,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 | `34-aviso-directo-domingo` | aviso del directo (capas.html, capas-facebook.html, capas-hoy.html) |
 | `35-tres-cartas-amor` | 35-tres-cartas-amor.mp4 |
 | `36-alma-vieja` | 36-alma-vieja-whatsapp.mp4, 36-alma-vieja.mp4 |
-| `37-que-significa-huevo` | 37-que-significa-huevo.mp4 (sin voz; con voz: voz.txt + armar.sh) |
+| `37-que-significa-huevo` | 37-que-significa-huevo-voz.mp4 (con la voz de Sibila), 37-que-significa-huevo.mp4 (sin voz) |
 
 ## Carruseles
 
