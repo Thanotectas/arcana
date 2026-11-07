@@ -3,6 +3,8 @@ import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layer
 import { PAQUETES, PAQUETE_CIRCULO, formatoCOP, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
+import { tasasDelDia } from "@/lib/monedas";
+import { PrecioLocal, ProveedorMoneda, SelectorMoneda } from "@/components/PreciosLocales";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 import { CarruselVideos } from "@/components/CarruselVideos";
@@ -23,7 +25,7 @@ const VIDEOS = [
 ] as const;
 
 export default async function Portada() {
-  const [usuario, t, idioma, contador, compras] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0), comprasVisibles()]);
+  const [usuario, t, idioma, contador, compras, tasas] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0), comprasVisibles(), tasasDelDia()]);
   const MODULOS = [
     { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
     { icono: Sunrise, ...t.crecimiento.moduloHoy, href: "/hoy" },
@@ -114,14 +116,18 @@ export default async function Portada() {
       <section>
         <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.paquetesTitulo}</h2>
         <p className="mt-2 text-center text-texto-suave">{t.portada.paquetesIntro}</p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <ProveedorMoneda porUSD={tasas.porUSD}>
+        <div className="mt-4">
+          <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={t.creditos.monedaLocal.nota} idioma={idioma} />
+        </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
           {PAQUETES.map((p) => {
             const textos = t.creditos.paquetes[p.id as keyof typeof t.creditos.paquetes];
             return (
               <div key={p.id} className={`tarjeta tarjeta-modulo p-6 ${p.destacado ? "border-oro/50" : ""}`}>
                 {p.destacado && <span className="text-xs uppercase tracking-widest text-oro">{t.portada.masElegido}</span>}
                 <h3 className="font-display mt-1 text-2xl font-semibold">{textos?.nombre ?? p.nombre}</h3>
-                <p className="mt-2 text-3xl font-semibold text-oro-suave">{formatoCOP(p.precioCOP)}</p>
+                <p className="mt-2 text-3xl font-semibold text-oro-suave">{formatoCOP(p.precioCOP)}<PrecioLocal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} /></p>
                 <p className="text-sm text-texto-suave">{plantilla(t.portada.nCreditos, { n: p.creditos })}</p>
                 <p className="mt-3 text-sm text-texto-suave">{textos?.descripcion ?? p.descripcion}</p>
                 <Link href="/creditos" className="boton boton-secundario mt-5 w-full">{t.portada.comprar}</Link>
@@ -140,6 +146,7 @@ export default async function Portada() {
           </div>
           <span className="boton boton-primario">{t.crecimiento.circuloPortada.cta}</span>
         </Link>
+        </ProveedorMoneda>
       </section>
     </div>
   );

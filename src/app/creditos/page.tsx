@@ -20,6 +20,8 @@ import { cookies } from "next/headers";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { COOKIE_CODIGO, normalizarCodigo, validarCodigo } from "@/lib/pagos/codigos";
 import { Ticket } from "lucide-react";
+import { tasasDelDia } from "@/lib/monedas";
+import { PrecioLocal, ProveedorMoneda, SelectorMoneda } from "@/components/PreciosLocales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -28,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaginaCreditos({ searchParams }: { searchParams: Promise<{ error?: string; moneda?: string; codigo?: string }> }) {
   await requerirUsuario();
-  const [{ error, moneda, codigo: codigoUrl }, perfil, t, haComprado, idioma, h, oferta, jar] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores(), cookies()]);
+  const [{ error, moneda, codigo: codigoUrl }, perfil, t, haComprado, idioma, h, oferta, jar, tasas] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores(), cookies(), tasasDelDia()]);
   // Código de oferta: de la URL (?codigo=) o de la cookie del enlace corto /c/CODIGO.
   const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || "";
   const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
@@ -40,7 +42,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   const accion = internacional ? accionComprarInternacional : accionComprar;
   // Fuera de Colombia se paga en pesos con Bold (acepta Visa y Mastercard extranjeras): se muestra el aproximado en dólares.
   const fuera = !internacional && pais !== "CO";
-  const aprox = (centavosUSD: number) => (fuera ? <span className="block text-xs font-normal text-texto-suave">≈ {formatoUSD(centavosUSD)}</span> : null);
+  // En pesos, debajo de cada precio va el aproximado en la moneda que elija la persona (o la de su país).
+  const aprox = (centavosUSD: number, cop: number) => (internacional ? null : <PrecioLocal cop={cop} usdCentavos={centavosUSD} />);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) => (internacional ? formatoUSD(p.precioUSDCentavos) : formatoCOP(p.precioCOP));
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
@@ -60,6 +63,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   const precioBase = PAQUETES[0].precioCOP / PAQUETES[0].creditos;
 
   return (
+    <ProveedorMoneda porUSD={tasas.porUSD} pais={pais}>
     <div className="mx-auto max-w-4xl space-y-8">
       <div className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.creditos.seccion}</p>
@@ -89,6 +93,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           <Link href="/creditos?moneda=usd" className="text-oro-suave underline">{t.creditos.internacional.enlaceFuera}</Link>
         ) : null}
       </p>
+
+      {!internacional && <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={t.creditos.monedaLocal.nota} idioma={idioma} />}
 
       <form method="get" action="/creditos" className={`tarjeta flex flex-wrap items-center gap-3 p-4 ${codigo?.valido ? "border-oro/50" : ""}`}>
         {moneda && <input type="hidden" name="moneda" value={moneda} />}
@@ -124,7 +130,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
                 {ahorro > 0 && <span className="rounded-full bg-exito/15 px-2 py-0.5 text-xs text-exito">{plantilla(t.creditos.ahorro, { pct: ahorro })}</span>}
               </div>
               <h2 className="font-display mt-1 text-2xl font-semibold">{textos?.nombre ?? p.nombre}</h2>
-              <p className="mt-2 text-3xl font-semibold text-oro-suave">{precio(p)}{aprox(p.precioUSDCentavos)}</p>
+              <p className="mt-2 text-3xl font-semibold text-oro-suave">{precio(p)}{aprox(p.precioUSDCentavos, p.precioCOP)}</p>
               <p className="text-sm text-texto-suave">
                 {p.creditos} {t.comun.creditos} · {plantilla(t.creditos.porCredito, { precio: internacional ? formatoUSD(Math.round(p.precioUSDCentavos / p.creditos)) : formatoCOP(Math.round(porCredito)) })}
               </p>
@@ -151,7 +157,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-2xl font-semibold text-oro-suave">{precio(PAQUETE_PRUEBA)}{aprox(PAQUETE_PRUEBA.precioUSDCentavos)}</p>
+          <p className="text-2xl font-semibold text-oro-suave">{precio(PAQUETE_PRUEBA)}{aprox(PAQUETE_PRUEBA.precioUSDCentavos, PAQUETE_PRUEBA.precioCOP)}</p>
           <BotonEnviar className="boton boton-secundario px-4 py-2 text-sm" cargando={t.creditos.preparando}>{t.creditos.prueba.boton}</BotonEnviar>
         </div>
       </form>
@@ -183,10 +189,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
             {oferta.activa ? (
               <>
                 <p className="text-lg text-texto-suave line-through">{precio(PAQUETE_CIRCULO)}</p>
-                <p className="text-4xl font-semibold text-oro-suave">{internacional ? formatoUSD(OFERTA_FUNDADORES.precioUSDCentavos) : formatoCOP(OFERTA_FUNDADORES.precioCOP)}{aprox(OFERTA_FUNDADORES.precioUSDCentavos)}</p>
+                <p className="text-4xl font-semibold text-oro-suave">{internacional ? formatoUSD(OFERTA_FUNDADORES.precioUSDCentavos) : formatoCOP(OFERTA_FUNDADORES.precioCOP)}{aprox(OFERTA_FUNDADORES.precioUSDCentavos, OFERTA_FUNDADORES.precioCOP)}</p>
               </>
             ) : (
-              <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}{aprox(PAQUETE_CIRCULO.precioUSDCentavos)}</p>
+              <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}{aprox(PAQUETE_CIRCULO.precioUSDCentavos, PAQUETE_CIRCULO.precioCOP)}</p>
             )}
             <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
             {!internacional && !oferta.activa && <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })}</p>}
@@ -218,5 +224,6 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         </ul>
       </section>
     </div>
+    </ProveedorMoneda>
   );
 }

@@ -31,9 +31,22 @@ export const MONEDAS: Moneda[] = [
   { codigo: "EUR", nombre: "euros", paises: "España y Europa" },
 ];
 
+/** Moneda que se muestra según el país (código ISO de Vercel o de la región del idioma del navegador). */
+export const PAIS_MONEDA: Record<string, string> = {
+  MX: "MXN", US: "USD", EC: "USD", SV: "USD", PA: "USD", PR: "USD", VE: "USD", AR: "ARS", CL: "CLP", PE: "PEN", BO: "BOB",
+  GT: "GTQ", HN: "HNL", NI: "NIO", CR: "CRC", DO: "DOP", UY: "UYU", PY: "PYG", BR: "BRL", CO: "COP",
+  ES: "EUR", FR: "EUR", IT: "EUR", DE: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", IE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+};
+
+/** Bandera de un país por su código ISO (para el selector de moneda). */
+export const BANDERA_MONEDA: Record<string, string> = {
+  COP: "🇨🇴", MXN: "🇲🇽", USD: "🇺🇸", ARS: "🇦🇷", CLP: "🇨🇱", PEN: "🇵🇪", BOB: "🇧🇴", GTQ: "🇬🇹", HNL: "🇭🇳", NIO: "🇳🇮",
+  CRC: "🇨🇷", DOP: "🇩🇴", UYU: "🇺🇾", PYG: "🇵🇾", BRL: "🇧🇷", EUR: "🇪🇺",
+};
+
 /** Respaldo aproximado (unidades por 1 USD, nov 2026). Solo se usa si el servicio de tasas no responde. */
 const RESPALDO_POR_USD: Record<string, number> = {
-  MXN: 18.5, USD: 1, ARS: 1450, CLP: 940, PEN: 3.45, BOB: 6.96, GTQ: 7.67, HNL: 26.2, NIO: 36.7, CRC: 505, DOP: 63, UYU: 40, PYG: 7200, BRL: 5.4, EUR: 0.86,
+  COP: 3950, MXN: 18.5, USD: 1, ARS: 1450, CLP: 940, PEN: 3.45, BOB: 6.96, GTQ: 7.67, HNL: 26.2, NIO: 36.7, CRC: 505, DOP: 63, UYU: 40, PYG: 7200, BRL: 5.4, EUR: 0.86,
 };
 
 type Tasas = { porUSD: Record<string, number>; fuente: "del día" | "aproximadas" };
