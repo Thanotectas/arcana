@@ -32,6 +32,7 @@ import { MOVIMIENTOS, PESO_MOVIMIENTO, inicioDelDia, type Movimiento } from "../
 import { calcularMaya, nombreKin } from "../oraculos/maya";
 import type { EntradaFoto } from "../oraculos/foto";
 import { calcularRevolucion } from "../astro/revolucion";
+import { calcularVidasPasadas } from "../astro/vidas-pasadas";
 import { randomInt } from "node:crypto";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
@@ -887,6 +888,24 @@ export async function accionRevolucion(_prev: EstadoAccion, formData: FormData):
   try {
     const r = calcularRevolucion(natal, anio, lugar);
     id = await crearLectura({ tipo: "revolucion_solar", titulo: `Revolución solar ${anio}-${anio + 1} de ${natal.nombre}`, entrada: { ...natal, anio, lugarRevolucion: lugar }, resultado: r });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Vidas pasadas (reencarnación): Nodo Sur, karma numerológico y tres cartas
+// ---------------------------------------------------------------------------
+export async function accionVidasPasadas(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const natal = leerNacimiento(formData, "");
+  const error = errorNacimiento(natal, "astral");
+  if (error) return { error };
+  await guardarNacimiento(natal);
+  let id: string;
+  try {
+    const r = calcularVidasPasadas(natal);
+    id = await crearLectura({ tipo: "vidas_pasadas", titulo: `Las vidas pasadas de ${natal.nombre}`, entrada: natal, resultado: r });
   } catch (e) {
     return manejarError(e);
   }

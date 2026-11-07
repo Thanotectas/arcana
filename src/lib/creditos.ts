@@ -27,7 +27,8 @@ export type TipoLectura =
   | "pendulo"
   | "cafe"
   | "huevo"
-  | "maya";
+  | "maya"
+  | "vidas_pasadas";
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -54,6 +55,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   cafe: 3,
   huevo: 3,
   maya: 2,
+  vidas_pasadas: 4, // premium: carta kármica + numerología kármica + tres cartas
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -81,6 +83,7 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   cafe: "Lectura del café",
   huevo: "Limpia con huevo",
   maya: "Calendario maya",
+  vidas_pasadas: "Tus vidas pasadas",
 };
 
 /** Pregunta de seguimiento sobre una lectura. */

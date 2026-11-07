@@ -28,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...SIGNOS.map((s) => url(`/signos-zodiacales/${s.id}`, 0.8)),
     url("/compatibilidad-signos", 0.9),
     ...todasLasParejas().map(([a, b]) => url(`/compatibilidad-signos/${slugPareja(a, b)}`, 0.6)),
+    url("/reencarnacion", 0.8),
     url("/piedras", 0.6),
     url("/rituales", 0.6),
     url("/velas", 0.5),

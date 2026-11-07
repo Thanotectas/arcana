@@ -35,6 +35,7 @@ import { resumenPendulo, TRADICION_PENDULO, type EntradaPendulo, type ResultadoP
 import { resumenMaya, TRADICION_MAYA, type ResultadoMaya } from "../oraculos/maya";
 import { resumenCafe, resumenHuevo, TRADICION_CAFE, TRADICION_HUEVO, type EntradaFoto } from "../oraculos/foto";
 import { resumenRevolucion, type ResultadoRevolucion } from "../astro/revolucion";
+import { resumenVidasPasadas, type ResultadoVidasPasadas } from "../astro/vidas-pasadas";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -316,6 +317,28 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
           INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
       opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
+    };
+  }
+
+  if (l.tipo === "vidas_pasadas") {
+    const r = resultado as unknown as ResultadoVidasPasadas;
+    const natal = entrada as unknown as DatosNacimiento;
+    return {
+      usuario:
+        `Haz la lectura de vidas pasadas de esta persona (reencarnación y karma).\n\n${resumenVidasPasadas(r, natal)}\n\n` +
+        `Estructura: ## Quién fuiste (a partir del Nodo Sur por signo${natal.horaDesconocida ? "" : " y casa"} y los planetas que lo acompañan, cuenta en segunda persona una vida pasada posible, con época, tipo de lugar, oficio o papel y lo que la marcó; que se sienta como un recuerdo, no como un dato), ` +
+        `## Lo que trajiste contigo (los talentos que ya dominas y los patrones que repites sin darte cuenta: Nodo Sur, retrógrados${natal.horaDesconocida ? "" : ", casa 12"}), ` +
+        `## Tu karma en los números (las deudas kármicas y las lecciones de su nombre: qué vino a saldar y a aprender; si no tiene deudas, dilo como una buena noticia), ` +
+        `## Las cartas de tu memoria (las tres cartas, una por posición, enlazadas con lo anterior), ` +
+        `## Saturno y Plutón: la lección que vuelve (qué situación se repite en su vida y cómo se rompe el ciclo), ` +
+        `## Almas que reconoces (cómo se reconocen los vínculos de otras vidas: la persona que sientes que ya conocías, la relación que se repite; sin nombres ni promesas), ` +
+        `## Hacia dónde va tu alma (Nodo Norte: el camino de esta vida, con un paso concreto para empezar), ` +
+        `## Un ritual para soltar el pasado (sencillo, con lo que hay en casa). ` +
+        (natal.horaDesconocida ? "La hora es desconocida: no hay casas; apóyate en los signos y dilo una vez. " : "") +
+        `Usa el nombre de la persona. Extensión: 1100 a 1500 palabras.`,
+      sistemaExtra:
+        "Astrología kármica y reencarnación: el Nodo Sur describe lo que el alma ya vivió y domina (su zona cómoda), el Nodo Norte lo que vino a desarrollar; Saturno marca la lección que se repite y Plutón lo que muere y renace; la casa 12 guarda la memoria del alma; los retrógrados son asuntos que vuelven. En numerología, las deudas 13, 14, 16 y 19 son karma por saldar y los números ausentes del nombre, lecciones. Es una lectura espiritual y simbólica: cuenta la vida pasada con imágenes vivas y concretas, pero nunca la presentes como un hecho comprobado ni des nombres, fechas exactas o lugares históricos precisos. Nada de miedo ni de castigos: el karma se cuenta como aprendizaje.",
+      opciones: { idioma, effort: "medium", maxTokens: 4600, nivel: "premium" },
     };
   }
 

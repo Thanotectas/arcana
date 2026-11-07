@@ -124,6 +124,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       { etiqueta: t.maya.oraculo.oculto, valor: selloPorNumero(r.oraculo.oculto).nombre[idioma] },
       { etiqueta: t.maya.nawal, valor: `${r.nawal.numero} ${NAWALES[r.nawal.indice]?.nombre ?? ""}` },
     );
+  } else if (tipo === "vidas_pasadas") {
+    const r = resultado as { nodoSur?: { signo: string }; nodoNorte?: { signo: string }; deudas?: number[]; cartas?: { nombre: string }[] };
+    const sur = signoPorId(r.nodoSur?.signo ?? "");
+    const norte = signoPorId(r.nodoNorte?.signo ?? "");
+    if (sur) fichas.push({ etiqueta: t.vidasPasadas.nodoSur, valor: sur.nombre });
+    if (norte) fichas.push({ etiqueta: t.vidasPasadas.nodoNorte, valor: norte.nombre });
+    fichas.push({ etiqueta: t.vidasPasadas.deudas, valor: r.deudas?.join(" · ") || t.vidasPasadas.ninguna });
+    if (r.cartas?.length) fichas.push({ etiqueta: t.vidasPasadas.cartas, valor: r.cartas.map((c) => c.nombre).join(" · ") });
   } else if (tipo === "carta_astral" || tipo === "revolucion_solar") {
     const planetas = (resultado.planetas as { cuerpo: string; signo: string }[]) ?? [];
     const casas = resultado.casas as { ascendente: number } | undefined;

@@ -40,6 +40,7 @@ const ICONO: Record<TipoLectura, string> = {
   pendulo: "◇",
   cafe: "☕",
   huevo: "◯",
+  vidas_pasadas: "∞",
   maya: "◈",
 };
 
