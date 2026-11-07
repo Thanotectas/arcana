@@ -8,7 +8,7 @@ import type { Diccionario } from "./i18n/diccionarios";
 export type GrupoCatalogo = "oraculos" | "cielo" | "pareja" | "profundo";
 export const GRUPOS_CATALOGO: GrupoCatalogo[] = ["oraculos", "cielo", "pareja", "profundo"];
 
-export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales" | "piedras" | "revolucion" | "baraja" | "lenormand" | "runas" | "pendulo" | "cafe" | "huevo" | "maya" | "vidas";
+export type IconoCatalogo = "tarot" | "astral" | "hoy" | "horoscopo" | "luna" | "numerologia" | "quiromancia" | "iching" | "chino" | "suenos" | "chocolate" | "velas" | "aura" | "tabaco" | "compatibilidad" | "sinastria" | "cruce" | "rituales" | "piedras" | "revolucion" | "baraja" | "lenormand" | "runas" | "pendulo" | "cafe" | "huevo" | "maya" | "vidas" | "akashicos";
 
 export interface ItemCatalogo {
   clave: IconoCatalogo;
@@ -41,6 +41,7 @@ export const CATALOGO: ItemCatalogo[] = [
   { clave: "astral", href: "/carta-astral", grupo: "cielo", costo: COSTOS.carta_astral },
   { clave: "revolucion", href: "/revolucion-solar", grupo: "cielo", costo: COSTOS.revolucion_solar },
   { clave: "vidas", href: "/vidas-pasadas", grupo: "profundo", costo: COSTOS.vidas_pasadas },
+  { clave: "akashicos", href: "/registros-akashicos", grupo: "profundo", costo: COSTOS.akashicos },
   { clave: "maya", href: "/calendario-maya", grupo: "cielo", costo: COSTOS.maya },
   { clave: "chino", href: "/calendario-chino", grupo: "cielo", costo: COSTOS.chino },
   { clave: "numerologia", href: "/numerologia", grupo: "cielo", costo: COSTOS.numerologia },

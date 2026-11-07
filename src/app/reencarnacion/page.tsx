@@ -105,6 +105,7 @@ export default function PaginaReencarnacion() {
         </ul>
         <p className="text-sm text-texto-suave">
           ¿Un sueño así? <Link href="/suenos" className="text-oro-suave hover:text-texto">Sibila te lo interpreta</Link>.
+          ¿Una pregunta para tu alma? <Link href="/que-son-registros-akashicos" className="text-oro-suave hover:text-texto">Abre tus registros akáshicos</Link>.
         </p>
       </section>
 

@@ -36,6 +36,7 @@ import { resumenMaya, TRADICION_MAYA, type ResultadoMaya } from "../oraculos/may
 import { resumenCafe, resumenHuevo, TRADICION_CAFE, TRADICION_HUEVO, type EntradaFoto } from "../oraculos/foto";
 import { resumenRevolucion, type ResultadoRevolucion } from "../astro/revolucion";
 import { resumenVidasPasadas, type ResultadoVidasPasadas } from "../astro/vidas-pasadas";
+import { resumenAkashicos, type EntradaAkashicos, type ResultadoAkashicos } from "../akashicos";
 
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
@@ -317,6 +318,26 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
           INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
       opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
+    };
+  }
+
+  if (l.tipo === "akashicos") {
+    const e = entrada as unknown as EntradaAkashicos;
+    const r = resultado as unknown as ResultadoAkashicos;
+    return {
+      usuario:
+        `Haz una lectura de registros akáshicos para esta persona, sobre su pregunta.\n\n${resumenAkashicos(e, r)}\n\n` +
+        `Estructura: ## Se abren tus registros (una invocación breve y serena con tus propias palabras, nombrando a la persona por su nombre completo: pides permiso para leer su registro con amor y verdad), ` +
+        `## Lo que tu alma quiere que sepas (el mensaje central, ligado a su número del alma), ` +
+        `## Sobre tu pregunta (respóndela de frente: lo que el registro muestra, qué hay detrás de la situación y qué está en sus manos; con imágenes concretas y sin rodeos), ` +
+        `## El patrón que se repite (el aprendizaje o acuerdo del alma que está en juego: de dónde viene, por qué vuelve y cómo se transforma), ` +
+        `## Mensaje de tus guías (la carta del Oráculo de los Ángeles, enlazada con su pregunta), ` +
+        `## Lo que puedes hacer ahora (tres pasos concretos para estas semanas), ` +
+        `## Se cierran tus registros (cierre breve de agradecimiento y una frase para que la persona repita). ` +
+        `Usa el nombre de la persona. Extensión: 900 a 1200 palabras.`,
+      sistemaExtra:
+        "Registros akáshicos: según la tradición espiritual, son la memoria del alma, donde queda todo lo que ha vivido, sentido y acordado. Se leen con amor, sin juicio y sin miedo: el registro no condena, muestra. Habla como quien lee con reverencia, cálida y directa. Es una lectura espiritual y simbólica: no la presentes como un hecho comprobado. No hables en nombre de personas fallecidas ni transmitas mensajes suyos como si fueran literales; puedes hablar del vínculo y de lo que el alma de la persona necesita sanar. Si la pregunta es de salud, embarazo, asuntos legales o dinero urgente, responde desde lo emocional y recomienda con suavidad buscar a quien corresponda.",
+      opciones: { idioma, effort: "medium", maxTokens: 4200, nivel: "premium" },
     };
   }
 

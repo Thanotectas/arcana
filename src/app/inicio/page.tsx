@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean, Infinity as Infinito } from "lucide-react";
+import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean, Infinity as Infinito, LibraryBig as Archivo } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
@@ -87,6 +87,7 @@ export default async function PaginaInicio() {
     { href: "/pendulo", icono: Diamond, ...t.inicio.accesos.pendulo, costo: COSTOS.pendulo },
     { href: "/revolucion-solar", icono: Sun, ...t.inicio.accesos.revolucion, costo: COSTOS.revolucion_solar },
     { href: "/vidas-pasadas", icono: Infinito, ...t.inicio.accesos.vidas, costo: COSTOS.vidas_pasadas },
+    { href: "/registros-akashicos", icono: Archivo, ...t.inicio.accesos.akashicos, costo: COSTOS.akashicos },
     { href: "/calendario-maya", icono: Pyramid, ...t.inicio.accesos.maya, costo: COSTOS.maya },
     { href: "/aura", icono: Sparkle, ...t.inicio.accesos.aura, costo: COSTOS.aura },
     { href: "/cruce", icono: Layers, ...t.inicio.accesos.cruce, costo: COSTOS.cruce },

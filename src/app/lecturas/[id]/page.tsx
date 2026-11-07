@@ -17,6 +17,8 @@ import { VistaCartaAstral } from "@/components/VistaCartaAstral";
 import { RetornoSolar } from "@/components/RetornoSolar";
 import { VistaSinastria } from "@/components/VistaSinastria";
 import { VistaVidasPasadas } from "@/components/VistaVidasPasadas";
+import { VistaAkashicos } from "@/components/VistaAkashicos";
+import type { EntradaAkashicos, ResultadoAkashicos } from "@/lib/akashicos";
 import type { ResultadoVidasPasadas } from "@/lib/astro/vidas-pasadas";
 import { CompartirLectura } from "@/components/CompartirLectura";
 import { TIRADAS, POSICIONES_I18N, cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
@@ -100,6 +102,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
           <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />
         </>
       )}
+      {lectura.tipo === "akashicos" && <VistaAkashicos entrada={lectura.entrada as unknown as EntradaAkashicos} resultado={lectura.resultado as unknown as ResultadoAkashicos} t={t} />}
       {lectura.tipo === "vidas_pasadas" && <VistaVidasPasadas resultado={lectura.resultado as unknown as ResultadoVidasPasadas} t={t} />}
       {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
       {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} entrada={lectura.entrada as { a?: DatosNacimiento; b?: DatosNacimiento }} t={t} />}
@@ -175,6 +178,7 @@ function rutaNueva(tipo: string) {
   const nuevas: Record<string, string> = {
     revolucion_solar: "/revolucion-solar",
     vidas_pasadas: "/vidas-pasadas",
+    akashicos: "/registros-akashicos",
     baraja_espanola: "/baraja-espanola",
     lenormand: "/lenormand",
     runas: "/runas",

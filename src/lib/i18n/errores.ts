@@ -30,6 +30,7 @@ export function textoErrorLectura(codigo: string | undefined, t: Diccionario): s
     cafe: t.cafe.errores,
     huevo: t.huevo.errores,
     maya: t.maya.errores,
+    akashicos: t.akashicos.errores,
   };
   return grupos[grupo]?.[clave] ?? codigo;
 }

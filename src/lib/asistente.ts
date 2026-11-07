@@ -39,6 +39,7 @@ export const RUTAS: Record<TipoLectura, string> = {
   tabaco: "/tabaco",
   revolucion_solar: "/revolucion-solar",
   vidas_pasadas: "/vidas-pasadas",
+  akashicos: "/registros-akashicos",
   baraja_espanola: "/baraja-espanola",
   lenormand: "/lenormand",
   runas: "/runas",

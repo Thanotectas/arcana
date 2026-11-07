@@ -124,6 +124,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       { etiqueta: t.maya.oraculo.oculto, valor: selloPorNumero(r.oraculo.oculto).nombre[idioma] },
       { etiqueta: t.maya.nawal, valor: `${r.nawal.numero} ${NAWALES[r.nawal.indice]?.nombre ?? ""}` },
     );
+  } else if (tipo === "akashicos") {
+    const r = resultado as { caminoDeVida?: number; alma?: number; guia?: { nombre?: string } };
+    const e = entrada as { pregunta?: string };
+    if (e.pregunta) fichas.push({ etiqueta: t.akashicos.tuPregunta, valor: e.pregunta });
+    fichas.push({ etiqueta: t.akashicos.camino, valor: String(r.caminoDeVida ?? "") }, { etiqueta: t.akashicos.alma, valor: String(r.alma ?? "") });
+    if (r.guia?.nombre) fichas.push({ etiqueta: t.akashicos.guias, valor: r.guia.nombre });
   } else if (tipo === "vidas_pasadas") {
     const r = resultado as { nodoSur?: { signo: string }; nodoNorte?: { signo: string }; deudas?: number[]; cartas?: { nombre: string }[] };
     const sur = signoPorId(r.nodoSur?.signo ?? "");

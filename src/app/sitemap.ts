@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/compatibilidad-signos", 0.9),
     ...todasLasParejas().map(([a, b]) => url(`/compatibilidad-signos/${slugPareja(a, b)}`, 0.6)),
     url("/reencarnacion", 0.8),
+    url("/que-son-registros-akashicos", 0.8),
     url("/alma-vieja", 0.9, "weekly"),
     ...NIVELES_ALMA.map((n) => url(`/alma-vieja/${n}`, 0.4)),
     url("/piedras", 0.6),

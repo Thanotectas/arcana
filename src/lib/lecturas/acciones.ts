@@ -33,6 +33,7 @@ import { calcularMaya, nombreKin } from "../oraculos/maya";
 import type { EntradaFoto } from "../oraculos/foto";
 import { calcularRevolucion } from "../astro/revolucion";
 import { calcularVidasPasadas } from "../astro/vidas-pasadas";
+import { PREGUNTA_MAX, PREGUNTA_MIN, calcularAkashicos, esTemaAkashico, type EntradaAkashicos } from "../akashicos";
 import { randomInt } from "node:crypto";
 import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
@@ -906,6 +907,28 @@ export async function accionVidasPasadas(_prev: EstadoAccion, formData: FormData
   try {
     const r = calcularVidasPasadas(natal);
     id = await crearLectura({ tipo: "vidas_pasadas", titulo: `Las vidas pasadas de ${natal.nombre}`, entrada: natal, resultado: r });
+  } catch (e) {
+    return manejarError(e);
+  }
+  redirect(`/lecturas/${id}`);
+}
+
+// ---------------------------------------------------------------------------
+// Registros akáshicos: una pregunta del alma, con nombre completo y fecha
+// ---------------------------------------------------------------------------
+export async function accionAkashicos(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
+  const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 100);
+  const fecha = String(formData.get("fecha") ?? "");
+  const tema = String(formData.get("tema") ?? "");
+  const pregunta = String(formData.get("pregunta") ?? "").replace(/\r/g, "").trim().slice(0, PREGUNTA_MAX);
+  if (!nombre) return { error: "astral.nombre" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || Number(fecha.slice(0, 4)) < 1900 || fecha > new Date().toISOString().slice(0, 10)) return { error: "astral.fecha" };
+  if (!esTemaAkashico(tema)) return { error: "akashicos.tema" };
+  if (pregunta.length < PREGUNTA_MIN) return { error: "akashicos.pregunta" };
+  const entrada: EntradaAkashicos = { nombre, fecha, tema, pregunta };
+  let id: string;
+  try {
+    id = await crearLectura({ tipo: "akashicos", titulo: `Registros akáshicos de ${nombre.split(/\s+/)[0]}`, entrada, resultado: calcularAkashicos(entrada) });
   } catch (e) {
     return manejarError(e);
   }

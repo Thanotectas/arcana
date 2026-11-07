@@ -62,6 +62,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (MAZOS_CON_IMAGEN.has(mazo)) imagenes = await Promise.all(cartas.slice(0, 3).map((c) => cartaComoDataUri(mazo, c.carta.id)));
     simbolos = cartas.slice(0, 4).map((c) => (c.carta.arcano === "mayor" ? "✦" : { bastos: "🜂", copas: "🜄", espadas: "🜁", oros: "🜃" }[c.carta.palo ?? "bastos"]));
     void (tipo as TipoTirada);
+  } else if (tipo === "akashicos") {
+    const guia = resultado.guia as { id?: string; nombre?: string } | undefined;
+    if (guia?.nombre) titulo = guia.nombre;
+    if (guia?.id) imagenes = [await cartaComoDataUri("angeles", guia.id)].filter(Boolean);
   } else if (tipo === "vidas_pasadas") {
     const cartas = ((resultado.cartas as { id: string }[]) ?? []).slice(0, 3);
     const sur = signoPorId(String((resultado.nodoSur as { signo?: string } | undefined)?.signo ?? ""));
