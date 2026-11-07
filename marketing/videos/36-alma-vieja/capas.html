@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+#gancho{position:absolute;inset:0;opacity:0}
+#gancho .v{position:absolute;left:0;right:0;top:0;height:900px;background:linear-gradient(180deg,rgba(11,7,22,.88) 0%,rgba(11,7,22,.7) 60%,rgba(11,7,22,0) 100%)}
+#gancho .t{position:absolute;left:60px;right:60px;top:230px;text-align:center;font-family:C;font-size:104px;line-height:1.02;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.45),0 4px 20px rgba(0,0,0,.7)}
+#actual{position:absolute;left:60px;right:60px;top:170px;padding:26px 34px;border-radius:30px;background:rgba(11,7,22,.72);border:2px solid rgba(241,217,154,.6);text-align:center;opacity:0}
+#actual .n{font-family:I;font-size:30px;letter-spacing:.3em;color:#b7a5ff}
+#actual .x{margin-top:10px;font-family:C;font-size:66px;line-height:1.06;color:#fff}
+#lista{position:absolute;left:60px;right:60px;top:1220px;padding:26px 34px;border-radius:30px;background:rgba(11,7,22,.66);border:1.5px solid rgba(241,217,154,.35);opacity:0}
+.f{display:flex;align-items:center;gap:22px;font-family:IR;font-size:34px;line-height:1.25;color:#cfc6ea;padding:9px 0}
+.cj{flex:none;width:46px;height:46px;border-radius:10px;border:2.5px solid rgba(241,217,154,.7);display:flex;align-items:center;justify-content:center;font-family:I;font-size:32px;color:#0b0716}
+#fin{position:absolute;inset:0;opacity:0}
+#fin .v{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,7,22,.0) 0%,rgba(11,7,22,.0) 45%,rgba(11,7,22,.86) 62%,#0b0716 100%)}
+</style></head><body>
+<div id="gancho"><div class="v"></div><div class="t">Si te pasan<br>4 de estas 6…<br><span style="color:#fff">eres alma vieja</span></div></div>
+<div id="actual"><div class="n" id="an"></div><div class="x" id="ax"></div></div>
+<div id="lista"></div>
+<div id="fin"><div class="v"></div>
+  <div style="position:absolute;left:0;right:0;top:150px;text-align:center;font-family:C;font-size:96px;line-height:1.02;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.45),0 4px 20px rgba(0,0,0,.8)">¿Cuántas tienes?<br><span style="color:#fff;font-size:70px">Comenta 👇</span></div>
+  <div style="position:absolute;left:70px;right:70px;top:1240px;text-align:center">
+    <div style="font-family:I;font-size:30px;letter-spacing:.3em;color:#b7a5ff">TEST GRATIS · 1 MINUTO</div>
+    <div style="margin-top:14px;font-family:C;font-size:84px;line-height:1.02;color:#f1d99a">¿Eres alma vieja?</div>
+    <div style="margin-top:22px;font-family:IR;font-size:30px;color:#ece6f7" id="niveles"></div>
+    <div style="display:inline-block;margin-top:36px;padding:22px 44px;border-radius:999px;border:2px solid #f1d99a;font-family:I;font-size:44px;color:#f1d99a;background:rgba(11,7,22,.6)">miarcana.com/alma-vieja</div>
+  </div>
+</div>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+// Señales y cuándo las dice Sibila (inicio y fin de cada audio en el video, ver armar.sh).
+const S=[["Desde niña te decían «madura para tu edad»",5.33,9.46],["Necesitas soledad para recargarte",9.81,13.52],["Nostalgia de épocas que no viviste",13.87,18.15],
+ ["Tu intuición casi nunca falla",18.5,21.97],["Te piden consejo aunque seas joven",22.32,27.57],["Sientes que este mundo no es tu casa",27.92,31.92]];
+const NIV=["Alma nueva","joven","madura","vieja","ancestral"];
+document.getElementById("niveles").innerHTML=NIV.map((n,i)=>`<span style="color:#f1d99a">${"★".repeat(i+1)}</span> ${n}`).join(" &nbsp;·&nbsp; ");
+const lista=document.getElementById("lista");
+lista.innerHTML=S.map((s,i)=>`<div class="f" id="f${i}"><span class="cj" id="c${i}"></span><span>${s[0]}</span></div>`).join("");
+window.pintar=(t)=>{
+  document.getElementById("gancho").style.opacity=ven(t,0.1,5.2).toFixed(3);
+  const i=S.findIndex(s=>t>=s[1]-.15&&t<s[2]+.3);
+  const a=document.getElementById("actual");
+  if(i>=0){ document.getElementById("an").textContent=`${i+1} / 6`; document.getElementById("ax").textContent=S[i][0]; a.style.opacity=ven(t,S[i][1]-.15,S[i][2]+.3,.25).toFixed(3);} else a.style.opacity=0;
+  lista.style.opacity=(Math.min(su(pr(t,5.1,5.6)),1-su(pr(t,32.0,32.6)))).toFixed(3);
+  S.forEach((s,k)=>{const on=t>=s[1]+.6; const c=document.getElementById("c"+k), f=document.getElementById("f"+k);
+    c.style.background=on?"#f1d99a":"transparent"; c.textContent=on?"✓":""; f.style.color=k===i?"#fff":on?"#f1d99a":"#8f84ad"; f.style.fontFamily=k===i?"I":"IR";});
+  document.getElementById("fin").style.opacity=su(pr(t,32.2,32.9)).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
