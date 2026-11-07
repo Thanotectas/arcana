@@ -1,5 +1,5 @@
 Prompts para Gemini (fotos realistas de cada señal). Guarda cada imagen en fotos/<nombre>.jpg y vuelve a correr
-generar.js: la lámina usa la foto en vez del dibujo. Ya hay fotos de todas menos yema-flota
+generar.js: la lámina usa la foto en vez del dibujo. Ya están las fotos de las 8 señales
 (en fotos/extra/ queda otra versión del velo). Formato horizontal 3:2 (la foto se recorta arriba de la lámina).
 
 Base para todos (pégala antes de cada uno):
