@@ -10,6 +10,7 @@ export async function PiePagina() {
       <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 sm:px-6">
         <nav className="flex flex-wrap gap-x-4 gap-y-1">
           <Link href="/que-carta-eres" className="text-oro-suave hover:text-texto">{t.pie.testCarta}</Link>
+          <Link href="/alma-vieja" className="text-oro-suave hover:text-texto">{t.pie.testAlma}</Link>
           <Link href="/matriz-del-destino" className="hover:text-texto">{t.pie.matrizDestino}</Link>
           <Link href="/significado-tarot" className="hover:text-texto">{t.pie.guiaTarot}</Link>
           <Link href="/signos-zodiacales" className="hover:text-texto">{t.pie.guiaSignos}</Link>

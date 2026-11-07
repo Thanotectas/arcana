@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { MAZO } from "@/lib/tarot/deck";
 import { SIGNOS } from "@/lib/zodiaco";
 import { RESULTADOS } from "@/lib/seo/test-carta";
+import { NIVELES_ALMA } from "@/lib/seo/test-alma";
 import { slugPareja, todasLasParejas } from "@/lib/seo/compatibilidad";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
@@ -29,6 +30,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/compatibilidad-signos", 0.9),
     ...todasLasParejas().map(([a, b]) => url(`/compatibilidad-signos/${slugPareja(a, b)}`, 0.6)),
     url("/reencarnacion", 0.8),
+    url("/alma-vieja", 0.9, "weekly"),
+    ...NIVELES_ALMA.map((n) => url(`/alma-vieja/${n}`, 0.4)),
     url("/piedras", 0.6),
     url("/rituales", 0.6),
     url("/velas", 0.5),

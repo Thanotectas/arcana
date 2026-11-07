@@ -78,6 +78,14 @@ export default function PaginaReencarnacion() {
         </div>
       </section>
 
+      <Link href="/alma-vieja" className="tarjeta flex items-center justify-between gap-4 border-oro/40 bg-oro/5 p-5 transition hover:border-oro">
+        <span>
+          <span className="font-display block text-2xl">¿Eres alma vieja?</span>
+          <span className="text-sm text-texto-suave">Test gratis de 7 preguntas: descubre la edad de tu alma.</span>
+        </span>
+        <span className="text-oro-suave">Hacer el test →</span>
+      </Link>
+
       <CtaLectura
         titulo="Recuerda tus vidas pasadas con Sibila"
         texto="Calculamos tu Nodo Sur, Saturno, Plutón y tus números kármicos, sacas tres cartas, y Sibila te cuenta quién fuiste, qué trajiste contigo y hacia dónde va tu alma."

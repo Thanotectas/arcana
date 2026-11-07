@@ -77,6 +77,7 @@ export const es = {
     guiaCompatibilidad: "Compatibilidad de signos",
     matrizDestino: "Matriz del Destino",
     testCarta: "¿Qué carta del tarot eres?",
+    testAlma: "¿Eres alma vieja?",
   },
   lecturas: {
     nombres: {
