@@ -196,7 +196,7 @@ const CSS = `
 body { width: 1080px; height: 1350px; overflow: hidden; background: #0b0716; color: #ece6f7; font-family: Inter, sans-serif; }
 .lienzo { position: relative; width: 1080px; height: 1350px; background: radial-gradient(ellipse at 50% 70%, #1d1240 0%, #0b0716 75%); }
 .escena { position: absolute; left: 0; right: 0; top: 0; height: 735px; overflow: hidden; }
-.escena::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,7,22,.75) 0%, rgba(11,7,22,0) 16%, rgba(11,7,22,0) 72%, #0e0920 100%); }
+.escena::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,7,22,.9) 0%, rgba(11,7,22,.35) 10%, rgba(11,7,22,0) 19%, rgba(11,7,22,0) 72%, #0e0920 100%); }
 .marco { position: absolute; inset: 26px; border: 2px solid rgba(241,217,154,.55); border-radius: 26px; z-index: 2; pointer-events: none; }
 .esq { position: absolute; color: #f1d99a; font-size: 28px; z-index: 3; }
 .marca { position: absolute; top: 56px; left: 0; right: 0; text-align: center; font-size: 21px; letter-spacing: .36em; text-transform: uppercase; color: #cfc2ff; z-index: 3; text-shadow: 0 2px 10px #0b0716; }

@@ -1,5 +1,6 @@
 Prompts para Gemini (fotos realistas de cada señal). Guarda cada imagen en fotos/<nombre>.jpg y vuelve a correr
-generar.js: la lámina usa la foto en vez del dibujo. Formato horizontal 3:2 (la foto se recorta arriba de la lámina).
+generar.js: la lámina usa la foto en vez del dibujo. Ya hay fotos de yema-doble, velitas, velo-manto y puntito-rojo
+(en fotos/extra/ queda otra versión del velo). Formato horizontal 3:2 (la foto se recorta arriba de la lámina).
 
 Base para todos (pégala antes de cada uno):
 Fotografía realista, horizontal 3:2, de un vaso de vidrio liso y transparente lleno de agua sobre un paño de terciopelo
