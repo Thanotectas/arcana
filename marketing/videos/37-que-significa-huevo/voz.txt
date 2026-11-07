@@ -1,0 +1,15 @@
+Voz de Sibila para el video 37 (genérala con la misma voz de los videos anteriores). Guarda cada frase como un audio
+con el número al inicio (01-gancho.mp3 … 10-cierre.mp3) y ponlos todos en una carpeta. Luego:
+  marketing/videos/37-que-significa-huevo/armar.sh salida.mp4 <carpeta>
+Cada parte dura lo que dura su audio (mínimo 4,5 s), así que no hace falta cronometrar.
+
+01-gancho     ¿Te hiciste la limpia con huevo y no sabes qué significa lo que salió? Te lo cuento, sin miedo.
+02-doble      La yema doble: algo te llega por partida doble. Dos caminos, o una bendición doble.
+03-velitas    Los picos con burbujita son velitas: lo que pediste ya se está moviendo.
+04-velo       Un velo que se abre es un manto de protección. Alguien te cuida.
+05-flota      Si la yema flota, tu energía pide descanso. Te toca cuidarte.
+06-rojo       El puntito rojo no es daño ni enfermedad: es una carga que por fin salió.
+07-corona     Una corona de burbujas alrededor de la yema: estás resguardada.
+08-red        La telaraña son preocupaciones enredadas que empiezan a aclararse.
+09-hilo       Y un solo hilo hasta arriba es un camino claro. Da hoy el primer paso.
+10-cierre     ¿Y en tu vaso, qué salió? Comenta la palabra, o mándame tu foto en mi arcana punto com, barra, huevo, y te la marco con líneas. Tu primera lectura es gratis.

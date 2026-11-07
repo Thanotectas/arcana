@@ -1,0 +1,91 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Video 37 · «¿Qué significa lo que salió en tu vaso?» 1080×1920. Gancho, 8 señales con las fotos de la serie
+     (marketing/carruseles/que-significa-huevo/fotos) y cierre. window.preparar(duraciones) arma la línea de tiempo y
+     window.pintar(t) dibuja el segundo t. El texto va arriba: abajo y a la derecha quedan los botones de TikTok/Reels. -->
+<style>
+@font-face { font-family: Cormorant; src: url("../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Cormorant; src: url("../../../src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: Inter; src: url("../../../src/app/fuentes/Inter-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: Inter; src: url("../../../src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: 1080px; height: 1920px; overflow: hidden; background: #0b0716; color: #ece6f7; font-family: Inter, sans-serif; }
+.seg { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+.seg img { position: absolute; left: 50%; top: 330px; height: 1560px; transform-origin: 50% 62%; -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 88%, transparent 100%); }
+.seg img.fondo { top: -40px; height: 2000px; -webkit-mask-image: none; filter: blur(28px) brightness(.55); transform: translateX(-50%) scale(1.1) !important; }
+.seg .borde { position: absolute; left: 0; right: 0; top: 330px; height: 1560px; box-shadow: inset 0 0 0 0 transparent; display: none; }
+.seg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,7,22,.9) 0%, rgba(11,7,22,.6) 22%, rgba(11,7,22,0) 34%, rgba(11,7,22,0) 80%, rgba(11,7,22,.7) 100%); }
+.txt { position: absolute; left: 70px; right: 130px; top: 120px; z-index: 2; text-align: center; }
+.kick { font-family: Cormorant; font-style: italic; font-size: 46px; color: #b7a5ff; }
+h1 { font-family: Cormorant; font-weight: 600; font-size: 108px; line-height: 1; color: #f1d99a; text-shadow: 0 0 40px rgba(241,217,154,.35), 0 3px 16px #0b0716; margin-top: 6px; }
+.num { font-size: 26px; letter-spacing: .3em; color: #cfc2ff; text-transform: uppercase; }
+.lee { margin-top: 22px; font-size: 46px; line-height: 1.25; text-shadow: 0 2px 14px #0b0716; }
+.chip { display: inline-block; margin-top: 22px; padding: 10px 26px 12px; border-radius: 999px; border: 2px solid rgba(241,217,154,.7); background: rgba(11,7,22,.6); font-family: Cormorant; font-style: italic; font-size: 38px; }
+.chip b { font-style: normal; color: #f1d99a; }
+.puntos { position: absolute; top: 62px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; z-index: 3; }
+.puntos i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(241,217,154,.7); }
+.puntos i.si { background: #f1d99a; box-shadow: 0 0 12px #f1d99a; }
+.marca { position: absolute; left: 0; right: 0; bottom: 330px; text-align: center; z-index: 3; font-size: 26px; letter-spacing: .3em; text-transform: uppercase; color: #ece6f7; text-shadow: 0 2px 10px #0b0716; }
+.marca b { color: #f1d99a; }
+.pildora { margin: 34px auto 0; width: 700px; padding: 24px 20px 26px; border-radius: 999px; border: 2px solid #f1d99a; background: rgba(11,7,22,.7); box-shadow: 0 0 50px rgba(241,217,154,.25); }
+</style></head><body>
+<div id="raiz"></div><div class="puntos" id="puntos"></div><p class="marca"><b>Arcana</b> · Sibila te lee</p>
+<script>
+const F = "../../carruseles/que-significa-huevo/fotos/";
+const SEG = [
+  { foto: "telarana", html: `<p class="kick">¿Te hiciste la limpia con huevo?</p><h1>¿Qué significa lo que salió en tu vaso?</h1><p class="lee">8 señales, explicadas sin miedo</p>` },
+  ...[
+    ["yema-doble", "La yema doble", "Algo te llega por partida doble: dos caminos, o una bendición doble.", "DOBLE"],
+    ["velitas", "Picos con burbujita", "Son «velitas»: lo que pediste ya se está moviendo.", "VELITAS"],
+    ["velo-manto", "El velo que se abre", "Un manto de protección: alguien te cuida.", "VELO"],
+    ["yema-flota", "La yema que flota", "Tu energía pide descanso. Te toca cuidarte.", "FLOTA"],
+    ["puntito-rojo", "El puntito rojo", "Una carga que por fin salió. No es daño ni enfermedad.", "ROJO"],
+    ["corona-burbujas", "La corona de burbujas", "Burbujas alrededor de la yema: estás resguardada.", "CORONA"],
+    ["telarana", "La telaraña", "Preocupaciones enredadas que empiezan a aclararse.", "RED"],
+    ["hilo-recto", "Un solo hilo", "Un camino claro: da hoy el primer paso.", "HILO"],
+  ].map(([foto, t, lee, p], i) => ({ foto, senal: i, html: `<p class="num">Señal ${i + 1} de 8</p><h1>${t}</h1><p class="lee">${lee}</p><p class="chip">¿Te salió? Comenta <b>«${p}»</b></p>` })),
+  { foto: "extra/velo-manto-2", bajar: 200, html: `<h1 style="font-size:116px">¿Y en tu vaso, qué salió?</h1><p class="lee">Mándame tu foto y te la marco con líneas</p><div class="pildora"><p style="font-size:54px;font-weight:600;color:#f1d99a">miarcana.com/huevo</p><p style="font-size:24px;letter-spacing:.2em;text-transform:uppercase;color:#cfc2ff;margin-top:6px">Tu primera lectura es gratis</p></div>` },
+];
+const raiz = document.getElementById("raiz");
+const els = SEG.map((s) => {
+  const d = document.createElement("div");
+  d.className = "seg";
+  d.innerHTML = `<img class="fondo" src="${F}${s.foto}.jpg"><img class="foto" src="${F}${s.foto}.jpg"><div class="borde"></div><div class="txt">${s.html}</div>`;
+  if (s.bajar) { d.querySelector("img.foto").style.top = `${330 + s.bajar}px`; d.querySelector(".borde").style.top = `${330 + s.bajar}px`; }
+  raiz.appendChild(d);
+  return d;
+});
+const puntos = document.getElementById("puntos");
+puntos.innerHTML = Array.from({ length: 8 }, () => "<i></i>").join("");
+let INI = [], FIN = [];
+window.DURACIONES_BASE = [5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 6.5];
+window.preparar = (dur = window.DURACIONES_BASE) => {
+  let t = 0;
+  INI = dur.map((d) => { const a = t; t += d; return a; });
+  FIN = INI.map((a, i) => a + dur[i]);
+  return t;
+};
+window.listo = () => Promise.all([...document.images].map((i) => i.decode())).then(() => document.fonts.ready);
+const suave = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+window.pintar = (t) => {
+  let senal = -1;
+  els.forEach((el, i) => {
+    const a = INI[i], b = FIN[i];
+    const fade = i === 0 ? 1 : suave((t - a + 0.45) / 0.45);
+    const vis = t >= a - 0.45 && (t < b || i === els.length - 1);
+    el.style.opacity = vis ? fade : 0;
+    if (!vis) return;
+    if (t >= a && SEG[i].senal !== undefined) senal = SEG[i].senal;
+    const p = Math.max(0, (t - a + 0.45) / (b - a + 0.45));
+    const img = el.querySelector("img.foto");
+    img.style.transform = `translateX(-50%) scale(${1.02 + 0.07 * p}) translateX(${(i % 2 ? -1 : 1) * 14 * p}px)`;
+    const k = suave((t - a - 0.05) / 0.5);
+    const txt = el.querySelector(".txt");
+    txt.style.opacity = k;
+    txt.style.transform = `translateY(${(1 - k) * 34}px)`;
+  });
+  [...puntos.children].forEach((e, i) => e.classList.toggle("si", i <= senal));
+  puntos.style.opacity = senal >= 0 ? 1 : 0;
+};
+window.preparar();
+</script></body></html>
