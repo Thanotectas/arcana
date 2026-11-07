@@ -1,0 +1,66 @@
+VIDEO 36 — «6 SEÑALES DE QUE ERES ALMA VIEJA». Google Flow (Veo), 3 clips de 8 s, vertical 9:16.
+Lleva al test gratis miarcana.com/alma-vieja (y de ahí a la lectura «Tus vidas pasadas»).
+SIN CARAS: solo manos, objetos antiguos y luz de vela (en los videos 23 y 24 Flow cambió la cara de Sibila).
+Tono: nostálgico, cálido y misterioso, como un recuerdo. Nada de miedo. Los prompts van en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- «Texto a video», vertical 9:16, 8 s. Los clips 2 y 3 con «Extender» (Extend) desde el anterior, para que la mesa,
+  las manos y la luz no cambien.
+- Sonido: solo ambiente (velas, páginas, madera, un reloj lejano). Sin música y sin voces: la voz es la de Marcela.
+- El clip 3 termina en un plano QUIETO de la mesa con la luna en la ventana: ahí van el cierre y el enlace.
+
+==================== CLIP 1 · «El libro» (8 s) ====================
+Vertical 9:16, cinematic close-up, warm candlelight, nostalgic and mysterious atmosphere, like a memory. On an old
+dark wooden table: a thick antique leather book, a brass candlestick with a lit candle, an old folded map, a few
+pressed dried flowers and a small brass pocket watch. Only a young woman's hands are visible (slender, a thin gold
+ring, the sleeve of a soft cream knitted sweater). The hands slowly open the book and turn a yellowed page; tiny golden
+dust particles float up into the candlelight. The hands stop on a page with a pressed flower and rest there, as if
+remembering something. Slow, smooth camera push-in toward the hands and the page.
+Sound: a page turning, the candle crackling, the soft ticking of the pocket watch. No music, no voices.
+No faces, no readable text on the pages (only blurred old handwriting), no letters, no logos. Warm, golden, serene.
+
+==================== CLIP 2 · «Las fotos» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same table, book, candle, map, pocket watch, same hands and cream sleeve. The hands close the
+book gently and open a small carved wooden box next to it. Inside: old sepia photographs, a vintage iron key and a
+ribbon. The hands lift one sepia photograph of an old city street from another century (blurred, no faces visible) and
+hold it toward the candle, as if recognizing the place. The candle flame leans softly toward the photo for a moment.
+Slow camera movement, close-up on the photograph in the hands.
+Sound: the creak of the wooden box, paper, the candle, the pocket watch. No music, no voices.
+No faces (the people in the photograph are tiny and blurred or seen from behind), no readable text, no logos.
+
+==================== CLIP 3 · «La ventana» (8 s, Extender desde el clip 2) ====================
+Continue the same scene. The hands place the sepia photograph on the open map, next to the iron key, and slowly
+withdraw out of frame. The camera rises gently and reveals, behind the table, a window with old wooden frames: outside,
+a big full moon in a deep blue night sky, with soft clouds. For the last 3 seconds: a fixed, static shot of the whole
+table (candle burning, book, wooden box, photograph, map, key, pocket watch) with the full moon in the window behind;
+the camera does not move and no hands are in frame.
+Sound: the candle, a soft night breeze, the pocket watch. No music, no voices.
+No faces, no readable text, no logos. Warm candlelight inside, cool blue moonlight outside.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración de siempre) ====================
+Ocho frases por separado (≈ 32 s en total). Nombra los archivos así:
+1-gancho.mp3: "Si te pasan cuatro de estas seis cosas… eres alma vieja."
+2-nina.mp3: "Uno: desde niña te decían que eras madura para tu edad."
+3-soledad.mp3: "Dos: necesitas estar sola para recargarte."
+4-nostalgia.mp3: "Tres: sientes nostalgia de épocas que nunca viviste."
+5-intuicion.mp3: "Cuatro: tu intuición casi nunca falla."
+6-consejo.mp3: "Cinco: la gente te busca para pedirte consejo… aunque seas joven."
+7-casa.mp3: "Seis: a veces sientes que este mundo no es tu casa."
+8-cierre.mp3: "¿Cuántas tienes? Haz el test en mi arcana punto com… y descubre la edad de tu alma."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Gancho del primer segundo (texto grande): «Si te pasan 4 de estas 6… eres alma vieja».
+- Cada señal en pantalla con su número y una casilla que se marca (✓ 1/6 … ✓ 6/6), sincronizada con la voz:
+  1 · «Desde niña te decían "madura para tu edad"» · 2 · «Necesitas soledad para recargarte» ·
+  3 · «Nostalgia de épocas que no viviste» · 4 · «Tu intuición casi nunca falla» ·
+  5 · «Te piden consejo aunque seas joven» · 6 · «Sientes que este mundo no es tu casa».
+- Cierre sobre el plano quieto: «¿Cuántas tienes? Comenta 👇» + «Test gratis: ¿Eres alma vieja?» +
+  miarcana.com/alma-vieja y las cinco estrellas de los niveles (alma nueva → ancestral).
+- Versión para WhatsApp (menos de 10 MB).
+
+==================== SI ALGO SALE MAL ====================
+- Aparece una cara: agrega «extreme close-up of the hands only, the person is out of frame».
+- Aparecen letras legibles en el libro o en las fotos: «only blurred old handwriting, nothing readable».
+- La foto sepia muestra caras: «an empty old city street seen from far away, no people».
+- La luna sale rara o doble: genera solo el plano final aparte (4–8 s), «fixed static shot, one full moon in the window».
+- Sale oscuro o tenebroso: «warm golden candlelight, cozy and nostalgic, nothing scary».
