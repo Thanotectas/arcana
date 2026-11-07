@@ -63,6 +63,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 - `carruseles/frase-signos/`
 - `carruseles/nahual-maya/`
 - `carruseles/numeros-repetidos/`
+- `carruseles/que-significa-huevo/` (serie de la limpia con huevo: 8 señales ilustradas + textos)
 - `carruseles/rituales-fin-de-anio/`
 - `carruseles/serie-acepto-signos/`
 - `carruseles/serie-decretado-signos/`
