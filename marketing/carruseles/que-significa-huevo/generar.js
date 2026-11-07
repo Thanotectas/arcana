@@ -1,65 +1,118 @@
-// Serie «¿Qué significa…?» de la limpia con huevo: portada, 8 señales (una por lámina, con su vaso ilustrado, lo que
-// se lee, lo físico y lo que anuncia, según src/lib/conocimiento/huevo.md) y cierre. 1080×1350.
-// Cada lámina sirve también sola (una publicación por día).
+// Serie «¿Qué significa…?» de la limpia con huevo: portada, 8 señales (una por lámina: lo que se lee, lo físico o un
+// gesto, y lo que anuncia, según src/lib/conocimiento/huevo.md) y cierre. 1080×1350. Cada lámina sirve también sola.
+// Cada señal es una escena ilustrada: el vaso sobre un paño de terciopelo, entre dos velas, con sal y romero.
+// Si existe fotos/<id>.jpg|png|webp (por ejemplo, generada con los prompts de prompts-gemini.txt), se usa esa foto.
 // Uso: NODE_PATH=$(npm root -g) node marketing/carruseles/que-significa-huevo/generar.js [carpeta de salida]
 const { chromium } = require("playwright");
-const { mkdirSync, writeFileSync, rmSync } = require("node:fs");
+const { mkdirSync, writeFileSync, rmSync, existsSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
 const RAIZ = join(__dirname, "../../..");
 const SALIDA = process.argv[2] || join(__dirname, "laminas");
 const fuente = (f) => `file://${RAIZ}/src/app/fuentes/${f}`;
 
-/* ───────────── El vaso ilustrado (SVG 600×760) ─────────────
-   Interior del vaso: arriba x 112–488 (y 110), abajo x 150–450 (y 668). Agua desde y 175. */
+/* ───────────── La escena (SVG 1000×680) ─────────────
+   El vaso se dibuja en su propio sistema (600×760; interior arriba x 112–488 en y 110, abajo x 150–450 en y 668;
+   agua desde y 175) y se coloca en la escena con translate(272,44) scale(.76). */
 const izq = (y) => 112 + ((y - 110) / 558) * 38;
 const der = (y) => 488 - ((y - 110) / 558) * 38;
-function vaso({ yema = { x: 300, y: 610, rx: 78, ry: 40 }, yemas = null, clara = "", encima = "", agua = "agua", punto = null } = {}) {
+
+const llama = (x, y, k = 1) => `
+  <circle cx="${x}" cy="${y - 10 * k}" r="${120 * k}" fill="url(#halo)" opacity=".75"/>
+  <circle cx="${x}" cy="${y - 10 * k}" r="${46 * k}" fill="url(#halo)"/>
+  <path d="M${x} ${y - 52 * k} C${x + 17 * k} ${y - 26 * k} ${x + 15 * k} ${y - 2 * k} ${x} ${y + 6 * k} C${x - 15 * k} ${y - 2 * k} ${x - 17 * k} ${y - 26 * k} ${x} ${y - 52 * k} Z" fill="url(#fuego)"/>
+  <path d="M${x} ${y - 30 * k} C${x + 7 * k} ${y - 16 * k} ${x + 6 * k} ${y - 2 * k} ${x} ${y + 2 * k} C${x - 6 * k} ${y - 2 * k} ${x - 7 * k} ${y - 16 * k} ${x} ${y - 30 * k} Z" fill="#fffbe8"/>
+  <path d="M${x} ${y + 6 * k} L${x} ${y + 16 * k}" stroke="#2a1a10" stroke-width="${3 * k}" stroke-linecap="round"/>`;
+const vela = (x, arriba, abajo, ancho) => `
+  <ellipse cx="${x}" cy="${abajo}" rx="${ancho * 0.9}" ry="${ancho * 0.18}" fill="#000" opacity=".5" filter="url(#b6)"/>
+  <path d="M${x - ancho / 2} ${arriba} L${x - ancho / 2} ${abajo} Q${x} ${abajo + ancho * 0.16} ${x + ancho / 2} ${abajo} L${x + ancho / 2} ${arriba} Z" fill="url(#cera)"/>
+  <path d="M${x - ancho / 2} ${arriba} Q${x - ancho * 0.42} ${arriba + 40} ${x - ancho * 0.38} ${arriba + 58} Q${x - ancho * 0.34} ${arriba + 66} ${x - ancho * 0.3} ${arriba + 52} Q${x - ancho * 0.24} ${arriba + 18} ${x - ancho * 0.1} ${arriba + 12} Z" fill="#fff6dc" opacity=".8"/>
+  <path d="M${x + ancho * 0.18} ${arriba + 6} Q${x + ancho * 0.22} ${arriba + 30} ${x + ancho * 0.26} ${arriba + 34} Q${x + ancho * 0.31} ${arriba + 30} ${x + ancho * 0.32} ${arriba + 8} Z" fill="#fff6dc" opacity=".7"/>
+  <ellipse cx="${x}" cy="${arriba}" rx="${ancho / 2}" ry="${ancho * 0.14}" fill="#fff3d1"/>
+  <ellipse cx="${x}" cy="${arriba + 1}" rx="${ancho * 0.36}" ry="${ancho * 0.09}" fill="#f1d99a" opacity=".8"/>
+  ${llama(x, arriba - 16, ancho / 70)}`;
+
+function vaso({ yema = { x: 300, y: 610, rx: 78, ry: 40 }, yemas = null, clara = "", encima = "", punto = null } = {}) {
   const ys = yemas || [yema];
-  const unaYema = (y, i) => `
-    <ellipse cx="${y.x}" cy="${y.y + y.ry * 0.85}" rx="${y.rx * 0.95}" ry="${y.ry * 0.35}" fill="#000" opacity=".25" filter="url(#b6)"/>
+  const unaYema = (y) => `
+    <ellipse cx="${y.x}" cy="${y.y + 4}" rx="${y.rx * 1.45}" ry="${y.ry * 1.5}" fill="#fff" fill-opacity=".09" filter="url(#b6)"/>
+    <ellipse cx="${y.x}" cy="${y.y + 2}" rx="${y.rx * 1.3}" ry="${y.ry * 1.3}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+    <ellipse cx="${y.x}" cy="${y.y + y.ry * 0.85}" rx="${y.rx * 0.95}" ry="${y.ry * 0.35}" fill="#4a1a00" opacity=".35" filter="url(#b6)"/>
     <ellipse cx="${y.x}" cy="${y.y}" rx="${y.rx}" ry="${y.ry}" fill="url(#yema)"/>
-    <ellipse cx="${y.x - y.rx * 0.32}" cy="${y.y - y.ry * 0.38}" rx="${y.rx * 0.3}" ry="${y.ry * 0.22}" fill="#fff" opacity=".55" filter="url(#b3)"/>
-    <ellipse cx="${y.x}" cy="${y.y}" rx="${y.rx}" ry="${y.ry}" fill="none" stroke="#ffe7a8" stroke-opacity=".35" stroke-width="2"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" width="600" height="760">
+    <ellipse cx="${y.x}" cy="${y.y}" rx="${y.rx}" ry="${y.ry}" fill="url(#yemaBorde)"/>
+    <ellipse cx="${y.x - y.rx * 0.3}" cy="${y.y - y.ry * 0.4}" rx="${y.rx * 0.34}" ry="${y.ry * 0.2}" fill="#fff" opacity=".7" filter="url(#b3)"/>
+    <ellipse cx="${y.x - y.rx * 0.36}" cy="${y.y - y.ry * 0.46}" rx="${y.rx * 0.1}" ry="${y.ry * 0.07}" fill="#fff"/>
+    <path d="M${y.x + y.rx * 0.2} ${y.y + y.ry * 0.55} Q${y.x + y.rx * 0.6} ${y.y + y.ry * 0.4} ${y.x + y.rx * 0.8} ${y.y}" fill="none" stroke="#ffe2a0" stroke-opacity=".5" stroke-width="2" filter="url(#b2)"/>`;
+  const v = `
+  <g clip-path="url(#dentro)">
+    <rect x="100" y="175" width="400" height="520" fill="url(#agua)"/>
+    <rect x="100" y="175" width="400" height="520" fill="url(#aguaLados)"/>
+    <g clip-path="url(#enAgua)">${clara}${ys.map(unaYema).join("")}${punto ? `<circle cx="${punto.x}" cy="${punto.y}" r="8" fill="#a3201a"/><circle cx="${punto.x}" cy="${punto.y}" r="13" fill="#c0392b" opacity=".25" filter="url(#b3)"/><circle cx="${punto.x - 2.5}" cy="${punto.y - 2.5}" r="2.6" fill="#ff9a8a"/>` : ""}${encima}</g>
+    <ellipse cx="300" cy="175" rx="${(der(175) - izq(175)) / 2}" ry="13" fill="#fff" opacity=".14"/>
+    <ellipse cx="300" cy="178" rx="${(der(175) - izq(175)) / 2 - 6}" ry="10" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+    <ellipse cx="300" cy="175" rx="${(der(175) - izq(175)) / 2}" ry="13" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4"/>
+  </g>
+  <path d="M112 110 L488 110 L450 668 Q300 690 150 668 Z" fill="url(#borde)" stroke="#f6ead0" stroke-opacity=".8" stroke-width="3.2"/>
+  <path d="M150 668 Q300 690 450 668 L446 712 Q300 738 154 712 Z" fill="url(#base)" stroke="#f6ead0" stroke-opacity=".55" stroke-width="2"/>
+  <path d="M170 690 Q300 706 430 690" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2"/>
+  <ellipse cx="300" cy="110" rx="188" ry="16" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3.4"/>
+  <ellipse cx="300" cy="113" rx="181" ry="12" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+  <path d="M134 140 L163 640" stroke="#fff" stroke-opacity=".5" stroke-width="12" stroke-linecap="round" filter="url(#b3)"/>
+  <path d="M146 150 L170 560" stroke="#fff" stroke-opacity=".8" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M466 150 L444 600" stroke="#ffd9a0" stroke-opacity=".35" stroke-width="9" stroke-linecap="round" filter="url(#b3)"/>
+  <path d="M190 120 Q300 128 420 118" stroke="#fff" stroke-opacity=".6" stroke-width="3" fill="none" filter="url(#b2)"/>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
   <defs>
-    <radialGradient id="fondo" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#3a2468"/><stop offset=".6" stop-color="#1a1036"/><stop offset="1" stop-color="#0b0716"/></radialGradient>
-    <radialGradient id="yema" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffd36b"/><stop offset=".45" stop-color="#ffab2e"/><stop offset="1" stop-color="#d9700e"/></radialGradient>
-    <linearGradient id="agua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe6ff" stop-opacity=".16"/><stop offset="1" stop-color="#9cc4ff" stop-opacity=".30"/></linearGradient>
-    <linearGradient id="aguaTurbia" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#f3ead2" stop-opacity=".45"/></linearGradient>
-    <linearGradient id="borde" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".08" stop-color="#fff" stop-opacity=".08"/><stop offset=".9" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#fff" stop-opacity=".4"/></linearGradient>
-    <radialGradient id="vela" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fondo" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#3b2470"/><stop offset=".55" stop-color="#1b1039"/><stop offset="1" stop-color="#0b0716"/></radialGradient>
+    <linearGradient id="pano" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2466"/><stop offset=".35" stop-color="#25164a"/><stop offset="1" stop-color="#0d0820"/></linearGradient>
+    <radialGradient id="yema" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffe08a"/><stop offset=".35" stop-color="#ffb53a"/><stop offset=".8" stop-color="#e8790f"/><stop offset="1" stop-color="#b85508"/></radialGradient>
+    <radialGradient id="yemaBorde" cx="50%" cy="50%" r="50%"><stop offset=".78" stop-color="#ff9f2a" stop-opacity="0"/><stop offset="1" stop-color="#ffd27a" stop-opacity=".55"/></radialGradient>
+    <linearGradient id="agua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6e6ff" stop-opacity=".14"/><stop offset=".7" stop-color="#a8c6ff" stop-opacity=".22"/><stop offset="1" stop-color="#ffcf8a" stop-opacity=".28"/></linearGradient>
+    <linearGradient id="aguaLados" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b0716" stop-opacity=".35"/><stop offset=".18" stop-color="#0b0716" stop-opacity="0"/><stop offset=".82" stop-color="#0b0716" stop-opacity="0"/><stop offset="1" stop-color="#0b0716" stop-opacity=".35"/></linearGradient>
+    <linearGradient id="borde" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".07" stop-color="#fff" stop-opacity=".1"/><stop offset=".5" stop-color="#fff" stop-opacity=".02"/><stop offset=".93" stop-color="#ffe6b8" stop-opacity=".1"/><stop offset="1" stop-color="#ffe6b8" stop-opacity=".45"/></linearGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#ffe6b8" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>
+    <linearGradient id="cera" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8a27a"/><stop offset=".35" stop-color="#f6ead0"/><stop offset=".6" stop-color="#fff8e6"/><stop offset="1" stop-color="#a8916a"/></linearGradient>
+    <radialGradient id="fuego" cx="50%" cy="75%" r="70%"><stop offset="0" stop-color="#fff7d6"/><stop offset=".45" stop-color="#ffc75a"/><stop offset="1" stop-color="#ff7a1a"/></radialGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".18"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <radialGradient id="caustica" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
     <filter id="b2"><feGaussianBlur stdDeviation="2"/></filter><filter id="b3"><feGaussianBlur stdDeviation="3"/></filter>
-    <filter id="b6"><feGaussianBlur stdDeviation="6"/></filter><filter id="b20"><feGaussianBlur stdDeviation="20"/></filter>
+    <filter id="b6"><feGaussianBlur stdDeviation="6"/></filter><filter id="b14"><feGaussianBlur stdDeviation="14"/></filter>
     <clipPath id="dentro"><path d="M112 110 L488 110 L450 668 Q300 690 150 668 Z"/></clipPath>
     <clipPath id="enAgua"><path d="M${izq(175)} 175 L${der(175)} 175 L450 668 Q300 690 150 668 Z"/></clipPath>
   </defs>
-  <rect width="600" height="760" rx="36" fill="url(#fondo)"/>
-  <!-- Luz de velas al fondo -->
-  <circle cx="90" cy="150" r="70" fill="url(#vela)" opacity=".55" filter="url(#b20)"/><circle cx="530" cy="250" r="50" fill="url(#vela)" opacity=".35" filter="url(#b20)"/>
-  <circle cx="500" cy="110" r="30" fill="url(#vela)" opacity=".4" filter="url(#b20)"/>
-  <!-- Mesa -->
-  <ellipse cx="300" cy="700" rx="270" ry="40" fill="#000" opacity=".45" filter="url(#b6)"/>
-  <!-- Agua -->
-  <g clip-path="url(#dentro)">
-    <rect x="100" y="175" width="400" height="520" fill="url(#${agua === "turbia" ? "aguaTurbia" : "agua"})"/>
-    <g clip-path="url(#enAgua)">${clara}${ys.map(unaYema).join("")}${punto ? `<circle cx="${punto.x}" cy="${punto.y}" r="7" fill="#b3261e"/><circle cx="${punto.x - 2}" cy="${punto.y - 2}" r="2.5" fill="#ff8a7a"/>` : ""}${encima}</g>
-    <ellipse cx="300" cy="175" rx="${(der(175) - izq(175)) / 2}" ry="12" fill="#fff" opacity=".18"/>
-    <ellipse cx="300" cy="175" rx="${(der(175) - izq(175)) / 2}" ry="12" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+  <rect width="1000" height="680" fill="url(#fondo)"/>
+  ${[[90, 120, 26, "#ffd27a", 0.25], [930, 90, 34, "#b7a5ff", 0.22], [820, 210, 16, "#ffd27a", 0.3], [180, 300, 14, "#b7a5ff", 0.25], [700, 60, 12, "#fff", 0.25], [300, 70, 10, "#ffd27a", 0.3], [960, 330, 20, "#ffd27a", 0.18], [40, 420, 18, "#b7a5ff", 0.2]]
+    .map(([x, y, r, c, o]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" opacity="${o}" filter="url(#b6)"/>`).join("")}
+  ${[[250, 140], [760, 120], [640, 40], [380, 30], [880, 260], [120, 220]].map(([x, y]) => `<path d="M${x} ${y - 7} L${x + 1.6} ${y - 1.6} L${x + 7} ${y} L${x + 1.6} ${y + 1.6} L${x} ${y + 7} L${x - 1.6} ${y + 1.6} L${x - 7} ${y} L${x - 1.6} ${y - 1.6} Z" fill="#f1d99a" opacity=".55"/>`).join("")}
+  <!-- Paño de terciopelo -->
+  <path d="M0 520 Q500 490 1000 520 L1000 680 L0 680 Z" fill="url(#pano)"/>
+  <path d="M0 520 Q500 490 1000 520" fill="none" stroke="#b7a5ff" stroke-opacity=".25" stroke-width="2"/>
+  <path d="M140 680 Q180 600 150 525" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="18" filter="url(#b6)"/>
+  <path d="M860 680 Q820 600 850 525" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="18" filter="url(#b6)"/>
+  <!-- Velas -->
+  ${vela(125, 300, 560, 74)}${vela(880, 360, 548, 64)}
+  <!-- Romero -->
+  <g transform="translate(205 590) rotate(-14)">
+    <path d="M0 0 Q70 -6 150 -2" stroke="#4f6b3a" stroke-width="4" fill="none" stroke-linecap="round"/>
+    ${Array.from({ length: 13 }, (_, i) => { const x = 8 + i * 11; return `<ellipse cx="${x}" cy="-9" rx="10" ry="3" transform="rotate(-35 ${x} -9)" fill="#6f8f4e"/><ellipse cx="${x + 4}" cy="5" rx="10" ry="3" transform="rotate(30 ${x + 4} 5)" fill="#5c7a40"/>`; }).join("")}
   </g>
-  <!-- Vidrio -->
-  <path d="M112 110 L488 110 L450 668 Q300 690 150 668 Z" fill="url(#borde)" stroke="#f3e6c4" stroke-opacity=".75" stroke-width="3"/>
-  <path d="M150 668 Q300 690 450 668 L446 700 Q300 724 154 700 Z" fill="#fff" opacity=".14" stroke="#f3e6c4" stroke-opacity=".5" stroke-width="2"/>
-  <ellipse cx="300" cy="110" rx="188" ry="16" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
-  <path d="M132 140 L162 640" stroke="#fff" stroke-opacity=".35" stroke-width="10" stroke-linecap="round" filter="url(#b3)"/>
-  <path d="M462 150 L440 600" stroke="#fff" stroke-opacity=".15" stroke-width="6" stroke-linecap="round" filter="url(#b3)"/>
+  <!-- Sal -->
+  <ellipse cx="770" cy="612" rx="62" ry="13" fill="#000" opacity=".4" filter="url(#b3)"/>
+  <path d="M712 610 Q740 572 770 568 Q802 572 828 610 Q770 622 712 610 Z" fill="#f4f0ff"/>
+  <path d="M735 596 Q760 578 780 578" stroke="#fff" stroke-width="3" fill="none" opacity=".9"/>
+  ${Array.from({ length: 22 }, (_, i) => `<rect x="${700 + ((i * 37) % 140)}" y="${612 + ((i * 13) % 12)}" width="3" height="3" fill="#fff" opacity=".8" transform="rotate(${i * 20} ${700 + ((i * 37) % 140)} ${612 + ((i * 13) % 12)})"/>`).join("")}
+  <!-- Vaso: sombra y luz que atraviesa el agua -->
+  <ellipse cx="500" cy="592" rx="165" ry="20" fill="#000" opacity=".55" filter="url(#b6)"/>
+  <ellipse cx="555" cy="606" rx="130" ry="18" fill="url(#caustica)" filter="url(#b6)"/>
+  <g transform="translate(272 44) scale(.76)">${v}</g>
 </svg>`;
 }
 
-// Piezas de la clara (blancas, translúcidas)
-const blanco = (d, op = 0.55, ancho = 3) => `<path d="${d}" fill="none" stroke="#fff" stroke-opacity="${op}" stroke-width="${ancho}" stroke-linecap="round" filter="url(#b2)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="${op + 0.2}" stroke-width="${ancho * 0.4}" stroke-linecap="round"/>`;
-const nube = (d, op = 0.45) => `<path d="${d}" fill="#fff" fill-opacity="${op}" filter="url(#b3)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/>`;
-const burbuja = (x, y, r = 7) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".85" stroke-width="2"/><circle cx="${x - r * 0.35}" cy="${y - r * 0.35}" r="${r * 0.3}" fill="#fff" opacity=".9"/>`;
+// Piezas de la clara (blancas, translúcidas), en coordenadas del vaso
+const blanco = (d, op = 0.55, ancho = 3) => `<path d="${d}" fill="none" stroke="#fff" stroke-opacity="${op * 0.6}" stroke-width="${ancho * 2.4}" stroke-linecap="round" filter="url(#b3)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="${op}" stroke-width="${ancho}" stroke-linecap="round" filter="url(#b2)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="${Math.min(1, op + 0.25)}" stroke-width="${ancho * 0.4}" stroke-linecap="round"/>`;
+const nube = (d, op = 0.45) => `<path d="${d}" fill="#fff" fill-opacity="${op * 0.6}" filter="url(#b6)"/><path d="${d}" fill="#fff" fill-opacity="${op * 0.5}" filter="url(#b2)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/>`;
+const burbuja = (x, y, r = 7) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" fill-opacity=".1" stroke="#fff" stroke-opacity=".9" stroke-width="2"/><circle cx="${x - r * 0.35}" cy="${y - r * 0.35}" r="${r * 0.3}" fill="#fff" opacity=".95"/><path d="M${x + r * 0.2} ${y + r * 0.7} A${r * 0.8} ${r * 0.8} 0 0 0 ${x + r * 0.75} ${y + r * 0.1}" stroke="#ffd27a" stroke-opacity=".7" stroke-width="1.4" fill="none"/>`;
 
 const SENALES = [
   {
@@ -124,6 +177,16 @@ const SENALES = [
   },
 ];
 
+/** Foto propia de la señal (fotos/<id>.jpg|png|webp), si existe, como data URL. */
+function foto(id) {
+  for (const ext of ["jpg", "png", "webp"]) {
+    const f = join(__dirname, "fotos", `${id}.${ext}`);
+    if (existsSync(f)) return `data:image/${ext === "jpg" ? "jpeg" : ext};base64,${readFileSync(f).toString("base64")}`;
+  }
+  return null;
+}
+const escena = (s) => { const f = foto(s.id); return f ? `<img src="${f}" style="width:100%;height:100%;object-fit:cover">` : s.svg; };
+
 const CSS = `
 @font-face { font-family: Cormorant; src: url("${fuente("CormorantGaramond-SemiBold.ttf")}"); font-weight: 600; }
 @font-face { font-family: Cormorant; src: url("${fuente("CormorantGaramond-Italic.ttf")}"); font-style: italic; }
@@ -131,53 +194,60 @@ const CSS = `
 @font-face { font-family: Inter; src: url("${fuente("Inter-SemiBold.ttf")}"); font-weight: 600; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { width: 1080px; height: 1350px; overflow: hidden; background: #0b0716; color: #ece6f7; font-family: Inter, sans-serif; }
-.lienzo { position: relative; width: 1080px; height: 1350px; background: radial-gradient(ellipse at 50% 25%, #2a1a5e 0%, #160d33 55%, #0b0716 100%); }
-.marco { position: absolute; inset: 30px; border: 2px solid rgba(241,217,154,.55); border-radius: 26px; }
-.esq { position: absolute; color: #f1d99a; font-size: 30px; }
-.marca { position: absolute; top: 62px; left: 0; right: 0; text-align: center; font-size: 22px; letter-spacing: .36em; text-transform: uppercase; color: #b7a5ff; }
+.lienzo { position: relative; width: 1080px; height: 1350px; background: radial-gradient(ellipse at 50% 70%, #1d1240 0%, #0b0716 75%); }
+.escena { position: absolute; left: 0; right: 0; top: 0; height: 735px; overflow: hidden; }
+.escena::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,7,22,.75) 0%, rgba(11,7,22,0) 16%, rgba(11,7,22,0) 72%, #0e0920 100%); }
+.marco { position: absolute; inset: 26px; border: 2px solid rgba(241,217,154,.55); border-radius: 26px; z-index: 2; pointer-events: none; }
+.esq { position: absolute; color: #f1d99a; font-size: 28px; z-index: 3; }
+.marca { position: absolute; top: 56px; left: 0; right: 0; text-align: center; font-size: 21px; letter-spacing: .36em; text-transform: uppercase; color: #cfc2ff; z-index: 3; text-shadow: 0 2px 10px #0b0716; }
 .marca b { color: #f1d99a; font-weight: 600; }
-.ilus { position: absolute; left: 60px; top: 150px; width: 470px; height: 595px; border-radius: 30px; overflow: hidden; box-shadow: 0 0 60px rgba(241,217,154,.18), 0 0 0 2px rgba(241,217,154,.45); }
-.ilus svg { width: 100%; height: 100%; }
-.der { position: absolute; left: 570px; right: 70px; top: 160px; height: 580px; display: flex; flex-direction: column; justify-content: center; }
-.kick { font-family: Cormorant; font-style: italic; font-size: 40px; color: #b7a5ff; }
-h1 { font-family: Cormorant; font-weight: 600; font-size: 74px; line-height: .98; color: #f1d99a; margin-top: 6px; text-shadow: 0 0 40px rgba(241,217,154,.3); }
-.lee { margin-top: 26px; font-size: 29px; line-height: 1.42; }
-.bloque { position: absolute; left: 60px; right: 60px; border-radius: 24px; padding: 22px 30px; }
-.fis { top: 780px; background: rgba(11,7,22,.55); border: 1.5px solid rgba(183,165,255,.35); }
-.anu { background: rgba(241,217,154,.08); border: 2px solid rgba(241,217,154,.55); }
-.et { font-size: 21px; letter-spacing: .26em; text-transform: uppercase; }
-.tx { margin-top: 8px; font-size: 29px; line-height: 1.38; }
-.pie { position: absolute; bottom: 58px; left: 0; right: 0; text-align: center; font-size: 24px; color: #b7a5ff; }
+.titulo { position: absolute; left: 60px; right: 60px; top: 662px; text-align: center; z-index: 3; }
+.kick { font-family: Cormorant; font-style: italic; font-size: 38px; color: #b7a5ff; }
+h1 { font-family: Cormorant; font-weight: 600; font-size: 82px; line-height: 1; color: #f1d99a; text-shadow: 0 0 40px rgba(241,217,154,.35), 0 2px 14px #0b0716; }
+.lee { position: absolute; left: 90px; right: 90px; top: 818px; text-align: center; font-size: 27px; line-height: 1.42; z-index: 3; }
+.fila { position: absolute; left: 60px; right: 60px; top: 962px; display: flex; gap: 22px; z-index: 3; }
+.bloque { flex: 1; border-radius: 24px; padding: 20px 24px; min-height: 200px; }
+.fis { background: rgba(11,7,22,.6); border: 1.5px solid rgba(183,165,255,.4); }
+.anu { background: linear-gradient(160deg, rgba(241,217,154,.16), rgba(241,217,154,.04)); border: 2px solid rgba(241,217,154,.6); display: flex; flex-direction: column; }
+.et { font-size: 19px; letter-spacing: .24em; text-transform: uppercase; }
+.tx { margin-top: 8px; font-size: 23px; line-height: 1.36; }
+.anu .tx { font-family: Cormorant; font-weight: 600; font-size: 40px; line-height: 1.08; color: #f1d99a; flex: 1; display: flex; align-items: center; }
+.cta { position: absolute; left: 0; right: 0; top: 1196px; text-align: center; font-family: Cormorant; font-style: italic; font-size: 37px; z-index: 3; }
+.cta b { font-style: normal; color: #f1d99a; }
+.pie { position: absolute; bottom: 48px; left: 0; right: 0; text-align: center; font-size: 22px; color: #b7a5ff; z-index: 3; }
 .pie b { color: #f1d99a; font-weight: 600; }
 `;
-const esquinas = `<span class="esq" style="top:44px;left:48px">✦</span><span class="esq" style="top:44px;right:48px">✦</span><span class="esq" style="bottom:44px;left:48px">✦</span><span class="esq" style="bottom:44px;right:48px">✦</span>`;
-const pagina = (cuerpo) => `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body><div class="lienzo"><div class="marco"></div>${esquinas}${cuerpo}</div></body></html>`;
+const esquinas = `<span class="esq" style="top:38px;left:42px">✦</span><span class="esq" style="top:38px;right:42px">✦</span><span class="esq" style="bottom:38px;left:42px">✦</span><span class="esq" style="bottom:38px;right:42px">✦</span>`;
+const pagina = (cuerpo) => `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body><div class="lienzo">${cuerpo}<div class="marco"></div>${esquinas}</div></body></html>`;
 
 const lamina = (s, i) => pagina(`
+  <div class="escena">${escena(s)}</div>
   <p class="marca"><b>Arcana</b> · La limpia con huevo, sin miedo</p>
-  <div class="ilus">${s.svg}</div>
-  <div class="der"><p class="kick">¿Qué significa…</p><h1>${s.titulo}?</h1><p class="lee">${s.lee}</p></div>
-  <div class="bloque fis"><p class="et" style="color:#b7a5ff">${s.fisico ? "Lo físico" : "Un gesto para ti"}</p><p class="tx">${s.fisico || s.gesto}</p></div>
-  <div class="bloque anu" style="top:990px"><p class="et" style="color:#f1d99a">✦ Lo que anuncia</p><p class="tx" style="font-family:Cormorant;font-weight:600;font-size:46px;line-height:1.1;color:#f1d99a">${s.anuncia}</p></div>
-  <p style="position:absolute;left:0;right:0;top:1160px;text-align:center;font-family:Cormorant;font-style:italic;font-size:40px;color:#ece6f7">¿Te salió así? Comenta <b style="font-style:normal;color:#f1d99a">«${s.palabra}»</b> y Sibila te lee 🔮</p>
+  <div class="titulo"><p class="kick">¿Qué significa…</p><h1>${s.titulo}?</h1></div>
+  <p class="lee">${s.lee}</p>
+  <div class="fila">
+    <div class="bloque fis"><p class="et" style="color:#b7a5ff">${s.fisico ? "Lo físico" : "Un gesto para ti"}</p><p class="tx">${s.fisico || s.gesto}</p></div>
+    <div class="bloque anu"><p class="et" style="color:#f1d99a">✦ Lo que anuncia</p><p class="tx">${s.anuncia}</p></div>
+  </div>
+  <p class="cta">¿Te salió así? Comenta <b>«${s.palabra}»</b> y Sibila te lee 🔮</p>
   <p class="pie">${i + 1} de ${SENALES.length} · Sibila te marca tu vaso en <b>miarcana.com/huevo</b></p>`);
 
 const portada = pagina(`
+  <div class="escena" style="height:820px">${escena(SENALES[1])}</div>
   <p class="marca"><b>Arcana</b> · Sibila te lee</p>
-  <div style="position:absolute;left:50%;top:150px;transform:translateX(-50%);width:440px;height:557px;border-radius:30px;overflow:hidden;box-shadow:0 0 70px rgba(241,217,154,.22),0 0 0 2px rgba(241,217,154,.5)">${SENALES[1].svg.replace('width="600" height="760"', 'width="440" height="557"')}</div>
-  <p style="position:absolute;left:0;right:0;top:760px;text-align:center;font-family:Cormorant;font-style:italic;font-size:50px;color:#b7a5ff">¿Qué significa lo que salió en tu vaso?</p>
-  <h1 style="position:absolute;left:70px;right:70px;top:830px;text-align:center;font-size:96px">La limpia con huevo, sin miedo</h1>
-  <p style="position:absolute;left:110px;right:110px;top:1060px;text-align:center;font-size:31px;line-height:1.4">8 señales del vaso: lo que es físico, lo que se lee y lo que anuncia.</p>
-  <p class="pie">Guárdalo para tu próxima limpia · Desliza →</p>`);
+  <p style="position:absolute;left:0;right:0;top:770px;text-align:center;font-family:Cormorant;font-style:italic;font-size:46px;color:#b7a5ff;z-index:3">¿Qué significa lo que salió en tu vaso?</p>
+  <h1 style="position:absolute;left:60px;right:60px;top:835px;text-align:center;font-size:104px;z-index:3">La limpia con huevo, sin miedo</h1>
+  <p style="position:absolute;left:110px;right:110px;top:1072px;text-align:center;font-size:30px;line-height:1.42;z-index:3">8 señales del vaso: lo que es físico, lo que se lee y lo que anuncia para ti.</p>
+  <p class="pie" style="font-size:24px">Guárdalo para tu próxima limpia · <b>Desliza →</b></p>`);
 
 const cierre = pagina(`
+  <div class="escena" style="height:760px">${escena(SENALES[2])}</div>
   <p class="marca"><b>Arcana</b> · Sibila te lee</p>
-  <h1 style="position:absolute;left:80px;right:80px;top:150px;text-align:center;font-size:92px">¿Y en tu vaso, qué salió?</h1>
-  <div style="position:absolute;left:50%;top:400px;transform:translateX(-50%);width:380px;height:481px;border-radius:30px;overflow:hidden;box-shadow:0 0 70px rgba(241,217,154,.22),0 0 0 2px rgba(241,217,154,.5)">${SENALES[2].svg.replace('width="600" height="760"', 'width="380" height="481"')}</div>
-  <p style="position:absolute;left:110px;right:110px;top:920px;text-align:center;font-size:34px;line-height:1.42">Tómale una foto de lado, con luz, y Sibila te <b style="color:#f1d99a">marca con líneas</b> lo que salió y lo que viene para ti.</p>
-  <div style="position:absolute;left:230px;right:230px;top:1090px;padding:22px 20px 24px;border-radius:999px;border:2px solid #f1d99a;text-align:center;background:rgba(11,7,22,.55)">
-    <p style="font-size:42px;font-weight:600;color:#f1d99a">miarcana.com/huevo</p>
-    <p style="font-size:22px;letter-spacing:.2em;text-transform:uppercase;color:#b7a5ff;margin-top:4px">Tu primera lectura es gratis</p>
+  <h1 style="position:absolute;left:60px;right:60px;top:700px;text-align:center;font-size:92px;z-index:3">¿Y en tu vaso, qué salió?</h1>
+  <p style="position:absolute;left:110px;right:110px;top:838px;text-align:center;font-size:32px;line-height:1.42;z-index:3">Tómale una foto de lado, con luz, y Sibila te <b style="color:#f1d99a">marca con líneas</b> lo que salió y lo que viene para ti.</p>
+  <div style="position:absolute;left:220px;right:220px;top:1010px;padding:24px 20px 26px;border-radius:999px;border:2px solid #f1d99a;text-align:center;background:rgba(241,217,154,.08);box-shadow:0 0 50px rgba(241,217,154,.2);z-index:3">
+    <p style="font-size:44px;font-weight:600;color:#f1d99a">miarcana.com/huevo</p>
+    <p style="font-size:21px;letter-spacing:.2em;text-transform:uppercase;color:#cfc2ff;margin-top:4px">Tu primera lectura es gratis</p>
   </div>
   <p class="pie">En el vaso no se ven envidias, «trabajos» ni enfermedades</p>`);
 
@@ -192,6 +262,8 @@ const cierre = pagina(`
     await p.goto(`file://${tmp}`, { waitUntil: "load" });
     await p.evaluate(() => document.fonts.ready);
     await p.waitForTimeout(200);
+    const desborde = await p.evaluate(() => [...document.querySelectorAll(".lee,.fila,.titulo")].some((e) => e.getBoundingClientRect().bottom > ({ lee: 950, fila: 1190, titulo: 812 })[e.className.split(" ")[0]]));
+    if (desborde) console.warn(`⚠ ${nombre}: el texto se sale de su espacio`);
     await p.screenshot({ path: join(SALIDA, `${nombre}.png`) });
   }
   rmSync(tmp, { force: true });

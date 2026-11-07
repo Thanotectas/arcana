@@ -1,0 +1,18 @@
+Prompts para Gemini (fotos realistas de cada señal). Guarda cada imagen en fotos/<nombre>.jpg y vuelve a correr
+generar.js: la lámina usa la foto en vez del dibujo. Formato horizontal 3:2 (la foto se recorta arriba de la lámina).
+
+Base para todos (pégala antes de cada uno):
+Fotografía realista, horizontal 3:2, de un vaso de vidrio liso y transparente lleno de agua sobre un paño de terciopelo
+morado oscuro, entre dos velas blancas encendidas (una a cada lado, desenfocadas), con un montoncito de sal y una
+ramita de romero en primer plano. Fondo oscuro morado con luces cálidas desenfocadas (bokeh). Luz cálida de vela,
+estilo místico y elegante, nada tenebroso. El vaso centrado, visto de frente a la altura del agua, nítido. Dentro del
+agua, un huevo crudo (yema naranja entera y clara transparente) en el fondo. Sin texto, sin manos, sin personas.
+
+yema-doble.jpg ........ con DOS yemas juntas en el fondo del vaso, una al lado de la otra.
+velitas.jpg ........... de la clara suben tres picos blancos delgados y verticales, como velitas, cada uno con una burbujita de aire en la punta.
+velo-manto.jpg ........ la clara sube desde la yema y se abre hacia arriba como un velo o un manto blanco translúcido.
+yema-flota.jpg ........ la yema flota a media altura del agua, sostenida por la clara, no está en el fondo.
+puntito-rojo.jpg ...... en la yema, en el fondo, se ve un puntito rojo pequeño (mancha de sangre natural del huevo).
+corona-burbujas.jpg ... alrededor de la yema, en el fondo, un anillo de burbujitas de aire redondas, como una corona.
+telarana.jpg .......... hilos finos de clara blanca se cruzan por todo el vaso como una telaraña.
+hilo-recto.jpg ........ un solo hilo fino de clara blanca sube recto desde la yema hasta la superficie del agua.

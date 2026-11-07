@@ -7,6 +7,8 @@ Dos maneras de usarla:
 1. **Carrusel completo** (Instagram, TikTok fotos, Facebook álbum): las 10 juntas.
 2. **Una por día** (8 días): cada lámina sola, con su texto de abajo. Termina con la portada + cierre como carrusel de repaso.
 
+Las imágenes son escenas ilustradas. Para una versión con fotos realistas, ver `prompts-gemini.txt`.
+
 Las palabras clave para comentar (DOBLE, VELITAS, VELO, FLOTA, ROJO, CORONA, RED, HILO) nos dicen qué le salió a cada persona: respóndeles con la lectura de esa señal y, por DM, invítalas a subir su foto.
 
 ---
