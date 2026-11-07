@@ -1839,6 +1839,83 @@ export const en: Diccionario = {
     hacerLectura: "Get the reading",
     verGuia: "How is it prepared? See the guide",
     otras: "Other guides",
+    vidas: {
+      "titulo": "Past-life rituals",
+      "intro": "To remember, cut ties that come from long ago, break a pattern that keeps repeating and honor those who came before. Do them calmly, in a quiet place, and write down everything that comes: images, feelings, dreams.",
+      "cta": "Discover your past lives",
+      "temas": {
+        "recordar": {
+          "titulo": "Remember a past life",
+          "para": "A candle-guided meditation to glimpse what your soul has already lived.",
+          "materiales": "A purple (or white) candle, an amethyst or a glass of water, paper and pencil.",
+          "pasos": [
+            "Turn off the lights, light the candle and sit comfortably in front of it. Take seven deep breaths, counting slowly.",
+            "Gaze at the flame without straining and imagine a staircase going down. With each step, whisper one year less than your age, until you reach zero.",
+            "At the bottom there is a door. Ask: \"What do I need to remember today?\", open it and let an image come: a place, your feet, clothes, a person.",
+            "Stay there a few minutes, without judging. Then climb back up counting forward to your age and open your eyes.",
+            "Write down right away everything you saw and felt, even if it seems small. Let the candle burn down or put it out without blowing."
+          ],
+          "fraseTexto": "I remember what my soul needs to know today, and I release what no longer serves me.",
+          "senalTexto": "An image that comes back several times, a strong emotion for no reason or a vivid dream that same night."
+        },
+        "lazos": {
+          "titulo": "Cut karmic ties",
+          "para": "To release a relationship that keeps repeating, someone you feel you \"already knew\" who hurts you, or a bond that ties you down.",
+          "materiales": "Two small white candles, red thread or yarn (about 30 cm), a plate and scissors.",
+          "pasos": [
+            "Place the two candles on the plate, a hand's width apart: one is you, the other is the tie you want to release. Join them with the thread, tied around the base of each.",
+            "Light them during the waning moon and say out loud what that bond taught you: \"Thank you for…\".",
+            "Cut the thread in the middle and say your phrase. If you like, carefully burn the ends of the thread in the flame.",
+            "Let the candles burn down. Throw away the remains and the thread far from your home (in a street bin or buried).",
+            "That week, don't look for that person or check their social media: let the cut settle."
+          ],
+          "fraseTexto": "I give back what is yours and take back what is mine. I go my way in peace.",
+          "senalTexto": "The two flames lean in opposite directions, you feel relief in your chest or you stop thinking about that person."
+        },
+        "patron": {
+          "titulo": "Break a repeating pattern",
+          "para": "For when the same story keeps coming back with different people: the same kind of partner, the same betrayal, the same money loss.",
+          "materiales": "A black (or purple) candle, paper, a pencil, coarse salt and a fireproof container.",
+          "pasos": [
+            "Write the pattern as a story in the third person: \"She always…\". Be specific: how it starts, how it ends, what she feels.",
+            "Below it, write the new version in the present tense and first person: \"I now…\".",
+            "Light the candle during the waning moon, read both parts out loud and cut the paper along the line between them.",
+            "Burn the old pattern in the container and cover the ashes with salt. Keep the new version folded in your wallet or on your nightstand.",
+            "Pour the salt and ashes into running water (the drain works) and wash your hands with cold water."
+          ],
+          "fraseTexto": "This story ends with me. What kept repeating is transformed today.",
+          "senalTexto": "The paper burns fast and completely, and in the following weeks you notice you react differently to the same situation."
+        },
+        "ancestros": {
+          "titulo": "Heal and honor your ancestors",
+          "para": "To thank those who came before, heal what was inherited (fears, scarcity, wounds) and ask for their protection.",
+          "materiales": "A white candle, a glass of water, a flower (marigold, carnation or whatever you have), a photo or object of an ancestor and, if you like, bread or coffee.",
+          "pasos": [
+            "Make a small altar on a clean cloth: the photo or object in the center, the glass of water on the right, the flower and the food on the left.",
+            "Light the candle and say out loud the names you remember: \"Grandma…, Grandpa…, and all those I never met\".",
+            "Give thanks for something specific you inherited (strength, faith, cooking, laughter) and then name what you no longer want to carry: \"I won't continue this\".",
+            "Sit in silence for a few minutes. When the candle burns down, pour the water on a plant and leave the flower until it wilts.",
+            "Repeat it every year in November, or whenever you feel the family needs peace."
+          ],
+          "fraseTexto": "I honor what they gave me, I heal what hurt me and I go on with their blessing.",
+          "senalTexto": "The flame rises tall and calm, the water in the glass forms tiny bubbles or you dream of a relative that week."
+        },
+        "suenos": {
+          "titulo": "Dream of your past lives",
+          "para": "To ask your dreams to show you something from another life.",
+          "materiales": "An amethyst or quartz (or a glass of water on the nightstand), a small purple candle and a notebook by the bed.",
+          "pasos": [
+            "Before sleeping, light the candle for a few minutes, hold the stone and write a question in the notebook: \"Who was I and what did I come to learn?\".",
+            "Put out the candle without blowing and place the stone under your pillow (or the glass of water on the nightstand).",
+            "As you fall asleep, repeat your question in your mind, like a whisper.",
+            "When you wake up, don't move: stay still and write down everything you remember, even fragments. Do it seven nights in a row.",
+            "At the end of the week, read your notes: look for places, clothes, languages or people that repeat. If a dream moves you, tell Sibila about it."
+          ],
+          "fraseTexto": "While I sleep, my soul remembers; when I wake, I bring it with me.",
+          "senalTexto": "Dreams more vivid than usual, scenes from another era or waking up with a word or a place in your head."
+        }
+      }
+    },
     atraer: {
       "titulo": "Rituals to attract",
       "intro": "The ones people ask for most: love, work, abundance, protection, letting go and calm. Each one with its candle, its day, its moon phase and the steps. When the candle burns out, photograph what is left and Sibila tells you how your intention is going.",
@@ -2126,7 +2203,7 @@ export const en: Diccionario = {
       aura: { texto: "You know the color of your energy now. Want to see what today's sky says about caring for it?", accion: "See my sky today", href: "/hoy" },
       tabaco: { texto: "The cigar answered the moment. The tarot shows you the road ahead.", accion: "Draw a spread", href: "/tarot" },
       revolucion_solar: { texto: "You know the climate of your year. Want to see how it moves today?", accion: "See my sky today", href: "/hoy" },
-      vidas_pasadas: { texto: "Now you know where your soul comes from. Your full birth chart shows everything it brings into this life.", accion: "See my birth chart", href: "/carta-astral" },
+      vidas_pasadas: { texto: "Now you know where your soul comes from. You can cut the ties and break the patterns you brought with you.", accion: "Past-life rituals", href: "/rituales#vidas-pasadas" },
       baraja_espanola: { texto: "The deck answered. Tarot shows you the whole path.", accion: "Do a spread", href: "/tarot" },
       lenormand: { texto: "Lenormand told you what is happening. Tarot tells you what to do about it.", accion: "Do a spread", href: "/tarot" },
       runas: { texto: "The runes spoke of fate. The I Ching tells you how to act.", accion: "Consult the I Ching", href: "/iching" },

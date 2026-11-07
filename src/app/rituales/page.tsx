@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Coffee, Wind, Hand, Hexagon, FlameKindling, Orbit, Sparkles } from "lucide-react";
+import { Coffee, Wind, Hand, Hexagon, FlameKindling, Orbit, Sparkles, Infinity as Infinito } from "lucide-react";
 import { FICHA_INTENCION, TONO_COLOR, type Intencion } from "@/lib/velas";
 import { COSTOS } from "@/lib/creditos";
 import { getT } from "@/lib/i18n/servidor";
@@ -45,6 +45,15 @@ const ATRAER: readonly { id: string; intencion: Intencion }[] = [
   { id: "calma", intencion: "sanacion" },
 ];
 
+/** Rituales de vidas pasadas (reencarnación y karma), con la ficha de vela de su intención. */
+const VIDAS: readonly { id: string; intencion: Intencion }[] = [
+  { id: "recordar", intencion: "intuicion" },
+  { id: "lazos", intencion: "cierre" },
+  { id: "patron", intencion: "cierre" },
+  { id: "ancestros", intencion: "sanacion" },
+  { id: "suenos", intencion: "intuicion" },
+];
+
 /** Guía pública: cómo se hace cada ritual y qué se puede ver. */
 export default async function PaginaRituales() {
   const t = await getT();
@@ -53,6 +62,32 @@ export default async function PaginaRituales() {
   const temas = atraer.temas as Record<string, TemaAtraer>;
   const colores = t.velas.colores as Record<string, { nombre: string }>;
   const fases = t.luna.fases as Record<string, { nombre: string }>;
+  const vidas = t.rituales.vidas;
+  const temasVidas = vidas.temas as Record<string, TemaAtraer>;
+
+  const tarjeta = (ancla: string, tema: TemaAtraer, intencion: Intencion) => {
+    const ficha = FICHA_INTENCION[intencion];
+    return (
+      <article key={ancla} id={ancla} className="tarjeta scroll-mt-24 space-y-3 p-5">
+        <div className="flex items-center gap-3">
+          <span className="h-9 w-9 shrink-0 rounded-full border border-borde" style={{ background: TONO_COLOR[ficha.color] }} aria-hidden />
+          <div>
+            <h3 className="font-display text-2xl">{tema.titulo}</h3>
+            <p className="text-xs text-texto-suave">
+              {atraer.cuando}: {t.velas.dias[ficha.dia]} · {fases[ficha.fase]?.nombre} · {colores[ficha.color]?.nombre}
+            </p>
+          </div>
+        </div>
+        <p className="text-sm text-texto-suave">{tema.para}</p>
+        <p className="text-sm"><span className="font-semibold text-oro-suave">{atraer.necesitas}:</span> {tema.materiales}</p>
+        <ol className="list-decimal space-y-1 pl-5 text-sm">
+          {tema.pasos.map((paso, i) => <li key={i}>{paso}</li>)}
+        </ol>
+        <p className="rounded-xl border border-oro/30 bg-oro/5 px-3 py-2 text-sm"><span className="font-semibold text-oro-suave">{atraer.frase}:</span> <em>«{tema.fraseTexto}»</em></p>
+        <p className="text-sm text-texto-suave"><span className="font-semibold text-oro-suave">{atraer.senal}:</span> {tema.senalTexto}</p>
+      </article>
+    );
+  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-10">
@@ -64,6 +99,10 @@ export default async function PaginaRituales() {
           <a href="#atraer" className="flex items-center gap-2 rounded-full border border-oro/50 px-3 py-1.5 text-sm text-oro-suave transition hover:text-texto">
             <Sparkles className="h-4 w-4 text-oro" aria-hidden />
             {atraer.titulo}
+          </a>
+          <a href="#vidas-pasadas" className="flex items-center gap-2 rounded-full border border-violeta/50 px-3 py-1.5 text-sm text-violeta-suave transition hover:text-texto">
+            <Infinito className="h-4 w-4 text-violeta-suave" aria-hidden />
+            {vidas.titulo}
           </a>
           {GUIAS.map(({ id, Icono }) => (
             <a key={id} href={`#${id}`} className="flex items-center gap-2 rounded-full border border-borde px-3 py-1.5 text-sm text-texto-suave transition hover:border-oro/50 hover:text-texto">
@@ -80,35 +119,27 @@ export default async function PaginaRituales() {
           <p className="mt-1 max-w-2xl text-texto-suave">{atraer.intro}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          {ATRAER.map(({ id, intencion }) => {
-            const tema = temas[id];
-            const ficha = FICHA_INTENCION[intencion];
-            return (
-              <article key={id} id={`atraer-${id}`} className="tarjeta scroll-mt-24 space-y-3 p-5">
-                <div className="flex items-center gap-3">
-                  <span className="h-9 w-9 shrink-0 rounded-full border border-borde" style={{ background: TONO_COLOR[ficha.color] }} aria-hidden />
-                  <div>
-                    <h3 className="font-display text-2xl">{tema.titulo}</h3>
-                    <p className="text-xs text-texto-suave">
-                      {atraer.cuando}: {t.velas.dias[ficha.dia]} · {fases[ficha.fase]?.nombre} · {colores[ficha.color]?.nombre}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-texto-suave">{tema.para}</p>
-                <p className="text-sm"><span className="font-semibold text-oro-suave">{atraer.necesitas}:</span> {tema.materiales}</p>
-                <ol className="list-decimal space-y-1 pl-5 text-sm">
-                  {tema.pasos.map((paso, i) => <li key={i}>{paso}</li>)}
-                </ol>
-                <p className="rounded-xl border border-oro/30 bg-oro/5 px-3 py-2 text-sm"><span className="font-semibold text-oro-suave">{atraer.frase}:</span> <em>«{tema.fraseTexto}»</em></p>
-                <p className="text-sm text-texto-suave"><span className="font-semibold text-oro-suave">{atraer.senal}:</span> {tema.senalTexto}</p>
-              </article>
-            );
-          })}
+          {ATRAER.map(({ id, intencion }) => tarjeta(`atraer-${id}`, temas[id], intencion))}
         </div>
         <p className="text-sm text-texto-suave">{t.velas.seguridad}</p>
         <Link href="/velas" className="boton boton-primario">
           <FlameKindling className="h-4 w-4" aria-hidden />
           {atraer.cta}
+        </Link>
+      </section>
+
+      <section id="vidas-pasadas" className="scroll-mt-24 space-y-4">
+        <div>
+          <h2 className="font-display text-3xl">{vidas.titulo}</h2>
+          <p className="mt-1 max-w-2xl text-texto-suave">{vidas.intro}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {VIDAS.map(({ id, intencion }) => tarjeta(`vidas-${id}`, temasVidas[id], intencion))}
+        </div>
+        <p className="text-sm text-texto-suave">{t.velas.seguridad}</p>
+        <Link href="/vidas-pasadas" className="boton boton-primario">
+          <Infinito className="h-4 w-4" aria-hidden />
+          {vidas.cta}
         </Link>
       </section>
 

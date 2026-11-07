@@ -100,6 +100,24 @@ export default function PaginaReencarnacion() {
         </p>
       </section>
 
+      <section className="tarjeta border-violeta/40 p-6">
+        <h2 className="font-display text-2xl">Rituales de vidas pasadas</h2>
+        <p className="mt-1 text-sm text-texto-suave">Paso a paso, con su vela, su día y su fase lunar.</p>
+        <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          {[
+            ["recordar", "Recordar una vida pasada"],
+            ["lazos", "Cortar lazos kármicos"],
+            ["patron", "Romper un patrón que se repite"],
+            ["ancestros", "Sanar y honrar a tus ancestros"],
+            ["suenos", "Soñar con tus vidas pasadas"],
+          ].map(([id, nombre]) => (
+            <li key={id}>
+              <Link href={`/rituales#vidas-${id}`} className="text-oro-suave hover:text-texto">{nombre} →</Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <Preguntas
         items={[
           { p: "¿Cómo saber quién fui en mi vida pasada?", r: "La astrología kármica lo lee en el Nodo Sur de tu carta astral: su signo describe el tipo de vida que tu alma ya conoce y su casa, el área donde lo vivió. Se complementa con Saturno, Plutón, la casa 12 y los números kármicos de tu nombre y tu fecha." },

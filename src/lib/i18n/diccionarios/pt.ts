@@ -1836,6 +1836,83 @@ export const pt: Diccionario = {
     hacerLectura: "Fazer a leitura",
     verGuia: "Como se prepara? Ver o guia",
     otras: "Outros guias",
+    vidas: {
+      "titulo": "Rituais de vidas passadas",
+      "intro": "Para lembrar, cortar laços que vêm de longe, quebrar um padrão que se repete e honrar quem veio antes. Faça-os com calma, num lugar tranquilo, e anote tudo o que chegar: imagens, sensações, sonhos.",
+      "cta": "Conheça suas vidas passadas",
+      "temas": {
+        "recordar": {
+          "titulo": "Lembrar uma vida passada",
+          "para": "Uma meditação guiada pela vela para espiar o que sua alma já viveu.",
+          "materiales": "Vela roxa (ou branca), uma ametista ou um copo de água, papel e lápis.",
+          "pasos": [
+            "Apague as luzes, acenda a vela e sente-se confortável diante dela. Respire fundo sete vezes, contando devagar.",
+            "Olhe a chama sem forçar os olhos e imagine uma escada que desce. A cada degrau, diga baixinho um ano a menos da sua idade, até chegar a zero.",
+            "No fim da escada há uma porta. Pergunte: «O que preciso lembrar hoje?», abra-a e deixe chegar uma imagem: um lugar, seus pés, uma roupa, uma pessoa.",
+            "Fique ali alguns minutos, sem julgar. Depois suba a escada contando até a sua idade e abra os olhos.",
+            "Escreva na hora tudo o que viu e sentiu, mesmo que pareça pouco. Deixe a vela terminar ou apague-a sem soprar."
+          ],
+          "fraseTexto": "Lembro o que minha alma precisa saber hoje e solto o que já não me serve.",
+          "senalTexto": "Uma imagem que volta várias vezes, uma emoção forte sem motivo ou um sonho vívido na mesma noite."
+        },
+        "lazos": {
+          "titulo": "Cortar laços kármicos",
+          "para": "Para soltar uma relação que se repete, alguém que você sente que «já conhecia» e que machuca, ou um vínculo que prende.",
+          "materiales": "Duas velas brancas pequenas, linha vermelha ou de lã (uns 30 cm), um prato e uma tesoura.",
+          "pasos": [
+            "Coloque as duas velas no prato, a um palmo de distância: uma é você, a outra é o laço que quer soltar. Una-as com a linha, amarrada na base de cada uma.",
+            "Acenda-as na lua minguante e diga em voz alta o que esse vínculo te ensinou: «Obrigada por…».",
+            "Corte a linha ao meio com a tesoura e diga sua frase. Se quiser, queime com cuidado as pontas da linha na chama.",
+            "Deixe as velas terminarem. Jogue os restos e a linha longe da sua casa (no lixo da rua ou enterrados).",
+            "Nessa semana, não procure essa pessoa nem olhe as redes dela: deixe o corte assentar."
+          ],
+          "fraseTexto": "Devolvo o que é seu e recupero o que é meu. Sigo meu caminho em paz.",
+          "senalTexto": "As duas chamas se afastam para lados opostos, você sente alívio no peito ou deixa de pensar nessa pessoa."
+        },
+        "patron": {
+          "titulo": "Quebrar um padrão que se repete",
+          "para": "Para quando a mesma história volta com pessoas diferentes: o mesmo tipo de parceiro, a mesma traição, a mesma perda de dinheiro.",
+          "materiales": "Vela preta (ou roxa), papel, um lápis, sal grosso e um recipiente que resista ao fogo.",
+          "pasos": [
+            "Escreva o padrão como uma história na terceira pessoa: «Ela sempre…». Seja concreta: como começa, como termina, o que ela sente.",
+            "Embaixo, escreva a nova versão no presente e na primeira pessoa: «Eu agora…».",
+            "Acenda a vela na lua minguante, leia as duas partes em voz alta e corte o papel na linha que as separa.",
+            "Queime a parte do padrão antigo no recipiente e cubra as cinzas com sal. Guarde a nova versão dobrada na carteira ou na mesa de cabeceira.",
+            "Jogue o sal e as cinzas em água corrente (o ralo serve) e lave as mãos com água fria."
+          ],
+          "fraseTexto": "Esta história termina comigo. O que se repetia, hoje se transforma.",
+          "senalTexto": "O papel queima rápido e por inteiro, e nas semanas seguintes você percebe que reage diferente à mesma situação."
+        },
+        "ancestros": {
+          "titulo": "Curar e honrar seus ancestrais",
+          "para": "Para agradecer a quem veio antes, curar o que foi herdado (medos, escassez, feridas) e pedir a proteção deles.",
+          "materiales": "Vela branca, um copo de água, uma flor (cravo-de-defunto, cravo ou a que tiver), uma foto ou objeto de um ancestral e, se quiser, pão ou café.",
+          "pasos": [
+            "Faça um pequeno altar sobre um pano limpo: a foto ou objeto no centro, o copo de água à direita, a flor e a comida à esquerda.",
+            "Acenda a vela e diga em voz alta os nomes de quem você lembra: «Vó…, vô…, e todos que não conheci».",
+            "Agradeça algo concreto que herdou (a força, a fé, a cozinha, o riso) e depois nomeie o que não quer continuar carregando: «Isto eu não continuo».",
+            "Fique alguns minutos em silêncio. Quando a vela terminar, jogue a água numa planta e deixe a flor até murchar.",
+            "Repita todo ano em novembro, ou quando sentir que a família precisa de paz."
+          ],
+          "fraseTexto": "Honro o que me deram, curo o que me doeu e sigo com a bênção deles.",
+          "senalTexto": "A chama sobe alta e tranquila, a água do copo faz bolhinhas ou você sonha com um familiar nessa semana."
+        },
+        "suenos": {
+          "titulo": "Sonhar com suas vidas passadas",
+          "para": "Para pedir aos seus sonhos que mostrem algo de outra vida.",
+          "materiales": "Uma ametista ou um quartzo (ou um copo de água na mesa de cabeceira), uma vela roxa pequena e um caderno ao lado da cama.",
+          "pasos": [
+            "Antes de dormir, acenda a vela por alguns minutos, segure a pedra e escreva uma pergunta no caderno: «Quem fui e o que vim aprender?».",
+            "Apague a vela sem soprar e coloque a pedra debaixo do travesseiro (ou o copo de água na mesa de cabeceira).",
+            "Ao adormecer, repita a pergunta mentalmente, como um sussurro.",
+            "Ao acordar, não se mexa: fique quieta e anote tudo o que lembrar, mesmo que sejam pedaços. Faça isso sete noites seguidas.",
+            "No fim da semana, leia suas notas: procure lugares, roupas, idiomas ou pessoas que se repetem. Se um sonho te tocar, conte para a Sibila."
+          ],
+          "fraseTexto": "Enquanto durmo, minha alma lembra; ao acordar, trago comigo.",
+          "senalTexto": "Sonhos mais vívidos que o normal, cenas de outra época ou acordar com uma palavra ou um lugar na cabeça."
+        }
+      }
+    },
     atraer: {
       "titulo": "Rituais para atrair",
       "intro": "Os que mais nos pedem: amor, trabalho, abundância, proteção, desapego e calma. Cada um com sua vela, seu dia, sua fase da Lua e os passos. Quando a vela terminar, fotografe os restos e a Sibila diz como vai a sua intenção.",
@@ -2123,7 +2200,7 @@ export const pt: Diccionario = {
       aura: { texto: "Você já conhece a cor da sua energia. Quer ver o que o céu de hoje diz sobre como cuidar dela?", accion: "Ver meu céu hoje", href: "/hoy" },
       tabaco: { texto: "O charuto respondeu ao momento. O tarô mostra o caminho que segue.", accion: "Fazer uma tiragem", href: "/tarot" },
       revolucion_solar: { texto: "Você já conhece o clima do seu ano. Quer ver como ele se move hoje?", accion: "Ver meu céu hoje", href: "/hoy" },
-      vidas_pasadas: { texto: "Agora você sabe de onde vem sua alma. Seu mapa astral completo mostra tudo o que ela traz nesta vida.", accion: "Ver meu mapa astral", href: "/carta-astral" },
+      vidas_pasadas: { texto: "Agora você sabe de onde vem sua alma. Pode cortar os laços e quebrar os padrões que trouxe.", accion: "Rituais de vidas passadas", href: "/rituales#vidas-pasadas" },
       baraja_espanola: { texto: "O baralho respondeu. O tarô mostra o caminho completo.", accion: "Fazer uma tiragem", href: "/tarot" },
       lenormand: { texto: "O Lenormand disse o que acontece. O tarô diz o que fazer com isso.", accion: "Fazer uma tiragem", href: "/tarot" },
       runas: { texto: "As runas falaram do destino. O I Ching diz como agir.", accion: "Consultar o I Ching", href: "/iching" },
