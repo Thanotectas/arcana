@@ -57,6 +57,11 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 | `30-anuncio-limpia` | 30-anuncio-limpia-sibila-te-la-lee.mp4 |
 | `31-anuncio-vela` | 31-anuncio-vela-sibila-te-la-lee.mp4 |
 | `32-por-que-me-llamo-sibila` | 32-por-que-me-llamo-sibila.mp4 |
+| `33-mensaje-por-elemento` | 33-mensaje-por-elemento.mp4 |
+| `34-aviso-directo-domingo` | aviso del directo (capas.html, capas-facebook.html, capas-hoy.html) |
+| `35-tres-cartas-amor` | 35-tres-cartas-amor.mp4 |
+| `36-alma-vieja` | 36-alma-vieja-whatsapp.mp4, 36-alma-vieja.mp4 |
+| `37-que-significa-huevo` | 37-que-significa-huevo.mp4 (sin voz; con voz: voz.txt + armar.sh) |
 
 ## Carruseles
 
