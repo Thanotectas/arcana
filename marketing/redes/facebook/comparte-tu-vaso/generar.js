@@ -19,11 +19,11 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 <div class="c" style="top:120px"><span style="display:inline-flex;align-items:center;gap:12px;padding:10px 26px;border-radius:999px;background:#e0453a;font-family:I;font-size:28px;letter-spacing:.18em;color:#fff"><span style="width:14px;height:14px;border-radius:50%;background:#fff"></span>HOY EN VIVO · 8 P.M.</span></div>
 <p class="c" style="top:700px;font-family:CI;font-size:50px;color:#b7a5ff">¿Te hiciste la limpia con huevo?</p>
 <h1 class="c" style="top:768px;font-family:C;font-weight:600;font-size:104px;line-height:1;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.35)">Comparte tu vaso</h1>
-<p class="c" style="top:900px;font-size:36px;line-height:1.35">Deja la foto en los comentarios 👇<br>y <b style="font-family:I;color:#f1d99a">esta noche Sibila lo lee en vivo</b></p>
-<div class="c" style="top:1040px"><div style="display:inline-block;padding:20px 40px;border-radius:999px;border:2px solid #f1d99a;background:rgba(241,217,154,.08)">
+<p class="c" style="top:885px;font-size:34px;line-height:1.35">Déjala en los comentarios 👇 o súbela en<br><b style="font-family:I;color:#f1d99a;font-size:44px">miarcana.com/vivo</b><br>y esta noche Sibila la lee en vivo</p>
+<div class="c" style="top:1075px"><div style="display:inline-block;padding:20px 40px;border-radius:999px;border:2px solid #f1d99a;background:rgba(241,217,154,.08)">
 <p style="font-family:I;font-size:38px;color:#f1d99a">8 p.m. Colombia · en TikTok @miarcana4</p>
 <p style="font-size:24px;color:#cfc2ff;margin-top:6px">7 p.m. México · 9 p.m. Venezuela · 10 p.m. Argentina y Chile</p></div></div>
-<p class="c" style="top:1225px;font-size:22px;color:#a89fc0">Foto de lado y con luz · Al compartirla aceptas que la mostremos en el directo con tu nombre</p>
+<p class="c" style="top:1245px;font-size:21px;color:#a89fc0">Foto de lado y con luz · Al compartirla aceptas que la mostremos en el directo con tu nombre</p>
 </body></html>`;
 (async () => {
   const b = await chromium.launch();

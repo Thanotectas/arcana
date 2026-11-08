@@ -28,9 +28,10 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transpa
 <div class="zona" id="z2"><div style="font-family:C;font-size:100px;line-height:1;color:#f1d99a">HOY · Domingo 8</div>
   <div style="font-family:I;font-size:42px;color:#fff;margin-top:22px">8:00 p.m. Colombia · Perú · Ecuador</div>
   <div style="font-family:IR;font-size:32px;color:#b7a5ff;margin-top:14px">7:00 p.m. México · 9:00 p.m. Venezuela<br>10:00 p.m. Argentina · Chile</div></div>
-<div class="zona" id="z3"><div style="font-family:IR;font-size:36px;color:#ece6f7;margin-bottom:14px">Escribe tu signo y tu pregunta y te leo <b style="font-family:I;color:#f1d99a">gratis</b>:</div>
-  <span class="it" id="i0">Tu vaso de huevo 🥚</span><span class="it" id="i1">Tarot</span><span class="it" id="i2">Carta astral</span><span class="it" id="i3">Péndulo</span>
-  <div id="i4" style="opacity:0;font-family:C;font-size:54px;color:#fff;margin-top:24px">Sígueme y activa el aviso del LIVE 🔔</div></div>
+<div class="zona" id="z3"><div style="font-family:IR;font-size:38px;color:#ece6f7;line-height:1.3">Escribe tu signo y tu pregunta,<br>o <b style="font-family:I;color:#f1d99a">sube la foto de tu vaso</b> 🥚</div>
+  <div class="it" id="i0" style="font-size:46px;padding:16px 40px;margin-top:22px;border-width:3px;border-color:#f1d99a">miarcana.com/vivo</div>
+  <span id="i1"></span><span id="i2"></span><span id="i3"></span>
+  <div id="i4" style="opacity:0;font-family:C;font-size:54px;color:#fff;margin-top:22px">Sígueme y activa el aviso del LIVE 🔔</div></div>
 <script>
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
 const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
@@ -38,26 +39,28 @@ const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const est=(id,w,h,n,o)=>document.getElementById(id).innerHTML=Array.from({length:n},(_,i)=>'<circle cx="'+(az(i+o)*w).toFixed(0)+'" cy="'+(az(i+o+999)*h).toFixed(0)+'" r="'+(.6+az(i+o+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+o+3)*.6).toFixed(2)+'"/>').join("");
 est("e1",1080,400,60,3);est("e2",1080,480,70,400);
 const FINAL=1123;
+// Fin de la parte 1, fin de la parte 2 y largo total (armar.sh los pasa en #a,b,f según los audios de la voz).
+const [A,B]=(location.hash.slice(1)||"5.6,11.4,17").split(",").map(Number);
 const ch=document.getElementById("chispas");
 const N=70;
 ch.innerHTML=Array.from({length:N},(_,i)=>'<path id="p'+i+'" d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="'+(i%3?"#f1d99a":"#fff")+'" opacity="0"/>').join("");
 window.pintar=(t)=>{
   // Parte 1 (0–5,6 s): contador hasta 1.140 y chispas doradas cayendo
-  const a1=ven(t,0,5.6,.4);
+  const a1=ven(t,0,A,.4);
   document.getElementById("a1").style.opacity=a1.toFixed(3);
   document.getElementById("cuenta").textContent=Math.round(FINAL*su(pr(t,.3,2.6))).toLocaleString("es-CO");
   document.getElementById("cuenta").style.transform="scale("+(1+.12*Math.max(0,1-Math.abs(t-2.75)/.35))+")";
-  document.getElementById("z1").style.opacity=ven(t,1.2,5.6).toFixed(3);
+  document.getElementById("z1").style.opacity=ven(t,1.2,A).toFixed(3);
   for(let i=0;i<N;i++){const e=document.getElementById("p"+i),ini=2.5+az(i)*1.2,v=260+az(i+50)*320,x=az(i+9)*1080+Math.sin(t*2+i)*30,y=-30+(t-ini)*v;
-    const vis=t>ini&&y<1900?Math.min(1,(t-ini)*3)*(1-su(pr(t,5,5.6))):0;
+    const vis=t>ini&&y<1900?Math.min(1,(t-ini)*3)*(1-su(pr(t,A-.6,A))):0;
     e.setAttribute("transform","translate("+x.toFixed(1)+" "+y.toFixed(1)+") rotate("+(t*90+i*20).toFixed(0)+") scale("+(.6+az(i+3)*1.4).toFixed(2)+")");e.setAttribute("opacity",vis.toFixed(2));}
   // Parte 2 (5,6–17 s): el directo
-  document.getElementById("a2").style.opacity=su(pr(t,5.6,6.1)).toFixed(3);
+  document.getElementById("a2").style.opacity=su(pr(t,A,A+.5)).toFixed(3);
   document.getElementById("punto").style.opacity=(.35+.65*(.5+.5*Math.sin(t*6))).toFixed(2);
-  document.getElementById("z2").style.opacity=ven(t,5.8,11.4).toFixed(3);
-  document.getElementById("z3").style.opacity=su(pr(t,11.5,11.9)).toFixed(3);
-  for(let i=0;i<4;i++)document.getElementById("i"+i).style.opacity=su(pr(t,12+i*.5,12.4+i*.5)).toFixed(3);
-  document.getElementById("i4").style.opacity=su(pr(t,14.4,14.9)).toFixed(3);
+  document.getElementById("z2").style.opacity=ven(t,A+.2,B).toFixed(3);
+  document.getElementById("z3").style.opacity=su(pr(t,B+.1,B+.5)).toFixed(3);
+  for(let i=0;i<4;i++)document.getElementById("i"+i).style.opacity=su(pr(t,B+.6+i*.5,B+1+i*.5)).toFixed(3);
+  document.getElementById("i4").style.opacity=su(pr(t,B+3,B+3.5)).toFixed(3);
 };
 window.pintar(0);
 </script></body></html>
