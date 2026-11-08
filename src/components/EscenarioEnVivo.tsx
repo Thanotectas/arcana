@@ -395,7 +395,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
   const escena = retrato !== null;
   // Zona de la lectura: el tercio derecho en horizontal; todo el ancho en vertical.
-  const derecha = vertical ? "left-10 right-10" : escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
+  const derecha = vertical ? "left-[110px] right-[110px]" : escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
   // Tamaños: en vertical se usan los de la escena (más compactos).
   const compacto = escena || vertical;
   const cartas = lectura?.cartas ?? [
@@ -428,7 +428,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 400 }} nivel={nivel} modo="cielo" />
             <div className="absolute left-0 right-0 top-[110px] h-[520px] overflow-hidden border-y-2 border-oro/40" style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
               {escena ? (
-                <div className="absolute" style={{ left: -150, top: -40, width: 1885, height: 1060 }}>
+                <div className="absolute" style={{ left: -230, top: -40, width: 1885, height: 1060 }}>
                   <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />
                 </div>
               ) : (
@@ -439,9 +439,10 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
                 </div>
               )}
             </div>
+            {/* Todo lo importante queda entre x 110 y 970: en celulares altos (19,5:9) TikTok recorta ~96 px por lado. */}
             {/* La mesa en vivo: recuadro (16:9) donde LIVE Studio pone, encima, la cámara de las manos, la vela y la baraja.
                 TikTok castiga como «pregrabado» un LIVE sin nada en tiempo real; así se ve que hay alguien, sin mostrar la cara. */}
-            <div className="absolute right-6 top-[392px] h-[230px] w-[392px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
+            <div className="absolute right-[110px] top-[400px] h-[214px] w-[380px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
               <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] text-center text-lg text-violeta-suave">Aquí va la cámara de la mesa</div>
               <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> Mi mesa · en vivo
@@ -456,7 +457,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         )}
         {/* Encabezado */}
         {vertical ? (
-          <div className="absolute left-8 right-8 top-6 flex items-center justify-between">
+          <div className="absolute left-[110px] right-[110px] top-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Marca tamano={52} />
               <div>
@@ -660,14 +661,14 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {/* Subtítulos */}
         {!(cierre === "fin" && !subtitulo) && (
-        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? "left-8 right-8 top-[1275px] bg-black/60" : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
+        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? "left-[100px] right-[100px] top-[1275px] bg-black/60" : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
           <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
         )}
 
         {/* Pie (en vertical, dos líneas cortas: abajo TikTok pone los comentarios) */}
         {vertical ? (
-          <div className="absolute bottom-10 left-8 right-8 space-y-2 text-center text-2xl text-violeta-suave">
+          <div className="absolute bottom-10 left-[110px] right-[110px] space-y-2 text-center text-2xl text-violeta-suave">
             {cierre !== "abierto" ? (
               <p>✦ Gracias por acompañarnos ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
             ) : (
