@@ -29,3 +29,25 @@ export function diasParaDirecto(ahora = new Date()): number {
   const dia = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONA_DIRECTO }).format(d);
   return Math.round((Date.parse(dia(new Date(PROXIMO_DIRECTO.inicio))) - Date.parse(dia(ahora))) / 86_400_000);
 }
+
+/**
+ * Directo de TikTok LIVE (sin emisión programada ni aviso en la portada). Mientras está próximo (el mismo día) o en
+ * curso, /vivo lo muestra y deja subir desde antes la foto del vaso, la taza o la mano: queda en la fila para esa noche.
+ * Para el siguiente basta cambiar las dos horas.
+ */
+export const DIRECTO_TIKTOK = {
+  inicio: "2026-11-08T20:00:00-05:00",
+  fin: "2026-11-08T21:00:00-05:00",
+  perfil: "https://www.tiktok.com/@miarcana4",
+  envivo: "https://www.tiktok.com/@miarcana4/live",
+};
+
+/** Las fotos se reciben desde 12 horas antes del directo de TikTok hasta que termina. */
+const ANTES_FOTOS = 12 * 3_600_000;
+
+export function estadoTikTok(ahora = new Date()): "proximo" | "en-vivo" | null {
+  const t = ahora.getTime();
+  const inicio = Date.parse(DIRECTO_TIKTOK.inicio);
+  if (t >= Date.parse(DIRECTO_TIKTOK.fin) || t < inicio - ANTES_FOTOS) return null;
+  return t >= inicio ? "en-vivo" : "proximo";
+}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { escenarioActivo } from "@/lib/en-vivo";
-import { PROXIMO_DIRECTO, ZONA_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
+import { DIRECTO_TIKTOK, PROXIMO_DIRECTO, ZONA_DIRECTO, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 import { FormularioVivo } from "@/components/FormularioVivo";
 import { GRUPO_FACEBOOK, CANAL_WHATSAPP } from "@/lib/marca/redes";
 
@@ -23,6 +23,36 @@ export default async function PaginaVivo() {
   const inicio = new Date(PROXIMO_DIRECTO.inicio);
   const fecha = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, weekday: "long", day: "numeric", month: "long" }).format(inicio);
   const hora = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(inicio);
+  // Directo de TikTok de hoy: el aviso y el formulario para dejar la foto desde antes.
+  const tiktok = estadoTikTok();
+  const horaTiktok = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(new Date(DIRECTO_TIKTOK.inicio));
+  if (tiktok) {
+    return (
+      <div className="mx-auto max-w-md space-y-6 py-6">
+        <div className="text-center">
+          <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Sibila en vivo · TikTok</p>
+          <h1 className="mt-2 font-display text-4xl font-semibold text-oro-suave">Sube tu vaso para el directo</h1>
+          <p className="mt-2 text-texto-suave">
+            {tiktok === "en-vivo" ? "Sibila está leyendo en vivo en TikTok." : `Hoy a las ${horaTiktok} (hora de Colombia) Sibila lee en vivo en TikTok.`} Deja aquí la foto de tu limpia con huevo, de tu taza o de tu mano: entra a la fila y Sibila la lee en pantalla, con tu nombre.
+          </p>
+        </div>
+        <a href={tiktok === "en-vivo" ? DIRECTO_TIKTOK.envivo : DIRECTO_TIKTOK.perfil} target="_blank" rel="noopener noreferrer" className="boton boton-primario flex w-full justify-center text-lg">
+          {tiktok === "en-vivo" ? "▶ Entrar al directo en TikTok" : "Seguir a Arcana en TikTok (@miarcana4)"}
+        </a>
+        <div className="tarjeta p-5">
+          <FormularioVivo />
+        </div>
+        <p className="text-center text-sm text-texto-suave">
+          ¿No quieres esperar? Sibila te marca tu vaso con líneas ahora mismo en{" "}
+          <Link href="/huevo" className="text-oro-suave underline">
+            miarcana.com/huevo
+          </Link>
+          .
+        </p>
+        <p className="text-center text-xs text-texto-suave">Lecturas de entretenimiento y reflexión personal.</p>
+      </div>
+    );
+  }
   return (
     <div className="mx-auto max-w-md space-y-6 py-6">
       <div className="text-center">

@@ -10,6 +10,7 @@ import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
+import { estadoTikTok } from "@/lib/marca/directo";
 
 export interface EstadoEnVivo {
   error?: string;
@@ -36,7 +37,8 @@ export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData):
   if (foto.size > 4 * 1024 * 1024) return { error: "La foto pesa demasiado." };
 
   const admin = getSupabaseAdmin();
-  if (!(await escenarioActivo(admin))) return { error: "En este momento no hay directo. Mira los horarios en Instagram @miarcana.oficial, o haz tu lectura en miarcana.com." };
+  // Durante el directo, o desde antes el día de un directo de TikTok (la foto espera en la fila).
+  if (!estadoTikTok() && !(await escenarioActivo(admin))) return { error: "En este momento no hay directo. Mira los horarios en Instagram @miarcana.oficial, o haz tu lectura en miarcana.com." };
 
   const h = await headers();
   const huella = huellaDe(h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida");
