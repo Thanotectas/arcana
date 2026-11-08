@@ -52,9 +52,16 @@ export function PreguntaManual() {
           <option value="lenormand">Lenormand</option>
           <option value="baraja">Baraja española</option>
           <option value="chino">Horóscopo chino (año o fecha)</option>
+          <option value="huevo">Foto: vaso de la limpia con huevo</option>
+          <option value="chocolate">Foto: taza de chocolate</option>
+          <option value="mano">Foto: mano</option>
         </select>
       </div>
-      <input name="texto" placeholder="Ej: Soy Leo, ¿qué viene en el amor? · carta: 14/03/1985 10:30 Medellín · sinastría: 14/03/1985 y 22/08/1990" maxLength={300} required className="campo w-full" />
+      <input name="texto" placeholder="Ej: Soy Leo, ¿qué viene en el amor? · carta: 14/03/1985 10:30 Medellín · sinastría: 14/03/1985 y 22/08/1990" maxLength={300} className="campo w-full" />
+      <label className="block text-sm text-texto-suave">
+        Foto (opcional: el vaso, la taza o la mano que te mandaron por Facebook o WhatsApp; con foto, el texto puede ir vacío)
+        <input name="foto" type="file" accept="image/*" className="campo mt-1 w-full" />
+      </label>
       {estado.error && <Aviso>{estado.error}</Aviso>}
       {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
       <BotonEnviar className="boton boton-secundario text-sm" cargando="Agregando…">

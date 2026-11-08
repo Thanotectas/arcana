@@ -69,6 +69,10 @@ export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormDa
   const autor = String(formData.get("autor") ?? "").trim().slice(0, 40);
   const texto = String(formData.get("texto") ?? "").trim().slice(0, 300);
   const elegido = String(formData.get("tipo") ?? "auto");
+  const foto = formData.get("foto");
+  const conFoto = foto instanceof File && foto.size > 0;
+  // Con foto (por ejemplo, la de un vaso que mandaron por Facebook): huevo, taza o mano; sin límite por hora.
+  if (conFoto) return agregarFotoManual(autor, texto, elegido, foto);
   // «auto» clasifica el texto igual que el chat (carta astral, sinastría, aura…); lo que pide foto queda en tarot.
   const tipo = (elegido === "auto" ? (tipoDeMensaje(texto) ?? "tarot") : elegido) as TipoLectura;
   if (!autor || texto.length < 3 || !TIPOS.includes(tipo)) return { error: "Escribe el nombre, el tipo y la consulta." };
@@ -79,6 +83,29 @@ export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormDa
   if (error) return { error: error.message };
   revalidatePath("/admin/en-vivo");
   return { mensaje: "Agregada: es la siguiente que lee Sibila." };
+}
+
+/** Foto agregada desde /admin/en-vivo (vasos o tazas que llegaron por Facebook o WhatsApp): se limpia igual que en /vivo. */
+async function agregarFotoManual(autor: string, texto: string, elegido: string, foto: File): Promise<EstadoEnVivo> {
+  if (!autor) return { error: "Escribe el nombre de la persona." };
+  if (foto.size > 4 * 1024 * 1024) return { error: "La foto pesa demasiado (máximo 4 MB)." };
+  const tipo: TipoLectura = elegido === "mano" ? "mano" : elegido === "chocolate" ? "chocolate" : "huevo";
+  let limpia: Buffer;
+  try {
+    limpia = await sharp(Buffer.from(await foto.arrayBuffer())).rotate().resize({ width: 1024, height: 1024, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 82 }).toBuffer();
+  } catch {
+    return { error: "No pudimos abrir esa imagen. Prueba con otra." };
+  }
+  const admin = getSupabaseAdmin();
+  const ruta = `en-vivo/fotos/${randomUUID()}.jpg`;
+  const { error: errorSubida } = await admin.storage.from(BUCKET_FOTOS).upload(ruta, limpia, { contentType: "image/jpeg", cacheControl: "300" });
+  if (errorSubida) return { error: `No se pudo guardar la foto: ${errorSubida.message}` };
+  const fila = { origen: "manual" as const, tipo, autor, texto, signo: detectarSigno(texto)?.id ?? null, imagen: ruta };
+  let { error } = await admin.from("en_vivo_preguntas").insert(fila);
+  if (error?.code === "23514" && tipo === "huevo") ({ error } = await admin.from("en_vivo_preguntas").insert({ ...fila, tipo: "chocolate", texto: `${MARCA_HUEVO}${texto}`.trim() }));
+  if (error) return { error: error.message };
+  revalidatePath("/admin/en-vivo");
+  return { mensaje: `Foto de ${autor} agregada: es la siguiente que lee Sibila.` };
 }
 
 /** Saca de la fila todo lo pendiente (por ejemplo, al empezar un directo nuevo). */
