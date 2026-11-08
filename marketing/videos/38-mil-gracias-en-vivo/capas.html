@@ -37,7 +37,7 @@ const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
 const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const est=(id,w,h,n,o)=>document.getElementById(id).innerHTML=Array.from({length:n},(_,i)=>'<circle cx="'+(az(i+o)*w).toFixed(0)+'" cy="'+(az(i+o+999)*h).toFixed(0)+'" r="'+(.6+az(i+o+7)*1.8).toFixed(1)+'" fill="#fff" opacity="'+(.3+az(i+o+3)*.6).toFixed(2)+'"/>').join("");
 est("e1",1080,400,60,3);est("e2",1080,480,70,400);
-const FINAL=1140;
+const FINAL=1123;
 const ch=document.getElementById("chispas");
 const N=70;
 ch.innerHTML=Array.from({length:N},(_,i)=>'<path id="p'+i+'" d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="'+(i%3?"#f1d99a":"#fff")+'" opacity="0"/>').join("");
