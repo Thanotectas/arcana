@@ -576,7 +576,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         {cierre !== "abierto" ? (
           <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${vertical ? "top-[800px] h-[420px]" : escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
             <Bell className={`text-oro-suave vivo-campana ${compacto ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
-            <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>Suscríbete y activa la campanita</p>
+            <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>{vertical ? "Sígueme y activa las notificaciones" : "Suscríbete y activa la campanita"}</p>
             <p className={`text-texto ${compacto ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
             <p className={`text-violeta-suave ${compacto ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
           </div>
