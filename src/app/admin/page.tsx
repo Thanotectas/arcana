@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
@@ -12,6 +12,7 @@ const HERRAMIENTAS = [
   { href: "/admin/en-vivo", icono: Radio, titulo: "Sibila en vivo", texto: "Directos de YouTube: Sibila lee tarot, aura, numerología, horóscopo, tazas y manos en voz alta." },
   { href: "/admin/telegram", icono: Send, titulo: "Telegram", texto: "El bot de Sibila: responde dudas, manda la carta del día y la envía cada mañana a quien escribió /diaria." },
   { href: "/admin/whatsapp", icono: MessageCircle, titulo: "Atención", texto: "Preguntas de visitantes en el chat de la página (y el historial de WhatsApp, desactivado por Meta)." },
+  { href: "/admin/regalo", icono: Gift, titulo: "Regalo del vaso", texto: "Correo «tu vaso tiene algo que decirte»: una lectura del vaso de regalo para quien se quedó sin créditos." },
   { href: "/admin/probadores", icono: Mail, titulo: "Correo a probadores", texto: "Agradecimiento a quienes prueban Arcana en Google Play, con sus créditos." },
 ];
 
