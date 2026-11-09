@@ -554,6 +554,14 @@ Fuente «Enlace» de LIVE Studio con la URL vertical, «Resolución personalizad
 «mi arcana punto com, barra, vivo»), ni precios en pesos («tu primera lectura completa es gratis»), y dicen «sígueme
 y activa las notificaciones» en lugar de «suscríbete al canal».
 
+### Segundo TikTok LIVE (domingo 8 nov 2026)
+
+29 min, 160 visualizaciones (el primero: 50), 4 personas comentaron, 4 me gusta, 1 seguidor nuevo, 0 diamantes; 20
+espectadores llegaron por los «momentos destacados». Ayudó: llegar a 1.000 seguidores el mismo día, el video 38 (¡Mil
+gracias! + aviso), la publicación de Facebook «Comparte tu vaso» y /vivo abierto desde 12 horas antes (DIRECTO_TIKTOK en
+src/lib/marca/directo.ts; para el siguiente directo basta cambiar las dos horas). Pendiente: más comentarios (preguntas
+directas, nombrar a quien entra, encuesta de TikTok) y publicar recortes del directo como momentos destacados.
+
 ### Pausa para el presentador (migración 0045)
 
 En /admin/en-vivo, «Pausa para el presentador»: 30 s, 1 min, «hasta reanudar» y «Reanudar». Sibila termina la frase
