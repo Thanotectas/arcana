@@ -557,7 +557,11 @@ y activa las notificaciones» en lugar de «suscríbete al canal».
 ### Segundo TikTok LIVE (domingo 8 nov 2026)
 
 29 min, 160 visualizaciones (el primero: 50), 4 personas comentaron, 4 me gusta, 1 seguidor nuevo, 0 diamantes; 20
-espectadores llegaron por los «momentos destacados». Ayudó: llegar a 1.000 seguidores el mismo día, el video 38 (¡Mil
+espectadores llegaron por los «momentos destacados». TikTok lo volvió a marcar como «contenido pregrabado», aunque la
+cámara (con la cara) estuvo activa todo el tiempo en el recuadro «Mi mesa»: la persona ocupaba un rincón y el resto era
+la página. Por eso existe la versión `&formato=vertical&camara=grande` (en /admin/en-vivo): la cámara arriba, 860×484,
+y Sibila en un círculo junto a sus subtítulos. Además: hablar en voz alta desde el primer minuto (pausa hasta reanudar al
+empezar) y entre lecturas. Ayudó: llegar a 1.000 seguidores el mismo día, el video 38 (¡Mil
 gracias! + aviso), la publicación de Facebook «Comparte tu vaso» y /vivo abierto desde 12 horas antes (DIRECTO_TIKTOK en
 src/lib/marca/directo.ts; para el siguiente directo basta cambiar las dos horas). Pendiente: más comentarios (preguntas
 directas, nombrar a quien entra, encuesta de TikTok) y publicar recortes del directo como momentos destacados.

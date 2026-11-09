@@ -77,6 +77,8 @@ export default async function PaginaAdminEnVivo() {
         <DireccionEscenario url={url} />
         <p className="text-sm text-texto-suave">Versión vertical para TikTok LIVE (1080×1920):</p>
         <DireccionEscenario url={`${url}&formato=vertical`} />
+        <p className="text-sm text-texto-suave">Vertical con tu cámara grande (recomendada en TikTok: así no lo marca como «contenido pregrabado»):</p>
+        <DireccionEscenario url={`${url}&formato=vertical&camara=grande`} />
         <ol className="list-decimal space-y-1 pl-5 text-sm text-texto-suave">
           <li>OBS → Fuentes → <strong>+</strong> → <strong>Navegador</strong>. URL: la de arriba. Ancho 1920, alto 1080. Marca «Controlar el audio a través de OBS».</li>
           <li>En YouTube Studio → <strong>Crear → Emitir en directo</strong> → copia la <strong>clave de transmisión</strong>.</li>

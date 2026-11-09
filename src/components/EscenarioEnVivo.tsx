@@ -148,7 +148,7 @@ function Pendulo({ respuesta }: { respuesta: string }) {
  * A la hora de cierre se despide y queda la pantalla final (gracias y
  * suscríbete); si en el panel se corre la hora, vuelve a leer sola.
  */
-export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean }) {
+export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false, camaraGrande = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean; camaraGrande?: boolean }) {
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
   // los comentarios, solo lo secundario. Misma lógica (voz, fila, oráculos, relleno, cierre).
   const W = vertical ? 1080 : ANCHO;
@@ -422,7 +422,30 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
-        {vertical ? (
+        {vertical && camaraGrande ? (
+          <>
+            {/* Cámara grande: TikTok marca como «contenido pregrabado» un LIVE donde la persona ocupa un rincón. Aquí la
+                cámara del presentador es lo principal (arriba, 860×484) y Sibila habla desde un círculo junto a sus subtítulos. */}
+            <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1330 }} nivel={nivel} modo="cielo" />
+            <div className="absolute left-[110px] right-[110px] top-[118px] h-[484px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
+              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] text-center text-2xl text-violeta-suave">Aquí va tu cámara (ponla encima, del mismo tamaño)</div>
+              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> En vivo · mi mesa
+              </div>
+            </div>
+            <div className="absolute left-[96px] top-[1262px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
+              {escena ? (
+                <div className="absolute" style={{ left: -174, top: -64, width: 792, height: 445 }}>
+                  <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <RostroSibila tamano={130} nivel={nivel} />
+                </div>
+              )}
+            </div>
+          </>
+        ) : vertical ? (
           <>
             {/* Estrellas de fondo y Sibila en una ventana arriba (la pintura, recortada a su rostro y su pecho) */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 400 }} nivel={nivel} modo="cielo" />
@@ -661,7 +684,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {/* Subtítulos */}
         {!(cierre === "fin" && !subtitulo) && (
-        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? "left-[100px] right-[100px] top-[1275px] bg-black/60" : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
+        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? `${camaraGrande ? "left-[262px]" : "left-[100px]"} right-[100px] top-[1275px] bg-black/60` : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
           <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
         )}
