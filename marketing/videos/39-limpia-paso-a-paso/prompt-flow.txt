@@ -1,0 +1,64 @@
+VIDEO 39 — «LA LIMPIA CON HUEVO, PASO A PASO (Y SIN MIEDO)». Google Flow (Veo), 3 clips de 8 s, vertical 9:16.
+Tutorial: el contenido que más se guarda y se comparte. Lleva a miarcana.com/huevo (y encaja con el correo del regalo).
+SIN CARAS: solo manos y el cuerpo de los hombros para abajo. Misma escena que las fotos de la serie «¿Qué significa…?»:
+paño de terciopelo morado, dos velas blancas en candelabros dorados, sal gruesa, romero, luces cálidas desenfocadas.
+Tono: cálido, sereno, protector. Nada de miedo. Los prompts van en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- «Ingredientes a video» (Ingredients to video): sube como referencia la foto
+  marketing/carruseles/que-significa-huevo/fotos/velitas.jpg (la escena: vaso, velas, sal, romero, terciopelo).
+- Vertical 9:16, 8 s. Los clips 2 y 3 con «Extender» (Extend) desde el anterior, para que la mesa, las manos y la luz
+  no cambien.
+- Sonido: solo ambiente (velas, el roce del huevo, el crujido de la cáscara, el agua). Sin música y sin voces: la voz es
+  la de Marcela (ElevenLabs).
+- El clip 3 termina en un primer plano QUIETO del vaso: ahí van los pasos finales y el enlace.
+
+==================== CLIP 1 · «Lo que necesitas» (8 s) ====================
+Vertical 9:16, cinematic close-up, warm candlelight, serene and protective atmosphere, like the reference image. On a
+table covered with dark purple velvet: a plain clear drinking glass filled three quarters with water, a fresh white egg,
+a small pile of coarse salt, a sprig of fresh rosemary and two white candles in brass candlesticks, one lit; warm
+golden bokeh lights in the dark purple background. Only a young woman's hands are visible (slender, a thin gold ring,
+the sleeve of a soft cream knitted sweater). One hand lights the second candle with a long match; then both hands pick
+up the white egg and hold it gently together at chest height, cupped like something precious, for a calm breath.
+Slow, smooth camera push-in from the whole table to the hands holding the egg.
+Sound: the match striking, candles crackling softly. No music, no voices.
+No faces (frame from the shoulders down), no text, no letters, no logos. Warm, golden, calm, nothing dark or scary.
+
+==================== CLIP 2 · «Pasar el huevo» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same velvet table, glass of water, salt, rosemary, two lit candles, same hands, ring and cream
+sweater. Seen from the shoulders down, the woman slowly passes the white egg over her own body without touching it,
+a few centimeters away: down from one shoulder along the arm to the open palm, then across the chest in slow small
+circles, then over the other palm. A very faint warm golden glow follows the egg as it moves. Her breathing is slow
+and relaxed. Gentle camera movement following the egg, medium close-up.
+Sound: soft fabric rustle, candles crackling, a slow calm breath. No music, no voices.
+No faces (never show the face; frame from the shoulders down), no text, no letters, no logos. Warm and caring.
+
+==================== CLIP 3 · «Romper y esperar» (8 s, Extender desde el clip 2) ====================
+Continue the same scene. The hands bring the egg to the clear glass of water and gently crack it on the rim, at water
+level, and open it; the raw egg slides into the water without the shell. Close-up of the glass: the whole orange yolk
+sinks slowly to the bottom, and thin translucent threads of egg white rise slowly upward like three little candles,
+each with a tiny air bubble at the tip. The hands set the empty shell on the velvet and withdraw out of frame.
+For the last 3 seconds: a fixed, static close-up of the glass on the purple velvet, backlit by the two candles, with
+the yolk at the bottom and the rising threads clearly visible; the camera does not move and no hands are in frame.
+Sound: the soft crack of the shell, a gentle splash, candles. No music, no voices.
+No faces, no text, no letters, no logos. The egg looks natural and clean (no blood, nothing dark or frightening).
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración de siempre) ====================
+Ocho frases por separado (≈ 40 s en total). Nombra los archivos así:
+01-gancho.mp3: "¿Quieres hacerte una limpia con huevo, pero no sabes cómo? Te enseño, paso a paso… y sin miedo."
+02-necesitas.mp3: "Necesitas un huevo fresco, a temperatura ambiente, y un vaso de vidrio liso con agua."
+03-intencion.mp3: "Enciende una vela, respira hondo… y piensa en lo que quieres soltar."
+04-pasar.mp3: "Pasa el huevo despacio, de la cabeza a los pies: la nuca, el pecho, las manos… sin prisa."
+05-romper.mp3: "Rómpelo suave en el borde del vaso, y deja caer todo sin la cáscara."
+06-esperar.mp3: "Ahora espera de tres a cinco minutos: las figuras se forman con calma."
+07-despues.mp3: "Al terminar, bota el agua por el inodoro con un puñado de sal, y lava el vaso."
+08-cierre.mp3: "Pero antes, tómale una foto de lado, con buena luz. Súbela en mi arcana punto com, barra, huevo… y yo te digo lo que salió."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Gancho del primer segundo: «La limpia con huevo, paso a paso 🥚» + «(y sin miedo)».
+- Cada paso numerado en pantalla, sincronizado con la voz: 1 · Huevo fresco y vaso con agua · 2 · Una vela y tu
+  intención · 3 · De la cabeza a los pies · 4 · Rómpelo en el borde · 5 · Espera 3 a 5 minutos · 6 · Agua al inodoro
+  con sal.
+- Cierre sobre el plano quieto del vaso: «📸 Foto de lado, con luz» + miarcana.com/huevo + «Tu primera lectura es gratis»
+  + «Guárdalo para tu próxima limpia».
+- Versión para WhatsApp (menos de 10 MB).
