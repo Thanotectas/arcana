@@ -268,6 +268,24 @@ type ChatVisitaRow = {
   creado_en: string;
 };
 
+type ClicRedesRow = {
+  id: number;
+  fecha: string;
+  red: string;
+  origen: string;
+  dispositivo: "movil" | "escritorio";
+  creado_en: string;
+};
+
+type SeguidorRedesRow = {
+  id: number;
+  fecha: string;
+  red: string;
+  seguidores: number | null;
+  detalle: string | null;
+  creado_en: string;
+};
+
 type MetricaRedesRow = {
   id: number;
   red: "instagram" | "facebook";
@@ -529,6 +547,18 @@ export type Database = {
         Row: MetricaRedesRow;
         Insert: Insertable<MetricaRedesRow, "id" | "formato" | "vistas" | "alcance" | "me_gusta" | "comentarios" | "guardados" | "compartidos" | "detalle" | "actualizado_en">;
         Update: Partial<MetricaRedesRow>;
+        Relationships: [];
+      };
+      clics_redes: {
+        Row: ClicRedesRow;
+        Insert: Insertable<ClicRedesRow, "id" | "origen" | "dispositivo" | "creado_en">;
+        Update: Partial<ClicRedesRow>;
+        Relationships: [];
+      };
+      seguidores_redes: {
+        Row: SeguidorRedesRow;
+        Insert: Insertable<SeguidorRedesRow, "id" | "seguidores" | "detalle" | "creado_en">;
+        Update: Partial<SeguidorRedesRow>;
         Relationships: [];
       };
       interacciones_redes: {

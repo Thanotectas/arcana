@@ -142,6 +142,7 @@ export function textoShortYoutube(fecha: string) {
     "",
     "🔮 Saca tu carta del día gratis: https://miarcana.com/yt",
     `✨ Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}: https://miarcana.com/yt/tarot`,
+    "🌙 Todas mis redes: https://miarcana.com/redes?ref=youtube-short",
     "",
     "Lecturas de entretenimiento y reflexión personal.",
     "#Shorts #tarot #cartadeldia #tarotenespañol #espiritualidad",

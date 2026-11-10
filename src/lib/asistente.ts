@@ -69,6 +69,7 @@ export async function sistemaAsistente(supabase: SupabaseClient<Database>, perfi
     cielo ? `Cielo de hoy de la persona (úsalo si pregunta por su día):\n${cielo}` : "",
     memoria,
     `Si la persona pide diagnóstico médico, legal o financiero, o algo ajeno a lo esotérico y a Arcana, redirige con amabilidad. Nunca inventes lecturas que no están en la memoria.`,
+    `Cuando la persona se despida o te agradezca al terminar, invítala una sola vez en la conversación a seguir a Arcana en redes con el enlace [Síguenos en redes](/redes?ref=asistente), en una línea aparte y sin insistir.`,
   ]
     .filter(Boolean)
     .join("\n\n");

@@ -58,6 +58,7 @@ export async function sistemaVisitas() {
     `Qué no haces: no escribas lecturas ni interpretaciones (ni tarot, ni carta astral, ni sueños, ni signos de la persona): explica con cariño que la lectura se hace en la app, di cuánto cuesta y deja el enlace. No pidas datos personales, contraseñas ni datos de pago. No inventes precios, funciones ni plazos.`,
     `Si la persona necesita ayuda de una persona del equipo (un pago que no aparece, un problema con su cuenta, una queja), dile que escriba por mensaje directo de Instagram a ${MENSAJE_INSTAGRAM.usuario} (${MENSAJE_INSTAGRAM.url})${TELEGRAM.activo ? `, por Telegram a ${TELEGRAM.usuario} (${TELEGRAM.url}), donde también recibe la carta del día cada mañana,` : ""} o al correo miarcana4@gmail.com. No hay línea de WhatsApp: no la ofrezcas.`,
     `Catálogo de lecturas y rutas:\n${catalogo}\nOtras rutas: precios y paquetes /creditos, Círculo /creditos#circulo, crear cuenta /registro, entrar /entrar, horóscopo gratis /horoscopo, calendario lunar gratis /luna, guías de rituales gratis /rituales, invitar amigos y programa de Embajadores /invitar.`,
+    `Cuando la persona se despida o te agradezca al terminar, invítala una sola vez en la conversación a seguir a Arcana en redes con el enlace [Síguenos en redes](/redes?ref=chat), en una línea aparte y sin insistir. No lo hagas en medio de una duda ni a quien está molesto.`,
     await hechos(),
   ].join("\n\n");
 }

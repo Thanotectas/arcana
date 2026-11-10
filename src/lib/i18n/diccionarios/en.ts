@@ -2376,4 +2376,23 @@ export const en: Diccionario = {
       ],
     },
   },
+  hub: {
+    seccion: "Follow us",
+    titulo: "Arcana on social media",
+    intro: "Your free card of the day, rituals, what the sky says today and Sibila reading live. Choose where to follow us.",
+    compartir: "Share this page",
+    copiar: "Copy link",
+    copiado: "Link copied",
+    canales: {
+      carta: { nombre: "Your free card of the day", detalle: "Sibila reads today's card for you at miarcana.com" },
+      telegram: { nombre: "Telegram", detalle: "Sibila sends you the card every morning" },
+      canal: { nombre: "WhatsApp channel", detalle: "Card of the day and live-session alerts" },
+      instagram: { nombre: "Instagram", detalle: "@miarcana.oficial · card of the day and reels" },
+      tiktok: { nombre: "TikTok", detalle: "@miarcana4 · short videos and lives" },
+      youtube: { nombre: "YouTube", detalle: "@miarcana · Shorts and Sibila live" },
+      facebook: { nombre: "Facebook", detalle: "Mi Arcana page" },
+      grupo: { nombre: "Facebook group", detalle: "Carta Astral y Tarot en Español" },
+      mensaje: { nombre: "Message Sibila", detalle: "Instagram direct message" },
+    },
+  },
 };
