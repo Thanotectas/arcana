@@ -2373,4 +2373,23 @@ export const pt: Diccionario = {
       ],
     },
   },
+  hub: {
+    seccion: "Siga-nos",
+    titulo: "Arcana nas redes",
+    intro: "Sua carta do dia grátis, rituais, o que o céu diz hoje e Sibila lendo ao vivo. Escolha onde nos seguir.",
+    compartir: "Compartilhar esta página",
+    copiar: "Copiar link",
+    copiado: "Link copiado",
+    canales: {
+      carta: { nombre: "Sua carta do dia grátis", detalle: "Sibila lê a carta de hoje para você em miarcana.com" },
+      telegram: { nombre: "Telegram", detalle: "Sibila envia a carta toda manhã" },
+      canal: { nombre: "Canal do WhatsApp", detalle: "Carta do dia e avisos das lives" },
+      instagram: { nombre: "Instagram", detalle: "@miarcana.oficial · carta do dia e reels" },
+      tiktok: { nombre: "TikTok", detalle: "@miarcana4 · vídeos curtos e lives" },
+      youtube: { nombre: "YouTube", detalle: "@miarcana · Shorts e Sibila ao vivo" },
+      facebook: { nombre: "Facebook", detalle: "Página Mi Arcana" },
+      grupo: { nombre: "Grupo do Facebook", detalle: "Carta Astral y Tarot en Español" },
+      mensaje: { nombre: "Escreva para Sibila", detalle: "Mensagem direta do Instagram" },
+    },
+  },
 };

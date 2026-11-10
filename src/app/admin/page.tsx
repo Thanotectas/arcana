@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2 } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
@@ -8,6 +8,7 @@ export const metadata: Metadata = { title: "Administración", robots: { index: f
 const HERRAMIENTAS = [
   { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes a las 7:00." },
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },
+  { href: "/admin/hub", icono: Share2, titulo: "Hub de redes", texto: "miarcana.com/redes: clics hacia cada canal por origen, seguidores de cada red y enlaces con QR para cada sitio." },
   { href: "/admin/embajadores", icono: HandCoins, titulo: "Embajadores", texto: "Retiros de comisiones por pagar y quién trae más ventas con su enlace." },
   { href: "/admin/en-vivo", icono: Radio, titulo: "Sibila en vivo", texto: "Directos de YouTube: Sibila lee tarot, aura, numerología, horóscopo, tazas y manos en voz alta." },
   { href: "/admin/telegram", icono: Send, titulo: "Telegram", texto: "El bot de Sibila: responde dudas, manda la carta del día y la envía cada mañana a quien escribió /diaria." },

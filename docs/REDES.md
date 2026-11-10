@@ -573,3 +573,29 @@ que está diciendo y espera en silencio (sin tomar la siguiente consulta ni deci
 momento: te hablan desde la mesa», para que el presentador salude o lea la pregunta sin que se crucen las voces.
 Guarda en_vivo_estado.pausa_hasta (supabase/migrations/0045_en_vivo_pausa.sql). Con audífonos, el micrófono no capta
 la voz de Sibila.
+
+## Hub de redes (10 nov 2026)
+
+Una sola página con todos los canales, **miarcana.com/redes**, para la biografía de cada red, el pie de los
+correos, el cierre de los videos y el QR impreso. Migración `0049_hub_redes.sql` (`clics_redes`,
+`seguidores_redes`).
+
+- **Qué muestra.** Los canales de `CANALES_HUB` (`src/lib/marca/redes.ts`): carta del día gratis (botón
+  principal), Telegram (si `NEXT_PUBLIC_TELEGRAM_BOT` existe), canal de WhatsApp, Instagram, TikTok, YouTube,
+  página y grupo de Facebook y el mensaje directo a Sibila. Los textos están en `t.hub` (es/en/pt).
+- **Código de origen.** `miarcana.com/redes?ref=instagram-bio`. Se escribe «red-lugar»: lo que va antes del
+  primer guion se convierte en `utm_source` cuando la persona entra a la app desde el hub (y queda en
+  «Por dónde llegan»), y el bot de Telegram recibe `?start=hub-<ref>`. Generador de enlaces y tarjeta con QR
+  (`/redes/qr?ref=…`, imprimible) en `/admin/hub`.
+- **Clics.** Cada botón envía `POST /api/redes/clic` (canal, origen y si fue desde el celular; sin IP) a
+  `clics_redes`. Sin la migración, el clic se pierde y la página sigue funcionando.
+- **Seguidores.** `/api/cron/seguidores` (orquestador de la mañana) anota en `seguidores_redes`: Instagram
+  (`IG_USER_ID` + `IG_PAGE_TOKEN`), Facebook (token de página, `followers_count`), YouTube (canal conectado,
+  `subscriberCount`), TikTok (`follower_count`; necesita el permiso `user.info.stats`, añadido a
+  `SCOPES_TIKTOK`: hay que **volver a conectar TikTok** en /admin/redes para que lo conceda) y Telegram
+  (suscriptores activos de la carta diaria). Botón «Consultar seguidores ahora» en `/admin/hub`.
+- **Dónde se invita a seguirnos.** Sibila al despedirse en el chat de visitantes (`/redes?ref=chat`), en el
+  asistente con sesión (`?ref=asistente`) y en Telegram (`?ref=telegram`); el cierre hablado de los directos
+  («mi arcana punto com, barra, redes»); la descripción del Short diario (`?ref=youtube-short`); y el pie de
+  todos los correos a personas (`?ref=correo-pie`, `conPieRedes` en `src/lib/correo.ts`; los avisos internos a
+  la administración van sin pie).

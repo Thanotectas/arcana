@@ -19,7 +19,9 @@ import { sitio } from "@/lib/correo";
  * verificar el dominio de Supabase.
  */
 const API = "https://open.tiktokapis.com/v2";
-export const SCOPES_TIKTOK = ["user.info.basic", "video.upload", "video.publish"];
+// user.info.stats: seguidores de la cuenta, para el hub de redes (/admin/hub). Si la cuenta se
+// conectó antes de pedirlo, hay que volver a conectarla para que TikTok lo conceda.
+export const SCOPES_TIKTOK = ["user.info.basic", "user.info.stats", "video.upload", "video.publish"];
 
 export type CuentaTiktok = Database["public"]["Tables"]["tiktok_cuenta"]["Row"];
 export type PublicacionTiktok = Database["public"]["Tables"]["publicaciones_tiktok"]["Row"];
@@ -125,6 +127,10 @@ export async function cuentaTiktok(admin: Admin) {
 }
 
 /** Token vigente: si vence en menos de 5 minutos, lo renueva con el refresh token. */
+export async function tokenVigenteTiktok(admin: Admin): Promise<string> {
+  return tokenVigente(admin);
+}
+
 async function tokenVigente(admin: Admin): Promise<string> {
   const { data: c } = await admin.from("tiktok_cuenta").select("*").eq("id", 1).maybeSingle();
   if (!c) throw new Error("TikTok no está conectado: usa «Conectar TikTok» en /admin/redes.");

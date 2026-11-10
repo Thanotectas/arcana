@@ -35,13 +35,29 @@ export interface Correo {
   cabeceras?: Record<string, string>;
   /** Etiqueta para las métricas de Resend. */
   etiqueta?: string;
+  /** Sin el pie «Síguenos en redes» (correos internos a la administración). */
+  sinPieRedes?: boolean;
 }
 
 export type ResultadoEnvio = { ok: true; id: string } | { ok: false; error: string };
 
+// Pie con la invitación a seguirnos en todos los correos a personas (no en los avisos
+// internos). El enlace lleva al hub de redes con el origen «correo-pie»: en /admin/hub se
+// ve cuántas entran desde los correos.
+export const ENLACE_REDES_CORREO = "https://miarcana.com/redes?ref=correo-pie";
+const ETIQUETAS_INTERNAS = new Set(["resumen_semanal", "redes_humano", "telegram_humano", "whatsapp_humano", "kit_canal", "kit_comentarios", "kit_tiktok", "agente_redes"]);
+export const PIE_REDES_TEXTO = `Sigue a Arcana en redes (Telegram, canal de WhatsApp, Instagram, TikTok, YouTube y Facebook): ${ENLACE_REDES_CORREO}`;
+export const PIE_REDES_HTML = `<p style="font-family:Arial,sans-serif;font-size:12px;color:#9a90b8;max-width:560px;margin:16px auto 0;padding-top:10px;border-top:1px solid #2a2140;text-align:center;">Sigue a Arcana en redes: <a href="${ENLACE_REDES_CORREO}" style="color:#d9b45a;">Telegram, canal de WhatsApp, Instagram, TikTok, YouTube y Facebook</a></p>`;
+
+export function conPieRedes(c: Pick<Correo, "texto" | "html" | "etiqueta" | "sinPieRedes">): Pick<Correo, "texto" | "html"> {
+  if (c.sinPieRedes || (c.etiqueta && ETIQUETAS_INTERNAS.has(c.etiqueta))) return { texto: c.texto, html: c.html };
+  return { texto: `${c.texto.replace(/\s+$/, "")}\n\n${PIE_REDES_TEXTO}`, html: `${c.html}\n${PIE_REDES_HTML}` };
+}
+
 export async function enviarCorreo(c: Correo): Promise<ResultadoEnvio> {
   const clave = process.env.RESEND_API_KEY;
   if (!clave) return { ok: false, error: "sin_configurar" };
+  const cuerpo = conPieRedes(c);
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -51,8 +67,8 @@ export async function enviarCorreo(c: Correo): Promise<ResultadoEnvio> {
         reply_to: respuesta(),
         to: [c.para],
         subject: c.asunto,
-        html: c.html,
-        text: c.texto,
+        html: cuerpo.html,
+        text: cuerpo.texto,
         headers: c.cabeceras,
         tags: c.etiqueta ? [{ name: "tipo", value: c.etiqueta }] : undefined,
       }),
