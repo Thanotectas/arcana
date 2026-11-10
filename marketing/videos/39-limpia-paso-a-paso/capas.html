@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+#sombra{position:absolute;left:0;right:0;top:0;height:760px;background:linear-gradient(180deg,rgba(11,7,22,.88) 0%,rgba(11,7,22,.7) 45%,rgba(11,7,22,0) 100%)}
+.c{position:absolute;left:70px;right:70px;text-align:center;opacity:0}
+.paso{top:120px}
+.num{display:inline-flex;align-items:center;justify-content:center;width:92px;height:92px;border-radius:50%;background:#f1d99a;color:#0b0716;font-family:I;font-size:52px;box-shadow:0 0 40px rgba(241,217,154,.5)}
+.t{font-family:C;font-size:84px;line-height:1.02;color:#fff;margin-top:22px;text-shadow:0 3px 18px #0b0716}
+.s{font-family:IR;font-size:36px;color:#f1d99a;margin-top:14px;text-shadow:0 2px 12px #0b0716}
+#puntos{position:absolute;top:66px;left:0;right:0;display:flex;justify-content:center;gap:14px;opacity:0}
+#puntos i{width:16px;height:16px;border-radius:50%;border:2px solid rgba(241,217,154,.8)}
+#puntos i.si{background:#f1d99a;box-shadow:0 0 10px #f1d99a}
+.marca{position:absolute;left:0;right:0;bottom:300px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716;opacity:.85}
+.marca b{color:#f1d99a}
+</style></head><body>
+<div id="sombra"></div>
+<div id="puntos"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="c" id="g" style="top:150px"><div style="font-family:CI;font-size:52px;color:#b7a5ff;text-shadow:0 2px 12px #0b0716">paso a paso (y sin miedo)</div>
+  <div style="font-family:C;font-size:120px;line-height:.98;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.4),0 3px 18px #0b0716;margin-top:10px">La limpia<br>con huevo 🥚</div></div>
+<div class="c paso" id="p1"><span class="num">1</span><div class="t">Huevo fresco<br>y vaso con agua</div><div class="s">a temperatura ambiente · vidrio liso</div></div>
+<div class="c paso" id="p2"><span class="num">2</span><div class="t">Una vela<br>y tu intención</div><div class="s">respira hondo: ¿qué quieres soltar?</div></div>
+<div class="c paso" id="p3"><span class="num">3</span><div class="t">De la cabeza<br>a los pies</div><div class="s">nuca, pecho, manos… sin prisa</div></div>
+<div class="c paso" id="p4"><span class="num">4</span><div class="t">Rómpelo en<br>el borde del vaso</div><div class="s">a la altura del agua · sin la cáscara</div></div>
+<div class="c paso" id="p5"><span class="num">5</span><div class="t">Espera de<br>3 a 5 minutos</div><div class="s" id="reloj">⏳ las figuras se forman con calma</div></div>
+<div class="c paso" id="p6"><span class="num">6</span><div class="t">Agua al inodoro<br>con un puñado de sal</div><div class="s">y lava el vaso con agua y sal</div></div>
+<div class="c" id="z" style="top:110px"><div style="font-family:C;font-size:86px;line-height:1.02;color:#fff;text-shadow:0 3px 18px #0b0716">📸 Pero antes:<br>foto de lado, con luz</div>
+  <div style="display:inline-block;margin-top:28px;padding:18px 44px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.75);box-shadow:0 0 40px rgba(241,217,154,.3)">
+    <div style="font-family:I;font-size:54px;color:#f1d99a">miarcana.com/huevo</div>
+    <div style="font-family:I;font-size:22px;letter-spacing:.2em;color:#cfc2ff;margin-top:6px">TU PRIMERA LECTURA ES GRATIS</div></div>
+  <div id="guarda" style="font-family:CI;font-size:44px;color:#ece6f7;margin-top:22px;text-shadow:0 2px 12px #0b0716;opacity:0">Guárdalo para tu próxima limpia 🤍</div></div>
+<p class="marca"><b>ARCANA</b> · SIBILA TE LEE</p>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+// Tiempos (s): armar.sh pasa los inicios de cada voz en #v1,…,v8,fin.
+const T=(location.hash.slice(1)||"0.3,7.3,13.9,19.9,28.5,33.5,39.1,44.8,55.5").split(",").map(Number);
+const [v1,v2,v3,v4,v5,v6,v7,v8,F]=T;
+const pasos=[[v2,v3],[v3,v4],[v4,v5],[v5,v6],[v6,v7],[v7,v8]];
+window.pintar=(t)=>{
+  const g=document.getElementById("g");g.style.opacity=ven(t,0,v2-.1,.4).toFixed(3);g.style.transform=`translateY(${(1-su(pr(t,0,.6)))*30}px)`;
+  let activo=-1;
+  pasos.forEach(([a,b],i)=>{const e=document.getElementById("p"+(i+1));const o=ven(t,a-.15,b-.1,.35);e.style.opacity=o.toFixed(3);
+    e.style.transform=`translateY(${(1-su(pr(t,a-.15,a+.35)))*34}px)`;if(t>=a-.15)activo=i;});
+  document.getElementById("puntos").style.opacity=(t>=v2-.15&&t<v8?1:0)*su(pr(t,v2-.15,v2+.2));
+  [...document.querySelectorAll("#puntos i")].forEach((e,i)=>e.classList.toggle("si",i<=activo));
+  const z=document.getElementById("z");z.style.opacity=su(pr(t,v8-.1,v8+.4)).toFixed(3);z.style.transform=`translateY(${(1-su(pr(t,v8-.1,v8+.5)))*34}px)`;
+  document.getElementById("guarda").style.opacity=su(pr(t,v8+4.5,v8+5)).toFixed(3);
+  document.getElementById("sombra").style.opacity=1;
+};
+window.pintar(0);
+</script></body></html>

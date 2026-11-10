@@ -63,6 +63,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 | `36-alma-vieja` | 36-alma-vieja-whatsapp.mp4, 36-alma-vieja.mp4 |
 | `37-que-significa-huevo` | 37-que-significa-huevo-voz.mp4 (con la voz de Sibila), 37-que-significa-huevo.mp4 (sin voz) |
 | `38-mil-gracias-en-vivo` | 38-mil-gracias-en-vivo.mp4 (gracias por los 1.000 + directo del domingo 8, 8 p.m.) |
+| `39-limpia-paso-a-paso` | 39-limpia-paso-a-paso.mp4 (con la voz de Sibila), 39-limpia-paso-a-paso-whatsapp.mp4 |
 
 ## Carruseles
 
