@@ -1,0 +1,60 @@
+VIDEO 40 — «RITUAL 11:11: PIDE TU DESEO» (11 de noviembre de 2026). Google Flow (Veo), 3 clips de 8 s, vertical 9:16.
+Misma mesa, manos y suéter crema del video 39 (continuidad de la cuenta). SIN CARAS: solo manos, de los hombros para abajo.
+Cielo real: Luna creciente (nació en Escorpio el 9), Marte y Júpiter juntándose en Leo, Luna llena el 24.
+Tono: mágico, sereno, esperanzador. Nada de miedo. Prompts en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- «Ingredientes a video»: sube referencia-mesa.jpg (este mismo folder: la mesa de terciopelo morado, las velas, las manos).
+- Vertical 9:16, 8 s. Clips 2 y 3 con «Extender» desde el anterior. Al terminar, descarga la ESCENA completa
+  (Creador de escenas → descargar), no solo el primer clip.
+- Sonido: solo ambiente (fósforo, pluma sobre papel, velas). Sin música y sin voces: la voz es la de Marcela.
+
+==================== CLIP 1 · «La vela blanca y el reloj» (8 s) ====================
+Vertical 9:16, cinematic close-up, warm candlelight, magical and hopeful night atmosphere, like the reference image.
+On the dark purple velvet table: one tall white candle in a brass candlestick, a small vintage brass pocket watch lying
+open, a small sheet of cream paper, a golden pen and a sprig of rosemary; warm golden bokeh lights in the dark
+background. Only a young woman's hands are visible (slender, a thin gold ring, the sleeve of a soft cream knitted
+sweater). One hand lights the white candle with a long match. Then the camera moves closer to the open pocket watch:
+its hands move and stop exactly at eleven past eleven, both hands pointing to the 11; a tiny golden sparkle glows on
+the dial. Slow, smooth camera push-in.
+Sound: the match striking, the candle, the soft ticking of the watch. No music, no voices.
+No faces (frame from the shoulders down, the camera stays below the chin the whole time), no readable text, no
+letters, no numbers other than those on the watch dial, no logos. Warm, golden, calm.
+
+==================== CLIP 2 · «Los deseos» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same table, candle, watch, paper, pen and rosemary, same hands, ring and cream sweater. The
+hands take the golden pen and slowly write several short lines on the cream paper (the handwriting is soft and
+blurred, not readable). Then the hands lift the paper and hold it close to the candle flame, not touching it, as if
+reading the wishes to the light; the flame grows a little taller and brighter, and tiny golden particles float up
+from the paper into the air.
+Gentle camera movement, close-up on the hands, the paper and the flame.
+Sound: the pen on paper, the candle, a soft calm breath. No music, no voices.
+No faces (never show the face), no readable text on the paper, no letters, no logos.
+
+==================== CLIP 3 · «Guardarlo hasta la Luna llena» (8 s, Extender desde el clip 2) ====================
+Continue the same scene. The hands fold the paper twice, place it under the brass candlestick next to the open pocket
+watch and lay the rosemary sprig on top, then withdraw out of frame. The camera rises gently to reveal, behind the
+table, a window with a thin crescent moon in a deep blue night sky full of stars. For the last 3 seconds: a fixed,
+static shot of the table (candle burning, folded paper under the candlestick, open pocket watch, rosemary) with the
+crescent moon in the window behind; the camera does not move and no hands are in frame.
+Sound: the candle, a soft night breeze, the ticking watch. No music, no voices.
+No faces, no readable text, no logos. Warm candlelight inside, cool blue moonlight outside.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración de siempre) ====================
+Ocho frases por separado (≈ 45 s). Nombra los archivos así:
+01-gancho.mp3: "Hoy es once del once… y el portal está abierto. Esto es lo que vas a hacer a las once y once."
+02-vela.mp3: "Enciende una vela blanca y respira hondo tres veces. Deja afuera el ruido del día."
+03-reloj.mp3: "Cuando el reloj marque las once y once, de la mañana o de la noche… empieza."
+04-deseos.mp3: "Escribe once deseos en presente, como si ya fueran tuyos: tengo, soy, vivo."
+05-voz.mp3: "Léelos en voz alta, frente a la llama, y cierra con: así es, así será."
+06-cielo.mp3: "Y no es cualquier once once: la Luna está creciendo, y Marte y Júpiter se juntan en Leo. Valor… y expansión."
+07-guardar.mp3: "Dobla el papel y guárdalo hasta la Luna llena del veinticuatro. Ese día, léelo otra vez… y agradece."
+08-cierre.mp3: "Escríbeme once once y tu deseo en los comentarios… y lo decreto contigo."
+
+==================== LO QUE AGREGO EN EL MONTAJE ====================
+- Gancho: «11:11 · Hoy se abre el portal ✨».
+- Pasos en pantalla al ritmo de la voz: 1 · Vela blanca · 2 · A las 11:11 · 3 · 11 deseos en presente · 4 · En voz alta:
+  «Así es, así será» · 5 · Guárdalo hasta la Luna llena (24 nov).
+- Dato del cielo: «🌙 Luna creciente · ♂ Marte + ♃ Júpiter en Leo».
+- Cierre sobre el plano quieto: «Escribe 1111 + tu deseo 👇» + miarcana.com.
+- Versión para WhatsApp.
