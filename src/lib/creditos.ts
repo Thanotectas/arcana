@@ -153,7 +153,8 @@ export const PAQUETE_PRUEBA: Paquete = {
   id: "prueba",
   nombre: "Prueba",
   creditos: 1,
-  precioCOP: 1900,
+  // 3.900 COP ≈ 0,99 USD: el mismo valor en pesos y en dólares (antes 1.900 COP, que era la mitad del precio en dólares).
+  precioCOP: 3900,
   precioUSDCentavos: 99,
   descripcion: "Un crédito para probar una lectura sencilla.",
 };

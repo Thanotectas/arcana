@@ -106,7 +106,7 @@ paquete de `/api/cron/instagram` y `/admin/redes` por `outputFileTracingIncludes
 (`reels/carta-dia-AAAA-MM-DD.mp4`, se crea solo) y se reutiliza en la corrida
 de la tarde. Si el reel falla en cualquier paso, se publica la imagen de siempre.
 `REDES_REEL=0` vuelve a la imagen fija. El texto de la publicación termina con la
-invitación "Sibila te lee tres cartas sobre tu pregunta por $1.900" (precio del
+invitación "Sibila te lee tres cartas sobre tu pregunta por $3.900" (precio del
 paquete de prueba). Vista previa en `/admin/redes` → "Ver el reel de hoy".
 
 ## Sibila responde comentarios y mensajes (17 oct 2026)
