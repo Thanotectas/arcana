@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { BANDERA_MONEDA, MONEDAS, PAIS_MONEDA, convertir, formatoMoneda } from "@/lib/monedas";
+import { formatoCOP, formatoUSD } from "@/lib/creditos";
 
 /**
  * Precios aproximados en la moneda de cada país. Se cobra siempre en pesos colombianos; esto solo ayuda a ubicarse.
@@ -22,7 +23,8 @@ function adivinar(pais?: string | null) {
 }
 
 export function ProveedorMoneda({ porUSD, pais, children }: { porUSD: Record<string, number>; pais?: string | null; children: ReactNode }) {
-  const [moneda, setEstado] = useState("COP");
+  // El país (Vercel) ya se sabe en el servidor: fuera de Colombia el primer render sale en dólares, sin parpadeo.
+  const [moneda, setEstado] = useState(() => (pais && PAIS_MONEDA[pais] ? PAIS_MONEDA[pais] : "COP"));
   useEffect(() => {
     let guardada: string | null = null;
     try {
@@ -52,6 +54,31 @@ export function PrecioLocal({ cop, usdCentavos, className = "block text-xs font-
   const v = convertir({ porUSD: c.porUSD, fuente: "del día" }, cop, usdCentavos, c.moneda);
   // «COP» primero: el «$» del precio también lo usan otros países (México, Argentina, Chile…).
   return v === null ? null : <span className={className}>COP · ≈ {formatoMoneda(v, c.moneda)}</span>;
+}
+
+/**
+ * Precio principal de un paquete: en Colombia, en pesos; fuera (o si la persona eligió otra moneda), en dólares, que
+ * es lo que entiende cualquier visitante, y debajo lo que de verdad se cobra en pesos y su moneda aproximada.
+ */
+export function PrecioPrincipal({ cop, usdCentavos, cobro }: { cop: number; usdCentavos: number; cobro: string }) {
+  const c = useContext(Contexto);
+  if (!c || c.moneda === "COP") return <>{formatoCOP(cop)}</>;
+  const local = c.moneda === "USD" ? null : convertir({ porUSD: c.porUSD, fuente: "del día" }, cop, usdCentavos, c.moneda);
+  return (
+    <>
+      {formatoUSD(usdCentavos)} <span className="text-base font-normal text-texto-suave">USD</span>
+      <span className="block text-xs font-normal text-texto-suave">
+        {local !== null ? `≈ ${formatoMoneda(local, c.moneda)} · ` : ""}
+        {cobro} {formatoCOP(cop)} COP
+      </span>
+    </>
+  );
+}
+
+/** Un texto ya armado en pesos o en dólares, según la moneda de la persona (en Colombia, pesos). */
+export function SegunMoneda({ cop, usd }: { cop: string; usd: string }) {
+  const c = useContext(Contexto);
+  return <>{!c || c.moneda === "COP" ? cop : usd}</>;
 }
 
 /** Selector «Ver precios en…» con las monedas de Latinoamérica, dólares y euros. */
