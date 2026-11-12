@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     try {
       const contexto = historial.map((m) => (m.rol === "persona" ? `Persona: ${datoDeUsuario(m.contenido, 600)}` : `Tú: ${datoDeUsuario(m.contenido, 800)}`)).join("\n\n");
       const usuario = (contexto ? `Conversación reciente:\n${contexto}\n\n` : "") + `Mensaje nuevo de la persona: ${datoDeUsuario(texto, CHAT_VISITAS.largo)}\n\nResponde solo a este mensaje.`;
-      const respuesta = await generarTexto(usuario, await sistemaVisitas(), { idioma, effort: "low", maxTokens: 500 }, enviar);
+      const respuesta = await generarTexto(usuario, await sistemaVisitas(request.headers.get("x-vercel-ip-country")), { idioma, effort: "low", maxTokens: 500 }, enviar);
       await admin.from("chat_visitas").update({ respuesta, estado: "lista" }).eq("id", fila.id);
     } catch (e) {
       console.error("[chat visita] fallo:", e instanceof Error ? e.message : e);

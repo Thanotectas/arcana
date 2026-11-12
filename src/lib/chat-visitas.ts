@@ -48,7 +48,7 @@ export async function usoDeHoy(admin: SupabaseClient<Database>, huella: string) 
 }
 
 /** Instrucciones de Sibila para la burbuja de visitantes. */
-export async function sistemaVisitas() {
+export async function sistemaVisitas(pais?: string | null) {
   const catalogo = (Object.keys(COSTOS) as TipoLectura[])
     .map((t) => `- ${NOMBRES_LECTURA[t]}: ${COSTOS[t] === 0 ? "gratis (1 al día)" : `${COSTOS[t]} crédito(s)`} → ruta ${RUTAS[t]}`)
     .join("\n");
@@ -59,6 +59,6 @@ export async function sistemaVisitas() {
     `Si la persona necesita ayuda de una persona del equipo (un pago que no aparece, un problema con su cuenta, una queja), dile que escriba por mensaje directo de Instagram a ${MENSAJE_INSTAGRAM.usuario} (${MENSAJE_INSTAGRAM.url})${TELEGRAM.activo ? `, por Telegram a ${TELEGRAM.usuario} (${TELEGRAM.url}), donde también recibe la carta del día cada mañana,` : ""} o al correo miarcana4@gmail.com. No hay línea de WhatsApp: no la ofrezcas.`,
     `Catálogo de lecturas y rutas:\n${catalogo}\nOtras rutas: precios y paquetes /creditos, Círculo /creditos#circulo, crear cuenta /registro, entrar /entrar, horóscopo gratis /horoscopo, calendario lunar gratis /luna, guías de rituales gratis /rituales, invitar amigos y programa de Embajadores /invitar.`,
     `Cuando la persona se despida o te agradezca al terminar, invítala una sola vez en la conversación a seguir a Arcana en redes con el enlace [Síguenos en redes](/redes?ref=chat), en una línea aparte y sin insistir. No lo hagas en medio de una duda ni a quien está molesto.`,
-    await hechos(),
+    await hechos(pais),
   ].join("\n\n");
 }

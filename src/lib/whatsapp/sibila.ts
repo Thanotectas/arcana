@@ -2,7 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { generarTexto } from "@/lib/ia";
-import { preciosEnMonedas, tresMonedas } from "@/lib/monedas";
+import { preciosEnMonedas, preciosParaPais, tresMonedas } from "@/lib/monedas";
 import { BONO_PRIMERA_COMPRA, COSTOS, OFERTA_FUNDADORES, PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA } from "@/lib/creditos";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { diccionario } from "@/lib/i18n/diccionarios";
@@ -28,14 +28,18 @@ const MAXIMO_POR_DIA = 40;
 const CONTEXTO = 16;
 
 /** Hechos del producto, calculados desde el código para que los precios nunca queden viejos. También los usa Sibila en redes. */
-export async function hechos() {
+export async function hechos(pais?: string | null) {
   const t = diccionario("es");
   const modulos = t.portada.modulos as Record<string, { titulo: string; texto: string }>;
   const lista = Object.values(modulos).map((m) => `- ${m.titulo}: ${m.texto}`).join("\n");
   const paquetes = [PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]
     .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${tresMonedas(p.precioCOP, p.precioUSDCentavos)}${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
     .join("\n");
-  const [f, enMonedas] = await Promise.all([estadoOfertaFundadores(), preciosEnMonedas([PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO])]);
+  const [f, enMonedas, delPais] = await Promise.all([
+    estadoOfertaFundadores(),
+    preciosEnMonedas([PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]),
+    preciosParaPais(pais, [PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]),
+  ]);
   const oferta = f.activa
     ? `Oferta de fundadores vigente: el Círculo Arcana a ${tresMonedas(OFERTA_FUNDADORES.precioCOP, OFERTA_FUNDADORES.precioUSDCentavos)} en lugar de ${tresMonedas(PAQUETE_CIRCULO.precioCOP, PAQUETE_CIRCULO.precioUSDCentavos)}, solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}, hasta el ${fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10))}. Se compra en ${sitio()}/creditos.`
     : "No hay oferta especial vigente.";
@@ -47,7 +51,10 @@ export async function hechos() {
 - Paquetes de créditos (se compran en ${sitio()}/creditos con la cuenta abierta):
 ${paquetes}
 - ${enMonedas}
-- Cuando des un precio, dalo siempre en las tres monedas, así: «$ 9.900 COP · $2.49 USD · ≈ $46 MXN» (pesos colombianos, dólares y pesos mexicanos), para que cualquiera se ubique.
+- PRECIOS SEGÚN EL PAÍS: primero averigua de dónde es la persona. ${delPais ?? "No sabemos su país: dedúcelo de lo que escribe (si nombra su país o ciudad, su moneda —soles, quetzales, lempiras, bolívares, euros—, el teléfono con su código, o palabras muy de su tierra como «lana» o «varo» en México, «plata» o «parce» en Colombia, «luca» o «che» en Argentina, «pata» en Perú, «chamo» en Venezuela). Si no hay ninguna pista, da los precios en las tres monedas de referencia y pregunta con naturalidad desde qué país escribe, para darle el valor exacto."}
+- Con su moneda: di primero el valor aproximado en su moneda (redondeado, con «≈» o «unos») y, entre paréntesis, la referencia en pesos colombianos y dólares. Ejemplo para Perú: «el paquete Inicial sale en unos 9 soles ($ 9.900 COP · $2.49 USD)». Si es de Colombia, solo pesos colombianos. Si es de México, pesos mexicanos.
+- Sin pistas del país, las tres monedas de referencia, así: «$ 9.900 COP · $2.49 USD · ≈ $46 MXN».
+- Siempre aclara, en media frase y una sola vez, que se cobra en pesos colombianos con Bold (acepta Visa y Mastercard de cualquier país) y que su banco hace la conversión, así que puede variar un poco.
 - Si preguntan cuánto es en su moneda, da el valor aproximado de esa lista (redondeado, con «aproximadamente») y aclara en media frase que se cobra en pesos colombianos y su banco hace la conversión. Si su moneda no está, dalo en dólares. Nunca digas que no sabes el precio.
 - La primera compra trae ${BONO_PRIMERA_COMPRA} créditos extra de regalo. El Círculo Arcana da 30 días con "tu cielo hoy" cada mañana y preguntas a Sibila sin cobro.
 - ${oferta}

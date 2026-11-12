@@ -97,6 +97,32 @@ export function formatoMoneda(valor: number, codigo: string) {
   return `${numero} ${codigo}`;
 }
 
+const NOMBRE_PAIS: Record<string, string> = {
+  CO: "Colombia", MX: "México", US: "Estados Unidos", EC: "Ecuador", SV: "El Salvador", PA: "Panamá", PR: "Puerto Rico", VE: "Venezuela",
+  AR: "Argentina", CL: "Chile", PE: "Perú", BO: "Bolivia", GT: "Guatemala", HN: "Honduras", NI: "Nicaragua", CR: "Costa Rica",
+  DO: "República Dominicana", UY: "Uruguay", PY: "Paraguay", BR: "Brasil", ES: "España", FR: "Francia", IT: "Italia", DE: "Alemania",
+  PT: "Portugal", NL: "Países Bajos", BE: "Bélgica", IE: "Irlanda", AT: "Austria", FI: "Finlandia", GR: "Grecia",
+};
+
+/**
+ * Si se sabe el país de la persona (el chat de la página lo trae de Vercel), los precios en su moneda para que
+ * Sibila los dé primero. Sin país, null: Sibila lo deduce de lo que la persona escribe.
+ */
+export async function preciosParaPais(pais: string | null | undefined, paquetes: { nombre: string; precioCOP: number; precioUSDCentavos: number }[]) {
+  const codigo = pais ? pais.toUpperCase() : "";
+  const moneda = PAIS_MONEDA[codigo];
+  if (!moneda) return null;
+  const tasas = await tasasDelDia();
+  const nombre = NOMBRE_PAIS[codigo] ?? codigo;
+  if (moneda === "COP") return `La persona escribe desde ${nombre}: da los precios en pesos colombianos (y, si ayuda, también en dólares).`;
+  const m = MONEDAS.find((x) => x.codigo === moneda);
+  const lineas = paquetes.map((p) => {
+    const v = convertir(tasas, p.precioCOP, p.precioUSDCentavos, moneda);
+    return v === null ? null : `- ${p.nombre}: ≈ ${formatoMoneda(v, moneda)} (${tresMonedas(p.precioCOP, p.precioUSDCentavos)})`;
+  }).filter(Boolean);
+  return `La persona escribe desde ${nombre}: cuando hables de precios, empieza por su moneda (${m?.nombre ?? moneda}) y luego, entre paréntesis, la referencia en pesos colombianos y dólares. Sus precios:\n${lineas.join("\n")}`;
+}
+
 /** Bloque para los hechos de Sibila: cada moneda con el precio aproximado de cada paquete. */
 export async function preciosEnMonedas(paquetes: { nombre: string; precioCOP: number; precioUSDCentavos: number }[]) {
   const tasas = await tasasDelDia();
