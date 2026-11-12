@@ -2,8 +2,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { generarTexto } from "@/lib/ia";
-import { preciosEnMonedas } from "@/lib/monedas";
-import { BONO_PRIMERA_COMPRA, COSTOS, OFERTA_FUNDADORES, PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
+import { preciosEnMonedas, tresMonedas } from "@/lib/monedas";
+import { BONO_PRIMERA_COMPRA, COSTOS, OFERTA_FUNDADORES, PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA } from "@/lib/creditos";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { diccionario } from "@/lib/i18n/diccionarios";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
@@ -27,21 +27,17 @@ const MAXIMO_POR_DIA = 40;
 /** Cuántos mensajes anteriores entran como contexto. */
 const CONTEXTO = 16;
 
-function usd(centavos: number) {
-  return `US$ ${(centavos / 100).toFixed(2)}`;
-}
-
 /** Hechos del producto, calculados desde el código para que los precios nunca queden viejos. También los usa Sibila en redes. */
 export async function hechos() {
   const t = diccionario("es");
   const modulos = t.portada.modulos as Record<string, { titulo: string; texto: string }>;
   const lista = Object.values(modulos).map((m) => `- ${m.titulo}: ${m.texto}`).join("\n");
   const paquetes = [PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO]
-    .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${formatoCOP(p.precioCOP)} (≈ ${usd(p.precioUSDCentavos)})${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
+    .map((p) => `- ${p.nombre}: ${p.creditos} crédito${p.creditos === 1 ? "" : "s"} por ${tresMonedas(p.precioCOP, p.precioUSDCentavos)}${p.id === "circulo" ? ", incluye 30 días de Círculo" : ""}`)
     .join("\n");
   const [f, enMonedas] = await Promise.all([estadoOfertaFundadores(), preciosEnMonedas([PAQUETE_PRUEBA, ...PAQUETES, PAQUETE_CIRCULO])]);
   const oferta = f.activa
-    ? `Oferta de fundadores vigente: el Círculo Arcana a ${formatoCOP(OFERTA_FUNDADORES.precioCOP)} (${usd(OFERTA_FUNDADORES.precioUSDCentavos)}) en lugar de ${formatoCOP(PAQUETE_CIRCULO.precioCOP)}, solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}, hasta el ${fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10))}. Se compra en ${sitio()}/creditos.`
+    ? `Oferta de fundadores vigente: el Círculo Arcana a ${tresMonedas(OFERTA_FUNDADORES.precioCOP, OFERTA_FUNDADORES.precioUSDCentavos)} en lugar de ${tresMonedas(PAQUETE_CIRCULO.precioCOP, PAQUETE_CIRCULO.precioUSDCentavos)}, solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}, hasta el ${fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10))}. Se compra en ${sitio()}/creditos.`
     : "No hay oferta especial vigente.";
   const c = cartaDelDia(fechaBogota());
   return `HECHOS DE ARCANA (usa solo esto; si no sabes algo, dilo y ofrece pasar con una persona):
@@ -51,6 +47,7 @@ export async function hechos() {
 - Paquetes de créditos (se compran en ${sitio()}/creditos con la cuenta abierta):
 ${paquetes}
 - ${enMonedas}
+- Cuando des un precio, dalo siempre en las tres monedas, así: «$ 9.900 COP · $2.49 USD · ≈ $46 MXN» (pesos colombianos, dólares y pesos mexicanos), para que cualquiera se ubique.
 - Si preguntan cuánto es en su moneda, da el valor aproximado de esa lista (redondeado, con «aproximadamente») y aclara en media frase que se cobra en pesos colombianos y su banco hace la conversión. Si su moneda no está, dalo en dólares. Nunca digas que no sabes el precio.
 - La primera compra trae ${BONO_PRIMERA_COMPRA} créditos extra de regalo. El Círculo Arcana da 30 días con "tu cielo hoy" cada mañana y preguntas a Sibila sin cobro.
 - ${oferta}

@@ -2,7 +2,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { generarTexto } from "@/lib/ia";
-import { COSTOS, OFERTA_FUNDADORES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
+import { COSTOS, OFERTA_FUNDADORES, PAQUETE_CIRCULO, PAQUETE_PRUEBA } from "@/lib/creditos";
+import { tresMonedas } from "@/lib/monedas";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { proximasLunaciones, type FaseClave } from "@/lib/astro/lunaciones";
 import { SIGNOS, signoPorId } from "@/lib/zodiaco";
@@ -245,7 +246,7 @@ export async function encargosSemana(lunes: string): Promise<Encargo[]> {
       } else {
         const costo = f.costo ?? 1;
         // Las lecturas sin costo (el péndulo) se presentan como gratis una vez al día.
-        const precio = costo === 0 ? "Es gratis, una vez al día, con tu cuenta" : `Cuesta ${costo} crédito${costo === 1 ? "" : "s"} (un crédito desde ${formatoCOP(PAQUETE_PRUEBA.precioCOP)})`;
+        const precio = costo === 0 ? "Es gratis, una vez al día, con tu cuenta" : `Cuesta ${costo} crédito${costo === 1 ? "" : "s"} (un crédito desde ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)})`;
         const pie = costo === 0 ? "Gratis una vez al día" : `${costo} crédito${costo === 1 ? "" : "s"} · 3 de regalo al registrarte`;
         encargos.push({ tipo: "producto", fecha, etiqueta: nombre, contexto: `Lectura "${nombre}": ${m?.texto ?? ""} ${precio}. Enlace miarcana.com${f.ruta}.`, enlace: `miarcana.com${f.ruta}`, simbolos: f.simbolos, carta: visual, pie });
       }
@@ -261,11 +262,11 @@ export async function encargosSemana(lunes: string): Promise<Encargo[]> {
         const f = fundadores;
         if (f.activa) {
           const hasta = fechaLargaEs(OFERTA_FUNDADORES.hasta.slice(0, 10));
-          encargos.push({ tipo, fecha, etiqueta: "Oferta de fundadores", contexto: `Oferta de fundadores: el Círculo Arcana (30 días con el cielo personal cada mañana, preguntas a Sibila sin cobro y 15 créditos) a ${formatoCOP(OFERTA_FUNDADORES.precioCOP)} en lugar de ${formatoCOP(PAQUETE_CIRCULO.precioCOP)}. Solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}. Hasta el ${hasta}. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["✦"], carta: null, pie: `Quedan ${f.restantes} cupos · hasta el ${hasta}` });
+          encargos.push({ tipo, fecha, etiqueta: "Oferta de fundadores", contexto: `Oferta de fundadores: el Círculo Arcana (30 días con el cielo personal cada mañana, preguntas a Sibila sin cobro y 15 créditos) a ${tresMonedas(OFERTA_FUNDADORES.precioCOP, OFERTA_FUNDADORES.precioUSDCentavos)} en lugar de ${tresMonedas(PAQUETE_CIRCULO.precioCOP, PAQUETE_CIRCULO.precioUSDCentavos)}. Solo ${OFERTA_FUNDADORES.cupo} cupos, quedan ${f.restantes}. Hasta el ${hasta}. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["✦"], carta: null, pie: `Quedan ${f.restantes} cupos · hasta el ${hasta}` });
         } else if (n % 2 === 0) {
-          encargos.push({ tipo, fecha, etiqueta: "Prueba por 1 crédito", contexto: `Paquete de prueba: 1 crédito por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}, suficiente para una tirada de tres cartas o una numerología. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["✦"], carta: null, pie: `Una lectura por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}` });
+          encargos.push({ tipo, fecha, etiqueta: "Prueba por 1 crédito", contexto: `Paquete de prueba: 1 crédito por ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)}, suficiente para una tirada de tres cartas o una numerología. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["✦"], carta: null, pie: `Una lectura por ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)}` });
         } else {
-          encargos.push({ tipo, fecha, etiqueta: "Círculo Arcana", contexto: `Círculo Arcana: ${PAQUETE_CIRCULO.descripcion} Cuesta ${formatoCOP(PAQUETE_CIRCULO.precioCOP)} al mes. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["☉"], carta: null, pie: `${formatoCOP(PAQUETE_CIRCULO.precioCOP)} por 30 días` });
+          encargos.push({ tipo, fecha, etiqueta: "Círculo Arcana", contexto: `Círculo Arcana: ${PAQUETE_CIRCULO.descripcion} Cuesta ${tresMonedas(PAQUETE_CIRCULO.precioCOP, PAQUETE_CIRCULO.precioUSDCentavos)} al mes. Enlace miarcana.com/creditos.`, enlace: "miarcana.com/creditos", simbolos: ["☉"], carta: null, pie: `${tresMonedas(PAQUETE_CIRCULO.precioCOP, PAQUETE_CIRCULO.precioUSDCentavos)} por 30 días` });
         }
         break;
       }

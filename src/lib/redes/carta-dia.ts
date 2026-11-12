@@ -1,6 +1,7 @@
 import type { CartaTarot } from "@/lib/tarot/deck";
 import { MAZOS, type IdMazo } from "@/lib/tarot/mazos";
-import { PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
+import { PAQUETE_PRUEBA } from "@/lib/creditos";
+import { tresMonedas } from "@/lib/monedas";
 
 /**
  * "Carta del día de Arcana" para redes: la misma carta para todos en una
@@ -121,7 +122,7 @@ export function textoCartaDelDia(fecha: string, red: "instagram" | "facebook" = 
     `Palabras clave: ${c.palabrasClave.slice(0, 3).join(" · ")}`,
     "",
     `🔮 Esta es la carta para todos. ¿Qué te dicen las cartas a ti? Saca la tuya gratis en ${enlace}.`,
-    `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}.`,
+    `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)}.`,
     "",
     "💬 Comenta tu signo y Sibila te responde.",
     "",
@@ -141,7 +142,7 @@ export function textoShortYoutube(fecha: string) {
     frase(c.significado, 320),
     "",
     "🔮 Saca tu carta del día gratis: https://miarcana.com/yt",
-    `✨ Sibila te lee tres cartas sobre tu pregunta por ${formatoCOP(PAQUETE_PRUEBA.precioCOP)}: https://miarcana.com/yt/tarot`,
+    `✨ Sibila te lee tres cartas sobre tu pregunta por ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)}: https://miarcana.com/yt/tarot`,
     "🌙 Todas mis redes: https://miarcana.com/redes?ref=youtube-short",
     "",
     "Lecturas de entretenimiento y reflexión personal.",

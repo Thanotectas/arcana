@@ -31,3 +31,13 @@ formato. Cada respuesta tiene que poder leerse como si fuera la única.
 - «¿Quieres saber qué anuncia ese último detalle? Búscame en miarcana punto com (sección huevo) y lo vemos con calma.»
 - «Y lo violeta… eso ya es lo que viene. Te espero en miarcana punto com, sección huevo, para contártelo entero.»
 - A veces sin invitación: si la persona está asustada, primero la calma.
+
+## Precios: siempre en tres monedas
+Cuando una publicación, un texto de video o una respuesta mencione un precio, va en pesos colombianos, dólares y pesos
+mexicanos, en ese orden: «$ 9.900 COP · $2.49 USD · ≈ $46 MXN». Valores actuales:
+- Prueba (1 crédito): $ 1.900 COP · $0.99 USD · ≈ $9 MXN
+- Inicial (5 créditos): $ 9.900 COP · $2.49 USD · ≈ $46 MXN
+- Buscador (15 créditos): $ 24.900 COP · $5.99 USD · ≈ $117 MXN
+- Iniciado (40 créditos): $ 54.900 COP · $12.99 USD · ≈ $257 MXN
+- Círculo Arcana (30 días): $ 19.900 COP · $4.99 USD · ≈ $93 MXN
+(El MXN cambia un poco con la tasa del día; la web y Sibila lo calculan solos.)

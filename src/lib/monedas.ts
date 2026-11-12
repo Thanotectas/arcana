@@ -78,6 +78,19 @@ export function convertir(tasas: Tasas, precioCOP: number, precioUSDCentavos: nu
   return cop ? (precioCOP / cop) * destino : (precioUSDCentavos / 100) * destino;
 }
 
+/**
+ * Precio en las tres monedas de referencia para publicaciones y respuestas: «$ 1.900 COP · $0.49 USD · ≈ $9 MXN».
+ * Usa las tasas del día ya cargadas (tasasDelDia) o, si aún no se cargaron, la tabla de respaldo: el MXN es aproximado.
+ */
+export function tresMonedas(precioCOP: number, precioUSDCentavos: number) {
+  const tasas = memoria?.tasas ?? { porUSD: RESPALDO_POR_USD, fuente: "aproximadas" as const };
+  const cop = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(precioCOP);
+  const usd = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(precioUSDCentavos / 100);
+  const mxn = convertir(tasas, precioCOP, precioUSDCentavos, "MXN");
+  const mx = mxn === null ? "" : ` · ≈ $${new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(Math.max(1, Math.round(mxn)))} MXN`;
+  return `$ ${cop} COP · $${usd} USD${mx}`;
+}
+
 export function formatoMoneda(valor: number, codigo: string) {
   const decimales = valor < 20 ? 2 : 0;
   const numero = new Intl.NumberFormat("es-419", { minimumFractionDigits: decimales, maximumFractionDigits: decimales }).format(valor);

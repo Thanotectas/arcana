@@ -10,7 +10,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { simboloDataUri } from "@/lib/marca/simbolo";
 import { MAZOS } from "@/lib/tarot/mazos";
-import { PAQUETE_PRUEBA, formatoCOP } from "@/lib/creditos";
+import { PAQUETE_PRUEBA } from "@/lib/creditos";
+import { tresMonedas } from "@/lib/monedas";
 import { cartaDelDia, frase, mazoDelDia } from "./carta-dia";
 import { fechaLargaEs } from "./calendario";
 import { filtroAudio, frases, narrar, tiemposConVoz } from "./voz";
@@ -106,12 +107,13 @@ async function capas(fecha: string) {
     </div>,
   );
 
-  const precio = formatoCOP(PAQUETE_PRUEBA.precioCOP);
+  const precios = tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos);
   const cta = await png(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", paddingBottom: 170 }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 940, padding: "40px 48px", borderRadius: 40, background: "rgba(11,7,22,0.82)", border: "2px solid rgba(241,217,154,0.55)" }}>
         <span style={{ fontSize: 34, color: "#b7a5ff", letterSpacing: 2 }}>¿Quieres tu propia tirada?</span>
-        <span style={{ marginTop: 14, fontFamily: "Cormorant", fontSize: 78, color: "#f1d99a", textAlign: "center", lineHeight: 1.05 }}>{`Sibila te lee tres cartas por ${precio}`}</span>
+        <span style={{ marginTop: 14, fontFamily: "Cormorant", fontSize: 78, color: "#f1d99a", textAlign: "center", lineHeight: 1.05 }}>Sibila te lee tres cartas sobre tu pregunta</span>
+        <span style={{ marginTop: 16, fontSize: 34, color: "#ece6f7", textAlign: "center" }}>{precios}</span>
         <div style={{ marginTop: 28, display: "flex", padding: "20px 56px", borderRadius: 999, background: "linear-gradient(135deg, #f1d99a, #d9b45a)", color: "#0b0716", fontSize: 40, fontWeight: 600 }}>miarcana.com</div>
         <span style={{ marginTop: 18, fontSize: 28, color: "#a89fc0" }}>Tu carta del día es gratis, todos los días</span>
       </div>
