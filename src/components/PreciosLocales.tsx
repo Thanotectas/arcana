@@ -91,6 +91,22 @@ export function PrecioPrincipal({ cop, usdCentavos }: { cop: number; usdCentavos
   );
 }
 
+/** «$ 19.900 COP · $4.99 USD · ≈ $92 MXN», empezando por la moneda de la persona. */
+function enTresMonedas(c: Ctx | null, cop: number, usdCentavos: number) {
+  const moneda = c?.moneda ?? "COP";
+  const mxn = convertir({ porUSD: c?.porUSD ?? {}, fuente: "del día" }, cop, usdCentavos, "MXN");
+  const partes: Record<string, string> = { COP: `${formatoCOP(cop)} COP`, USD: `${formatoUSD(usdCentavos)} USD` };
+  if (mxn !== null) partes.MXN = `≈ $${new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(Math.max(1, Math.round(mxn)))} MXN`;
+  const primera = moneda === "COP" ? "COP" : moneda === "MXN" && partes.MXN ? "MXN" : "USD";
+  return [primera, ...["COP", "USD", "MXN"].filter((m) => m !== primera)].filter((m) => partes[m]).map((m) => partes[m]).join(" · ");
+}
+
+/** Un texto con «{precio}» (p. ej. el del Círculo) con el precio en las tres monedas. */
+export function TextoTresMonedas({ texto, cop, usdCentavos }: { texto: string; cop: number; usdCentavos: number }) {
+  const c = useContext(Contexto);
+  return <>{texto.replace("{precio}", enTresMonedas(c, cop, usdCentavos))}</>;
+}
+
 /** Un texto ya armado en pesos o en dólares, según la moneda de la persona (en Colombia, pesos). */
 export function SegunMoneda({ cop, usd }: { cop: string; usd: string }) {
   const c = useContext(Contexto);

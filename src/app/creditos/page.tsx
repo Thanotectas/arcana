@@ -21,7 +21,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { COOKIE_CODIGO, normalizarCodigo, validarCodigo } from "@/lib/pagos/codigos";
 import { Ticket } from "lucide-react";
 import { tasasDelDia } from "@/lib/monedas";
-import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda } from "@/components/PreciosLocales";
+import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -196,7 +196,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
               <p className="text-4xl font-semibold text-oro-suave">{precio(PAQUETE_CIRCULO)}</p>
             )}
             <p className="text-sm text-texto-suave">{plantilla(t.circulo.porDias, { dias: CIRCULO.diasPorCompra })}</p>
-            {!internacional && !oferta.activa && <p className="text-sm text-oro-suave">{plantilla(t.crecimiento.porDia, { precio: fuera ? formatoUSD(Math.ceil(PAQUETE_CIRCULO.precioUSDCentavos / CIRCULO.diasPorCompra)) : formatoCOP(precioCirculoPorDia()) })}</p>}
+            {!internacional && !oferta.activa && <p className="text-sm text-oro-suave"><TextoTresMonedas texto={t.crecimiento.porDia} cop={precioCirculoPorDia()} usdCentavos={Math.ceil(PAQUETE_CIRCULO.precioUSDCentavos / CIRCULO.diasPorCompra)} /></p>}
             <p className="mt-1 text-xs text-texto-suave">{plantilla(t.circulo.incluyeCreditos, { n: PAQUETE_CIRCULO.creditos })}</p>
             <BotonEnviar className="boton boton-primario mt-4 w-full" cargando={t.creditos.preparando}>
               {miembro ? t.circulo.extender : t.circulo.unirme}

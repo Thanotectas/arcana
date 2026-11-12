@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
-import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, formatoCOP, formatoUSD, precioCirculoPorDia } from "@/lib/creditos";
+import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { tasasDelDia } from "@/lib/monedas";
-import { PrecioPrincipal, ProveedorMoneda, SegunMoneda, SelectorMoneda } from "@/components/PreciosLocales";
+import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 import { CarruselVideos } from "@/components/CarruselVideos";
@@ -140,8 +140,8 @@ export default async function Portada() {
             <Sunrise className="mt-1 h-8 w-8 shrink-0 text-oro" aria-hidden />
             <div>
               <h3 className="font-display text-2xl font-semibold">{t.crecimiento.circuloPortada.titulo}</h3>
-              <p className="mt-1 text-sm text-texto-suave"><SegunMoneda cop={plantilla(t.crecimiento.circuloPortada.texto, { precio: formatoCOP(PAQUETE_CIRCULO.precioCOP) })} usd={plantilla(t.crecimiento.circuloPortada.texto, { precio: `${formatoUSD(PAQUETE_CIRCULO.precioUSDCentavos)} USD` })} /></p>
-              <p className="mt-1 text-sm text-oro-suave"><SegunMoneda cop={plantilla(t.crecimiento.porDia, { precio: formatoCOP(precioCirculoPorDia()) })} usd={plantilla(t.crecimiento.porDia, { precio: formatoUSD(Math.ceil(PAQUETE_CIRCULO.precioUSDCentavos / CIRCULO.diasPorCompra)) })} /></p>
+              <p className="mt-1 text-sm text-texto-suave"><TextoTresMonedas texto={t.crecimiento.circuloPortada.texto} cop={PAQUETE_CIRCULO.precioCOP} usdCentavos={PAQUETE_CIRCULO.precioUSDCentavos} /></p>
+              <p className="mt-1 text-sm text-oro-suave"><TextoTresMonedas texto={t.crecimiento.porDia} cop={precioCirculoPorDia()} usdCentavos={Math.ceil(PAQUETE_CIRCULO.precioUSDCentavos / CIRCULO.diasPorCompra)} /></p>
             </div>
           </div>
           <span className="boton boton-primario">{t.crecimiento.circuloPortada.cta}</span>
