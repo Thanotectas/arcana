@@ -57,20 +57,36 @@ export function PrecioLocal({ cop, usdCentavos, className = "block text-xs font-
 }
 
 /**
- * Precio principal de un paquete: en Colombia, en pesos; fuera (o si la persona eligió otra moneda), en dólares, que
- * es lo que entiende cualquier visitante, y debajo lo que de verdad se cobra en pesos y su moneda aproximada.
+ * Precio de un paquete en tres monedas para que cualquiera se ubique: pesos colombianos (lo que se cobra), dólares y
+ * pesos mexicanos. La grande es la de la persona (Colombia → COP, México → MXN, el resto → USD); debajo, las otras dos
+ * y, si eligió otra moneda en el selector (ARS, CLP, EUR…), también esa.
  */
-export function PrecioPrincipal({ cop, usdCentavos, cobro }: { cop: number; usdCentavos: number; cobro: string }) {
+export function PrecioPrincipal({ cop, usdCentavos }: { cop: number; usdCentavos: number }) {
   const c = useContext(Contexto);
-  if (!c || c.moneda === "COP") return <>{formatoCOP(cop)}</>;
-  const local = c.moneda === "USD" ? null : convertir({ porUSD: c.porUSD, fuente: "del día" }, cop, usdCentavos, c.moneda);
+  const moneda = c?.moneda ?? "COP";
+  const tasas = { porUSD: c?.porUSD ?? {}, fuente: "del día" as const };
+  const mxn = convertir(tasas, cop, usdCentavos, "MXN");
+  const grande: Record<string, [string, string]> = {
+    COP: [formatoCOP(cop), "COP"],
+    USD: [formatoUSD(usdCentavos), "USD"],
+  };
+  const chico: Record<string, string> = { COP: `${formatoCOP(cop)} COP`, USD: `${formatoUSD(usdCentavos)} USD` };
+  if (mxn !== null) {
+    const n = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(Math.round(mxn));
+    grande.MXN = [`≈ $${n}`, "MXN"];
+    chico.MXN = `≈ $${n} MXN`;
+  }
+  const principal = moneda === "COP" ? "COP" : moneda === "MXN" && grande.MXN ? "MXN" : "USD";
+  const otras = ["COP", "USD", "MXN"].filter((m) => m !== principal && chico[m]).map((m) => chico[m]);
+  if (!["COP", "USD", "MXN"].includes(moneda)) {
+    const v = convertir(tasas, cop, usdCentavos, moneda);
+    if (v !== null) otras.push(`≈ ${formatoMoneda(v, moneda)}`);
+  }
+  const [cifra, sigla] = grande[principal];
   return (
     <>
-      {formatoUSD(usdCentavos)} <span className="text-base font-normal text-texto-suave">USD</span>
-      <span className="block text-xs font-normal text-texto-suave">
-        {local !== null ? `≈ ${formatoMoneda(local, c.moneda)} · ` : ""}
-        {cobro} {formatoCOP(cop)} COP
-      </span>
+      {cifra} <span className="text-base font-normal text-texto-suave">{sigla}</span>
+      <span className="block text-xs font-normal text-texto-suave">{otras.join(" · ")}</span>
     </>
   );
 }

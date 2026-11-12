@@ -45,7 +45,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // En pesos, debajo de cada precio va el aproximado en la moneda que elija la persona (o la de su país).
   // Fuera de Colombia el precio grande va en dólares (lo que entiende cualquier visitante) y debajo lo que se cobra en pesos.
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) =>
-    internacional ? formatoUSD(p.precioUSDCentavos) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} cobro={t.creditos.monedaLocal.cobro} />;
+    internacional ? formatoUSD(p.precioUSDCentavos) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} />;
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
     return (

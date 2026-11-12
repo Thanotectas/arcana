@@ -127,7 +127,7 @@ export default async function Portada() {
               <div key={p.id} className={`tarjeta tarjeta-modulo p-6 ${p.destacado ? "border-oro/50" : ""}`}>
                 {p.destacado && <span className="text-xs uppercase tracking-widest text-oro">{t.portada.masElegido}</span>}
                 <h3 className="font-display mt-1 text-2xl font-semibold">{textos?.nombre ?? p.nombre}</h3>
-                <p className="mt-2 text-3xl font-semibold text-oro-suave"><PrecioPrincipal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} cobro={t.creditos.monedaLocal.cobro} /></p>
+                <p className="mt-2 text-3xl font-semibold text-oro-suave"><PrecioPrincipal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} /></p>
                 <p className="text-sm text-texto-suave">{plantilla(t.portada.nCreditos, { n: p.creditos })}</p>
                 <p className="mt-3 text-sm text-texto-suave">{textos?.descripcion ?? p.descripcion}</p>
                 <Link href="/creditos" className="boton boton-secundario mt-5 w-full">{t.portada.comprar}</Link>
