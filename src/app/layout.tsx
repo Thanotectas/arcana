@@ -8,6 +8,9 @@ import { ProveedorIdioma } from "@/lib/i18n/cliente";
 import { CieloAnimado } from "@/components/CieloAnimado";
 import { AsistenteFlotante } from "@/components/AsistenteFlotante";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
+import { getPlataforma } from "@/lib/plataforma";
+import { META_PIXEL_ID } from "@/lib/marca/medicion";
+import { MedicionAnuncios } from "@/components/MedicionAnuncios";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -30,7 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [idioma, t] = await Promise.all([getIdioma(), getT()]);
+  const [idioma, t, plataforma] = await Promise.all([getIdioma(), getT(), getPlataforma()]);
+  // Nunca en la app de Google Play: su ficha de seguridad de datos dice que no se usan para publicidad.
+  const pixel = META_PIXEL_ID && plataforma !== "android" ? META_PIXEL_ID : "";
   return (
     <html lang={idioma} className={`${inter.variable} ${cormorant.variable}`}>
       <body className="flex min-h-dvh flex-col antialiased">
@@ -41,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />
           <AsistenteFlotante />
+          {pixel && <MedicionAnuncios pixelId={pixel} textos={t.medicion} />}
         </ProveedorIdioma>
         {/* Visitas anónimas y sin cookies (Vercel Web Analytics). */}
         <Analytics />

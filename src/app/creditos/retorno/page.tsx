@@ -4,6 +4,7 @@ import { requerirUsuario, getOrdenPorReferencia } from "@/lib/dal";
 import { consultarVenta, estadoOrden } from "@/lib/pagos/bold";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { Aviso } from "@/components/Aviso";
+import { EventoMeta } from "@/components/EventoMeta";
 import { getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 
@@ -60,6 +61,7 @@ export default async function PaginaRetorno({
 
   return (
     <div className="mx-auto max-w-md space-y-6 text-center">
+      {orden?.estado === "aprobada" && <EventoMeta evento="Purchase" clave={`compra-${orden.referencia}`} datos={{ value: Number(orden.monto_centavos) / 100, currency: orden.moneda }} />}
       <h1 className="font-display text-4xl font-semibold">{t.creditos.retorno.titulo}</h1>
       {!orden ? (
         <Aviso>{t.creditos.retorno.noEncontrada}</Aviso>

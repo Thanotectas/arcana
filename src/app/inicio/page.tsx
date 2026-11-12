@@ -14,6 +14,7 @@ import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
 import { AvisoDirecto } from "@/components/AvisoDirecto";
+import { EventoMeta } from "@/components/EventoMeta";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -34,8 +35,9 @@ function racha(fechas: string[]) {
   return n;
 }
 
-export default async function PaginaInicio() {
+export default async function PaginaInicio({ searchParams }: { searchParams: Promise<{ nueva?: string }> }) {
   await requerirUsuario();
+  const { nueva } = await searchParams;
   const [perfil, lecturas, cartaDisponible, t, idioma, invitaciones] = await Promise.all([
     getPerfil(),
     getLecturas(200),
@@ -95,6 +97,7 @@ export default async function PaginaInicio() {
 
   return (
     <div className="space-y-10">
+      {nueva === "1" && perfil && <EventoMeta evento="CompleteRegistration" clave={`registro-${perfil.id}`} />}
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.inicio.bienvenida}</p>

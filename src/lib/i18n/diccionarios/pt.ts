@@ -2369,9 +2369,16 @@ export const pt: Diccionario = {
         { titulo: "Dados que coletamos", texto: "Conta: nome, e-mail e senha (criptografada). Leituras: perguntas, nomes, datas, horas e locais de nascimento, e as fotografias da sua mão que você envia para a quiromancia. Pagamentos: referência, valor e status; os dados de cartão são processados pela Bold e nunca chegam aos nossos servidores." },
         { titulo: "Para que os usamos", texto: "Para prestar o serviço (calcular e redigir suas leituras), gerenciar seu saldo e nos comunicarmos com você sobre sua conta. Os dados das leituras, incluindo as fotografias, são enviados a um provedor de inteligência artificial unicamente para gerar a interpretação e não são usados para treinar modelos." },
         { titulo: "Seus direitos", texto: "Você pode conhecer, atualizar, retificar e excluir seus dados, e revogar a autorização, escrevendo para o e-mail de contato. Você pode apagar qualquer leitura, com sua fotografia, a partir do seu histórico." },
+        { titulo: "Medição de anúncios", texto: "No site (não no app do Google Play), e somente se você aceitar o aviso, usamos o pixel da Meta para saber quais anúncios nos trazem visitas, cadastros e compras. A Meta recebe a página visitada, o evento (cadastro ou compra, com seu valor) e dados técnicos do navegador; nunca suas leituras, perguntas, fotografias nem dados de nascimento. Para mudar sua escolha, apague os dados deste site no navegador e o aviso aparecerá de novo." },
         { titulo: "Conservação e segurança", texto: "Conservamos seus dados enquanto sua conta estiver ativa. Usamos criptografia em trânsito, armazenamento privado para as fotografias e controles de acesso por usuário no banco de dados." },
       ],
     },
+  },
+  medicion: {
+    aviso: "Usamos o pixel da Meta para saber quais anúncios nos trazem visitas. Nunca enviamos suas leituras, perguntas nem dados de nascimento.",
+    aceptar: "Aceitar",
+    rechazar: "Não, obrigado",
+    mas: "Mais informações",
   },
   hub: {
     seccion: "Siga-nos",

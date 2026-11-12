@@ -2371,9 +2371,16 @@ export const es = {
         { titulo: "Datos que recogemos", texto: "Cuenta: nombre, correo y contraseña (cifrada). Lecturas: preguntas, nombres, fechas, horas y lugares de nacimiento, y las fotografías de tu mano que subes para la quiromancia. Pagos: referencia, monto y estado; los datos de tarjeta los procesa Bold y nunca llegan a nuestros servidores." },
         { titulo: "Para qué los usamos", texto: "Para prestar el servicio (calcular y redactar tus lecturas), gestionar tu saldo y comunicarnos contigo sobre tu cuenta. Los datos de las lecturas, incluidas las fotografías, se envían a un proveedor de inteligencia artificial únicamente para generar la interpretación y no se usan para entrenar modelos." },
         { titulo: "Tus derechos", texto: "Puedes conocer, actualizar, rectificar y suprimir tus datos, y revocar la autorización, escribiendo al correo de contacto. Puedes borrar cualquier lectura, con su fotografía, desde tu historial." },
+        { titulo: "Medición de anuncios", texto: "En la página web (no en la app de Google Play), y solo si lo aceptas en el aviso, usamos el píxel de Meta para saber qué anuncios nos traen visitas, registros y compras. Meta recibe la página visitada, el evento (registro o compra, con su valor) y datos técnicos del navegador; nunca tus lecturas, preguntas, fotografías ni datos de nacimiento. Para cambiar tu elección, borra los datos de este sitio en tu navegador y el aviso volverá a aparecer." },
         { titulo: "Conservación y seguridad", texto: "Conservamos tus datos mientras tu cuenta esté activa. Usamos cifrado en tránsito, almacenamiento privado para las fotografías y controles de acceso por usuario en la base de datos." },
       ],
     },
+  },
+  medicion: {
+    aviso: "Usamos el píxel de Meta para saber qué anuncios nos traen visitas. Nunca enviamos tus lecturas, preguntas ni datos de nacimiento.",
+    aceptar: "Aceptar",
+    rechazar: "No, gracias",
+    mas: "Más información",
   },
   hub: {
     seccion: "Síguenos",
