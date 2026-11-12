@@ -87,7 +87,7 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
   if (data.session) {
     await aplicarInvitacionPendiente();
     await registrarOrigenPendiente(data.session.user.id);
-    redirect("/inicio");
+    redirect("/inicio?nueva=1");
   }
   return { mensaje: "revisaCorreo" };
 }

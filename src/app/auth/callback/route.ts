@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
       await aplicarInvitacionPendiente();
       // Cuenta nueva (correo confirmado o Google): queda por dónde llegó.
       if (data.user) await registrarOrigenPendiente(data.user.id);
-      return NextResponse.redirect(`${origin}${destino}`);
+      const url = new URL(destino, origin);
+      // Cuenta recién creada: /inicio manda el evento de registro del píxel (si la persona lo aceptó).
+      if (data.user?.created_at && Date.now() - Date.parse(data.user.created_at) < 30 * 60_000 && url.pathname === "/inicio") url.searchParams.set("nueva", "1");
+      return NextResponse.redirect(url);
     }
   }
   return NextResponse.redirect(`${origin}/entrar?error=enlace`);

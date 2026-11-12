@@ -2372,9 +2372,16 @@ export const en: Diccionario = {
         { titulo: "Data we collect", texto: "Account: name, email and password (encrypted). Readings: questions, names, dates, times and places of birth, and the photographs of your hand that you upload for palm reading. Payments: reference, amount and status; card details are processed by Bold and never reach our servers." },
         { titulo: "What we use it for", texto: "To provide the service (calculating and writing your readings), manage your balance and communicate with you about your account. Reading data, including photographs, is sent to an artificial intelligence provider solely to generate the interpretation and is not used to train models." },
         { titulo: "Your rights", texto: "You may access, update, correct and delete your data, and revoke your authorization, by writing to the contact email. You can delete any reading, along with its photograph, from your history." },
+        { titulo: "Ad measurement", texto: "On the website (not in the Google Play app), and only if you accept the notice, we use the Meta pixel to know which ads bring us visits, sign-ups and purchases. Meta receives the page visited, the event (sign-up or purchase, with its value) and technical browser data; never your readings, questions, photographs or birth details. To change your choice, clear this site's data in your browser and the notice will appear again." },
         { titulo: "Retention and security", texto: "We keep your data for as long as your account is active. We use encryption in transit, private storage for photographs and per-user access controls in the database." },
       ],
     },
+  },
+  medicion: {
+    aviso: "We use the Meta pixel to know which ads bring us visits. We never send your readings, questions or birth details.",
+    aceptar: "Accept",
+    rechazar: "No, thanks",
+    mas: "More information",
   },
   hub: {
     seccion: "Follow us",
