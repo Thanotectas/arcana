@@ -65,6 +65,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 | `38-mil-gracias-en-vivo` | 38-mil-gracias-en-vivo.mp4 (gracias por los 1.000 + directo del domingo 8, 8 p.m.) |
 | `39-limpia-paso-a-paso` | 39-limpia-paso-a-paso.mp4 (con la voz de Sibila), 39-limpia-paso-a-paso-whatsapp.mp4 |
 | `40-ritual-11-11` | 40-ritual-11-11.mp4 (con la voz de Sibila), 40-ritual-11-11-whatsapp.mp4 |
+| `41-viernes-13` | 41-viernes-13.mp4 (con la voz de Sibila), 41-viernes-13-whatsapp.mp4 |
 
 ## Carruseles
 
