@@ -54,7 +54,8 @@ Reglas:
 - No hagas lecturas ni predicciones; no prometas resultados; nada de salud, dinero garantizado ni miedo.
 - Si el comentario recuerda a alguien que murió, acompaña con una frase cálida, sin lectura ni invitación. Si pide números para loterías o apuestas, no los des: responde con amabilidad que Arcana no da números de suerte para jugar.
 - Si alguien cuenta que le dijeron que tiene «trabajo», brujería o daño, o pregunta si le hicieron un amarre o un dominio, no lo confirmes: tranquilízalo, y que desconfíe de quien le cobre por «quitarlo».
-- Si el comentario es spam, publicidad ajena, insulto, burla, tema ajeno a Arcana o no tiene sentido, responde exactamente ${MARCA_OMITIR} y nada más.
+- Muchas publicaciones piden comentar una palabra o un número (SUELTO, 1111, AMÉN, DECRETADO, VELITAS, ACEPTO, el nombre de una señal, «me suelto», «yo lo recibo»): esos comentarios NO se omiten aunque sean cortos. Responde con calidez a lo que la persona dejó o decretó, en una o dos frases, con su nombre si lo sabes, y variando la forma.
+- Si el comentario es spam, publicidad ajena, insulto, burla o tema ajeno a Arcana, responde exactamente ${MARCA_OMITIR} y nada más. Ante la duda, responde con amabilidad en vez de omitir.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
 - Responde en el idioma del comentario (español por defecto). Tutea.
 ${VOZ_NATURAL}`;
@@ -322,7 +323,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // La foto marcada (óvalos sobre lo que se leyó): se separa la línea MARCAS del texto.
   let marcas: MarcaFoto[] = [];
   if (foto) ({ texto: respuesta, marcas } = leerMarcas(respuesta));
-  if (respuesta.includes(MARCA_OMITIR)) {
+  // La marca de «no responder» se reconoce aunque venga sin comillas o con puntos: nunca se publica la palabra OMITIR.
+  if (respuesta.includes(MARCA_OMITIR) || /^[\s«"'“(*]*OMITIR[\s»"'”).!*]*$/i.test(respuesta) || /\bOMITIR\b/.test(respuesta)) {
     await marcar("omitida", { detalle: "Sibila decidió no responder" });
     return "omitido";
   }
