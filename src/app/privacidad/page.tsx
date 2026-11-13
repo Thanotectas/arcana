@@ -12,7 +12,7 @@ export default async function Privacidad() {
   return (
     <article className="prosa mx-auto max-w-3xl">
       <h1 className="font-display text-4xl font-semibold text-oro-suave">{t.legal.privacidad.titulo}</h1>
-      <p>{t.legal.privacidad.actualizado}: {fechaLarga("2026-11-12", idioma)}. {t.legal.privacidad.intro}</p>
+      <p>{t.legal.privacidad.actualizado}: {fechaLarga("2026-11-13", idioma)}. {t.legal.privacidad.intro}</p>
       {t.legal.privacidad.secciones.map((s) => (
         <section key={s.titulo}>
           <h2>{s.titulo}</h2>

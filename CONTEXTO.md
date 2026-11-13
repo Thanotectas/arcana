@@ -248,3 +248,12 @@ Pendiente de seguridad que requiere decisión o cuenta externa:
 - **Hub de redes** (10 nov 2026): `miarcana.com/redes` (todos los canales en una página, con código de origen `?ref=red-lugar`), tarjeta con QR en `/redes/qr`, clics en `clics_redes`, seguidores diarios de cada red en `seguidores_redes` (`/api/cron/seguidores`, orquestador de la mañana) y panel `/admin/hub`. Sibila, los directos, el Short diario y el pie de los correos invitan a seguirnos con el enlace del hub. **Migración 0049** (aplicar en el SQL Editor; sin ella la página funciona pero no guarda clics). TikTok pide ahora `user.info.stats`: reconectar la cuenta en /admin/redes. Detalle en docs/REDES.md.
 - **Píxel de Meta y campaña de anuncios** (12 nov 2026, `docs/ANUNCIOS-2026-11.md`): píxel con aviso de consentimiento (`src/lib/marca/medicion.ts`, `MedicionAnuncios`, `EventoMeta`; eventos PageView, CompleteRegistration y Purchase), **apagado hasta poner el identificador del conjunto de datos web** en `META_PIXEL_ID`; nunca en la app de Google Play. Piezas en `marketing/anuncios/2026-11/` y plan de 14 días en Meta y TikTok con `utm_source=meta-ads` / `tiktok-ads`, que se ven en «Por dónde llegan».
 - **Dos Shorts al día en YouTube** (20 oct 2026): carta del día al mediodía y la publicación del agente por la mañana (`/api/cron/youtube?que=publicacion`); `miarcana.com/suscribete` abre el canal con el aviso de suscripción y va en los correos de campaña. Migración 0037.
+- **Embudo** (13 nov 2026, rama `embudo`, **migración 0050**): `/admin/embudo` muestra, para las cuentas creadas en 7, 30 o 90 días, cuántas llegaron a cada paso hasta hoy, por origen o por país.
+  - Pasos: visitas nuevas → crearon cuenta → usaron la app (lectura o carta del día) → volvieron otro día → intentaron pagar → pagaron → Círculo.
+  - Muestra también los ingresos de esas cuentas y el paso donde más gente se pierde (solo con al menos 10 personas en el paso anterior).
+  - Las visitas las cuenta `ContarVisita` (layout): una por navegador, marca en `localStorage`, sin cookie ni identificador.
+  - `POST /api/visita` guarda en `visitas` el origen (cookie `arcana_origen`), el país de Vercel, la página de entrada, el dispositivo y la plataforma. Ignora robots y peticiones de otros sitios.
+  - `perfiles.pais` se llena al crear la cuenta (`registrarOrigenPendiente`).
+  - Cálculo puro en `src/lib/embudo/calculo.ts`; consultas paginadas en `datos.ts`.
+  - Sin la 0050, la página funciona sin visitas ni país y lo avisa.
+  - La política de privacidad tiene la sección «Estadísticas propias».
