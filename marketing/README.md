@@ -71,6 +71,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 - `carruseles/frase-signos/`
 - `carruseles/nahual-maya/`
 - `carruseles/numeros-repetidos/`
+- `carruseles/viernes-13/` (viernes 13 sin miedo: cuatro láminas, reel de 20 s y textos)
 - `carruseles/portal-11-11/` (portal 11:11: tres láminas, reel de 15 s y textos)
 - `carruseles/que-significa-huevo/` (serie de la limpia con huevo: 8 señales ilustradas + textos)
 - `carruseles/rituales-fin-de-anio/`
