@@ -26,6 +26,8 @@ type PerfilRow = {
   /** Red por la que llegó al registrarse (youtube, instagram, tiktok, …); null si no se supo. */
   origen: string | null;
   origen_detalle: string | null;
+  /** País desde el que se creó la cuenta (código ISO de Vercel); null en cuentas anteriores a la 0050. */
+  pais: string | null;
   creado_en: string;
   actualizado_en: string;
 };
@@ -277,6 +279,19 @@ type ClicRedesRow = {
   creado_en: string;
 };
 
+/** Primera visita de un navegador (migración 0050): sin datos que identifiquen a la persona. */
+type VisitaRow = {
+  id: number;
+  fecha: string;
+  origen: string;
+  origen_detalle: string | null;
+  pais: string | null;
+  ruta: string;
+  dispositivo: "movil" | "escritorio";
+  plataforma: "web" | "android" | "pwa";
+  creado_en: string;
+};
+
 type SeguidorRedesRow = {
   id: number;
   fecha: string;
@@ -413,7 +428,7 @@ export type Database = {
     Tables: {
       perfiles: {
         Row: PerfilRow;
-        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "recibe_correos" | "origen" | "origen_detalle" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<PerfilRow, "nombre" | "fecha_nacimiento" | "hora_nacimiento" | "lugar_nacimiento" | "latitud" | "longitud" | "zona_horaria" | "creditos" | "ilimitado" | "idioma" | "codigo_invitacion" | "invitado_por" | "invitacion_premiada" | "circulo_hasta" | "bienvenida_dada" | "recibe_correos" | "origen" | "origen_detalle" | "pais" | "creado_en" | "actualizado_en">;
         Update: Partial<PerfilRow>;
         Relationships: [];
       };
@@ -553,6 +568,12 @@ export type Database = {
         Row: ClicRedesRow;
         Insert: Insertable<ClicRedesRow, "id" | "origen" | "dispositivo" | "creado_en">;
         Update: Partial<ClicRedesRow>;
+        Relationships: [];
+      };
+      visitas: {
+        Row: VisitaRow;
+        Insert: Insertable<VisitaRow, "id" | "origen" | "origen_detalle" | "pais" | "ruta" | "dispositivo" | "plataforma" | "creado_en">;
+        Update: Partial<VisitaRow>;
         Relationships: [];
       };
       seguidores_redes: {

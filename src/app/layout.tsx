@@ -11,6 +11,7 @@ import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { getPlataforma } from "@/lib/plataforma";
 import { META_PIXEL_ID } from "@/lib/marca/medicion";
 import { MedicionAnuncios } from "@/components/MedicionAnuncios";
+import { ContarVisita } from "@/components/ContarVisita";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -50,6 +51,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </ProveedorIdioma>
         {/* Visitas anónimas y sin cookies (Vercel Web Analytics). */}
         <Analytics />
+        {/* Primera visita de cada navegador, para el embudo: sin cookies ni datos personales. */}
+        <ContarVisita />
       </body>
     </html>
   );

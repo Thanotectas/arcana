@@ -1,5 +1,5 @@
 import "server-only";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { COOKIE_ORIGEN, OPCIONES_COOKIE_ORIGEN, detalleOrigen, leerOrigen, serializarOrigen, type Origen } from "./comun";
@@ -19,17 +19,28 @@ export async function origenPendiente(): Promise<Origen | null> {
  */
 export async function registrarOrigenPendiente(usuarioId: string) {
   const origen = await origenPendiente();
-  if (!origen) return;
-  try {
-    const desde = new Date(Date.now() - 86_400_000).toISOString();
-    await getSupabaseAdmin()
-      .from("perfiles")
-      .update({ origen: origen.fuente, origen_detalle: detalleOrigen(origen) })
-      .eq("id", usuarioId)
-      .is("origen", null)
-      .gte("creado_en", desde);
-  } catch (e) {
-    console.error("[origen]", e instanceof Error ? e.message : e);
+  const desde = new Date(Date.now() - 86_400_000).toISOString();
+  if (origen) {
+    try {
+      await getSupabaseAdmin()
+        .from("perfiles")
+        .update({ origen: origen.fuente, origen_detalle: detalleOrigen(origen) })
+        .eq("id", usuarioId)
+        .is("origen", null)
+        .gte("creado_en", desde);
+    } catch (e) {
+      console.error("[origen]", e instanceof Error ? e.message : e);
+    }
+  }
+  // País desde el que se creó la cuenta, para el embudo por país (migración 0050).
+  const pais = (await headers()).get("x-vercel-ip-country");
+  if (pais && /^[A-Z]{2}$/.test(pais)) {
+    try {
+      const { error } = await getSupabaseAdmin().from("perfiles").update({ pais }).eq("id", usuarioId).is("pais", null).gte("creado_en", desde);
+      if (error) console.error("[origen] país:", error.message);
+    } catch (e) {
+      console.error("[origen] país:", e instanceof Error ? e.message : e);
+    }
   }
 }
 

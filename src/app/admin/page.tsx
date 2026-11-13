@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2 } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
 
 const HERRAMIENTAS = [
   { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes a las 7:00." },
+  { href: "/admin/embudo", icono: Filter, titulo: "Embudo", texto: "De la visita al pago: qué parte de la gente llega a cada paso, por origen y por país, en 7, 30 o 90 días." },
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },
   { href: "/admin/hub", icono: Share2, titulo: "Hub de redes", texto: "miarcana.com/redes: clics hacia cada canal por origen, seguidores de cada red y enlaces con QR para cada sitio." },
   { href: "/admin/embajadores", icono: HandCoins, titulo: "Embajadores", texto: "Retiros de comisiones por pagar y quién trae más ventas con su enlace." },
