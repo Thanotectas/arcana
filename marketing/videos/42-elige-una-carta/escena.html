@@ -1,0 +1,74 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716;color:#ece6f7;font-family:IR;font-variant-numeric:lining-nums}
+#cielo{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,#3b2470 0%,#1b1039 50%,#0b0716 100%)}
+.c{position:absolute;left:60px;right:60px;text-align:center}
+.brillo{font-family:C;color:#f1d99a;text-shadow:0 0 50px rgba(241,217,154,.7),0 0 120px rgba(241,217,154,.35)}
+.carta{position:absolute;width:290px;height:486px;perspective:1600px}
+.carta .in{position:absolute;inset:0;transform-style:preserve-3d}
+.carta img{position:absolute;inset:0;width:100%;height:100%;border-radius:18px;backface-visibility:hidden;border:3px solid rgba(241,217,154,.8);box-shadow:0 0 50px rgba(241,217,154,.25)}
+.carta .frente{transform:rotateY(180deg)}
+.n{position:absolute;left:50%;bottom:-92px;transform:translateX(-50%);width:76px;height:76px;border-radius:50%;background:#f1d99a;color:#0b0716;font-family:I;font-size:42px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(241,217,154,.6)}
+.msg{position:absolute;left:80px;right:80px;top:1320px;text-align:center;opacity:0}
+.msg .t{font-family:C;font-size:82px;color:#f1d99a;line-height:1}
+.msg .k{font-family:I;font-size:24px;letter-spacing:.3em;color:#cfc2ff;margin-top:10px}
+.msg .p{font-size:40px;line-height:1.38;margin-top:24px}
+.marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#cfc2ff;opacity:.85}
+.marca b{color:#f1d99a}
+</style></head><body>
+<div id="cielo"></div><svg id="est" width="1080" height="1920" style="position:absolute;inset:0"></svg>
+<div class="c" id="g1" style="top:150px;opacity:0"><div style="font-family:I;font-size:28px;letter-spacing:.3em;color:#cfc2ff">HOY · 14 DE NOVIEMBRE</div>
+  <div class="brillo" style="font-size:96px;line-height:1.02;margin-top:16px">Mercurio vuelve<br>a avanzar</div>
+  <div style="font-family:CI;font-size:50px;color:#fff;margin-top:20px">Lo que estaba trabado se suelta…<br>¿qué se destraba para ti?</div></div>
+<div class="c" id="g2" style="top:170px;opacity:0"><div class="brillo" style="font-size:118px;line-height:1">Elige una carta</div>
+  <div style="font-family:IR;font-size:42px;color:#fff;margin-top:22px">Piensa en eso que esperabas…</div>
+  <div id="cuenta" style="font-family:C;font-size:150px;color:#fff;margin-top:6px;text-shadow:0 0 40px rgba(255,255,255,.5)"></div></div>
+<div class="c" id="g3" style="top:150px;opacity:0"><div class="brillo" style="font-size:84px;line-height:1.04">Ahora sí: mira tu carta 👇</div></div>
+<div class="carta" id="k1" style="left:60px;top:620px"><div class="in"><img src="../../../public/cartas/arcana/dorso.webp"><img class="frente" src="../../../public/cartas/arcana/el-viajero.webp"></div><div class="n">1</div></div>
+<div class="carta" id="k2" style="left:395px;top:620px"><div class="in"><img src="../../../public/cartas/arcana/dorso.webp"><img class="frente" src="../../../public/cartas/arcana/el-encuentro.webp"></div><div class="n">2</div></div>
+<div class="carta" id="k3" style="left:730px;top:620px"><div class="in"><img src="../../../public/cartas/arcana/dorso.webp"><img class="frente" src="../../../public/cartas/arcana/el-despertar.webp"></div><div class="n">3</div></div>
+<div class="msg" id="m1"><div class="t">El Viajero</div><div class="k">CARTA 1 · EL PRIMER PASO</div><div class="p">Ese plan que se quedó en pausa vuelve a moverse. Esta semana da el primer paso, aunque sea pequeño: el camino aparece al caminar.</div></div>
+<div class="msg" id="m2"><div class="t">El Encuentro</div><div class="k">CARTA 2 · UN MENSAJE QUE LLEGA</div><div class="p">Una conversación pendiente por fin se da. Alguien que se había quedado callado te escribe… o te toca a ti dar el paso.</div></div>
+<div class="msg" id="m3"><div class="t">El Despertar</div><div class="k">CARTA 3 · CLARIDAD</div><div class="p">Una respuesta que buscabas llega de golpe, como cuando por fin entiendes algo. Confía en esa primera intuición.</div></div>
+<div class="c" id="z" style="top:1290px;opacity:0"><div style="font-family:C;font-size:84px;line-height:1.05;color:#fff">¿Cuál elegiste?<br><span class="brillo">Comenta 1, 2 o 3</span> 👇</div>
+  <div style="font-family:IR;font-size:36px;color:#ece6f7;margin-top:16px">y Sibila te dice qué más trae para ti 🔮</div>
+  <div style="display:inline-block;margin-top:26px;padding:14px 40px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.7)">
+    <div style="font-family:I;font-size:44px;color:#f1d99a">miarcana.com</div>
+    <div style="font-family:I;font-size:20px;letter-spacing:.2em;color:#cfc2ff;margin-top:4px">TU CARTA DEL DÍA ES GRATIS</div></div></div>
+<p class="marca"><b>ARCANA</b> · SIBILA TE LEE</p>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const az=(s)=>{let x=Math.sin(s*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+document.getElementById("est").innerHTML=Array.from({length:140},(_,i)=>`<circle id="e${i}" cx="${(az(i)*1080).toFixed(0)}" cy="${(az(i+999)*1920).toFixed(0)}" r="${(.6+az(i+7)*2).toFixed(1)}" fill="#fff"/>`).join("");
+// Tiempos: gancho 0–4 · elige 4–9 (cuenta 3,2,1) · revelaciones 9–17, 17–25, 25–33 · cierre 33–38
+const POS=[60,395,730], C=[9,17,25];
+window.pintar=(t)=>{
+  for(let i=0;i<140;i++){document.getElementById("e"+i).setAttribute("opacity",(.25+.55*(.5+.5*Math.sin(t*1.5+i))).toFixed(2));}
+  document.getElementById("g1").style.opacity=ven(t,0,4.2).toFixed(3);
+  document.getElementById("g2").style.opacity=ven(t,4,9).toFixed(3);
+  const cuenta=t<5.5?"":t<6.6?"3":t<7.7?"2":"1";document.getElementById("cuenta").textContent=cuenta;
+  document.getElementById("g3").style.opacity=ven(t,9,33).toFixed(3);
+  for(let k=0;k<3;k++){
+    const e=document.getElementById("k"+(k+1)),inn=e.querySelector(".in"),c=C[k];
+    // Flotan juntas; en su turno la carta crece al centro y gira; luego vuelve a su sitio boca arriba.
+    const flot=Math.sin(t*1.6+k*1.3)*10;
+    const turno=ven(t,c,c+8,.6);
+    const brillo=t>=4&&t<9?(.5+.5*Math.sin(t*5+k*2)):0;
+    const x=POS[k]+(395-POS[k])*turno, y=620+flot-120*turno, s=1+0.45*turno;
+    const giro=180*su(pr(t,c+.4,c+1.4));
+    e.style.transform=`translate(${(x-POS[k]).toFixed(1)}px,${(y-620).toFixed(1)}px) scale(${s.toFixed(3)})`;
+    e.style.zIndex=turno>0.01?10:1;
+    e.style.opacity=(t<0.3?su(pr(t,0,.3)):1)*(t>=c&&t<c+8?1:(t>=9&&t<33?0.35:1));
+    inn.style.transform=`rotateY(${t>=c?giro:0}deg)`;
+    e.querySelector(".n").style.opacity=turno>0.2?0:1;
+    inn.querySelectorAll("img").forEach(im=>im.style.boxShadow=`0 0 ${50+60*brillo}px rgba(241,217,154,${(.25+.4*brillo).toFixed(2)})`);
+    document.getElementById("m"+(k+1)).style.opacity=ven(t,c+1.3,c+8).toFixed(3);
+  }
+  document.getElementById("z").style.opacity=su(pr(t,33,33.6)).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
