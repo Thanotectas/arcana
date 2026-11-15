@@ -1,0 +1,33 @@
+VIDEO 44 — «SIBILA: HOY VENUS VUELVE A AVANZAR… Y TE LEO EN VIVO» (domingo 15 de noviembre de 2026).
+Gemini / Flow (Veo), 2 clips de 8 s, vertical 9:16, con la imagen de Sibila (sibila-referencia.jpg = public/marca/sibila/base.jpg).
+Cielo real: Venus retoma su marcha hoy (en Libra) y Marte y Júpiter se juntan en Leo. Directo en YouTube hoy 8 p.m.
+Sibila NO habla en cámara (boca cerrada, sonrisa suave): la voz va encima, con Marcela. Así no se nota el desfase de labios.
+
+CÓMO: «Ingredientes a video» (o en Gemini: adjunta la imagen y pide el video). Vertical 9:16, 8 s. El clip 2 con «Extender».
+Si Gemini cambia la cara de Sibila, repite agregando: «keep exactly the same face, hair and dress as the reference image».
+
+==================== PROMPT 1 · «Venus despierta» (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight, magical and serene atmosphere. The woman from the reference image (exactly
+the same face, long dark wavy hair, golden forehead jewel, deep violet dress with golden embroidery) sits at her
+wooden table with the crystal ball, lit candles and a deck of tarot cards, in the same room with gothic windows and a
+starry night sky. She slowly lifts her gaze from the cards and looks out of the window: in the night sky, a bright
+pink-golden star (the planet Venus) begins to glow stronger and leaves a soft shimmering trail. Soft golden light
+from the star falls across her face and hands; she smiles gently, with her mouth closed, as if receiving good news.
+Slow camera push-in from a medium shot to a close-up of her face lit by the star.
+Sound: candles crackling, a soft magical chime when the star glows. No music, no voices, she does not speak.
+No text, no letters, no logos. Same face as the reference image throughout. Warm, elegant, nothing scary.
+
+==================== PROMPT 2 · «La carta para ti» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same woman, same face, hair, dress, table, candles, crystal ball and window with the glowing
+pink-golden star. She turns back to the table, shuffles the tarot deck with graceful hands and slides one card
+forward toward the camera; she turns it face up (the card shows a soft glowing heart and a golden scale, no readable
+text). The crystal ball lights up from inside with the same pink-golden light. Then she looks directly into the
+camera with a warm, knowing smile, mouth closed, and makes a small inviting gesture with her open hand toward the
+viewer, as if saying "come". For the last 2 seconds: she holds still, smiling at the camera, and the camera stays fixed.
+Sound: cards shuffling, a card sliding on wood, a soft chime, candles. No music, no voices, she does not speak.
+No text, no letters, no logos. Same face as the reference image throughout.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela) ====================
+01-venus.mp3: "Hoy Venus vuelve a avanzar… y lo que se había enfriado en el amor, empieza a calentarse otra vez."
+02-carta.mp3: "Si alguien se alejó, puede volver. Y si tú te alejaste de ti… este es el momento de regresar."
+03-cierre.mp3: "Esta noche, a las ocho, te leo en vivo en YouTube. Trae tu pregunta… te estoy esperando."
