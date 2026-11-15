@@ -1,0 +1,26 @@
+DIRECTO EN YOUTUBE · DOMINGO 15 DE NOVIEMBRE, 8:00 P.M. (COLOMBIA)
+43-aviso-directo-youtube-15.mp4 (17 s): TikTok, Reels, Facebook. -whatsapp.mp4: estados.
+La web (portada y miarcana.com/vivo) ya anuncia el directo de hoy de 8 a 9 p.m.
+
+TEXTOS
+TikTok / Instagram: Hoy domingo 8 p.m. (Colombia) Sibila lee EN VIVO en YouTube 🔮 Escribe tu signo y tu pregunta en el chat y te leo gratis: tarot, carta astral dibujada, sinastría ✨ Busca @miarcana en YouTube y activa la campanita 🔔 #envivo #tarot #astrologia #arcana #sibila
+Facebook (sin enlace): Hoy domingo a las 8 p.m. (Colombia) Sibila lee en vivo en YouTube 🔮 Escribe tu signo y tu pregunta en el chat y te leo gratis. Búscanos en YouTube como @miarcana. 7 p.m. México · 9 p.m. Venezuela · 10 p.m. Argentina y Chile. — Sibila, de Arcana 🔮
+WhatsApp: 🔮 HOY 8 p.m. Sibila lee en vivo en YouTube: tu signo, tu pregunta, tu carta astral dibujada en pantalla. Entra aquí: youtube.com/@miarcana/live
+YouTube (comunidad): Hoy a las 8 p.m. (Colombia) te leo en vivo 🔮 Escribe en el chat tu signo y tu pregunta, o «carta astral + fecha, hora y ciudad» y la dibujo en pantalla. Activa la campanita 🔔
+
+OBS PASO A PASO (YouTube, horizontal 1920×1080)
+1. YouTube Studio → Crear → Emitir en directo → Transmisión. Título: «🔮 Sibila te lee en vivo · escribe tu signo y tu pregunta». Público, no es para niños. Copia la CLAVE DE TRANSMISIÓN (no la pegues en ningún chat).
+2. OBS → Ajustes → Emisión → Servicio: YouTube - RTMPS → «Usar clave de transmisión» → pega la clave → Aceptar.
+3. OBS → Ajustes → Salida: modo Simple, tasa de bits de video 4500 Kbps, codificador por hardware si aparece (NVENC/QuickSync), audio 160. Vídeo: resolución base y de salida 1920×1080, 30 FPS.
+4. Escena «Sibila»: Fuentes → + → Navegador. URL: la primera dirección de miarcana.com/admin/en-vivo («Escenario para OBS», la horizontal, SIN &formato=vertical). Ancho 1920, alto 1080. Marca «Controlar el audio a través de OBS». Aceptar.
+5. Audio: en el Mezclador, la fuente Navegador es la voz de Sibila (déjala en 0 dB). Tu micrófono: actívalo solo si vas a hablar y usa audífonos. Para escuchar a Sibila con audífonos: engranaje del Navegador → Propiedades de audio avanzadas → Monitorización: «Monitorizar y emitir».
+6. (Opcional) Tu cámara de la mesa (manos, vela, cartas): + → Dispositivo de captura de video, pequeña en una esquina de abajo a la izquierda, encima del Navegador.
+7. Prueba 2 minutos antes: en /admin/en-vivo «Agregar una consulta» con una prueba y mira que Sibila la lea y suene. Luego vacíala.
+8. En /admin/en-vivo → «Cierre»: 8:55 p.m. (o la hora en que quieras despedirte).
+9. «Iniciar transmisión» en OBS. En YouTube Studio la vista previa aparece en ~10 s; dale «Emitir en directo» si no está en automático.
+10. Al minuto, /admin/en-vivo debe decir «Directo encontrado»: Sibila ya lee el chat de YouTube sola.
+11. Para hablar tú: «Pausa para el presentador» en /admin/en-vivo.
+12. Al terminar: OBS → «Detener transmisión» y en YouTube Studio «Finalizar emisión».
+
+FACEBOOK AL MISMO TIEMPO
+Solo si Live Producer ya deja transmitir (página «Mi Arcana» con 60 días y 100 seguidores; la fecha de creación está en la página → Información → Transparencia). Si deja: complemento «Multiple RTMP Outputs» en OBS con el servidor rtmps://live-api-s.facebook.com:443/rtmp/ y la clave de Facebook (guía: marketing/directos/directo-facebook-obs.txt). Si todavía no deja: publica en Facebook el enlace youtube.com/@miarcana/live.
