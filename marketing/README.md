@@ -68,6 +68,7 @@ que ya están en la app (cartas, monedas, Sibila) viven en `public/`.
 | `41-viernes-13` | 41-viernes-13.mp4 (con la voz de Sibila), 41-viernes-13-whatsapp.mp4 |
 | `42-elige-una-carta` | 42-elige-una-carta.mp4 (interactivo: elige 1, 2 o 3; sin voz) |
 | `43-aviso-directo-youtube-15` | 43-aviso-directo-youtube-15.mp4, -whatsapp.mp4 (y textos-y-obs.txt) |
+| `44-sibila-venus-en-vivo` | 44-sibila-venus-en-vivo.mp4 (con la voz de Sibila), -whatsapp.mp4 |
 
 ## Carruseles
 
