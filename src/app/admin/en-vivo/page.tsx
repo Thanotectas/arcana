@@ -79,6 +79,11 @@ export default async function PaginaAdminEnVivo() {
         <DireccionEscenario url={`${url}&formato=vertical`} />
         <p className="text-sm text-texto-suave">Vertical con tu cámara grande (recomendada en TikTok: así no lo marca como «contenido pregrabado»):</p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=grande`} />
+        <p className="text-sm text-texto-suave">
+          Dos plataformas a la vez (por ejemplo YouTube en OBS y TikTok en LIVE Studio): abre el escenario normal en una y esta copia
+          espejo en la otra. El espejo no toma consultas: muestra y dice lo mismo que el principal, en vertical (necesita la migración 0051).
+        </p>
+        <DireccionEscenario url={`${url}&formato=vertical&camara=grande&espejo=1`} />
         <ol className="list-decimal space-y-1 pl-5 text-sm text-texto-suave">
           <li>OBS → Fuentes → <strong>+</strong> → <strong>Navegador</strong>. URL: la de arriba. Ancho 1920, alto 1080. Marca «Controlar el audio a través de OBS».</li>
           <li>En YouTube Studio → <strong>Crear → Emitir en directo</strong> → copia la <strong>clave de transmisión</strong>.</li>

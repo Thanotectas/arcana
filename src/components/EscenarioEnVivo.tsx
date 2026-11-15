@@ -148,7 +148,14 @@ function Pendulo({ respuesta }: { respuesta: string }) {
  * A la hora de cierre se despide y queda la pantalla final (gracias y
  * suscríbete); si en el panel se corre la hora, vuelve a leer sola.
  */
-export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false, camaraGrande = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean; camaraGrande?: boolean }) {
+/** Lo que el escenario principal publica para el espejo. */
+type EventoEspejo =
+  | { t: "lectura"; lectura: Lectura }
+  | { t: "frase"; texto: string; audio: string | null; cierre: "abierto" | "despidiendo" | "fin" }
+  | { t: "pausa"; on: boolean }
+  | { t: "cierre"; estado: "abierto" | "despidiendo" | "fin" };
+
+export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false, camaraGrande = false, espejo = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean; camaraGrande?: boolean; espejo?: boolean }) {
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
   // los comentarios, solo lo secundario. Misma lógica (voz, fila, oráculos, relleno, cierre).
   const W = vertical ? 1080 : ANCHO;
@@ -193,6 +200,20 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
       }
     },
     [clave],
+  );
+
+  // El principal publica cada paso para el espejo (sin esperar: si falla, el principal sigue igual).
+  const pausaPublicada = useRef(false);
+  const emitir = useCallback(
+    (e: EventoEspejo) => {
+      if (espejo) return;
+      if (e.t === "pausa") {
+        if (pausaPublicada.current === e.on) return;
+        pausaPublicada.current = e.on;
+      }
+      fetch(`/api/en-vivo/espejo?clave=${encodeURIComponent(clave)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(e), keepalive: false }).catch(() => null);
+    },
+    [clave, espejo],
   );
 
   /** Reproduce la voz (o simula su duración si no hay) con subtítulos y el latido del símbolo. */
@@ -270,7 +291,69 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
     setNivel(0);
   }, []);
 
+  // Espejo: no toma consultas; repite lo que publica el escenario principal (mismo contenido, otro formato).
   useEffect(() => {
+    if (!espejo) return;
+    let activo = true;
+    (async () => {
+      let visto = -1;
+      let primero = true;
+      while (activo) {
+        let r: { seq: number; evento?: EventoEspejo | null; error?: string } | null = null;
+        try {
+          const res = await fetch(`/api/en-vivo/espejo?desde=${visto}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
+          if (res.status === 401) {
+            setAviso("Clave del escenario inválida: copia otra vez la dirección desde /admin/en-vivo.");
+            return;
+          }
+          r = res.ok ? await res.json() : null;
+        } catch {
+          r = null;
+        }
+        if (!activo) break;
+        if (r?.error === "migracion") setAviso("Espejo: falta aplicar la migración 0051 en Supabase.");
+        if (r && r.seq > visto) {
+          visto = r.seq;
+          const e = r.evento;
+          // Al abrir el espejo no se repite lo último que ya pasó (solo se toma el estado de pausa y cierre).
+          if (e && primero) {
+            if (e.t === "pausa") setPausa(e.on);
+            if (e.t === "cierre") setCierre(e.estado);
+          } else if (e?.t === "pausa") setPausa(e.on);
+          else if (e?.t === "cierre") setCierre(e.estado);
+          else if (e?.t === "frase") {
+            setPausa(false);
+            setCierre(e.cierre);
+            setLectura(null);
+            setSinVoz(!e.audio);
+            await hablar(e.texto, e.audio);
+            setSubtitulo("");
+          } else if (e?.t === "lectura") {
+            setPausa(false);
+            setCierre("abierto");
+            setSinVoz(!e.lectura.audio);
+            setLectura(e.lectura);
+            setVolteadas(0);
+            setSubtitulo("");
+            for (let n = 1; n <= (e.lectura.cartas ? 3 : 1); n++) {
+              await esperar(900);
+              setVolteadas(n);
+            }
+            await esperar(600);
+            await hablar(e.lectura.texto, e.lectura.audio);
+          }
+        }
+        primero = false;
+        await esperar(700);
+      }
+    })();
+    return () => {
+      activo = false;
+    };
+  }, [espejo, clave, hablar]);
+
+  useEffect(() => {
+    if (espejo) return;
     let activo = true;
     const puentes = new Map<number, { texto: string; audio: string | null }>();
     (async () => {
@@ -291,6 +374,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         if (!frase || !activo) return;
         cierres.set(i, frase);
         setSinVoz(!frase.audio);
+        emitir({ t: "frase", texto: frase.texto, audio: frase.audio, cierre: "fin" });
         await hablar(frase.texto, frase.audio);
         setSubtitulo("");
       };
@@ -306,6 +390,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         puentes.set(i, frase);
         setSinVoz(!frase.audio);
         setLectura(null);
+        emitir({ t: "frase", texto: frase.texto, audio: frase.audio, cierre: "abierto" });
         await hablar(frase.texto, frase.audio);
         setSubtitulo("");
       };
@@ -329,10 +414,12 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
             setSinVoz(!r.audio);
             setLectura(null);
             setCierre("despidiendo");
+            emitir({ t: "frase", texto: r.texto, audio: r.audio, cierre: "despidiendo" });
             await hablar(r.texto, r.audio);
             setSubtitulo("");
           }
           setCierre("fin");
+          emitir({ t: "cierre", estado: "fin" });
           await esperar(4000);
           await decirCierre();
           await esperar(6000);
@@ -348,18 +435,22 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           // Se corrió la hora de cierre en el panel: Sibila sigue leyendo.
           despedida = false;
           setCierre("abierto");
+          emitir({ t: "cierre", estado: "abierto" });
         }
         if (r?.clase === "pausa") {
           // Habla el presentador: silencio, sin frases de espera.
           setPausa(true);
+          emitir({ t: "pausa", on: true });
           await esperar(1500);
           continue;
         }
         setPausa(false);
+        emitir({ t: "pausa", on: false });
         if (r?.clase === "lectura") {
           quietos = 0;
           setSinVoz(!r.audio);
           setLectura(r);
+          emitir({ t: "lectura", lectura: r });
           setVolteadas(0);
           setSubtitulo("");
           for (let n = 1; n <= (r.cartas ? 3 : 1); n++) {
@@ -375,6 +466,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
             const e = await pedir("estado");
             if (e?.clase !== "pausa") break;
             setPausa(true);
+            emitir({ t: "pausa", on: true });
             await esperar(1500);
           }
           setPausa(false);
@@ -389,7 +481,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
     return () => {
       activo = false;
     };
-  }, [pedir, hablar]);
+  }, [pedir, hablar, emitir, espejo]);
 
   const tipo = lectura?.tipo ?? "tarot";
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).

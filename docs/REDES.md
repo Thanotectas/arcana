@@ -599,3 +599,13 @@ correos, el cierre de los videos y el QR impreso. Migración `0049_hub_redes.sql
   («mi arcana punto com, barra, redes»); la descripción del Short diario (`?ref=youtube-short`); y el pie de
   todos los correos a personas (`?ref=correo-pie`, `conPieRedes` en `src/lib/correo.ts`; los avisos internos a
   la administración van sin pie).
+
+### Escenario espejo: YouTube y TikTok a la vez (15 nov 2026, migración 0051)
+
+Para transmitir a dos plataformas sin que Sibila lea cosas distintas en cada una: un solo escenario PRINCIPAL toma las
+consultas (el de siempre, en OBS → YouTube) y publica cada paso en `en_vivo_espejo` (POST /api/en-vivo/espejo: la
+lectura con su voz, cada frase, la pausa y el cierre). El ESPEJO (`&espejo=1`, en /admin/en-vivo la dirección vertical
+con cámara grande) no toma consultas: cada 0,7 s pregunta si hay algo nuevo y lo repite (mismas cartas, gráfico,
+subtítulos y voz, ~1 s después). Al abrirse no repite lo que ya pasó. Cada aplicación captura el audio de su propia
+fuente, así que no se mezclan. Las preguntas de TikTok se siguen pasando a mano («Agregar una consulta»).
+Sin la migración 0051 el principal funciona igual y el espejo muestra el aviso «falta aplicar la migración 0051».

@@ -516,6 +516,12 @@ export type Database = {
         Update: Partial<EnVivoPreguntaRow>;
         Relationships: [];
       };
+      en_vivo_espejo: {
+        Row: { id: number; seq: number; evento: Json | null; actualizado_en: string };
+        Insert: { id?: number; seq?: number; evento?: Json | null; actualizado_en?: string };
+        Update: Partial<{ id: number; seq: number; evento: Json | null; actualizado_en: string }>;
+        Relationships: [];
+      };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
         Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "actualizado_en">;

@@ -1,0 +1,15 @@
+GUÍA · DIRECTO EN YOUTUBE Y TIKTOK AL MISMO TIEMPO (escenario espejo)
+
+UNA SOLA VEZ: aplicar en Supabase → SQL Editor el archivo supabase/migrations/0051_en_vivo_espejo.sql (Run).
+
+1. OBS → YouTube (como siempre): fuente Navegador con la PRIMERA dirección de miarcana.com/admin/en-vivo (horizontal).
+   Este es el escenario PRINCIPAL: toma las preguntas del chat de YouTube y las que agregues a mano.
+2. TikTok LIVE Studio → fuente «Enlace» con la dirección «…&formato=vertical&camara=grande&espejo=1» (la última de
+   /admin/en-vivo). W 1080, H 1920, «Activar sonido» y «Mantener siempre activa». Este es el ESPEJO: muestra y dice
+   lo mismo que el principal, un segundo después, en vertical.
+3. En LIVE Studio, tu cámara encima del recuadro grande «Aquí va tu cámara» (así TikTok no lo marca como pregrabado).
+4. Nunca abras dos escenarios PRINCIPALES (sin &espejo=1): cada uno tomaría preguntas distintas de la fila.
+5. Preguntas de TikTok: «Agregar una consulta» en /admin/en-vivo; el principal las lee y el espejo las repite.
+6. Pausa para el presentador: vale para los dos (el espejo también calla).
+7. Audífonos puestos: OBS y LIVE Studio toman cada uno el sonido de su propia fuente.
+8. Primero inicia OBS (YouTube) y después LIVE Studio (TikTok): el espejo empieza con la siguiente frase o lectura.
