@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { escenarioActivo } from "@/lib/en-vivo";
-import { DIRECTO_TIKTOK, PROXIMO_DIRECTO, ZONA_DIRECTO, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
+import { DIRECTO_TIKTOK, PROXIMO_DIRECTO, ZONA_DIRECTO, diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 import { FormularioVivo } from "@/components/FormularioVivo";
 import { GRUPO_FACEBOOK, CANAL_WHATSAPP } from "@/lib/marca/redes";
 
@@ -81,6 +81,12 @@ export default async function PaginaVivo() {
             🔔 Activar el recordatorio en YouTube
           </a>
           <p className="text-xs text-texto-suave">En YouTube pulsa «Notificarme»: te avisa cuando empiece. A esa hora, este mismo enlace te lleva al directo.</p>
+          {diasParaDirecto() === 0 && (
+            <div className="border-t border-borde pt-4 text-left">
+              <p className="mb-3 text-center text-sm text-texto">Deja desde ya tu pregunta o la foto de tu vaso: entra a la fila y Sibila la lee esta noche, con tu nombre.</p>
+              <FormularioVivo />
+            </div>
+          )}
           <div className="space-y-2 border-t border-borde pt-4 text-left text-sm">
             <p className="text-xs uppercase tracking-widest text-texto-suave">Tú eliges qué leer · escríbelo en el chat</p>
             <p>

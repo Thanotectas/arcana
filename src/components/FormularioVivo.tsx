@@ -22,6 +22,7 @@ const OPCIONES = {
   huevo: { icono: "🥚", nombre: "Mi limpia con huevo", ayuda: "Toma la foto del vaso de lado, a la altura del agua y con buena luz, que se vean la yema y los hilos de la clara." },
   chocolate: { icono: "☕", nombre: "Mi taza de chocolate", ayuda: "Tómate el chocolate, inclina la taza y toma la foto desde arriba, con buena luz, mostrando el fondo con los restos." },
   mano: { icono: "✋", nombre: "Mi mano", ayuda: "Abre la palma de tu mano dominante, con buena luz, y toma la foto de frente. Solo la mano." },
+  pregunta: { icono: "🔮", nombre: "Solo mi pregunta", ayuda: "Escribe tu signo y tu pregunta (o «carta astral + fecha, hora y ciudad»). Sibila te la lee en el directo, con tu nombre." },
 } as const;
 export function FormularioVivo() {
   const [tipo, setTipo] = useState<keyof typeof OPCIONES>("huevo");
@@ -41,7 +42,7 @@ export function FormularioVivo() {
 
   return (
     <form action={enviar} className="space-y-5">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {(Object.keys(OPCIONES) as (keyof typeof OPCIONES)[]).map((t) => (
           <label key={t} className={`cursor-pointer rounded-2xl border p-4 text-center transition ${tipo === t ? "border-oro bg-oro/10 text-oro-suave" : "border-borde text-texto-suave"}`}>
             <input type="radio" name="tipo" value={t} checked={tipo === t} onChange={() => setTipo(t)} className="sr-only" />
@@ -53,21 +54,23 @@ export function FormularioVivo() {
       <p className="text-sm text-texto-suave">
         {OPCIONES[tipo].ayuda}
       </p>
-      <label className="block space-y-1 text-sm">
-        <span className="text-texto-suave">Foto</span>
-        <input type="file" name="foto" accept="image/*" capture="environment" required className="block w-full text-sm" />
-      </label>
+      {tipo !== "pregunta" && (
+        <label className="block space-y-1 text-sm">
+          <span className="text-texto-suave">Foto</span>
+          <input type="file" name="foto" accept="image/*" capture="environment" required className="block w-full text-sm" />
+        </label>
+      )}
       <label className="block space-y-1 text-sm">
         <span className="text-texto-suave">Tu nombre (como quieres que Sibila te llame)</span>
         <input name="nombre" maxLength={40} required className="campo w-full" />
       </label>
       <label className="block space-y-1 text-sm">
-        <span className="text-texto-suave">Tu pregunta (opcional) y tu signo</span>
-        <input name="pregunta" maxLength={200} placeholder="Ej: Soy Leo, ¿qué viene en el amor?" className="campo w-full" />
+        <span className="text-texto-suave">{tipo === "pregunta" ? "Tu signo y tu pregunta" : "Tu pregunta (opcional) y tu signo"}</span>
+        <input name="pregunta" maxLength={200} required={tipo === "pregunta"} placeholder="Ej: Soy Leo, ¿qué viene en el amor?" className="campo w-full" />
       </label>
       <label className="flex items-start gap-2 text-sm text-texto-suave">
         <input type="checkbox" name="acepto" className="mt-1" required />
-        Acepto que mi foto y mi nombre se muestren en el directo de Arcana. La foto se borra después de la lectura.
+        {tipo === "pregunta" ? "Acepto que mi nombre y mi pregunta se lean en el directo de Arcana." : "Acepto que mi foto y mi nombre se muestren en el directo de Arcana. La foto se borra después de la lectura."}
       </label>
       {estado.error && <Aviso>{estado.error}</Aviso>}
       <BotonEnviar className="boton boton-primario w-full" cargando="Enviando…">

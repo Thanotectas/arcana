@@ -10,7 +10,7 @@ import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
-import { estadoTikTok } from "@/lib/marca/directo";
+import { diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 
 export interface EstadoEnVivo {
   error?: string;
@@ -25,20 +25,44 @@ const POR_HORA = 2;
  * cola de Sibila. Solo mientras el escenario está transmitiendo, y máximo dos
  * por hora por persona.
  */
+/** Se reciben consultas desde /vivo el día de un directo (YouTube o TikTok, desde 12 h antes) o con el escenario al aire. */
+async function recibeConsultas(admin: ReturnType<typeof getSupabaseAdmin>) {
+  const youtubeHoy = estadoDirecto() === "en-vivo" || (estadoDirecto() === "proximo" && diasParaDirecto() === 0);
+  return youtubeHoy || Boolean(estadoTikTok()) || (await escenarioActivo(admin));
+}
+
+/** Pregunta escrita en /vivo (sin foto), por ejemplo de quien llega desde TikTok o Facebook: entra a la fila como el chat. */
+async function preguntaSinFoto(nombre: string, pregunta: string): Promise<EstadoEnVivo> {
+  if (pregunta.length < 6) return { error: "Escribe tu signo y tu pregunta." };
+  const admin = getSupabaseAdmin();
+  if (!(await recibeConsultas(admin))) return { error: "En este momento no hay directo. Mira los horarios en Instagram @miarcana.oficial, o haz tu lectura en miarcana.com." };
+  const h = await headers();
+  const huella = huellaDe(h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida");
+  const { count } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("huella", huella).gte("creado_en", new Date(Date.now() - 3_600_000).toISOString());
+  if ((count ?? 0) >= POR_HORA) return { error: "Ya enviaste tus preguntas de esta hora. ¡Gracias! Sibila las lee en orden." };
+  const tipo = (tipoDeMensaje(pregunta) ?? "tarot") as TipoLectura;
+  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina" as const, tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, huella });
+  if (error) return { error: "No se pudo enviar. Intenta de nuevo." };
+  const { count: antes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
+  return { mensaje: `¡Listo, ${nombre}! Tu pregunta está en la fila${antes && antes > 1 ? ` (hay ${antes - 1} antes de ti)` : ""}. Entra al directo: Sibila te va a nombrar.` };
+}
+
 export async function accionFotoEnVivo(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
   const elegido = formData.get("tipo");
+  const soloPregunta = elegido === "pregunta";
   const tipo: TipoLectura = elegido === "mano" ? "mano" : elegido === "huevo" ? "huevo" : "chocolate";
   const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 40);
   const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 200);
   const foto = formData.get("foto");
-  if (formData.get("acepto") !== "on") return { error: "Para leerla en el directo, acepta que se muestren tu foto y tu nombre." };
+  if (formData.get("acepto") !== "on") return { error: soloPregunta ? "Para leerla en el directo, acepta que se lean tu nombre y tu pregunta." : "Para leerla en el directo, acepta que se muestren tu foto y tu nombre." };
   if (nombre.length < 2) return { error: "Escribe tu nombre (o como quieres que Sibila te llame)." };
+  if (soloPregunta) return preguntaSinFoto(nombre, pregunta);
   if (!(foto instanceof File) || !foto.size) return { error: "Toma o elige la foto." };
   if (foto.size > 4 * 1024 * 1024) return { error: "La foto pesa demasiado." };
 
   const admin = getSupabaseAdmin();
   // Durante el directo, o desde antes el día de un directo de TikTok (la foto espera en la fila).
-  if (!estadoTikTok() && !(await escenarioActivo(admin))) return { error: "En este momento no hay directo. Mira los horarios en Instagram @miarcana.oficial, o haz tu lectura en miarcana.com." };
+  if (!(await recibeConsultas(admin))) return { error: "En este momento no hay directo. Mira los horarios en Instagram @miarcana.oficial, o haz tu lectura en miarcana.com." };
 
   const h = await headers();
   const huella = huellaDe(h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida");

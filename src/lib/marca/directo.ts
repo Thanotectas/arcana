@@ -10,7 +10,7 @@ export const PROXIMO_DIRECTO = {
   // Enlace del canal en vivo: siempre lleva al directo activo, aunque haya que crear otra emisión.
   url: "https://www.youtube.com/@miarcana/live",
   // Emisión programada en YouTube Studio: antes del directo muestra la cuenta regresiva y el botón «Notificarme».
-  // Emisión programada en YouTube Studio: antes del directo muestra la cuenta regresiva y el botón «Notificarme».
+  // Emisión programada en YouTube Studio (null: el botón lleva al canal en vivo). Al programarla, pegar aquí su enlace.
   emision: "https://youtube.com/live/4MOgSv2TN_4" as string | null,
   codigo: { codigo: "SIBILA", creditosExtra: 2 } as { codigo: string; creditosExtra: number } | null,
   video: "directo",
