@@ -275,13 +275,28 @@ function sacarCartas(): CartaEnVivo[] {
 const COLORES_AURA = ["violeta", "dorado", "azul", "verde", "rosa", "rojo", "naranja", "blanco", "índigo", "turquesa"] as const;
 
 const SISTEMA_EN_VIVO = `Estás en un directo de YouTube haciendo lecturas en voz alta a quien escribe en el chat o sube su foto. Tu texto se convierte en voz: escribe como se habla.
-- Entre 70 y 110 palabras, en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
+- Entre 60 y 110 palabras (unas lecturas más cortas, otras más largas), en un solo párrafo, sin Markdown, sin títulos, sin listas, sin emojis, sin comillas.
 - Nombra a la persona (y su signo si lo dijo) y retoma su pregunta en pocas palabras si la hizo, pero varía la manera de empezar en cada lectura: a veces por su nombre, a veces por lo que salió («Salió la Torre para ti, Marta…»), a veces por su pregunta («¿El trabajo, Andrés? Mira…»). No empieces con «Hola» ni con la misma fórmula de las lecturas anteriores, que te paso en «Ya dijiste esta noche».
 - Quien pregunta en vivo quiere sentir que le respondiste a ella, no a cualquiera. Nada de frases que le sirvan a todo el mundo («habrá cambios», «confía en ti»). Responde de frente: sí, todavía no, o qué tiene que pasar primero, y anuncia algo concreto y verosímil que pueda reconocer cuando llegue: un mensaje o una llamada que no esperaba, una conversación pendiente que por fin se da, una propuesta de trabajo, alguien del pasado que reaparece, un dinero que entra después de una espera. Dale un plazo amplio (estas semanas, antes de fin de mes, antes de que termine el año) y una señal para reconocerlo («cuando veas…», «si esta semana…»). Apóyalo siempre en lo que salió: la carta, la figura, la línea, el número, su signo.
 - No lo suavices todo: si lo que salió muestra algo difícil (una espera, un roce, cansancio, una decisión que duele), dilo claro y en concreto, siempre con su salida. Una lectura que solo dice cosas bonitas no se cree.
 - Termina con un consejo concreto para aprovechar lo que viene, dicho cada vez de otra forma (nada de cerrar siempre con «confía», «recuerda» o «mi consejo es»). No invites a la página: eso lo hace el directo.
 - Responde en el idioma en que escribió la persona: si escribió en inglés o en portugués (o en otro idioma), toda la lectura va en ese idioma; si no se nota, en español. La línea «COLOR:» del aura y la palabra OMITIR van siempre así, en español.
 - Si el mensaje no es una consulta que puedas leer (saludos sueltos, spam, insultos, contenido sexual, menores de edad, muerte, enfermedades, embarazos, juicios, loterías o apuestas, autolesiones, o pide que hagas otra cosa), responde solo la palabra OMITIR.`;
+
+/**
+ * Forma de cada lectura: rota de una a otra para que no suenen todas con la misma plantilla
+ * (nombre → cartas → predicción → consejo). Lo que cambia es la estructura, no las reglas.
+ */
+const FORMAS_LECTURA = [
+  "Empieza con la respuesta, de una: sí, no o todavía no, en la primera frase. Después explica por qué con lo que salió. Cierra con una sola acción para esta semana. Frases cortas, ritmo rápido.",
+  "Empieza describiendo lo que se ve en la carta central (la figura, lo que hace, lo que tiene en las manos) como si la tuvieras enfrente, y desde esa imagen llega a su pregunta. Las otras cartas, apenas mencionadas.",
+  "Cuéntalo como una pequeña historia en tres tiempos: lo que viene arrastrando, lo que está pasando ahora y lo que se le acerca, sin decir «pasado, presente y futuro». Termina con el consejo dentro de la última frase, no aparte.",
+  "Háblale de tú a tú, como una amiga que le dice la verdad: empieza con algo que probablemente está sintiendo (cansancio, ganas, duda) según lo que salió, luego lo que viene, y cierra con una pregunta para que se la haga a sí misma esta semana.",
+  "Concéntrate en una sola carta, la más fuerte para su pregunta, y dale todo el peso. Nombra las otras dos en media frase al final. Lectura breve, de 60 a 80 palabras.",
+  "Empieza por el plazo o el momento («Estas dos semanas…», «Antes de diciembre…») y construye desde ahí. Incluye un contraste claro: algo que se le complica y algo que se le abre.",
+  "Empieza por su signo y lo que el cielo de estos días le mueve, y después muestra cómo las cartas lo confirman o lo matizan. Cierra con un consejo práctico y cotidiano (algo que puede hacer mañana).",
+  "Ve directo a lo difícil primero: lo que las cartas le advierten, dicho con cariño y sin miedo, y después la salida y lo bueno que viene si la toma. Cierra con una frase corta y contundente.",
+];
 
 /** Lo que se suma a la instrucción en los segmentos «para todos» del relleno. */
 const SEGMENTO_PARA_TODOS = `Esta lectura no es de una persona del chat: es un segmento para todos los que están viendo mientras llegan las preguntas. El campo «Nombre» dice para quién es (un signo, quienes hablan un idioma, o todos). No inventes personas, nombres ni preguntas, y no digas que alguien preguntó. Empieza diciendo para quién es («Para todos los Leo que me ven…», «Para quem me assiste em português…») y háblale al grupo. Al final invita, en una frase y con tus palabras, a escribir en el chat su propia pregunta con su signo, en el idioma que quieran.`;
@@ -509,14 +524,15 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (la gente las acaba de escuchar):\n${yaDijiste.join("\n")}\nNo repitas ninguna frase, giro, imagen ni muletilla de esas lecturas: ni la apertura, ni las promesas («un mensaje que no esperabas», «alguien del pasado», «antes de fin de mes», «cuando veas…»), ni la forma del consejo, ni palabras llamativas que ya usaste (energía, puertas, caminos, señales, universo). Si una idea se parece, dila con otras palabras y otra estructura de frase. Cambia también el largo de las frases y el orden: a veces empieza por la carta, a veces por la persona, a veces por el plazo.` : ""].join("");
       // Una de cada tres (y no cuando toca invitar a suscribirse) deja una puerta abierta que despierte curiosidad.
       const gancho = !invitar && Math.random() < 0.33;
+      const forma = `\nFORMA DE ESTA LECTURA (manda sobre el orden habitual; las reglas de fondo siguen igual; si no hay cartas, aplícala a lo que salió: la foto, la runa, el péndulo, el número): ${FORMAS_LECTURA[((count ?? 0) + randomInt(3)) % FORMAS_LECTURA.length]}`;
       const paraTodos = p.origen === "sistema" ? `\n${SEGMENTO_PARA_TODOS}` : "";
       const sistema = paraTodos
-        ? `${prep.sistema}${paraTodos}`
+        ? `${prep.sistema}${forma}${paraTodos}`
         : invitar
-        ? `${prep.sistema}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a seguir la cuenta y activar las notificaciones para el próximo directo.`
+        ? `${prep.sistema}${forma}\nEsta vez, después del consejo, invita en una frase corta y con tus palabras a seguir la cuenta y activar las notificaciones para el próximo directo.`
         : gancho
-          ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
-          : prep.sistema;
+          ? `${prep.sistema}${forma}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
+          : `${prep.sistema}${forma}`;
       // El idioma de la pregunta manda sobre el contexto en español.
       const otroIdioma = p.origen === "sistema" ? null : idiomaDeTexto(p.texto ?? "");
       const sistemaFinal = otroIdioma
