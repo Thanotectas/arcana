@@ -1,4 +1,7 @@
 import "server-only";
+import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
+import { pareceConsulta, tipoDeMensaje } from "@/lib/en-vivo";
+import { PROXIMO_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
 import { VOZ_NATURAL } from "./voz-sibila";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -255,6 +258,25 @@ async function subirFotoMarcada(admin: SupabaseClient<Database>, idMeta: string,
   }
 }
 
+/** Pone en la fila del directo la consulta de un comentario del aviso y arma la invitación a entrar (sin enlaces: es Facebook). */
+async function encolarDelAviso(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
+  const nombre = (i.remitente ?? "").split(/\s+/)[0] || "";
+  const texto = i.texto.trim();
+  const alAire = estadoDirecto() === "en-vivo";
+  const cuando = alAire ? "Ya estamos en vivo" : `Hoy a las ${new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", hour: "numeric", minute: "2-digit" }).format(new Date(PROXIMO_DIRECTO.inicio))} (Colombia)`;
+  if (i.imagen && !texto) return `${nombre ? `${nombre}, ` : ""}¡qué bueno que la compartes! 🔮 Para que Sibila la lea en el directo, súbela en miarcana punto com barra vivo. ${cuando} en YouTube: búscanos como @miarcana.`;
+  if (!pareceConsulta(texto)) return `${nombre ? `¡Gracias, ${nombre}! ` : "¡Gracias! "}${cuando} te espero en YouTube (@miarcana) 🔮 Déjame aquí tu signo y tu pregunta y te la leo en vivo.`;
+  const tipo = tipoDeMensaje(texto) ?? "tarot";
+  await admin.from("en_vivo_preguntas").upsert(
+    { mensaje_id: `fbp:${i.idMeta}`, origen: "facebook" as const, tipo, autor: (i.remitente ?? "Alguien en Facebook").slice(0, 60), texto: texto.slice(0, 300), signo: detectarSigno(texto)?.id ?? null },
+    { onConflict: "mensaje_id", ignoreDuplicates: true },
+  );
+  const variantes = alAire
+    ? [`¡Anotada${nombre ? `, ${nombre}` : ""}! 🔮 Ya estamos en vivo en YouTube: búscanos como @miarcana, que tu lectura viene en la fila.`, `${nombre ? `${nombre}, ` : ""}tu pregunta ya está en la fila ✨ Entra ahora a YouTube (@miarcana) para escucharla en vivo, con tu nombre.`]
+    : [`¡Anotada${nombre ? `, ${nombre}` : ""}! 🔮 ${cuando} te la leo en vivo en YouTube: búscanos como @miarcana y activa el recordatorio.`, `${nombre ? `${nombre}, ` : ""}tu pregunta quedó en la fila ✨ ${cuando} la escuchas en vivo, con tu nombre, en YouTube (@miarcana).`];
+  return variantes[Math.floor(Math.random() * variantes.length)];
+}
+
 export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
   const textoGuardado = (i.imagen ? `${MARCA_FOTO} ${i.texto}` : i.texto).trim();
   const { error } = await admin.from("interacciones_redes").insert({ red: i.red, tipo: i.tipo, id_meta: i.idMeta, remitente_id: i.remitenteId, remitente: i.remitente, objeto_id: i.objetoId, texto: textoGuardado.slice(0, 4000) });
@@ -276,6 +298,14 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   if (i.tipo === "comentario" && i.objetoId && (await cuantasHoy(admin, { red: i.red, remitente_id: i.remitenteId, objeto_id: i.objetoId })) >= MAXIMO_POR_PERSONA_Y_PUBLICACION) {
     await marcar("omitida", { detalle: "ya se le respondió en esta publicación" });
     return "repetido";
+  }
+
+  // Comentario en la publicación que anuncia el directo: no se lee aquí. La consulta entra a la fila del directo y la
+  // respuesta invita a entrar a verlo (la lectura se escucha en vivo, con su nombre).
+  let respuestaDirecto: string | null = null;
+  if (i.tipo === "comentario" && i.red === "facebook" && i.objetoId) {
+    const aviso = await publicacionDelDirecto().catch(() => null);
+    if (aviso && aviso.id === i.objetoId) respuestaDirecto = `${await encolarDelAviso(admin, i)}\n\n— Sibila, de Arcana 🔮`;
   }
 
   const signo = detectarSigno(i.texto);
@@ -305,7 +335,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // La foto (una limpia con huevo, casi siempre): lectura corta con la imagen, dentro del tope diario.
   let foto: ImagenEntrada | null = null;
   let respuestaFija = false;
-  if (i.imagen) {
+  if (i.imagen && !respuestaDirecto) {
     if (process.env.REDES_FOTOS === "0" || (await fotosHoy(admin)) >= MAXIMO_FOTOS_DIA) respuestaFija = true;
     else foto = await descargarFoto(i.imagen);
     if (!foto && !i.texto.trim()) respuestaFija = true;
@@ -313,7 +343,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
 
   let respuesta: string;
   try {
-    if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
+    if (respuestaDirecto) respuesta = respuestaDirecto;
+    else if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
