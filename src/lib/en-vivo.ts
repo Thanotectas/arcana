@@ -497,14 +497,16 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const q = normalizar(p);
       const prep = await preparar(admin, q, signo);
       // Para que no suene automático: cómo empezaron y cerraron las últimas lecturas de la noche.
-      const { data: previas } = await admin.from("en_vivo_preguntas").select("lectura").eq("estado", "leida").gte("leida_en", inicioDia.toISOString()).order("leida_en", { ascending: false }).limit(5);
-      const yaDijiste = (previas ?? [])
-        .map((x) => x.lectura?.trim() ?? "")
-        .filter(Boolean)
-        .map((l) => `- empezó «${l.split(/\s+/).slice(0, 8).join(" ")}…» y cerró «…${l.split(/\s+/).slice(-8).join(" ")}»`);
+      const { data: previas } = await admin.from("en_vivo_preguntas").select("lectura").eq("estado", "leida").gte("leida_en", inicioDia.toISOString()).order("leida_en", { ascending: false }).limit(8);
+      const textosPrevios = (previas ?? []).map((x) => x.lectura?.trim() ?? "").filter(Boolean);
+      // Las cuatro últimas, completas (para no repetir giros de en medio), y de las anteriores, cómo empezaron y cerraron.
+      const yaDijiste = [
+        ...textosPrevios.slice(0, 4).map((l) => `- «${l}»`),
+        ...textosPrevios.slice(4).map((l) => `- empezó «${l.split(/\s+/).slice(0, 8).join(" ")}…» y cerró «…${l.split(/\s+/).slice(-8).join(" ")}»`),
+      ];
       // Cada cuarta lectura de la noche, Sibila invita a suscribirse, con sus palabras (sin pedirlo a cambio de nada).
       const invitar = (count ?? 0) % 4 === 3;
-      const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (no repitas esas aperturas ni esos cierres):\n${yaDijiste.join("\n")}` : ""].join("");
+      const entrada = [prep.entrada, yaDijiste.length ? `\nYa dijiste esta noche (la gente las acaba de escuchar):\n${yaDijiste.join("\n")}\nNo repitas ninguna frase, giro, imagen ni muletilla de esas lecturas: ni la apertura, ni las promesas («un mensaje que no esperabas», «alguien del pasado», «antes de fin de mes», «cuando veas…»), ni la forma del consejo, ni palabras llamativas que ya usaste (energía, puertas, caminos, señales, universo). Si una idea se parece, dila con otras palabras y otra estructura de frase. Cambia también el largo de las frases y el orden: a veces empieza por la carta, a veces por la persona, a veces por el plazo.` : ""].join("");
       // Una de cada tres (y no cuando toca invitar a suscribirse) deja una puerta abierta que despierte curiosidad.
       const gancho = !invitar && Math.random() < 0.33;
       const paraTodos = p.origen === "sistema" ? `\n${SEGMENTO_PARA_TODOS}` : "";
