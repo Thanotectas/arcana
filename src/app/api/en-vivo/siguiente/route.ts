@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { audioCierre, audioPuente, claveValida, despedida, enPausa, estadoCierre, latido, lecturaDeRelleno, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
-import { sincronizarFacebook } from "@/lib/en-vivo-facebook";
+import { sincronizarAvisoFacebook, sincronizarFacebook } from "@/lib/en-vivo-facebook";
 
 // Escribir la lectura y narrarla toma unos segundos.
 export const maxDuration = 60;
@@ -43,6 +43,11 @@ export async function GET(request: NextRequest) {
     }),
     sincronizarFacebook(admin).catch((e: unknown) => {
       console.error("[en vivo] facebook:", e instanceof Error ? e.message : e);
+      return null;
+    }),
+    // Los comentarios de la publicación que anuncia el directo en la página también entran (cada 20 s).
+    sincronizarAvisoFacebook(admin).catch((e: unknown) => {
+      console.error("[en vivo] aviso de facebook:", e instanceof Error ? e.message : e);
       return null;
     }),
   ]);

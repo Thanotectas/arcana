@@ -609,3 +609,12 @@ con cámara grande) no toma consultas: cada 0,7 s pregunta si hay algo nuevo y l
 subtítulos y voz, ~1 s después). Al abrirse no repite lo que ya pasó. Cada aplicación captura el audio de su propia
 fuente, así que no se mezclan. Las preguntas de TikTok se siguen pasando a mano («Agregar una consulta»).
 Sin la migración 0051 el principal funciona igual y el espejo muestra el aviso «falta aplicar la migración 0051».
+
+### Comentarios de la publicación de aviso en Facebook (16 nov 2026)
+
+Mientras la página no pueda transmitir en vivo, la gente de Facebook participa comentando la publicación que anuncia el
+directo. Con el escenario prendido, cada 20 s (`sincronizarAvisoFacebook` en `src/lib/en-vivo-facebook.ts`) se busca la
+publicación de la página de las últimas 20 horas que diga «en vivo», «directo» o «live», y sus comentarios que parecen
+consulta (signo, pregunta, fecha, carta astral…) entran a la fila con origen «facebook» y `mensaje_id` `fbp:<id>` (una
+sola vez cada uno; los de la página no). Sirven también los comentarios hechos antes de empezar. /admin/en-vivo muestra
+si encontró la publicación. Usa el mismo token de la página (META_PAGE_TOKEN).

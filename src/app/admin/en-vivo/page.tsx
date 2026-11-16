@@ -6,6 +6,7 @@ import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoD
 import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
+import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
 import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
@@ -32,6 +33,7 @@ export default async function PaginaAdminEnVivo() {
   const fila = filaGuardada?.map(normalizar);
   const leidas = leidasGuardadas?.map(normalizar);
   const codigos = await listarCodigos(admin);
+  const aviso = await publicacionDelDirecto().catch(() => null);
   const proximoDomingo = venceSugerido();
   const fechaHora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "no vence");
   const url = `${sitio()}/en-vivo/escenario?clave=${claveEscenario()}`;
@@ -66,6 +68,10 @@ export default async function PaginaAdminEnVivo() {
               : estado?.fb_live_id
                 ? "encontrado: leyendo los comentarios"
                 : `no encontrado todavía${estado?.fb_detalle ? ` (${estado.fb_detalle})` : " (se busca solo cuando el escenario está prendido)"}`}
+          </li>
+          <li className="flex items-center gap-2">
+            {punto(Boolean(aviso))} Publicación de aviso en Facebook{" "}
+            {aviso ? `encontrada («${aviso.texto}…»): sus comentarios con signo o pregunta entran a la fila` : "no encontrada (publica en la página, en las últimas 20 horas, un aviso que diga «EN VIVO»)"}
           </li>
           <li className="text-texto-suave">Lecturas hoy: {leidasHoy ?? 0} de {maximoDiario()} (tope diario por gasto de voz)</li>
         </ul>

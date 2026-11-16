@@ -120,3 +120,41 @@ export async function sincronizarFacebook(admin: Admin): Promise<EstadoFacebook>
   await guardar({ fb_desde: new Date(masReciente).toISOString(), fb_detalle: null });
   return { configurado: true, directo: true, nuevas };
 }
+
+// ───────────── Comentarios de la publicación de aviso ─────────────
+// Mientras no se pueda transmitir en Facebook, la gente de la página comenta en la publicación que anuncia el
+// directo («HOY EN VIVO…»). Con el escenario prendido, los comentarios de esa publicación que parecen consulta
+// entran a la misma fila (origen «facebook»), una sola vez cada uno.
+
+/** La publicación de la página de las últimas 20 horas que anuncia el directo (dice «en vivo» o «directo»). */
+export async function publicacionDelDirecto(): Promise<{ id: string; texto: string } | null> {
+  if (!metaConfigurado()) return null;
+  const pagina = await paginaMeta();
+  const desde = Math.floor((Date.now() - 20 * 3_600_000) / 1000);
+  const r = await graph<{ data?: { id: string; message?: string; created_time?: string }[] }>(`${pagina.id}/posts?fields=id,message,created_time&since=${desde}&limit=15`, pagina.token);
+  const p = (r.data ?? []).find((x) => /en\s*vivo|directo|live/i.test(x.message ?? ""));
+  return p ? { id: p.id, texto: (p.message ?? "").slice(0, 80) } : null;
+}
+
+let ultimaRevisionAviso = 0;
+
+export async function sincronizarAvisoFacebook(admin: Admin): Promise<{ publicacion: string | null; nuevas: number }> {
+  if (!metaConfigurado() || Date.now() - ultimaRevisionAviso < 20_000) return { publicacion: null, nuevas: 0 };
+  ultimaRevisionAviso = Date.now();
+  const aviso = await publicacionDelDirecto();
+  if (!aviso) return { publicacion: null, nuevas: 0 };
+  const pagina = await paginaMeta();
+  const r = await graph<{ data?: Comentario[] }>(`${aviso.id}/comments?filter=stream&order=reverse_chronological&fields=id,message,created_time,from{id,name}&limit=100`, pagina.token);
+  const filas = [];
+  for (const c of r.data ?? []) {
+    const texto = (c.message ?? "").trim();
+    if (c.from?.id === pagina.id || !pareceConsulta(texto)) continue;
+    const tipo = tipoDeMensaje(texto);
+    if (!tipo) continue;
+    filas.push({ mensaje_id: `fbp:${c.id}`, origen: "facebook" as const, tipo, autor: (c.from?.name ?? "Alguien en Facebook").slice(0, 60), texto: texto.slice(0, 300), signo: detectarSigno(texto)?.id ?? null });
+  }
+  if (!filas.length) return { publicacion: aviso.id, nuevas: 0 };
+  const { data, error } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
+  if (error) console.error("[en vivo] aviso de facebook:", error.message);
+  return { publicacion: aviso.id, nuevas: data?.length ?? 0 };
+}
