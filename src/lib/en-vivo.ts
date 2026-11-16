@@ -88,9 +88,25 @@ const PALABRAS_IDIOMA: { codigo: "en" | "pt" | "fr" | "it" | "de"; nombre: strin
 ];
 const PALABRAS_ESPANOL = /\b(el|la|los|las|mi|mis|que|qu[eé]|c[oó]mo|cu[aá]ndo|para|con|una|un|es|me|trabajo|dinero|va|voy|soy|y|en|de|por|amor|pareja|novi[oa]|hola|gracias|vida|futuro|a[nñ]o|semana|est[aá]|ser[aá]|tengo|pregunta|lectura|plata|mes|qu[eé] me)\b/gi;
 
-export function idiomaDeTexto(texto: string): { codigo: "en" | "pt" | "fr" | "it" | "de"; nombre: string } | null {
+/** Idiomas con escritura propia: basta ver sus letras (el japonés antes que el chino, por los kana). */
+const ESCRITURAS: { letras: RegExp; codigo: string; nombre: string }[] = [
+  { letras: /[\uac00-\ud7af\u1100-\u11ff]/, codigo: "ko", nombre: "coreano (한국어)" },
+  { letras: /[\u3040-\u30ff]/, codigo: "ja", nombre: "japonés (日本語)" },
+  { letras: /[\u4e00-\u9fff]/, codigo: "zh", nombre: "chino mandarín (中文)" },
+  { letras: /[\u0400-\u04ff]/, codigo: "ru", nombre: "ruso (русский)" },
+  { letras: /[\u0600-\u06ff]/, codigo: "ar", nombre: "árabe (العربية)" },
+  { letras: /[\u0590-\u05ff]/, codigo: "he", nombre: "hebreo (עברית)" },
+  { letras: /[\u0900-\u097f]/, codigo: "hi", nombre: "hindi (हिन्दी)" },
+  { letras: /[\u0e00-\u0e7f]/, codigo: "th", nombre: "tailandés (ไทย)" },
+  { letras: /[\u0370-\u03ff]/, codigo: "el", nombre: "griego (ελληνικά)" },
+];
+const OTRA_ESCRITURA = /[\uac00-\ud7af\u3040-\u30ff\u4e00-\u9fff\u0400-\u04ff\u0600-\u06ff\u0590-\u05ff\u0900-\u097f\u0e00-\u0e7f\u0370-\u03ff]/;
+
+export function idiomaDeTexto(texto: string): { codigo: string; nombre: string } | null {
   const t = texto.trim();
   if (!t) return null;
+  const escritura = ESCRITURAS.find((e) => e.letras.test(t));
+  if (escritura) return { codigo: escritura.codigo, nombre: escritura.nombre };
   const espanol = (t.match(PALABRAS_ESPANOL) ?? []).length + (/[ñ¿¡]/.test(t) ? 3 : 0);
   let mejor: (typeof PALABRAS_IDIOMA)[number] | null = null;
   let puntos = 0;
@@ -107,7 +123,7 @@ export function pareceConsulta(texto: string) {
   if (t.length < 8 || t.length > 300) return false;
   // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
   return (
-    Boolean(detectarSigno(t)) || t.includes("?") || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
+    Boolean(detectarSigno(t)) || t.includes("?") || OTRA_ESCRITURA.test(t) || /\baura\b|numerolog|hor[oó]scop/i.test(t) || PREGUNTA_SIN_SIGNO.test(t) || PREGUNTA_OTROS_IDIOMAS.test(t) ||
     fechasEn(t).length > 0 || anioQuePide(t) !== null || PIDE_CARTA.test(t) || PIDE_SINASTRIA.test(t) || oraculoPedido(t.toLowerCase()) !== null
   );
 }
