@@ -75,6 +75,33 @@ const PREGUNTA_SIN_SIGNO = /\b((c[oó]mo|qu[eé])\s+(me|te|le|nos|voy|vamos|va|v
 /** Lo mismo en inglés y portugués (Sibila responde en el idioma en que le escriben). */
 const PREGUNTA_OTROS_IDIOMAS = /\b(what|when|will i|should i|how (is|will|do|does|can)|tell me|my (love|job|future|life)|love|boyfriend|girlfriend|relationship|job|work|career|money|business|future|family|this (week|month|year)|como (vai|vou|fica|est[aá])|o que|quando|vou|namorad[oa]|relacionamento|trabalho|emprego|dinheiro|neg[oó]cio|fam[ií]lia|essa semana|este m[eê]s)\b/i;
 
+/**
+ * Idioma de la pregunta, contado por palabras propias de cada idioma. El contexto que acompaña la lectura (cartas,
+ * horóscopo, lecturas previas) va en español y arrastraba la respuesta al español: por eso se fija aparte.
+ */
+const PALABRAS_IDIOMA: { codigo: "en" | "pt" | "fr" | "it" | "de"; nombre: string; palabras: RegExp }[] = [
+  { codigo: "en", nombre: "inglés (English)", palabras: /\b(the|my|is|are|will|what|when|how|why|who|i|i'm|you|your|me|and|for|with|should|about|love|job|work|money|future|this|can|do|does|get|going|have|has|it|of|to|in|be|please|hello|hi|thanks|reading|sign|life|week|month|year|relationship|boyfriend|girlfriend|husband|wife|taurus|gemini|scorpio|sagittarius|capricorn|aquarius)\b/gi },
+  { codigo: "pt", nombre: "portugués de Brasil (português)", palabras: /\b(voc[eê]|meu|minha|n[aã]o|vai|vou|est[aá]|t[aá]|quando|isso|essa|esse|uma|um|com|obrigad[oa]|ol[aá]|oi|trabalho|dinheiro|namorad[oa]|relacionamento|fam[ií]lia|vida|sim|tamb[eé]m|muito|ent[aã]o|ser[aá]|tenho|sou|seu|sua|pra|gente|qual|leitura|signo de)\b/gi },
+  { codigo: "fr", nombre: "francés (français)", palabras: /\b(je|mon|ma|mes|est|quand|comment|amour|travail|argent|avec|pour|une|vais|suis|et|le|les|des|pas|qui|quoi|bonjour|merci|vie|avenir|ann[eé]e|semaine)\b/gi },
+  { codigo: "it", nombre: "italiano", palabras: /\b(il|mio|mia|quando|come|amore|lavoro|soldi|sono|che|per|una|non|ciao|grazie|vita|futuro|anno|settimana|cosa|sar[aà]|gli|della|anche)\b/gi },
+  { codigo: "de", nombre: "alemán (Deutsch)", palabras: /\b(ich|mein|meine|wann|wie|liebe|arbeit|geld|ist|und|f[uü]r|mit|eine|werde|nicht|was|hallo|danke|leben|zukunft|jahr|woche|bin|habe)\b/gi },
+];
+const PALABRAS_ESPANOL = /\b(el|la|los|las|mi|mis|que|qu[eé]|c[oó]mo|cu[aá]ndo|para|con|una|un|es|me|trabajo|dinero|va|voy|soy|y|en|de|por|amor|pareja|novi[oa]|hola|gracias|vida|futuro|a[nñ]o|semana|est[aá]|ser[aá]|tengo|pregunta|lectura|plata|mes|qu[eé] me)\b/gi;
+
+export function idiomaDeTexto(texto: string): { codigo: "en" | "pt" | "fr" | "it" | "de"; nombre: string } | null {
+  const t = texto.trim();
+  if (!t) return null;
+  const espanol = (t.match(PALABRAS_ESPANOL) ?? []).length + (/[ñ¿¡]/.test(t) ? 3 : 0);
+  let mejor: (typeof PALABRAS_IDIOMA)[number] | null = null;
+  let puntos = 0;
+  for (const l of PALABRAS_IDIOMA) {
+    const n = (t.match(l.palabras) ?? []).length + (l.codigo === "pt" && /[ãõç]/i.test(t) ? 2 : 0);
+    if (n > puntos) [mejor, puntos] = [l, n];
+  }
+  if (!mejor || puntos < 2 || puntos <= espanol) return null;
+  return { codigo: mejor.codigo, nombre: mejor.nombre };
+}
+
 export function pareceConsulta(texto: string) {
   const t = texto.trim();
   if (t.length < 8 || t.length > 300) return false;
@@ -488,7 +515,12 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
         : gancho
           ? `${prep.sistema}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : prep.sistema;
-      let texto = (await generarTexto(entrada, sistema, { effort: "low", maxTokens: 500, idioma: "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
+      // El idioma de la pregunta manda sobre el contexto en español.
+      const otroIdioma = p.origen === "sistema" ? null : idiomaDeTexto(p.texto ?? "");
+      const sistemaFinal = otroIdioma
+        ? `${sistema}\nIDIOMA: la persona escribió en ${otroIdioma.nombre}. Toda la lectura, de la primera a la última palabra, va en ${otroIdioma.nombre}, aunque el contexto, las cartas y las notas lleguen en español: tradúcelo todo (nombres de cartas y signos con su nombre tradicional en ese idioma). Solo la línea «COLOR:» va en español.`
+        : sistema;
+      let texto = (await generarTexto(entrada, sistemaFinal, { effort: "low", maxTokens: 500, idioma: otroIdioma?.codigo === "en" || otroIdioma?.codigo === "pt" ? otroIdioma.codigo : "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {
