@@ -45,10 +45,18 @@ const MARCA_FOTO = "[foto]";
 const LECTURAS_POR_PERSONA = Number(process.env.REDES_LECTURAS_POR_PERSONA) || 1;
 const RESPUESTAS_POR_PERSONA_DIA = Number(process.env.REDES_RESPUESTAS_POR_PERSONA) || 3;
 const DETALLE_LIMITE = "límite por persona: llevada a la página";
-const RESPUESTA_OTRA_FOTO =
-  "¡Qué bueno verte otra vez! 💛 Tu lectura de regalo por aquí ya te la hice. Para seguir leyendo tus vasos y ver lo que viene, súbelos en miarcana.com/huevo (o miarcana.com/velas si es una vela): tu primera lectura completa es gratis al crear tu cuenta 🔮";
+/** Por si alguien escribe sin parar (hubo días de 48 mensajes): pasado esto, Sibila ya no responde ese día. */
+const TOPE_SEGURIDAD_DIA = Number(process.env.REDES_TOPE_PERSONA_DIA) || 12;
 const RESPUESTA_LIMITE =
-  "Me encantó conversar contigo 💛 Para seguir, te espero en miarcana.com: tienes tu carta del día gratis y tu primera lectura completa de regalo al crear tu cuenta. Y los domingos a las 8 p.m. leo en vivo en YouTube (@miarcana) 🔮";
+  "Me encantó conversar contigo 💛 Para seguir con calma, te espero en miarcana.com: tienes tu carta del día gratis y tu primera lectura completa de regalo al crear tu cuenta 🔮";
+const INSTRUCCION_PAGINA = (motivo: "foto" | "conversacion") => `Estás respondiendo un mensaje directo de Arcana, como Sibila, a alguien con quien ya conversaste ${motivo === "foto" ? "y a quien ya le hiciste su lectura de regalo de una foto por aquí" : "bastante hoy"}.
+Ahora ya no haces lecturas ni sigues la conversación por mensaje: con mucho cariño la llevas a seguir en la página. Así:
+- Primero, una frase cálida que responda de verdad a lo que escribió (agradece, acompaña lo que siente o celebra lo que cuenta), con su nombre si lo sabes. ${motivo === "foto" ? "Si mandó otra foto, dile que se ve que tiene ganas de seguir leyendo sus vasos, sin leerla." : "No respondas preguntas de lectura (qué significa, qué viene, si volverá): eso se ve en la página."}
+- Luego invítala, sin presión y sin sonar a regla («ya no puedo», «se acabó», «límite»: nunca), a seguir allí: ${motivo === "foto" ? "que suba su foto en miarcana.com/huevo (o miarcana.com/velas si es una vela) para ver lo que viene" : "que haga su pregunta en miarcana.com, donde Sibila le hace la lectura completa con calma"}; su primera lectura completa es gratis al crear su cuenta. Si encaja, menciona que los domingos a las 8 p.m. lee en vivo en YouTube (@miarcana).
+- Máximo 3 líneas o 320 caracteres. Un emoji como mucho. Enlaces sin https. Tutea. Cada vez con otras palabras.
+- Si el mensaje es solo un agradecimiento o una despedida, responde la despedida con calidez en una línea y deja el enlace.
+- Si es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
+${VOZ_NATURAL}`;
 /** Lo que siempre se atiende aunque la persona haya llegado al límite: pagos, cuenta, pedir a una persona. */
 const PIDE_AYUDA = /\b(hablar con (una |alguien|alg[uú]n)|persona real|humano|asesor|alguien del equipo|pago|pagu[eé]|cobr|reembols|tarjeta|cr[eé]ditos? no|mi cuenta|no me deja|no puedo entrar|error|queja)/i;
 /** Respuesta sin IA cuando no se puede leer la foto (tope del día, lectura apagada, descarga fallida). */
@@ -318,36 +326,22 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (aviso && aviso.id === i.objetoId) respuestaDirecto = `${await encolarDelAviso(admin, i)}\n\n— Sibila, de Arcana 🔮`;
   }
 
-  // Mensajes directos: una lectura y pocas respuestas por persona; después, a la página (sin IA).
-  let respuestaLimite: string | null = null;
+  // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
+  // cariño a lo que le escriben, pero corto y llevando a la página (sin leer ni alargar la conversación).
+  let modoPagina: "foto" | "conversacion" | null = null;
   if (i.tipo === "mensaje" && !PIDE_AYUDA.test(i.texto)) {
     const desde = (ms: number) => new Date(Date.now() - ms).toISOString();
     const base = () => admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "respondida").neq("id_meta", i.idMeta);
+    const { count: hoy } = await base().gte("creado_en", desde(86_400_000));
+    if ((hoy ?? 0) >= TOPE_SEGURIDAD_DIA) {
+      await marcar("omitida", { detalle: "tope de seguridad por persona en el día" });
+      return "limite";
+    }
     if (i.imagen) {
-      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).neq("respuesta", RESPUESTA_FOTO_FIJA).neq("respuesta", RESPUESTA_OTRA_FOTO).gte("creado_en", desde(30 * 86_400_000));
-      if ((lecturas ?? 0) >= LECTURAS_POR_PERSONA) respuestaLimite = RESPUESTA_OTRA_FOTO;
+      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).is("detalle", null).neq("respuesta", RESPUESTA_FOTO_FIJA).gte("creado_en", desde(30 * 86_400_000));
+      if ((lecturas ?? 0) >= LECTURAS_POR_PERSONA) modoPagina = "foto";
     }
-    if (!respuestaLimite) {
-      const { count: hoy } = await base().gte("creado_en", desde(86_400_000));
-      if ((hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) {
-        const { count: yaLlevada } = await base().eq("detalle", DETALLE_LIMITE).gte("creado_en", desde(86_400_000));
-        if (yaLlevada) {
-          await marcar("omitida", { detalle: "límite por persona: ya se le dio el enlace hoy" });
-          return "limite";
-        }
-        respuestaLimite = RESPUESTA_LIMITE;
-      }
-    }
-  }
-  if (respuestaLimite) {
-    try {
-      await enviarMensajeDirecto(i.remitenteId, respuestaLimite);
-    } catch (e) {
-      await marcar("error", { respuesta: respuestaLimite, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
-      throw e;
-    }
-    await marcar("respondida", { respuesta: respuestaLimite, detalle: DETALLE_LIMITE });
-    return "limite";
+    if (!modoPagina && (hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) modoPagina = "conversacion";
   }
 
   const signo = detectarSigno(i.texto);
@@ -377,7 +371,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // La foto (una limpia con huevo, casi siempre): lectura corta con la imagen, dentro del tope diario.
   let foto: ImagenEntrada | null = null;
   let respuestaFija = false;
-  if (i.imagen && !respuestaDirecto) {
+  if (i.imagen && !respuestaDirecto && !modoPagina) {
     if (process.env.REDES_FOTOS === "0" || (await fotosHoy(admin)) >= MAXIMO_FOTOS_DIA) respuestaFija = true;
     else foto = await descargarFoto(i.imagen);
     if (!foto && !i.texto.trim()) respuestaFija = true;
@@ -387,6 +381,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
+    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "es" }).catch(() => RESPUESTA_LIMITE);
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
   } catch (e) {
@@ -425,7 +420,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("error", { respuesta, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
     throw e;
   }
-  await marcar("respondida", { respuesta, humano: pideHumano });
+  await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : {}) });
   if (pideHumano) await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }, { rol: "asistente", contenido: respuesta }]).catch((e) => console.error("[redes aviso]", e));
   return pideHumano ? "humano" : "respondido";
 }
