@@ -41,6 +41,16 @@ const MAXIMO_POR_PERSONA_Y_PUBLICACION = 2;
 const MAXIMO_FOTOS_DIA = Number(process.env.REDES_FOTOS_DIA) || 50;
 /** Prefijo del texto guardado cuando la interacción trae foto (así se cuentan sin otra columna). */
 const MARCA_FOTO = "[foto]";
+/** Mensajes directos: una lectura de foto por persona (en 30 días) y pocas respuestas al día; después, a la página. */
+const LECTURAS_POR_PERSONA = Number(process.env.REDES_LECTURAS_POR_PERSONA) || 1;
+const RESPUESTAS_POR_PERSONA_DIA = Number(process.env.REDES_RESPUESTAS_POR_PERSONA) || 3;
+const DETALLE_LIMITE = "límite por persona: llevada a la página";
+const RESPUESTA_OTRA_FOTO =
+  "¡Qué bueno verte otra vez! 💛 Tu lectura de regalo por aquí ya te la hice. Para seguir leyendo tus vasos y ver lo que viene, súbelos en miarcana.com/huevo (o miarcana.com/velas si es una vela): tu primera lectura completa es gratis al crear tu cuenta 🔮";
+const RESPUESTA_LIMITE =
+  "Me encantó conversar contigo 💛 Para seguir, te espero en miarcana.com: tienes tu carta del día gratis y tu primera lectura completa de regalo al crear tu cuenta. Y los domingos a las 8 p.m. leo en vivo en YouTube (@miarcana) 🔮";
+/** Lo que siempre se atiende aunque la persona haya llegado al límite: pagos, cuenta, pedir a una persona. */
+const PIDE_AYUDA = /\b(hablar con (una |alguien|alg[uú]n)|persona real|humano|asesor|alguien del equipo|pago|pagu[eé]|cobr|reembols|tarjeta|cr[eé]ditos? no|mi cuenta|no me deja|no puedo entrar|error|queja)/i;
 /** Respuesta sin IA cuando no se puede leer la foto (tope del día, lectura apagada, descarga fallida). */
 const RESPUESTA_FOTO_FIJA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo (o en miarcana.com/velas si es una vela): te digo lo que salió, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
 /** Hosts de donde Meta sirve las fotos adjuntas; cualquier otra URL se ignora. */
@@ -306,6 +316,38 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   if (i.tipo === "comentario" && i.red === "facebook" && i.objetoId) {
     const aviso = await publicacionDelDirecto().catch(() => null);
     if (aviso && aviso.id === i.objetoId) respuestaDirecto = `${await encolarDelAviso(admin, i)}\n\n— Sibila, de Arcana 🔮`;
+  }
+
+  // Mensajes directos: una lectura y pocas respuestas por persona; después, a la página (sin IA).
+  let respuestaLimite: string | null = null;
+  if (i.tipo === "mensaje" && !PIDE_AYUDA.test(i.texto)) {
+    const desde = (ms: number) => new Date(Date.now() - ms).toISOString();
+    const base = () => admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "respondida").neq("id_meta", i.idMeta);
+    if (i.imagen) {
+      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).neq("respuesta", RESPUESTA_FOTO_FIJA).neq("respuesta", RESPUESTA_OTRA_FOTO).gte("creado_en", desde(30 * 86_400_000));
+      if ((lecturas ?? 0) >= LECTURAS_POR_PERSONA) respuestaLimite = RESPUESTA_OTRA_FOTO;
+    }
+    if (!respuestaLimite) {
+      const { count: hoy } = await base().gte("creado_en", desde(86_400_000));
+      if ((hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) {
+        const { count: yaLlevada } = await base().eq("detalle", DETALLE_LIMITE).gte("creado_en", desde(86_400_000));
+        if (yaLlevada) {
+          await marcar("omitida", { detalle: "límite por persona: ya se le dio el enlace hoy" });
+          return "limite";
+        }
+        respuestaLimite = RESPUESTA_LIMITE;
+      }
+    }
+  }
+  if (respuestaLimite) {
+    try {
+      await enviarMensajeDirecto(i.remitenteId, respuestaLimite);
+    } catch (e) {
+      await marcar("error", { respuesta: respuestaLimite, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
+      throw e;
+    }
+    await marcar("respondida", { respuesta: respuestaLimite, detalle: DETALLE_LIMITE });
+    return "limite";
   }
 
   const signo = detectarSigno(i.texto);
