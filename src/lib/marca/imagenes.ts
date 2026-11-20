@@ -4,6 +4,23 @@ import path from "path";
 import sharp from "sharp";
 import type { IdMazo } from "@/lib/tarot/mazos";
 import { TONO_AURA, type ColorAura } from "@/lib/aura";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+
+/**
+ * La foto de una lectura (bucket privado «palmas»: mano, taza, café, huevo, tabaco, velas) como data URI JPEG, ya
+ * girada como se ve, con su tamaño. Solo para quien ya pasó el control de acceso a la lectura. null si no está.
+ */
+export async function fotoDeLectura(ruta: unknown): Promise<{ src: string; ancho: number; alto: number } | null> {
+  if (typeof ruta !== "string" || !ruta) return null;
+  const { data } = await getSupabaseAdmin().storage.from("palmas").download(ruta);
+  if (!data) return null;
+  try {
+    const { data: jpeg, info } = await sharp(Buffer.from(await data.arrayBuffer())).rotate().resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 82 }).toBuffer({ resolveWithObject: true });
+    return { src: `data:image/jpeg;base64,${jpeg.toString("base64")}`, ancho: info.width, alto: info.height };
+  } catch {
+    return null;
+  }
+}
 
 /** Un WebP de public/ como data URI PNG (el motor de las tarjetas no lee WebP). Si falta, "". */
 export async function webpComoDataUri(ruta: string, opciones: { lado?: number; alto?: number } = {}) {

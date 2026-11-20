@@ -5,7 +5,11 @@ import { getT } from "@/lib/i18n/servidor";
 import { cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { MAZOS_CON_IMAGEN } from "@/components/CartaVisual";
-import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri, runaComoDataUri } from "@/lib/marca/imagenes";
+import { cartaComoDataUri, monedaComoDataUri, auraComoDataUri, cartaEspanolaComoDataUri, cartaLenormandComoDataUri, fotoDeLectura, runaComoDataUri } from "@/lib/marca/imagenes";
+import { separarFiguras } from "@/lib/oraculos/taza";
+import { separarSenales } from "@/lib/oraculos/huevo";
+import { separarTabaco } from "@/lib/tabaco/senales";
+import { separarRestos } from "@/lib/velas/restos";
 import { LENORMAND_CON_IMAGEN } from "@/lib/oraculos/lenormand";
 import type { ResultadoAura } from "@/lib/aura";
 import { signoPorId, signoPorLongitud } from "@/lib/zodiaco";
@@ -54,6 +58,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   let hexagrama: (0 | 1)[] | undefined;
   let imagenes: string[] | undefined;
   let proporcion: number | undefined;
+  let foto: { src: string; ancho: number; alto: number; marcas?: { x: number; y: number; etiqueta: string }[] } | undefined;
 
   if (tipo.startsWith("tarot")) {
     const mazo: IdMazo = esMazo(entrada.mazo) ? entrada.mazo : "rider";
@@ -95,6 +100,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   } else if (tipo === "quiromancia") {
     simbolos = ["✋"];
     titulo = t.lecturas.nombres.quiromancia;
+    const imagen = await fotoDeLectura(entrada.foto);
+    if (imagen) foto = imagen;
   } else if (tipo === "chino") {
     const r = resultado as unknown as ResultadoChino;
     // Las fuentes de la tarjeta no traen caracteres chinos: el animal va en el título.
@@ -130,15 +137,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const movimiento = String((resultado as { movimiento?: string }).movimiento ?? "");
     simbolos = ["◇"];
     titulo = `${t.pendulo.respondio}: ${(t.pendulo.movimientos as Record<string, string>)[movimiento] ?? movimiento}`;
-  } else if (tipo === "tabaco") {
-    simbolos = ["✦"];
-    titulo = t.lecturas.nombres.tabaco;
-  } else if (tipo === "velas") {
-    simbolos = ["✦"];
-    titulo = t.lecturas.nombres.velas;
-  } else if (tipo === "chocolate") {
-    simbolos = ["☕"];
-    titulo = t.lecturas.nombres.chocolate;
+  } else if (tipo === "tabaco" || tipo === "velas" || tipo === "chocolate" || tipo === "cafe" || tipo === "huevo") {
+    // Lecturas con foto: la foto de la persona, con lo que Sibila vio marcado (figuras, señales, restos).
+    simbolos = [tipo === "chocolate" || tipo === "cafe" ? "☕" : "✦"];
+    titulo = t.lecturas.nombres[tipo];
+    const imagen = await fotoDeLectura(entrada.foto);
+    if (imagen) {
+      const interp = lectura.interpretacion;
+      const marcas =
+        tipo === "chocolate" || tipo === "cafe"
+          ? separarFiguras(interp).figuras
+          : tipo === "huevo"
+            ? separarSenales(interp).marcas
+            : tipo === "tabaco"
+              ? separarTabaco(interp).marcas
+              : separarRestos(interp).marcas;
+      foto = { ...imagen, marcas: marcas.map((m) => ({ x: m.x, y: m.y, etiqueta: m.nombre })) };
+    }
   } else if (tipo === "sinastria") {
     const r = resultado as unknown as ResultadoSinastria;
     simbolos = ["♡"];
@@ -162,7 +177,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     etiqueta: t.lecturas.nombres[tipo],
     titulo,
     simbolos,
-    extracto: extractoDe(lectura.interpretacion),
+    extracto: extractoDe(lectura.interpretacion, foto ? 160 : 230),
+    foto,
     enlace,
     pie: t.lecturas.detalle.tarjetaPie,
     hexagrama,

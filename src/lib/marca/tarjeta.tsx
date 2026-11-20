@@ -35,6 +35,8 @@ export interface DatosTarjeta {
   monedas?: boolean;
   /** Alto ÷ ancho de las cartas (1.5 por defecto; el Lenormand es 1.2). */
   proporcion?: number;
+  /** Foto de la persona (mano, taza, huevo…) con las marcas de lo que se leyó; si hay, va en lugar de las imágenes. */
+  foto?: { src: string; ancho: number; alto: number; marcas?: { x: number; y: number; etiqueta: string }[] };
   /** "historia" = 1080×1920 con márgenes para los controles de Instagram; por defecto publicación 1080×1350. */
   formato?: "publicacion" | "historia";
 }
@@ -104,6 +106,44 @@ export async function imagenTarjeta(d: DatosTarjeta) {
                 ),
               )}
             </div>
+          ) : d.foto ? (
+            (() => {
+              // La foto entra en una caja máxima conservando su forma; las marcas (en % de la foto) van encima.
+              const maxW = historia ? 820 : 640;
+              const maxH = historia ? 820 : 500;
+              const k = Math.min(maxW / d.foto.ancho, maxH / d.foto.alto);
+              const w = Math.round(d.foto.ancho * k);
+              const h = Math.round(d.foto.alto * k);
+              const lado = Math.round(Math.min(w, h) * 0.17);
+              return (
+                <div style={{ display: "flex", position: "relative", width: w, height: h, borderRadius: 22, border: "4px solid rgba(241,217,154,0.75)", boxShadow: "0 30px 70px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image */}
+                  <img src={d.foto.src} width={w} height={h} alt="" style={{ position: "absolute", left: 0, top: 0 }} />
+                  {(d.foto.marcas ?? []).slice(0, 4).map((m, i) => {
+                    const cx = (m.x / 100) * w;
+                    const cy = (m.y / 100) * h;
+                    const abajo = cy + lado / 2 + 46 < h;
+                    return (
+                      <div key={i} style={{ display: "flex", position: "absolute", left: 0, top: 0, width: w, height: h }}>
+                        <div style={{ position: "absolute", left: cx - lado / 2, top: cy - lado / 2, width: lado, height: lado, borderRadius: lado, border: "4px solid #f1d99a", boxShadow: "0 0 18px rgba(241,217,154,0.8)" }} />
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: Math.min(w - 230, Math.max(8, cx - 115)),
+                            top: abajo ? cy + lado / 2 + 6 : cy - lado / 2 - 44,
+                            width: 230,
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <span style={{ fontSize: 22, color: "#1b1230", background: "#f1d99a", padding: "4px 12px", borderRadius: 999 }}>{m.etiqueta.slice(0, 22)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()
           ) : d.imagenes && d.imagenes.length ? (
             <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
               {/* eslint-disable @next/next/no-img-element -- ImageResponse no usa next/image */}
