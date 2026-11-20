@@ -1,8 +1,9 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import { instagramConfigurado, publicarCarrusel, publicarHistoria } from "./instagram";
-import { facebookConfigurado, publicarHistoriaFacebook, publicarVariasFotosFacebook } from "./facebook";
+import { instagramConfigurado, publicarCarrusel, publicarHistoria, publicarImagen } from "./instagram";
+import { facebookConfigurado, publicarFotoFacebook, publicarHistoriaFacebook, publicarVariasFotosFacebook } from "./facebook";
+import { MAX_INTENTOS, cartaDelJuego, numeroDeJuego } from "@/lib/juego/carta-escondida";
 import { publicarUnaVez, type Resultado } from "./reservas";
 import { contenidoGuardado, redactarCarrusel, semanaDelCarrusel, urlsLaminas } from "./carrusel";
 import { enviarKitTiktok, piezasDelDia } from "./kit-tiktok";
@@ -35,6 +36,39 @@ export async function historiaDelDia(admin: SupabaseClient<Database>, fecha = fe
   const [instagram, facebook] = await Promise.all([
     instagramConfigurado() ? publicarUnaVez(admin, "instagram", "historia", fecha, () => publicarHistoria(imagen)) : sinConfigurar,
     facebookConfigurado() ? publicarUnaVez(admin, "facebook", "historia", fecha, () => publicarHistoriaFacebook(imagen)) : sinConfigurar,
+  ]);
+  return { fecha, instagram, facebook };
+}
+
+/** Texto de la publicación diaria del juego. Nunca dice la carta: solo la primera pista. */
+export function textoJuegoDelDia(fecha: string, red: "instagram" | "facebook") {
+  const numero = numeroDeJuego(fecha);
+  const carta = cartaDelJuego(numero);
+  const enlace = red === "facebook" ? "miarcana punto com / juego (enlace en nuestro perfil)" : "miarcana.com/ig/juego (enlace en la biografía)";
+  return [
+    `🔮 El Camino del Loco · carta #${numero}`,
+    "",
+    `Sibila escondió una de las 78 cartas del tarot. ¿La descubres en ${MAX_INTENTOS} intentos?`,
+    "",
+    `✨ Su primera pista: «${carta.palabrasClave[0]}».`,
+    "Con cada intento sabrás si vas por el palo correcto y si el número es mayor o menor. Con cada fallo, una pista nueva.",
+    "",
+    `🎮 Juega gratis en ${enlace}`,
+    "🏆 Cada semana hay ranking y el podio gana créditos para sus lecturas.",
+    "",
+    "💬 ¿Cuál crees que es? Escríbela en los comentarios (sin hacer trampa 😉).",
+    "",
+    "#tarot #juegodiario #tarotdiario #elcaminodelloco #miarcana",
+  ].join("\n");
+}
+
+/** Publicación diaria del juego en Instagram y Facebook (REDES_JUEGO=0 la apaga). */
+export async function juegoEnRedes(admin: SupabaseClient<Database>, fecha = fechaBogota()) {
+  if (process.env.REDES_JUEGO === "0") return { apagada: true };
+  const imagen = `${sitio()}/api/juego/reto?fecha=${fecha}`;
+  const [instagram, facebook] = await Promise.all([
+    instagramConfigurado() ? publicarUnaVez(admin, "instagram", "juego", fecha, () => publicarImagen(imagen, textoJuegoDelDia(fecha, "instagram"))) : sinConfigurar,
+    facebookConfigurado() ? publicarUnaVez(admin, "facebook", "juego", fecha, () => publicarFotoFacebook(imagen, textoJuegoDelDia(fecha, "facebook"))) : sinConfigurar,
   ]);
   return { fecha, instagram, facebook };
 }

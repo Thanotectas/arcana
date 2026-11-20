@@ -559,9 +559,21 @@ export type Database = {
         Relationships: [];
       };
       juego_jugadores: {
-        Row: { usuario_id: string; apodo: string; creado_en: string; actualizado_en: string };
-        Insert: { usuario_id: string; apodo: string; creado_en?: string; actualizado_en?: string };
-        Update: Partial<{ usuario_id: string; apodo: string; creado_en: string; actualizado_en: string }>;
+        Row: { usuario_id: string; apodo: string; ultimo_puesto: number | null; semana_puesto: string | null; creado_en: string; actualizado_en: string };
+        Insert: { usuario_id: string; apodo: string; ultimo_puesto?: number | null; semana_puesto?: string | null; creado_en?: string; actualizado_en?: string };
+        Update: Partial<{ usuario_id: string; apodo: string; ultimo_puesto: number | null; semana_puesto: string | null; creado_en: string; actualizado_en: string }>;
+        Relationships: [];
+      };
+      juego_mensajes: {
+        Row: { fecha: string; signo: string; carta: string; texto: string; creado_en: string };
+        Insert: { fecha: string; signo: string; carta: string; texto: string; creado_en?: string };
+        Update: Partial<{ fecha: string; signo: string; carta: string; texto: string; creado_en: string }>;
+        Relationships: [];
+      };
+      juego_eventos: {
+        Row: { id: number; fecha: string; visitante: string; evento: string; usuario_id: string | null; gano: boolean | null; intentos: number | null; creado_en: string };
+        Insert: { fecha: string; visitante: string; evento: string; usuario_id?: string | null; gano?: boolean | null; intentos?: number | null; creado_en?: string };
+        Update: Partial<{ fecha: string; visitante: string; evento: string; usuario_id: string | null; gano: boolean | null; intentos: number | null; creado_en: string }>;
         Relationships: [];
       };
       en_vivo_espejo: {

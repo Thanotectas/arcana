@@ -8,6 +8,8 @@ import { estaInstalada, pedirInstalacion, usePuedeInstalar } from "@/lib/instala
 import { medir } from "@/lib/marca/medicion";
 import { Logros, Tutorial, VozSibila } from "./Extras";
 import { RankingSemanal } from "./Ranking";
+import { MensajeSibila } from "./MensajeSibila";
+import { contarEvento } from "@/lib/juego/eventos";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
@@ -256,6 +258,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
     const uso = { tipo, en: intentos.length };
     setComodin(uso);
     guardarComodin(numero, uso);
+    if (!practica) contarEvento("comodin");
     sonidoPista();
     navigator.vibrate?.([20, 40, 20]);
     setTimeout(() => document.getElementById("selector-juego")?.scrollIntoView({ behavior: "smooth", block: "end" }), 500);
@@ -293,6 +296,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
       guardarPractica(numero, nuevos);
       return;
     }
+    if (intentos.length === 0) contarEvento("inicio");
     const siguiente =
       acierta || nuevos.length >= MAX_INTENTOS
         ? terminarPartida(progreso, fecha, nuevos, acierta, escondida.id)
@@ -300,6 +304,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
     if (acierta || nuevos.length >= MAX_INTENTOS) {
       // Para los anuncios (solo si la persona aceptó la medición): quién jugó, sin decir qué carta.
       medir("JuegoTerminado", { gano: acierta ? 1 : 0, intentos: nuevos.length });
+      contarEvento("fin", { gano: acierta, intentos: nuevos.length });
       void enviarPartida(fecha, nuevos, comodin?.tipo ?? null).then((r) => {
         if (r === null) setSesion("no");
         else if (r) {
@@ -872,6 +877,8 @@ function Final({
       </p>
       <VozSibila carta={escondida.id} />
 
+      <MensajeSibila carta={escondida.nombre} />
+
       <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-left font-sans text-sm leading-relaxed">{texto}</pre>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" onClick={compartir} className="boton boton-primario">
@@ -986,9 +993,6 @@ function Final({
 
       <Cuenta />
 
-      <Link href="/tarot" className="boton boton-secundario">
-        ¿Qué te dice esta carta a ti? Pregúntale a Sibila
-      </Link>
     </div>
   );
 }
@@ -1091,6 +1095,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
     guardarMaestro(fecha, nuevos);
     if (fin) {
       medir("RetoMaestro", { gano: acierta ? 1 : 0, intentos: nuevos.length });
+      contarEvento("maestro", { gano: acierta, intentos: nuevos.length });
       if (sesion !== "no") {
         void fetch("/api/juego/maestro", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fecha, intentos: nuevos }) }).catch(() => null);
       }

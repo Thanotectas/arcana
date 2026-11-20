@@ -82,6 +82,9 @@ export function RankingSemanal() {
           {fechaCorta(datos.desde)} – {fechaCorta(datos.hasta)}
         </p>
       </div>
+      <p className="rounded-lg bg-oro/10 px-2 py-1.5 text-xs">
+        🎁 Cada lunes el podio gana créditos para sus lecturas: <strong>🥇 3 · 🥈 2 · 🥉 1</strong>
+      </p>
       {datos.campeon && (
         <p className="text-xs text-texto-suave">
           👑 La semana pasada ganó <strong className="text-oro-suave">{datos.campeon.apodo}</strong> con {datos.campeon.puntos} puntos.

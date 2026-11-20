@@ -252,6 +252,51 @@ function ordenar(puntos: Map<string, { puntos: number; dias: number }>) {
   return [...puntos.entries()].sort((a, b) => b[1].puntos - a[1].puntos || b[1].dias - a[1].dias);
 }
 
+/** Créditos del lunes para el podio de la semana anterior: 1.º, 2.º y 3.º. */
+export const PREMIOS_SEMANA = [3, 2, 1];
+
+export interface PuestoSemana {
+  usuarioId: string;
+  apodo: string;
+  puesto: number;
+  puntos: number;
+  dias: number;
+}
+
+/** La tabla completa de una semana, solo con quienes tienen apodo, en orden. */
+export async function tablaSemana(desde: string, hasta: string): Promise<PuestoSemana[]> {
+  const [puntos, { data: jugadores }] = await Promise.all([puntosDeSemana(desde, hasta), getSupabaseAdmin().from("juego_jugadores").select("usuario_id, apodo").limit(50_000)]);
+  const apodos = new Map((jugadores ?? []).map((j) => [j.usuario_id, j.apodo]));
+  return ordenar(puntos)
+    .filter(([id]) => apodos.has(id))
+    .map(([id, x], i) => ({ usuarioId: id, apodo: apodos.get(id) ?? "", puesto: i + 1, puntos: x.puntos, dias: x.dias }));
+}
+
+/**
+ * Paga el podio de la semana que terminó (lo llama el cron del lunes). La fila «semana:AAAA-MM-DD» en juego_premios
+ * evita pagar dos veces si el cron se repite. Devuelve a quiénes se les pagó.
+ */
+export async function pagarPodioSemana(desde: string): Promise<(PuestoSemana & { creditos: number })[]> {
+  const tabla = (await tablaSemana(desde, sumarDias(desde, 6))).filter((f) => f.puntos > 0).slice(0, PREMIOS_SEMANA.length);
+  const admin = getSupabaseAdmin();
+  const pagados: (PuestoSemana & { creditos: number })[] = [];
+  for (const f of tabla) {
+    const creditos = PREMIOS_SEMANA[f.puesto - 1];
+    const { data: fila } = await admin
+      .from("juego_premios")
+      .upsert({ usuario_id: f.usuarioId, premio: `semana:${desde}`, creditos }, { onConflict: "usuario_id,premio", ignoreDuplicates: true })
+      .select("premio")
+      .maybeSingle();
+    if (!fila) continue;
+    const { error } = await admin.rpc("devolver_creditos", { p_usuario: f.usuarioId, p_cantidad: creditos, p_motivo: MOTIVO_RACHA, p_referencia: `semana:${desde}:${f.puesto}` });
+    if (error) {
+      console.error("[juego] no se pagó el podio", f.usuarioId, error.message);
+      await admin.from("juego_premios").delete().eq("usuario_id", f.usuarioId).eq("premio", `semana:${desde}`);
+    } else pagados.push({ ...f, creditos });
+  }
+  return pagados;
+}
+
 /** La tabla de la semana (lunes a domingo, hora de Bogotá). Solo aparece quien eligió apodo. */
 export async function rankingSemanal(usuarioId: string | null): Promise<Ranking> {
   const hoy = fechaBogota();
