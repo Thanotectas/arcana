@@ -187,3 +187,40 @@ export function textoParaCompartir(numero: number, comparaciones: Comparacion[],
     .filter(Boolean)
     .join("\n");
 }
+
+// ───────────────────────── Selector visual ─────────────────────────
+
+export const GRUPOS = [
+  { id: "mayor", nombre: "Mayores", icono: "✦" },
+  { id: "bastos", nombre: "Bastos", icono: "🔥" },
+  { id: "copas", nombre: "Copas", icono: "💧" },
+  { id: "espadas", nombre: "Espadas", icono: "🗡️" },
+  { id: "oros", nombre: "Oros", icono: "🪙" },
+] as const;
+export type IdGrupo = (typeof GRUPOS)[number]["id"];
+
+export function cartasDelGrupo(g: IdGrupo) {
+  return MAZO.filter((c) => grupo(c) === g).sort((a, b) => a.numero - b.numero);
+}
+
+const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
+const CORTE: Record<number, string> = { 1: "As", 11: "Sota", 12: "Caballo", 13: "Reina", 14: "Rey" };
+
+/** Lo que se ve en la casilla del selector: número arriba y nombre corto abajo. */
+export function rotuloCasilla(c: CartaTarot) {
+  if (c.arcano === "mayor") return { numero: ROMANOS[c.numero] ?? String(c.numero), nombre: c.nombre.replace(/^(El|La|Los|Las)\s+/, "") };
+  return { numero: String(c.numero), nombre: CORTE[c.numero] ?? "" };
+}
+
+/** Cartas que todavía pueden ser la escondida según lo que dijeron los intentos. */
+export function posibles(intentos: CartaTarot[], resultados: Comparacion[]) {
+  return new Set(
+    MAZO.filter((c) =>
+      intentos.every((g, i) => {
+        const r = comparar(g, c);
+        const s = resultados[i];
+        return r.acierto === s.acierto && r.grupo === s.grupo && r.numero === s.numero;
+      }),
+    ).map((c) => c.id),
+  );
+}

@@ -21,6 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/marca/icono-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     shortcuts: [
+      { name: "El Camino del Loco (juego)", short_name: "Juego", url: "/juego?app=pwa", icons: [{ src: "/marca/icono-192.png", sizes: "192x192" }] },
       { name: "Tu cielo hoy", url: "/hoy", icons: [{ src: "/marca/icono-192.png", sizes: "192x192" }] },
       { name: "Carta del día", url: "/tarot?tirada=tarot_carta", icons: [{ src: "/marca/icono-192.png", sizes: "192x192" }] },
       { name: "Hablar con Sibila", url: "/inicio?sibila=1", icons: [{ src: "/marca/icono-192.png", sizes: "192x192" }] },

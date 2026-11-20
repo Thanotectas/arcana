@@ -1303,3 +1303,22 @@ body {
 .bola-late {
   animation: bola-late 4.2s ease-in-out infinite;
 }
+
+/* El Camino del Loco: la carta escondida se voltea al descubrirla */
+@keyframes voltear-carta {
+  0% { transform: perspective(900px) rotateY(180deg) scale(0.92); filter: brightness(0.4); }
+  60% { transform: perspective(900px) rotateY(-12deg) scale(1.04); filter: brightness(1.15); }
+  100% { transform: perspective(900px) rotateY(0) scale(1); filter: none; }
+}
+.voltear-carta {
+  animation: voltear-carta 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  box-shadow: 0 0 0 1px rgba(241, 217, 154, 0.5), 0 0 48px rgba(139, 108, 246, 0.55);
+}
+@keyframes flotar-carta {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-6px) rotate(1deg); }
+}
+.flotar-carta { animation: flotar-carta 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .voltear-carta, .flotar-carta { animation: none; }
+}
