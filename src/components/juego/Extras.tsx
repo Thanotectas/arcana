@@ -49,6 +49,7 @@ export function VozSibila({ carta }: { carta: string }) {
 }
 
 const VISTOS = "arcana-logros-vistos";
+const medalla = (id: string) => `/juego/logros/${id}.webp`;
 
 /** Logros conseguidos y por conseguir; los recién ganados se destacan una vez. */
 export function Logros({ datos }: { datos: DatosLogros }) {
@@ -67,18 +68,24 @@ export function Logros({ datos }: { datos: DatosLogros }) {
   return (
     <div className="space-y-3 text-left">
       {recien.length > 0 && (
-        <p className="logro-nuevo rounded-xl border border-oro/60 bg-oro/10 p-3 text-center text-sm">
-          🏅 {recien.length === 1 ? "¡Nuevo logro!" : `¡${recien.length} logros nuevos!`}{" "}
+        <div className="logro-nuevo rounded-xl border border-oro/60 bg-oro/10 p-3 text-center text-sm">
+          <div className="mb-2 flex justify-center gap-2">
+            {recien.slice(0, 4).map((l) => (
+              // eslint-disable-next-line @next/next/no-img-element -- medalla estática
+              <img key={l.id} src={medalla(l.id)} alt="" className="h-20 w-20 drop-shadow-[0_0_14px_rgba(241,217,154,0.7)]" />
+            ))}
+          </div>
+          {recien.length === 1 ? "¡Nuevo logro!" : `¡${recien.length} logros nuevos!`}{" "}
           {recien.map((l, i) => (
             <span key={l.id}>
               {i > 0 && " · "}
               <strong>
-                {l.icono} {l.nombre}
+                {l.nombre}
               </strong>
               {recien.length === 1 && ` · ${l.descripcion}`}
             </span>
           ))}
-        </p>
+        </div>
       )}
       <p className="text-center text-sm text-texto-suave">
         Logros: <strong className="text-texto">{obtenidos.size}</strong> de {LOGROS.length}
@@ -90,10 +97,16 @@ export function Logros({ datos }: { datos: DatosLogros }) {
             <div
               key={l.id}
               title={`${l.nombre}: ${l.descripcion}`}
-              className={`flex aspect-square flex-col items-center justify-center rounded-xl border text-center ${tiene ? "border-oro/60 bg-oro/10" : "border-borde bg-superficie-2 opacity-40 grayscale"} ${nuevos.has(l.id) ? "logro-nuevo" : ""}`}
+              className={`flex flex-col items-center text-center ${nuevos.has(l.id) ? "logro-nuevo" : ""}`}
             >
-              <span className="text-2xl">{l.icono}</span>
-              <span className="mt-0.5 line-clamp-2 px-1 text-[9px] leading-tight">{l.nombre}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element -- medalla estática */}
+              <img
+                src={medalla(l.id)}
+                alt={tiene ? l.nombre : `${l.nombre} (por conseguir)`}
+                loading="lazy"
+                className={`aspect-square w-full ${tiene ? "drop-shadow-[0_0_10px_rgba(241,217,154,0.55)]" : "opacity-35 grayscale"}`}
+              />
+              <span className={`mt-1 line-clamp-2 text-[10px] leading-tight ${tiene ? "text-texto" : "text-texto-suave"}`}>{l.nombre}</span>
             </div>
           );
         })}
