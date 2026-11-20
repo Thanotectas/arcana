@@ -51,8 +51,8 @@ function aleatorio(semilla: number) {
 }
 
 /** Las 78 cartas en un orden fijo por ciclo: no se repite ninguna hasta pasar por todas. */
-function ordenDelCiclo(ciclo: number) {
-  const r = aleatorio(20_261_120 + ciclo * 7_919);
+function ordenDelCiclo(ciclo: number, base = 20_261_120) {
+  const r = aleatorio(base + ciclo * 7_919);
   const orden = MAZO.map((_, i) => i);
   for (let i = orden.length - 1; i > 0; i--) {
     const j = Math.floor(r() * (i + 1));
@@ -64,6 +64,126 @@ function ordenDelCiclo(ciclo: number) {
 export function cartaDelJuego(numero: number): CartaTarot {
   const n = Math.max(1, numero) - 1;
   return MAZO[ordenDelCiclo(Math.floor(n / MAZO.length))[n % MAZO.length]];
+}
+
+// ───────────────────────── Reto maestro ─────────────────────────
+
+/** El reto maestro: otra carta del día, con menos intentos y pistas en clave. Solo para quien encontró la del día. */
+export const MAX_INTENTOS_MAESTRO = 4;
+/** Puntos extra en el ranking por superar el reto maestro. */
+export const PUNTOS_MAESTRO = 3;
+
+export function cartaMaestra(numero: number): CartaTarot {
+  const n = Math.max(1, numero) - 1;
+  const orden = ordenDelCiclo(Math.floor(n / MAZO.length), 77_031_313);
+  let carta = MAZO[orden[n % MAZO.length]];
+  // Nunca la misma que la del día.
+  if (carta.id === cartaDelJuego(numero).id) carta = MAZO[orden[(n + 1) % MAZO.length]];
+  return carta;
+}
+
+const ELEMENTO_EN_CLAVE: Record<CartaTarot["elemento"], string> = {
+  fuego: "Arde, aunque no la veas.",
+  agua: "Fluye y se mete por las grietas.",
+  aire: "Corta como el viento.",
+  tierra: "Pesa como una piedra en la mano.",
+  espiritu: "No le pertenece a ningún elemento.",
+};
+
+/** Pistas del reto maestro: más simbólicas, empiezan por su sombra. */
+export function pistasMaestras(c: CartaTarot): string[] {
+  const [s1, s2] = c.palabrasClaveInvertida;
+  const sombra = (c.significadoInvertido.match(/[^.!?]+[.!?]+/g) ?? [c.significadoInvertido])[0].trim();
+  return [
+    `Sibila habla en clave: su sombra se llama «${s1}».`,
+    ELEMENTO_EN_CLAVE[c.elemento],
+    `Un eco suyo: «${c.palabrasClave[2] ?? c.palabrasClave[1] ?? c.palabrasClave[0]}». Y otra sombra: «${s2 ?? s1}».`,
+    `Cuando se voltea dice: «${ocultarNombre(sombra, c).replace(/^Invertid[ao],?\s*/i, "")}»`,
+  ];
+}
+
+// ───────────────────────── Comodín de Sibila ─────────────────────────
+
+/** Una ayuda al día: Sibila revela un rasgo de la carta escondida. */
+export type Comodin = "grupo" | "paridad" | "rango";
+
+export const COMODINES: { id: Comodin; titulo: string; descripcion: string }[] = [
+  { id: "grupo", titulo: "Su grupo", descripcion: "Te digo si es un Arcano Mayor o de qué palo es." },
+  { id: "paridad", titulo: "Par o impar", descripcion: "Te digo si su número es par o impar." },
+  { id: "rango", titulo: "¿Alto o bajo?", descripcion: "Te digo si su número es 10 o menos, u 11 o más." },
+];
+
+export function esComodin(x: unknown): x is Comodin {
+  return x === "grupo" || x === "paridad" || x === "rango";
+}
+
+function rasgo(c: CartaTarot, tipo: Comodin) {
+  if (tipo === "grupo") return grupo(c);
+  if (tipo === "paridad") return c.numero % 2 === 0 ? "par" : "impar";
+  return c.numero <= 10 ? "bajo" : "alto";
+}
+
+/** ¿Esta carta tiene el mismo rasgo que la escondida? (para apagar las que ya no pueden ser). */
+export function cumpleComodin(c: CartaTarot, tipo: Comodin, escondida: CartaTarot) {
+  return rasgo(c, tipo) === rasgo(escondida, tipo);
+}
+
+export function textoComodin(tipo: Comodin, escondida: CartaTarot) {
+  if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Mi comodín: es un Arcano Mayor." : `🔮 Mi comodín: es de ${nombreGrupo(escondida)}.`;
+  if (tipo === "paridad") return `🔮 Mi comodín: su número es ${escondida.numero % 2 === 0 ? "par" : "impar"}.`;
+  return escondida.numero <= 10
+    ? "🔮 Mi comodín: su número es 10 o menos."
+    : "🔮 Mi comodín: su número es 11 o más (en los palos, eso es una figura: Sota, Caballo, Reina o Rey).";
+}
+
+// ───────────────────────── Premios por completar el álbum ─────────────────────────
+
+export interface PremioAlbum {
+  id: string;
+  nombre: string;
+  creditos: number;
+  cartas: CartaTarot[];
+}
+
+/** Completar un palo (14 cartas) da 2 créditos; los 22 Mayores, 3; las 78, 5. */
+export function premiosAlbum(): PremioAlbum[] {
+  const palos = (["bastos", "copas", "espadas", "oros"] as const).map((p) => ({
+    id: `palo:${p}`,
+    nombre: NOMBRE_GRUPO[p],
+    creditos: 2,
+    cartas: MAZO.filter((c) => c.palo === p),
+  }));
+  return [...palos, { id: "camino", nombre: "El Camino del Loco", creditos: 3, cartas: MAZO.filter((c) => c.arcano === "mayor") }, { id: "mazo", nombre: "Todo el tarot", creditos: 5, cartas: MAZO }];
+}
+
+export function premiosCompletados(album: ReadonlySet<string>) {
+  return premiosAlbum().filter((p) => p.cartas.every((c) => album.has(c.id)));
+}
+
+export function premioDelGrupo(g: IdGrupo) {
+  return premiosAlbum().find((p) => p.id === (g === "mayor" ? "camino" : `palo:${g}`));
+}
+
+// ───────────────────────── Ranking semanal ─────────────────────────
+
+/**
+ * Puntos de un día: encontrarla en 1 intento da 7, en 2 da 6… en 6 da 2; usar el comodín resta 1; jugar y no
+ * encontrarla da 1 (premia la constancia). El reto maestro suma 3 más.
+ */
+export function puntosDePartida(gano: boolean, intentos: number, comodin: boolean) {
+  if (!gano) return 1;
+  return Math.max(1, MAX_INTENTOS + 2 - intentos - (comodin ? 1 : 0));
+}
+
+/** Lunes (AAAA-MM-DD) de la semana de una fecha. */
+export function inicioSemana(fecha: string) {
+  const d = new Date(`${fecha}T12:00:00Z`);
+  const desde = (d.getUTCDay() + 6) % 7;
+  return new Date(d.getTime() - desde * 86_400_000).toISOString().slice(0, 10);
+}
+
+export function sumarDias(fecha: string, dias: number) {
+  return new Date(Date.parse(`${fecha}T12:00:00Z`) + dias * 86_400_000).toISOString().slice(0, 10);
 }
 
 export function cartaPorId(id: string) {
@@ -107,7 +227,8 @@ const ELEMENTO: Record<CartaTarot["elemento"], string> = {
 
 function ocultarNombre(texto: string, c: CartaTarot) {
   const nombre = c.nombre.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return texto.replace(new RegExp(nombre, "gi"), "esta carta");
+  // También se lleva el artículo de delante («el Cuatro de Copas» → «esta carta»).
+  return texto.replace(new RegExp(`(\\b(?:el|la|los|las)\\s+)?${nombre}`, "gi"), "esta carta");
 }
 
 /**
@@ -219,9 +340,9 @@ export function enlaceResultado(sitio: string, numero: number, comparaciones: Co
 }
 
 /** Texto para compartir: sin revelar la carta. */
-export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string) {
+export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string, comodin = false) {
   return [
-    `🔮 El Camino del Loco #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}`,
+    `🔮 El Camino del Loco #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}${comodin ? " (con comodín)" : ""}`,
     ...comparaciones.map(emojiDe),
     racha > 1 ? `🔥 ${racha} días seguidos` : "",
     `¿Adivinas la carta de hoy? ${enlaceResultado(sitio, numero, comparaciones, racha)}`,
@@ -258,9 +379,10 @@ export function rotuloCasilla(c: CartaTarot) {
 }
 
 /** Cartas que todavía pueden ser la escondida según lo que dijeron los intentos. */
-export function posibles(intentos: CartaTarot[], resultados: Comparacion[]) {
+export function posibles(intentos: CartaTarot[], resultados: Comparacion[], filtro?: (c: CartaTarot) => boolean) {
   return new Set(
     MAZO.filter((c) =>
+      (!filtro || filtro(c)) &&
       intentos.every((g, i) => {
         const r = comparar(g, c);
         const s = resultados[i];

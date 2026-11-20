@@ -55,9 +55,14 @@ export default async function PaginaJuego({ searchParams }: { searchParams: Busq
           Cada día Sibila esconde una carta del tarot. Tienes 6 intentos para descubrirla con sus pistas. Cuando la encuentres, te
           dice su mensaje para tu día.
         </p>
-        <Link href="/juego/album" className="mt-3 inline-block text-sm text-oro-suave underline">
-          Ver mi álbum de cartas
-        </Link>
+        <p className="mt-3 flex justify-center gap-4 text-sm">
+          <Link href="/juego/album" className="text-oro-suave underline">
+            📖 Mi álbum de cartas
+          </Link>
+          <Link href="/juego/ranking" className="text-oro-suave underline">
+            🏆 Ranking de la semana
+          </Link>
+        </p>
       </header>
       {/* key: al cambiar de día de práctica se vuelve a montar el juego con esa carta. */}
       <CaminoDelLoco key={diaPractica ?? "hoy"} clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} diaPractica={diaPractica} reto={reto} />

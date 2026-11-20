@@ -541,9 +541,27 @@ export type Database = {
         Relationships: [];
       };
       juego_partidas: {
-        Row: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; creado_en: string };
-        Insert: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada?: boolean; creado_en?: string };
-        Update: Partial<{ usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; creado_en: string }>;
+        Row: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; comodin: string | null; creado_en: string };
+        Insert: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada?: boolean; comodin?: string | null; creado_en?: string };
+        Update: Partial<{ usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; comodin: string | null; creado_en: string }>;
+        Relationships: [];
+      };
+      juego_maestro: {
+        Row: { usuario_id: string; fecha: string; carta: string; intentos: string[]; gano: boolean; creado_en: string };
+        Insert: { usuario_id: string; fecha: string; carta: string; intentos: string[]; gano: boolean; creado_en?: string };
+        Update: Partial<{ usuario_id: string; fecha: string; carta: string; intentos: string[]; gano: boolean; creado_en: string }>;
+        Relationships: [];
+      };
+      juego_premios: {
+        Row: { usuario_id: string; premio: string; creditos: number; creado_en: string };
+        Insert: { usuario_id: string; premio: string; creditos: number; creado_en?: string };
+        Update: Partial<{ usuario_id: string; premio: string; creditos: number; creado_en: string }>;
+        Relationships: [];
+      };
+      juego_jugadores: {
+        Row: { usuario_id: string; apodo: string; creado_en: string; actualizado_en: string };
+        Insert: { usuario_id: string; apodo: string; creado_en?: string; actualizado_en?: string };
+        Update: Partial<{ usuario_id: string; apodo: string; creado_en: string; actualizado_en: string }>;
         Relationships: [];
       };
       en_vivo_espejo: {

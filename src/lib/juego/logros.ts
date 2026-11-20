@@ -20,6 +20,7 @@ export const LOGROS: Logro[] = [
   { id: "medio-mazo", icono: "🌓", nombre: "Medio mazo", descripcion: "Descubre 39 cartas" },
   { id: "camino", icono: "🧭", nombre: "El Camino del Loco", descripcion: "Descubre los 22 Arcanos Mayores" },
   { id: "mazo", icono: "👑", nombre: "Todo el tarot", descripcion: "Descubre las 78 cartas" },
+  { id: "maestro", icono: "🌙", nombre: "Ojo de maestro", descripcion: "Supera un reto maestro" },
 ];
 
 export interface DatosLogros {
@@ -27,6 +28,8 @@ export interface DatosLogros {
   mejorRacha: number;
   /** Partidas ganadas en 1, 2… 6 intentos. */
   distribucion: number[];
+  /** Retos maestros superados. */
+  maestros?: number;
 }
 
 export function logrosObtenidos(d: DatosLogros): Set<string> {
@@ -42,5 +45,6 @@ export function logrosObtenidos(d: DatosLogros): Set<string> {
   if (d.album.size >= 39) s.add("medio-mazo");
   if (tiene("mayor")) s.add("camino");
   if (d.album.size >= MAZO.length) s.add("mazo");
+  if ((d.maestros ?? 0) > 0) s.add("maestro");
   return s;
 }

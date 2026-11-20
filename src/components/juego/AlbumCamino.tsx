@@ -4,8 +4,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
-import { GRUPOS, cartaDelJuego, emblemaGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
-import { leerPractica, leerProgreso } from "./CaminoDelLoco";
+import { GRUPOS, cartaDelJuego, emblemaGrupo, premioDelGrupo, type IdGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
+import { leerPractica, leerProgreso, maestrosGanados } from "./CaminoDelLoco";
 import { Logros } from "./Extras";
 
 const DORSO = "/cartas/arcana/dorso.webp";
@@ -71,7 +71,7 @@ function Album() {
 
       <section className="tarjeta space-y-3 p-5">
         <h2 className="font-display text-2xl">Tus logros</h2>
-        <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion }} />
+        <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion, maestros: maestrosGanados() }} />
       </section>
 
       <section className="space-y-3">
@@ -80,7 +80,10 @@ function Album() {
           <img src={emblemaGrupo("mayor")} alt="" className="h-9 w-9" />
           El camino del Loco
         </h2>
-        <p className="text-sm text-texto-suave">Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.</p>
+        <p className="text-sm text-texto-suave">
+          Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.{" "}
+          <PremioGrupo id="mayor" tienes={mayores.filter((c) => tiene.has(c.id)).length} />
+        </p>
         <Camino cartas={mayores} tiene={tiene} />
       </section>
 
@@ -99,6 +102,9 @@ function Album() {
                 {n} de {cartas.length}
               </span>
             </h2>
+            <p className="text-sm text-texto-suave">
+              <PremioGrupo id={g.id} tienes={n} />
+            </p>
             <div className="grid grid-cols-5 gap-2 sm:grid-cols-7">
               {cartas.map((c) => (
                 <Carta key={c.id} carta={c} visible={tiene.has(c.id)} />
@@ -205,5 +211,18 @@ function Camino({ cartas, tiene }: { cartas: CartaTarot[]; tiene: ReadonlySet<st
         );
       })}
     </div>
+  );
+}
+
+/** Lo que se gana al completar el grupo (con cuenta): «Complétalo y gana 2 créditos» o «Completo». */
+function PremioGrupo({ id, tienes }: { id: IdGrupo; tienes: number }) {
+  const p = premioDelGrupo(id);
+  if (!p) return null;
+  return tienes >= p.cartas.length ? (
+    <span className="text-oro-suave">🏆 ¡Completo! Ganaste {p.creditos} créditos.</span>
+  ) : (
+    <span>
+      🎁 Complétalo y gana <strong className="text-oro-suave">{p.creditos} créditos</strong> (jugando con tu cuenta).
+    </span>
   );
 }

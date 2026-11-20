@@ -7,12 +7,22 @@ import { AvisoDiario } from "@/components/AvisoDiario";
 import { estaInstalada, pedirInstalacion, usePuedeInstalar } from "@/lib/instalar";
 import { medir } from "@/lib/marca/medicion";
 import { Logros, Tutorial, VozSibila } from "./Extras";
+import { RankingSemanal } from "./Ranking";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
+  COMODINES,
   GRUPOS,
   emblemaGrupo,
   MAX_INTENTOS,
+  MAX_INTENTOS_MAESTRO,
+  PUNTOS_MAESTRO,
+  cartaMaestra,
+  cumpleComodin,
+  pistasMaestras,
+  premiosAlbum,
+  textoComodin,
+  type Comodin,
   PROGRESO_VACIO,
   RACHA_PREMIO,
   buscarCartas,
@@ -58,16 +68,27 @@ interface ProgresoCuenta {
   album: string[];
   hoy: string[] | null;
   creditosGanados: number;
+  maestros?: number;
+  maestroHoy?: string[] | null;
+}
+interface PremioNuevo {
+  id: string;
+  nombre: string;
+  creditos: number;
 }
 type Sesion = "?" | "si" | "no";
 
 /** Guarda en la cuenta la partida terminada de hoy. null: sin sesión; undefined: falló. */
-async function enviarPartida(fecha: string, intentos: string[]): Promise<{ progreso: ProgresoCuenta; premio: boolean } | null | undefined> {
+async function enviarPartida(
+  fecha: string,
+  intentos: string[],
+  comodin: Comodin | null,
+): Promise<{ progreso: ProgresoCuenta; premio: boolean; premiosAlbum: PremioNuevo[] } | null | undefined> {
   try {
-    const r = await fetch("/api/juego", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fecha, intentos }) });
+    const r = await fetch("/api/juego", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fecha, intentos, comodin }) });
     if (r.status === 401) return null;
-    const d = (await r.json()) as { ok: boolean; progreso?: ProgresoCuenta; premio?: boolean };
-    return d.ok && d.progreso ? { progreso: d.progreso, premio: Boolean(d.premio) } : undefined;
+    const d = (await r.json()) as { ok: boolean; progreso?: ProgresoCuenta; premio?: boolean; premiosAlbum?: PremioNuevo[] };
+    return d.ok && d.progreso ? { progreso: d.progreso, premio: Boolean(d.premio), premiosAlbum: d.premiosAlbum ?? [] } : undefined;
   } catch {
     return undefined;
   }
@@ -89,6 +110,50 @@ function guardarPractica(numero: number, intentos: string[]) {
   } catch {
     /* nada */
   }
+}
+
+const CLAVE_COMODIN = "arcana-camino-comodin-v1";
+type UsoComodin = { tipo: Comodin; en: number };
+
+/** El comodín usado en cada carta (por número): una ayuda por carta. */
+function leerComodin(numero: number): UsoComodin | null {
+  try {
+    return (JSON.parse(localStorage.getItem(CLAVE_COMODIN) ?? "{}") as Record<string, UsoComodin>)[numero] ?? null;
+  } catch {
+    return null;
+  }
+}
+function guardarComodin(numero: number, uso: UsoComodin) {
+  try {
+    localStorage.setItem(CLAVE_COMODIN, JSON.stringify({ ...(JSON.parse(localStorage.getItem(CLAVE_COMODIN) ?? "{}") as object), [numero]: uso }));
+  } catch {
+    /* nada */
+  }
+}
+
+const CLAVE_MAESTRO = "arcana-camino-maestro-v1";
+
+/** Retos maestros jugados en este navegador (por fecha). */
+export function leerMaestro(): Record<string, string[]> {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE_MAESTRO) ?? "{}") as Record<string, string[]>;
+  } catch {
+    return {};
+  }
+}
+function guardarMaestro(fecha: string, intentos: string[]) {
+  try {
+    localStorage.setItem(CLAVE_MAESTRO, JSON.stringify({ ...leerMaestro(), [fecha]: intentos }));
+  } catch {
+    /* nada */
+  }
+}
+/** Cuántos retos maestros se superaron en este navegador. */
+export function maestrosGanados() {
+  return Object.entries(leerMaestro()).filter(([f, ids]) => {
+    const n = numeroDeJuego(f);
+    return n >= 1 && ids.includes(cartaMaestra(n).id);
+  }).length;
 }
 
 export function leerProgreso(): Progreso {
@@ -136,6 +201,8 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
   const [sesion, setSesion] = useState<Sesion>("?");
   const [cuenta, setCuenta] = useState<ProgresoCuenta | null>(null);
   const [premioNuevo, setPremioNuevo] = useState(false);
+  const [premiosNuevos, setPremiosNuevos] = useState<PremioNuevo[]>([]);
+  const [comodin, setComodin] = useState<UsoComodin | null>(() => leerComodin(numero));
 
   // Con sesión: trae el progreso de la cuenta. Si hoy ya jugó en otro dispositivo, muestra esa partida; si jugó
   // aquí antes de entrar, la guarda en la cuenta.
@@ -156,10 +223,11 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
         const terminadaAqui = locales.includes(escondidaHoy) || locales.length >= MAX_INTENTOS;
         if (d.hoy?.length && !locales.length) setIntentos(d.hoy);
         else if (!d.hoy && terminadaAqui) {
-          const r2 = await enviarPartida(fecha, locales);
+          const r2 = await enviarPartida(fecha, locales, leerComodin(numeroDeJuego(fecha))?.tipo ?? null);
           if (vivo && r2) {
             setCuenta(r2.progreso);
             setPremioNuevo(r2.premio);
+            setPremiosNuevos(r2.premiosAlbum);
           }
         }
       })
@@ -181,7 +249,17 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
   const [celebrar, setCelebrar] = useState(false);
   const rachaLocal = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
   const racha = cuenta ? cuenta.racha : rachaLocal;
-  const quedan = posibles(cartasIntento, comparaciones);
+  const quedan = posibles(cartasIntento, comparaciones, comodin ? (c) => cumpleComodin(c, comodin.tipo, escondida) : undefined);
+
+  function usarComodin(tipo: Comodin) {
+    if (comodin || termino) return;
+    const uso = { tipo, en: intentos.length };
+    setComodin(uso);
+    guardarComodin(numero, uso);
+    sonidoPista();
+    navigator.vibrate?.([20, 40, 20]);
+    setTimeout(() => document.getElementById("selector-juego")?.scrollIntoView({ behavior: "smooth", block: "end" }), 500);
+  }
 
   /** Sonido, vibración y estallido según cómo salió el intento. */
   function reaccionar(id: string, nuevos: string[]) {
@@ -222,12 +300,13 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
     if (acierta || nuevos.length >= MAX_INTENTOS) {
       // Para los anuncios (solo si la persona aceptó la medición): quién jugó, sin decir qué carta.
       medir("JuegoTerminado", { gano: acierta ? 1 : 0, intentos: nuevos.length });
-      void enviarPartida(fecha, nuevos).then((r) => {
+      void enviarPartida(fecha, nuevos, comodin?.tipo ?? null).then((r) => {
         if (r === null) setSesion("no");
         else if (r) {
           setSesion("si");
           setCuenta(r.progreso);
           setPremioNuevo(r.premio);
+          setPremiosNuevos(r.premiosAlbum);
         }
       });
     }
@@ -297,9 +376,27 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           {celebrar && <Estallido />}
         </div>
 
-        <Conversacion pistas={todasLasPistas} cartas={cartasIntento} comparaciones={comparaciones} escondida={escondida} termino={termino} gano={gano} />
+        <Conversacion
+          pistas={todasLasPistas}
+          cartas={cartasIntento}
+          comparaciones={comparaciones}
+          escondida={escondida}
+          termino={termino}
+          gano={gano}
+          comodin={comodin ? { texto: textoComodin(comodin.tipo, escondida), en: comodin.en } : null}
+        />
 
-        {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={cartasIntento.length ? null : "mayor"} onElegir={adivinar} />}
+        {!termino && !comodin && <ComodinSibila onUsar={usarComodin} />}
+
+        {!termino && (
+          <Selector
+            key={comodin?.tipo ?? "sin-comodin"}
+            intentados={new Set(intentos)}
+            quedan={quedan}
+            sugerido={comodin?.tipo === "grupo" ? (grupo(escondida) as IdGrupo) : cartasIntento.length ? null : "mayor"}
+            onElegir={adivinar}
+          />
+        )}
       </div>
 
       {termino && practica && (
@@ -327,6 +424,9 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           sesion={sesion}
           cuenta={cuenta}
           premioNuevo={premioNuevo}
+          premiosNuevos={premiosNuevos}
+          conComodin={Boolean(comodin)}
+          fecha={fecha}
           clavePublica={clavePublica}
         />
       )}
@@ -343,7 +443,15 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
             Tienes {MAX_INTENTOS} intentos. Elige un grupo (Mayores, Bastos, Copas, Espadas u Oros) y una carta. Verás si acertaste el grupo y si el número de la
             escondida es mayor ⬆️ o menor ⬇️. Las cartas que ya no pueden ser se apagan. En los menores, el As es 1, la Sota 11, el Caballo 12, la Reina 13 y el Rey 14.
           </p>
-          <p>Con cada fallo, Sibila te da una pista más. Cada carta que descubres entra en tu álbum, y si juegas {RACHA_PREMIO} días seguidos te regalamos 1 crédito para tus lecturas.</p>
+          <p>Con cada fallo, Sibila te da una pista más. Si te atascas, pídele su comodín (uno por carta): te revela el grupo, si el número es par o impar, o si es alto o bajo.</p>
+          <p>
+            Cada carta que descubres entra en tu álbum. Si juegas {RACHA_PREMIO} días seguidos te regalamos 1 crédito; si completas un palo, 2 créditos; los 22 Arcanos
+            Mayores, 3; y las 78 cartas, 5.
+          </p>
+          <p>
+            Cuando encuentras la carta del día se abre el <strong>reto maestro</strong>: otra carta, {MAX_INTENTOS_MAESTRO} intentos y pistas en clave. Y cada semana hay
+            ranking: encontrarla en 1 intento da 7 puntos, en 2 da 6… en 6 da 2; jugar sin encontrarla da 1; el comodín resta 1 y el reto maestro suma {PUNTOS_MAESTRO}.
+          </p>
         </div>
       </details>
     </div>
@@ -351,10 +459,10 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
 }
 
 /** Seis estrellas: se apagan con cada intento. */
-function Vidas({ usados, gano }: { usados: number; gano: boolean }) {
+function Vidas({ usados, gano, max = MAX_INTENTOS }: { usados: number; gano: boolean; max?: number }) {
   return (
-    <span className="flex gap-1" aria-label={`${MAX_INTENTOS - usados} intentos restantes`}>
-      {Array.from({ length: MAX_INTENTOS }, (_, i) => (
+    <span className="flex gap-1" aria-label={`${max - usados} intentos restantes`}>
+      {Array.from({ length: max }, (_, i) => (
         <span key={i} className={`text-base transition-opacity ${i < usados ? (gano && i === usados - 1 ? "text-oro estrella-gana" : "opacity-25 estrella-cae") : "text-oro"}`}>
           ★
         </span>
@@ -377,6 +485,8 @@ function Conversacion({
   escondida,
   termino,
   gano,
+  comodin = null,
+  max = MAX_INTENTOS,
 }: {
   pistas: string[];
   cartas: CartaTarot[];
@@ -384,19 +494,24 @@ function Conversacion({
   escondida: CartaTarot;
   termino: boolean;
   gano: boolean;
+  comodin?: { texto: string; en: number } | null;
+  max?: number;
 }) {
-  type Mensaje = { de: "sibila"; texto: string; calor?: string; cara: Cara } | { de: "tu"; carta: CartaTarot; r: Comparacion };
+  type Mensaje = { de: "sibila"; texto: string; calor?: string; cara: Cara; comodin?: boolean } | { de: "tu"; carta: CartaTarot; r: Comparacion };
   const mensajes: Mensaje[] = [{ de: "sibila", texto: pistas[0], cara: "pista" }];
+  const ponerComodin = () => comodin && mensajes.push({ de: "sibila", texto: comodin.texto, cara: "caliente", comodin: true });
+  if (comodin?.en === 0) ponerComodin();
   cartas.forEach((carta, i) => {
     const r = comparaciones[i];
     mensajes.push({ de: "tu", carta, r });
     if (r.acierto) mensajes.push({ de: "sibila", texto: "¡Ahí está! ✨ La encontraste.", cara: "gana" });
-    else if (i === MAX_INTENTOS - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙`, cara: "pierde" });
+    else if (i === max - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙`, cara: "pierde" });
     else {
       const re = reaccion(carta, escondida, i + 1);
       mensajes.push({ de: "sibila", texto: re.texto, calor: re.calor, cara: CARA_CALOR[re.calor] });
       if (pistas[i + 1]) mensajes.push({ de: "sibila", texto: pistas[i + 1], cara: "pista" });
     }
+    if (comodin?.en === i + 1) ponerComodin();
   });
   const ultimo = mensajes.length - 1;
   return (
@@ -408,7 +523,7 @@ function Conversacion({
             <img src={cara(m.cara)} alt="" className="h-8 w-8 shrink-0 rounded-full border border-oro/60" />
             <p
               className={`max-w-[85%] rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm ${
-                m.calor === "caliente" ? "bg-oro/15 ring-1 ring-oro/50" : m.calor === "frio" ? "bg-sky-900/30" : i === ultimo && !termino ? "bg-superficie-2 ring-1 ring-oro/40" : "bg-superficie-2"
+                m.comodin ? "bg-violeta/30 ring-1 ring-violeta-suave" : m.calor === "caliente" ? "bg-oro/15 ring-1 ring-oro/50" : m.calor === "frio" ? "bg-sky-900/30" : i === ultimo && !termino ? "bg-superficie-2 ring-1 ring-oro/40" : "bg-superficie-2"
               }`}
             >
               {i === ultimo && !termino ? <Escribiendo texto={m.texto} /> : m.texto}
@@ -675,6 +790,9 @@ function Final({
   sesion,
   cuenta,
   premioNuevo,
+  premiosNuevos,
+  conComodin,
+  fecha,
   clavePublica,
 }: {
   numero: number;
@@ -686,11 +804,15 @@ function Final({
   sesion: Sesion;
   cuenta: ProgresoCuenta | null;
   premioNuevo: boolean;
+  premiosNuevos: PremioNuevo[];
+  conComodin: boolean;
+  fecha: string;
   clavePublica: string | null;
 }) {
   const [copiado, setCopiado] = useState(false);
   const [generando, setGenerando] = useState(false);
-  const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin);
+  const [maestrosLocales] = useState(maestrosGanados);
+  const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin, conComodin);
   const urlImagen = `/api/juego/imagen?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&formato=historia`;
 
   /** La imagen para estados e historias: se comparte directo (celular) o se descarga. */
@@ -716,6 +838,8 @@ function Final({
   }
   const faltan = RACHA_PREMIO - (racha % RACHA_PREMIO);
   const stats = cuenta ?? { jugadas: progreso.jugadas, ganadas: progreso.ganadas, mejorRacha: progreso.mejorRacha, album: progreso.album, creditosGanados: 0 };
+  const album = new Set([...stats.album, ...progreso.album]);
+  const proximo = proximoPremio(album);
 
   async function compartir() {
     if (navigator.share) {
@@ -797,11 +921,34 @@ function Final({
             </div>
           </>
         )}
+        {premiosNuevos.map((p) => (
+          <div key={p.id} className="logro-nuevo flex items-center gap-3 rounded-xl border border-oro/60 bg-oro/10 p-3 text-left">
+            {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
+            <img src={emblemaPremio(p.id)} alt="" className="h-14 w-14 shrink-0 drop-shadow-[0_0_12px_rgba(241,217,154,0.7)]" />
+            <p>
+              🏆 <strong>¡Completaste {p.nombre}!</strong> Te sumamos {p.creditos} créditos de regalo: ya están en tu cuenta.
+            </p>
+          </div>
+        ))}
+        {proximo && (
+          <div className="flex items-center gap-3 text-left">
+            {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
+            <img src={emblemaPremio(proximo.id)} alt="" className="h-10 w-10 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs">
+                Próximo premio: completa <strong>{proximo.nombre}</strong> ({proximo.tienes} de {proximo.total}) y gana <strong>{proximo.creditos} créditos</strong>.
+              </p>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-superficie-2">
+                <div className="h-full rounded-full bg-oro" style={{ width: `${(proximo.tienes / proximo.total) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+        )}
         <p className="text-texto-suave">
           <Link href="/juego/album" className="text-oro-suave underline">
             Tu álbum
           </Link>
-          : {stats.album.length} de 78 cartas descubiertas.
+          : {album.size} de 78 cartas descubiertas.
           {stats.creditosGanados > 0 && ` Has ganado ${stats.creditosGanados} ${stats.creditosGanados === 1 ? "crédito" : "créditos"} jugando.`}
         </p>
         {sesion === "no" && (
@@ -817,6 +964,10 @@ function Final({
         )}
       </div>
 
+      {gano && <RetoMaestro fecha={fecha} numero={numero} sesion={sesion} cuenta={cuenta} />}
+
+      <RankingSemanal />
+
       {sesion === "si" && (
         <div className="space-y-2 rounded-xl bg-superficie-2 p-4 text-sm">
           <p>🔔 Activa los avisos y te recuerdo cuando haya carta nueva y tu racha esté en riesgo.</p>
@@ -826,9 +977,10 @@ function Final({
 
       <Logros
         datos={{
-          album: new Set([...stats.album, ...progreso.album]),
+          album,
           mejorRacha: Math.max(stats.mejorRacha, progreso.mejorRacha, racha),
           distribucion: progreso.distribucion,
+          maestros: Math.max(cuenta?.maestros ?? 0, maestrosLocales),
         }}
       />
 
@@ -837,6 +989,173 @@ function Final({
       <Link href="/tarot" className="boton boton-secundario">
         ¿Qué te dice esta carta a ti? Pregúntale a Sibila
       </Link>
+    </div>
+  );
+}
+
+/** Emblema de cada premio del álbum. */
+function emblemaPremio(id: string) {
+  if (id === "mazo") return "/juego/logros/mazo.webp";
+  if (id === "camino") return emblemaGrupo("mayor");
+  return emblemaGrupo(id.replace("palo:", "") as IdGrupo);
+}
+
+/** El premio del álbum más cercano (el de mayor avance que aún no se completa). */
+function proximoPremio(album: ReadonlySet<string>) {
+  const pendientes = premiosAlbum()
+    .map((p) => ({ id: p.id, nombre: p.nombre, creditos: p.creditos, total: p.cartas.length, tienes: p.cartas.filter((c) => album.has(c.id)).length }))
+    .filter((p) => p.tienes < p.total);
+  const sinMazo = pendientes.filter((p) => p.id !== "mazo");
+  const lista = sinMazo.length ? sinMazo : pendientes;
+  return lista.sort((a, b) => b.tienes / b.total - a.tienes / a.total)[0] ?? null;
+}
+
+/** Una ayuda por carta: Sibila revela un rasgo de la escondida (grupo, paridad o si el número es alto o bajo). */
+function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
+  const [abierto, setAbierto] = useState(false);
+  if (!abierto) {
+    return (
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => {
+            sonidoTocar();
+            setAbierto(true);
+          }}
+          className="flex items-center gap-2 rounded-full border border-violeta-suave/50 bg-violeta/15 py-1.5 pl-1.5 pr-4 text-sm transition hover:bg-violeta/25"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
+          <img src={cara("caliente")} alt="" className="h-7 w-7 rounded-full border border-oro/60" />
+          Pedirle el comodín a Sibila <span className="text-xs text-texto-suave">(1 por carta)</span>
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="aparecer space-y-3 rounded-xl border border-violeta-suave/50 bg-violeta/10 p-3">
+      <p className="text-center text-sm">
+        🔮 <strong>¿Qué quieres que te revele?</strong>
+        <span className="block text-xs text-texto-suave">Solo una vez por carta. En el ranking resta 1 punto.</span>
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {COMODINES.map((k) => (
+          <button key={k.id} type="button" onClick={() => onUsar(k.id)} className="rounded-xl border border-borde bg-superficie-2 p-2 text-center transition hover:border-violeta-suave active:scale-95">
+            <span className="block text-sm font-semibold">{k.titulo}</span>
+            <span className="mt-1 block text-[11px] leading-tight text-texto-suave">{k.descripcion}</span>
+          </button>
+        ))}
+      </div>
+      <button type="button" onClick={() => setAbierto(false)} className="mx-auto block text-xs text-texto-suave underline">
+        Mejor no, sigo sin ayuda
+      </button>
+    </div>
+  );
+}
+
+/** El reto maestro: se abre al encontrar la carta del día. Otra carta, 4 intentos, pistas en clave y sin comodín. */
+function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero: number; sesion: Sesion; cuenta: ProgresoCuenta | null }) {
+  const escondida = useMemo(() => cartaMaestra(numero), [numero]);
+  const [locales, setIntentos] = useState<string[]>(() => leerMaestro()[fecha] ?? []);
+  const intentos = locales.length ? locales : (cuenta?.maestroHoy ?? []);
+  const [abierto, setAbierto] = useState(() => locales.length > 0);
+  const [celebrar, setCelebrar] = useState(false);
+  const cartas = intentos.map((id) => cartaPorId(id)).filter((c) => c !== undefined);
+  const comparaciones = cartas.map((c) => comparar(c, escondida));
+  const gano = comparaciones.some((c) => c.acierto);
+  const termino = gano || intentos.length >= MAX_INTENTOS_MAESTRO;
+  const quedan = posibles(cartas, comparaciones);
+  const fallos = comparaciones.filter((c) => !c.acierto).length;
+
+  function adivinar(id: string) {
+    if (termino || intentos.includes(id)) return;
+    const nuevos = [...intentos, id];
+    const acierta = id === escondida.id;
+    const fin = acierta || nuevos.length >= MAX_INTENTOS_MAESTRO;
+    sonidoElegir();
+    setTimeout(() => {
+      if (acierta) {
+        sonidoGanar();
+        navigator.vibrate?.([40, 60, 40, 60, 120]);
+        setCelebrar(true);
+        setTimeout(() => setCelebrar(false), 2600);
+      } else if (fin) {
+        sonidoPerder();
+      } else {
+        const c = cartaPorId(id);
+        if (c) (reaccion(c, escondida, nuevos.length).calor === "frio" ? sonidoFrio : sonidoCerca)();
+        setTimeout(sonidoPista, 650);
+      }
+    }, 450);
+    setTimeout(() => document.getElementById(fin ? "reto-maestro" : "selector-juego")?.scrollIntoView({ behavior: "smooth", block: fin ? "start" : "end" }), 900);
+    setIntentos(nuevos);
+    guardarMaestro(fecha, nuevos);
+    if (fin) {
+      medir("RetoMaestro", { gano: acierta ? 1 : 0, intentos: nuevos.length });
+      if (sesion !== "no") {
+        void fetch("/api/juego/maestro", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fecha, intentos: nuevos }) }).catch(() => null);
+      }
+    }
+  }
+
+  if (!abierto) {
+    return (
+      <div className="relative overflow-hidden rounded-2xl border border-violeta-suave/60 bg-gradient-to-br from-violeta/30 via-noche to-noche p-5 text-left">
+        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">Desbloqueado</p>
+        <p className="mt-1 font-display text-2xl">🌙 El reto maestro de hoy</p>
+        <p className="mt-2 text-sm text-texto-suave">
+          Sibila escondió otra carta, más difícil: {MAX_INTENTOS_MAESTRO} intentos, pistas en clave y sin comodín. Si la encuentras sumas {PUNTOS_MAESTRO} puntos en el
+          ranking y ganas la medalla de maestría.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            sonidoPista();
+            setAbierto(true);
+            setTimeout(() => document.getElementById("reto-maestro")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+          }}
+          className="boton boton-primario mt-4"
+        >
+          Aceptar el reto
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div id="reto-maestro" className="scroll-mt-24 space-y-4 rounded-2xl border border-violeta-suave/60 bg-gradient-to-b from-violeta/20 to-noche p-4 text-left">
+      <div className="flex items-center justify-between">
+        <p className="font-display text-xl">🌙 Reto maestro</p>
+        <Vidas usados={intentos.length} gano={gano} max={MAX_INTENTOS_MAESTRO} />
+      </div>
+      <div className="relative flex justify-center py-1">
+        {termino ? (
+          // eslint-disable-next-line @next/next/no-img-element -- ilustración estática de la carta
+          <img src={imagenCarta(escondida) ?? DORSO} alt={escondida.nombre} className="voltear-carta w-32 rounded-xl" />
+        ) : (
+          <div className="flotar-carta relative">
+            {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
+            <img src={DORSO} alt="Carta maestra escondida" className="w-24 rounded-xl border border-violeta-suave/70 hue-rotate-[35deg]" style={{ boxShadow: `0 0 ${34 + fallos * 14}px rgba(182,156,255,${0.5 + fallos * 0.1})` }} />
+            <span className="absolute inset-0 flex items-center justify-center text-4xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">🌙</span>
+          </div>
+        )}
+        {celebrar && <Estallido />}
+      </div>
+      <Conversacion pistas={pistasMaestras(escondida)} cartas={cartas} comparaciones={comparaciones} escondida={escondida} termino={termino} gano={gano} max={MAX_INTENTOS_MAESTRO} />
+      {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={null} onElegir={adivinar} />}
+      {termino && (
+        <div className="aparecer space-y-2 text-center">
+          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `Maestría en ${intentos.length}` : "Se te escondió"}</p>
+          <p className="brillo-oro font-display text-3xl">{escondida.nombre}</p>
+          <p className="text-sm text-texto">{mensajeDelDia(escondida)}</p>
+          <p className="text-sm text-texto-suave">
+            {gano
+              ? sesion === "si"
+                ? `+${PUNTOS_MAESTRO} puntos en el ranking de esta semana. 🌙`
+                : `Entra con tu cuenta para que estos ${PUNTOS_MAESTRO} puntos cuenten en el ranking.`
+              : "Mañana hay otro reto maestro. 🌙"}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

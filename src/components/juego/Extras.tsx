@@ -90,7 +90,7 @@ export function Logros({ datos }: { datos: DatosLogros }) {
       <p className="text-center text-sm text-texto-suave">
         Logros: <strong className="text-texto">{obtenidos.size}</strong> de {LOGROS.length}
       </p>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
         {LOGROS.map((l) => {
           const tiene = obtenidos.has(l.id);
           return (
