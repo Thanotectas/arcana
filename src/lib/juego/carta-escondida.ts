@@ -23,6 +23,11 @@ export function numeroDeJuego(fecha: string) {
   return Math.round((Date.parse(`${fecha}T00:00:00Z`) - Date.parse(`${INICIO_JUEGO}T00:00:00Z`)) / 86_400_000) + 1;
 }
 
+/** Fecha (AAAA-MM-DD) de la carta número n. */
+export function fechaDeNumero(n: number) {
+  return new Date(Date.parse(`${INICIO_JUEGO}T12:00:00Z`) + (n - 1) * 86_400_000).toISOString().slice(0, 10);
+}
+
 /** Día anterior a una fecha AAAA-MM-DD. */
 export function diaAnterior(fecha: string) {
   return new Date(Date.parse(`${fecha}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
@@ -176,13 +181,50 @@ export function terminarPartida(p: Progreso, fecha: string, intentos: string[], 
   };
 }
 
+/**
+ * El resultado en pocas letras, para el enlace y la imagen (sin revelar la carta): por intento, «1» o «0» según el
+ * grupo, y «i», «m» o «n» según el número (igual, mayor, menor). Ej.: «0n1m1i».
+ */
+export function codigoResultado(comparaciones: Comparacion[]) {
+  return comparaciones.map((c) => `${c.grupo ? 1 : 0}${c.numero === "igual" ? "i" : c.numero === "mayor" ? "m" : "n"}`).join("");
+}
+
+export interface ResultadoCompartido {
+  numero: number;
+  filas: Comparacion[];
+  gano: boolean;
+  racha: number;
+}
+
+/** Lee un resultado compartido (?n=&f=&ra=). null si no es válido. */
+export function leerResultado(n: unknown, f: unknown, ra: unknown): ResultadoCompartido | null {
+  const numero = Number(n);
+  const codigo = typeof f === "string" ? f : "";
+  if (!Number.isInteger(numero) || numero < 1 || numero > 100_000 || !/^([01][imn]){1,6}$/.test(codigo)) return null;
+  const filas: Comparacion[] = (codigo.match(/../g) ?? []).map((par) => {
+    const grupo = par[0] === "1";
+    const numeroC = par[1] === "i" ? "igual" : par[1] === "m" ? "mayor" : "menor";
+    return { grupo, numero: numeroC, acierto: grupo && numeroC === "igual" };
+  });
+  // Solo el último puede ser el acierto; si hubo uno antes, el código no es válido.
+  if (filas.slice(0, -1).some((x) => x.acierto)) return null;
+  const gano = filas[filas.length - 1].acierto;
+  if (!gano && filas.length !== MAX_INTENTOS) return null;
+  const racha = Math.min(9999, Math.max(0, Math.floor(Number(ra) || 0)));
+  return { numero, filas, gano, racha };
+}
+
+export function enlaceResultado(sitio: string, numero: number, comparaciones: Comparacion[], racha: number) {
+  return `${sitio}/juego?n=${numero}&f=${codigoResultado(comparaciones)}${racha > 1 ? `&ra=${racha}` : ""}`;
+}
+
 /** Texto para compartir: sin revelar la carta. */
 export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string) {
   return [
     `🔮 El Camino del Loco #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}`,
     ...comparaciones.map(emojiDe),
     racha > 1 ? `🔥 ${racha} días seguidos` : "",
-    `¿Adivinas la carta de hoy? ${sitio}/juego`,
+    `¿Adivinas la carta de hoy? ${enlaceResultado(sitio, numero, comparaciones, racha)}`,
   ]
     .filter(Boolean)
     .join("\n");

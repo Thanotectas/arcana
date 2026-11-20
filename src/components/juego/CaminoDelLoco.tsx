@@ -18,7 +18,10 @@ import {
   cartasDelGrupo,
   comparar,
   diaAnterior,
+  enlaceResultado,
   fechaBogota,
+  fechaDeNumero,
+  codigoResultado,
   grupo,
   mensajeDelDia,
   msHastaNuevaCarta,
@@ -32,6 +35,7 @@ import {
   type Comparacion,
   type IdGrupo,
   type Progreso,
+  type ResultadoCompartido,
 } from "@/lib/juego/carta-escondida";
 
 const CLAVE = "arcana-camino-del-loco-v1";
@@ -60,8 +64,25 @@ async function enviarPartida(fecha: string, intentos: string[]): Promise<{ progr
   }
 }
 const DORSO = "/cartas/arcana/dorso.webp";
+const CLAVE_PRACTICA = "arcana-camino-practica-v1";
 
-function leerProgreso(): Progreso {
+/** Partidas de práctica (días anteriores): no cuentan para la racha ni el crédito. */
+export function leerPractica(): Record<string, string[]> {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE_PRACTICA) ?? "{}") as Record<string, string[]>;
+  } catch {
+    return {};
+  }
+}
+function guardarPractica(numero: number, intentos: string[]) {
+  try {
+    localStorage.setItem(CLAVE_PRACTICA, JSON.stringify({ ...leerPractica(), [numero]: intentos }));
+  } catch {
+    /* nada */
+  }
+}
+
+export function leerProgreso(): Progreso {
   try {
     const guardado = localStorage.getItem(CLAVE);
     return guardado ? { ...PROGRESO_VACIO, ...(JSON.parse(guardado) as Partial<Progreso>) } : PROGRESO_VACIO;
@@ -81,7 +102,7 @@ function guardarProgreso(p: Progreso) {
 const sinSuscripcion = () => () => {};
 
 /** El juego depende de la fecha y del progreso guardado en el navegador: se pinta solo en el cliente. */
-export function CaminoDelLoco({ clavePublica }: { clavePublica: string | null }) {
+export function CaminoDelLoco({ clavePublica, diaPractica = null, reto = null }: { clavePublica: string | null; diaPractica?: number | null; reto?: ResultadoCompartido | null }) {
   const enCliente = useSyncExternalStore(sinSuscripcion, () => true, () => false);
   if (!enCliente) {
     return (
@@ -92,15 +113,17 @@ export function CaminoDelLoco({ clavePublica }: { clavePublica: string | null })
       </div>
     );
   }
-  return <Juego clavePublica={clavePublica} />;
+  return <Juego clavePublica={clavePublica} diaPractica={diaPractica} reto={reto} />;
 }
 
-function Juego({ clavePublica }: { clavePublica: string | null }) {
+function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | null; diaPractica: number | null; reto: ResultadoCompartido | null }) {
   const [fecha] = useState(() => fechaBogota());
-  const numero = numeroDeJuego(fecha);
+  const numeroHoy = numeroDeJuego(fecha);
+  const practica = diaPractica !== null && diaPractica >= 1 && diaPractica < numeroHoy;
+  const numero = practica ? diaPractica : numeroHoy;
   const escondida = useMemo(() => cartaDelJuego(numero), [numero]);
   const [progreso, setProgreso] = useState(leerProgreso);
-  const [intentos, setIntentos] = useState<string[]>(() => leerProgreso().partidas[fecha] ?? []);
+  const [intentos, setIntentos] = useState<string[]>(() => (practica ? (leerPractica()[numero] ?? []) : (leerProgreso().partidas[fecha] ?? [])));
   const [sesion, setSesion] = useState<Sesion>("?");
   const [cuenta, setCuenta] = useState<ProgresoCuenta | null>(null);
   const [premioNuevo, setPremioNuevo] = useState(false);
@@ -108,6 +131,7 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
   // Con sesión: trae el progreso de la cuenta. Si hoy ya jugó en otro dispositivo, muestra esa partida; si jugó
   // aquí antes de entrar, la guarda en la cuenta.
   useEffect(() => {
+    if (practica) return;
     let vivo = true;
     fetch("/api/juego", { cache: "no-store" })
       .then(async (r) => {
@@ -134,7 +158,7 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
     return () => {
       vivo = false;
     };
-  }, [fecha]);
+  }, [fecha, practica]);
 
   const cartasIntento = intentos.map((id) => cartaPorId(id)).filter((c) => c !== undefined);
   const comparaciones = cartasIntento.map((c) => comparar(c, escondida));
@@ -150,6 +174,12 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
     if (termino || intentos.includes(id)) return;
     const nuevos = [...intentos, id];
     const acierta = id === escondida.id;
+    if (practica) {
+      if (acierta) navigator.vibrate?.([40, 60, 40]);
+      setIntentos(nuevos);
+      guardarPractica(numero, nuevos);
+      return;
+    }
     const siguiente =
       acierta || nuevos.length >= MAX_INTENTOS
         ? terminarPartida(progreso, fecha, nuevos, acierta, escondida.id)
@@ -174,6 +204,17 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
 
   return (
     <div className="space-y-6">
+      {reto && !practica && <Reto reto={reto} numeroHoy={numeroHoy} />}
+      {practica && (
+        <div className="tarjeta flex items-center justify-between gap-3 border border-violeta-suave/40 p-3 text-sm">
+          <span>
+            🧭 <strong>Práctica:</strong> carta del {new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${fechaDeNumero(numero)}T12:00:00Z`))}. No cuenta para tu racha.
+          </span>
+          <Link href="/juego" className="shrink-0 text-oro-suave underline">
+            Ir a la de hoy
+          </Link>
+        </div>
+      )}
       <div className="tarjeta space-y-5 p-4 sm:p-7">
         <div className="flex items-center justify-between text-sm text-texto-suave">
           <span className="rounded-full bg-superficie-2 px-3 py-1">Carta #{numero}</span>
@@ -210,7 +251,18 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
         {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={cartasIntento.length ? null : "mayor"} onElegir={adivinar} />}
       </div>
 
-      {termino && (
+      {termino && practica && (
+        <div className="tarjeta aparecer space-y-4 p-5 text-center sm:p-7">
+          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `La encontraste en ${comparaciones.length}` : "Esta se escondió muy bien"}</p>
+          <h2 className="brillo-oro font-display text-4xl font-semibold">{escondida.nombre}</h2>
+          <p className="mx-auto max-w-lg text-texto">{mensajeDelDia(escondida)}</p>
+          <Link href="/juego" className="boton boton-primario inline-flex">
+            Jugar la carta de hoy
+          </Link>
+        </div>
+      )}
+
+      {termino && !practica && (
         <Final
           numero={numero}
           escondida={escondida}
@@ -224,6 +276,8 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
           clavePublica={clavePublica}
         />
       )}
+
+      {(termino || practica) && <DiasAnteriores numeroHoy={numeroHoy} actual={numero} progreso={progreso} />}
 
       <Instalar />
 
@@ -420,7 +474,31 @@ function Final({
   clavePublica: string | null;
 }) {
   const [copiado, setCopiado] = useState(false);
+  const [generando, setGenerando] = useState(false);
   const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin);
+  const urlImagen = `/api/juego/imagen?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&formato=historia`;
+
+  /** La imagen para estados e historias: se comparte directo (celular) o se descarga. */
+  async function compartirImagen() {
+    setGenerando(true);
+    try {
+      const blob = await (await fetch(urlImagen)).blob();
+      const archivo = new File([blob], `camino-del-loco-${numero}.png`, { type: "image/png" });
+      if (navigator.canShare?.({ files: [archivo] })) {
+        await navigator.share({ files: [archivo], text: `¿Adivinas la carta de hoy? ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = archivo.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }
+    } catch {
+      window.open(urlImagen, "_blank");
+    } finally {
+      setGenerando(false);
+    }
+  }
   const faltan = RACHA_PREMIO - (racha % RACHA_PREMIO);
   const stats = cuenta ?? { jugadas: progreso.jugadas, ganadas: progreso.ganadas, mejorRacha: progreso.mejorRacha, album: progreso.album, creditosGanados: 0 };
 
@@ -462,7 +540,12 @@ function Final({
         <a href={`https://wa.me/?text=${encodeURIComponent(texto)}`} target="_blank" rel="noopener noreferrer" className="boton boton-whatsapp">
           Enviar por WhatsApp
         </a>
+        <button type="button" onClick={compartirImagen} disabled={generando} className="boton boton-secundario">
+          {generando ? "Preparando la imagen…" : "📸 Imagen para historias"}
+        </button>
       </div>
+
+      <ComoLeFue propio={gano ? comparaciones.length : null} />
 
       <div className="grid grid-cols-4 gap-2 text-center">
         {[
@@ -499,7 +582,10 @@ function Final({
           </>
         )}
         <p className="text-texto-suave">
-          Tu álbum: {stats.album.length} de 78 cartas descubiertas.
+          <Link href="/juego/album" className="text-oro-suave underline">
+            Tu álbum
+          </Link>
+          : {stats.album.length} de 78 cartas descubiertas.
           {stats.creditosGanados > 0 && ` Has ganado ${stats.creditosGanados} ${stats.creditosGanados === 1 ? "crédito" : "créditos"} jugando.`}
         </p>
         {sesion === "no" && (
@@ -568,6 +654,122 @@ function Instalar() {
           Instalar
         </Link>
       )}
+    </div>
+  );
+}
+
+/** Llegó desde el resultado que alguien compartió: el reto, sin revelar la carta. */
+function Reto({ reto, numeroHoy }: { reto: ResultadoCompartido; numeroHoy: number }) {
+  const deHoy = reto.numero === numeroHoy;
+  return (
+    <div className="tarjeta aparecer flex items-center gap-4 border border-oro/40 p-4">
+      <div className="flex shrink-0 flex-col gap-1" aria-hidden>
+        {reto.filas.map((f, i) => (
+          <div key={i} className="flex gap-1">
+            <span className={`h-3.5 w-3.5 rounded-[3px] ${f.grupo ? "bg-violeta" : "bg-superficie-2"}`} />
+            <span className={`h-3.5 w-3.5 rounded-[3px] ${f.numero === "igual" ? "bg-violeta" : "bg-superficie-2"}`} />
+          </div>
+        ))}
+      </div>
+      <p className="text-sm">
+        {deHoy ? (
+          <>
+            <strong>Te retaron:</strong> {reto.gano ? `la encontraron en ${reto.filas.length} de ${MAX_INTENTOS} intentos` : "a esta persona se le escondió"}. ¿Puedes hacerlo mejor? 🔮
+          </>
+        ) : (
+          <>
+            Ese reto era de la carta #{reto.numero}. Hoy Sibila escondió una nueva: <strong>¡a ver en cuántos la encuentras!</strong>
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
+interface ResumenHoy {
+  jugadores: number;
+  ganadas: number;
+  distribucion: number[];
+}
+
+/** Cómo le fue hoy a quienes juegan con cuenta: porcentaje que la encontró y en qué intento. */
+function ComoLeFue({ propio }: { propio: number | null }) {
+  const [resumen, setResumen] = useState<ResumenHoy | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/juego/hoy")
+      .then((r) => (r.ok ? (r.json() as Promise<ResumenHoy>) : null))
+      .then((d) => vivo && d && setResumen(d))
+      .catch(() => null);
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  if (!resumen || resumen.jugadores < 3) return null;
+  const maximo = Math.max(1, ...resumen.distribucion);
+  const masComun = resumen.distribucion.indexOf(Math.max(...resumen.distribucion)) + 1;
+  return (
+    <div className="space-y-3 rounded-xl bg-superficie-2 p-4 text-left text-sm">
+      <p className="text-center">
+        Hoy jugaron <strong>{resumen.jugadores}</strong> personas · el <strong>{Math.round((resumen.ganadas / resumen.jugadores) * 100)}%</strong> la encontró
+        {resumen.ganadas > 0 && (
+          <>
+            {" "}
+            · la mayoría en <strong>{masComun}</strong>
+          </>
+        )}
+      </p>
+      <div className="space-y-1.5">
+        {resumen.distribucion.map((n, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="w-3 text-right text-xs text-texto-suave">{i + 1}</span>
+            <div className="h-5 flex-1 overflow-hidden rounded bg-noche/60">
+              <div
+                className={`flex h-full items-center justify-end rounded px-1.5 text-[11px] ${propio === i + 1 ? "bg-oro text-noche" : "bg-violeta/80 text-white"}`}
+                style={{ width: `${Math.max(8, (n / maximo) * 100)}%` }}
+              >
+                {n}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {propio && <p className="text-center text-xs text-texto-suave">En dorado, tu resultado.</p>}
+    </div>
+  );
+}
+
+/** Las cartas de días anteriores: se pueden jugar como práctica (sin racha). */
+function DiasAnteriores({ numeroHoy, actual, progreso }: { numeroHoy: number; actual: number; progreso: Progreso }) {
+  const [practica] = useState(leerPractica);
+  if (numeroHoy <= 1) return null;
+  const dias = Array.from({ length: Math.min(14, numeroHoy - 1) }, (_, i) => numeroHoy - 1 - i);
+  return (
+    <div className="tarjeta space-y-3 p-4">
+      <div>
+        <p className="font-semibold">Cartas de días anteriores</p>
+        <p className="text-sm text-texto-suave">Juégalas como práctica: no cuentan para la racha, pero sí te enseñan las cartas.</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {dias.map((n) => {
+          const real = progreso.partidas[fechaDeNumero(n)];
+          const intentos = real ?? practica[n] ?? [];
+          const carta = cartaDelJuego(n).id;
+          const gano = intentos.includes(carta);
+          const termino = gano || intentos.length >= MAX_INTENTOS;
+          const marca = termino ? (gano ? "✓" : "✗") : intentos.length ? "…" : "";
+          const clase = `rounded-lg border px-3 py-1.5 text-sm ${n === actual ? "border-oro bg-oro/15" : "border-borde bg-superficie-2"}`;
+          return real && termino ? (
+            <span key={n} className={`${clase} opacity-60`} title="La jugaste ese día">
+              #{n} {marca}
+            </span>
+          ) : (
+            <Link key={n} href={`/juego?dia=${n}`} className={`${clase} hover:border-violeta-suave`}>
+              #{n} {marca}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
