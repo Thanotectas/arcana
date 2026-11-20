@@ -266,3 +266,25 @@ export function posibles(intentos: CartaTarot[], resultados: Comparacion[]) {
     ).map((c) => c.id),
   );
 }
+
+// ───────────────────────── Reacción de Sibila a cada intento ─────────────────────────
+
+export type Calor = "frio" | "tibio" | "caliente";
+
+const FRASES: Record<Calor, string[]> = {
+  caliente: ["¡Uy, casi! 🔥 Estás muy cerca.", "¡Caliente, caliente! 🔥 La tienes al lado.", "Se me erizó la piel 🔥 Estás a nada.", "¡Ahí, ahí! 🔥 Un pasito más."],
+  tibio: ["Vas por buen camino ✨", "Tibio… 🌙 Algo de eso hay.", "Mmm, te estás acercando ✨", "No es esa, pero vas bien 🌙"],
+  frio: ["Frío, frío ❄️", "Esa no… está lejos ❄️", "Ni cerca 😏 Escucha mi pista.", "Se escondió mejor que eso ❄️"],
+};
+
+/**
+ * Lo que Sibila dice después de un intento fallido: caliente si acertó el grupo y el número está a 2 o menos,
+ * tibio si acertó el grupo o el número está cerca, frío si no.
+ */
+export function reaccion(intento: CartaTarot, escondida: CartaTarot, vez: number): { texto: string; calor: Calor } {
+  const mismoGrupo = grupo(intento) === grupo(escondida);
+  const distancia = Math.abs(intento.numero - escondida.numero);
+  const calor: Calor = mismoGrupo && distancia <= 2 ? "caliente" : mismoGrupo || distancia <= 2 ? "tibio" : "frio";
+  const frases = FRASES[calor];
+  return { texto: frases[(vez + escondida.numero) % frases.length], calor };
+}

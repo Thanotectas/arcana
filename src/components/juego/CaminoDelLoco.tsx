@@ -6,6 +6,7 @@ import { imagenCarta } from "@/components/CartaVisual";
 import { AvisoDiario } from "@/components/AvisoDiario";
 import { estaInstalada, pedirInstalacion, usePuedeInstalar } from "@/lib/instalar";
 import { medir } from "@/lib/marca/medicion";
+import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
   GRUPOS,
@@ -29,6 +30,7 @@ import {
   numeroDeJuego,
   pistas,
   posibles,
+  reaccion,
   rotuloCasilla,
   terminarPartida,
   textoParaCompartir,
@@ -165,17 +167,41 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
   const gano = comparaciones.some((c) => c.acierto);
   const termino = gano || intentos.length >= MAX_INTENTOS;
   const fallos = comparaciones.filter((c) => !c.acierto).length;
-  const pistasVisibles = pistas(escondida).slice(0, termino ? 6 : 1 + fallos);
+  const todasLasPistas = pistas(escondida);
+  const [sonido, setSonido] = useState(sonidoActivo);
+  const [celebrar, setCelebrar] = useState(false);
   const rachaLocal = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
   const racha = cuenta ? cuenta.racha : rachaLocal;
   const quedan = posibles(cartasIntento, comparaciones);
+
+  /** Sonido, vibración y estallido según cómo salió el intento. */
+  function reaccionar(id: string, nuevos: string[]) {
+    const intento = cartaPorId(id);
+    if (id === escondida.id) {
+      sonidoGanar();
+      navigator.vibrate?.([40, 60, 40, 60, 120]);
+      setCelebrar(true);
+      setTimeout(() => setCelebrar(false), 2600);
+    } else if (nuevos.length >= MAX_INTENTOS) {
+      sonidoPerder();
+      navigator.vibrate?.(200);
+    } else if (intento) {
+      const { calor } = reaccion(intento, escondida, nuevos.length);
+      (calor === "frio" ? sonidoFrio : sonidoCerca)();
+      navigator.vibrate?.(calor === "caliente" ? [30, 40, 30] : 25);
+      setTimeout(sonidoPista, 650);
+    }
+  }
 
   function adivinar(id: string) {
     if (termino || intentos.includes(id)) return;
     const nuevos = [...intentos, id];
     const acierta = id === escondida.id;
+    sonidoElegir();
+    setTimeout(() => reaccionar(id, nuevos), 450);
+    // Que se vea la respuesta de Sibila y el selector (o el resultado) sin tener que buscarlos.
+    setTimeout(() => document.getElementById(acierta || nuevos.length >= MAX_INTENTOS ? "resultado-juego" : "selector-juego")?.scrollIntoView({ behavior: "smooth", block: acierta || nuevos.length >= MAX_INTENTOS ? "start" : "end" }), 900);
     if (practica) {
-      if (acierta) navigator.vibrate?.([40, 60, 40]);
       setIntentos(nuevos);
       guardarPractica(numero, nuevos);
       return;
@@ -184,7 +210,6 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
       acierta || nuevos.length >= MAX_INTENTOS
         ? terminarPartida(progreso, fecha, nuevos, acierta, escondida.id)
         : { ...progreso, partidas: { ...progreso.partidas, [fecha]: nuevos } };
-    if (acierta) navigator.vibrate?.([40, 60, 40, 60, 120]);
     if (acierta || nuevos.length >= MAX_INTENTOS) {
       // Para los anuncios (solo si la persona aceptó la medición): quién jugó, sin decir qué carta.
       medir("JuegoTerminado", { gano: acierta ? 1 : 0, intentos: nuevos.length });
@@ -219,34 +244,44 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
         <div className="flex items-center justify-between text-sm text-texto-suave">
           <span className="rounded-full bg-superficie-2 px-3 py-1">Carta #{numero}</span>
           <Vidas usados={intentos.length} gano={gano} />
-          <span className="rounded-full bg-superficie-2 px-3 py-1" title="Días seguidos jugando">
-            🔥 {racha}
+          <span className="flex items-center gap-1.5">
+            <span className="rounded-full bg-superficie-2 px-3 py-1" title="Días seguidos jugando">
+              🔥 {racha}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                guardarSonido(!sonido);
+                setSonido(!sonido);
+              }}
+              aria-label={sonido ? "Silenciar el juego" : "Activar el sonido"}
+              className="rounded-full bg-superficie-2 px-2 py-1"
+            >
+              {sonido ? "🔊" : "🔇"}
+            </button>
           </span>
         </div>
 
-        <div className="flex justify-center py-1">
+        <div className="relative flex justify-center py-1">
           {termino ? (
             // eslint-disable-next-line @next/next/no-img-element -- ilustración estática de la carta
             <img src={imagenCarta(escondida) ?? DORSO} alt={escondida.nombre} className="voltear-carta w-40 rounded-xl sm:w-48" />
           ) : (
             <div className="flotar-carta relative">
               {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
-              <img src={DORSO} alt="Carta escondida" className="w-28 rounded-xl border border-oro/50 shadow-[0_0_40px_rgba(139,108,246,0.45)] sm:w-36" />
+              <img
+                src={DORSO}
+                alt="Carta escondida"
+                className="w-28 rounded-xl border border-oro/50 transition-shadow duration-700 sm:w-36"
+                style={{ boxShadow: `0 0 ${30 + fallos * 12}px rgba(139,108,246,${0.4 + fallos * 0.08})` }}
+              />
               <span className="absolute inset-0 flex items-center justify-center font-display text-6xl text-oro drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">?</span>
             </div>
           )}
+          {celebrar && <Estallido />}
         </div>
 
-        <ul className="space-y-2">
-          {pistasVisibles.map((p, i) => (
-            <li key={i} className={`aparecer flex gap-2 rounded-lg px-3 py-2 text-sm ${i === pistasVisibles.length - 1 && !termino ? "border border-oro/40 bg-superficie-2" : "bg-superficie-2/70"}`}>
-              <span className="text-oro">✦</span>
-              <span>{p}</span>
-            </li>
-          ))}
-        </ul>
-
-        {cartasIntento.length > 0 && <Intentos cartas={cartasIntento} comparaciones={comparaciones} />}
+        <Conversacion pistas={todasLasPistas} cartas={cartasIntento} comparaciones={comparaciones} escondida={escondida} termino={termino} gano={gano} />
 
         {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={cartasIntento.length ? null : "mayor"} onElegir={adivinar} />}
       </div>
@@ -301,7 +336,7 @@ function Vidas({ usados, gano }: { usados: number; gano: boolean }) {
   return (
     <span className="flex gap-1" aria-label={`${MAX_INTENTOS - usados} intentos restantes`}>
       {Array.from({ length: MAX_INTENTOS }, (_, i) => (
-        <span key={i} className={`text-base transition-opacity ${i < usados ? (gano && i === usados - 1 ? "text-oro" : "opacity-25") : "text-oro"}`}>
+        <span key={i} className={`text-base transition-opacity ${i < usados ? (gano && i === usados - 1 ? "text-oro estrella-gana" : "opacity-25 estrella-cae") : "text-oro"}`}>
           ★
         </span>
       ))}
@@ -315,20 +350,99 @@ function Miniatura({ carta, className = "w-8" }: { carta: CartaTarot; className?
   return src ? <img src={src} alt="" className={`${className} rounded-[4px] border border-borde`} /> : <span className={className} />;
 }
 
-function Intentos({ cartas, comparaciones }: { cartas: CartaTarot[]; comparaciones: Comparacion[] }) {
+/** Lo que Sibila va diciendo y tus intentos, como un chat: su pista, tu carta (con lo que coincidió), su reacción y la siguiente pista. */
+function Conversacion({
+  pistas,
+  cartas,
+  comparaciones,
+  escondida,
+  termino,
+  gano,
+}: {
+  pistas: string[];
+  cartas: CartaTarot[];
+  comparaciones: Comparacion[];
+  escondida: CartaTarot;
+  termino: boolean;
+  gano: boolean;
+}) {
+  type Mensaje = { de: "sibila"; texto: string; calor?: string } | { de: "tu"; carta: CartaTarot; r: Comparacion };
+  const mensajes: Mensaje[] = [{ de: "sibila", texto: pistas[0] }];
+  cartas.forEach((carta, i) => {
+    const r = comparaciones[i];
+    mensajes.push({ de: "tu", carta, r });
+    if (r.acierto) mensajes.push({ de: "sibila", texto: "¡Ahí está! ✨ La encontraste." });
+    else if (i === MAX_INTENTOS - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙` });
+    else {
+      const re = reaccion(carta, escondida, i + 1);
+      mensajes.push({ de: "sibila", texto: re.texto, calor: re.calor });
+      if (pistas[i + 1]) mensajes.push({ de: "sibila", texto: pistas[i + 1] });
+    }
+  });
+  const ultimo = mensajes.length - 1;
   return (
-    <div className="space-y-2">
-      {cartas.map((c, i) => {
-        const r = comparaciones[i];
-        return (
-          <div key={c.id} className={`aparecer flex items-center gap-2 rounded-xl p-1.5 pr-2 ${r.acierto ? "bg-violeta/30 ring-1 ring-oro/60" : "bg-superficie-2"}`}>
-            <Miniatura carta={c} />
-            <span className={`min-w-0 flex-1 truncate text-sm ${r.acierto ? "font-semibold" : ""}`}>{c.nombre}</span>
-            <span className={`shrink-0 rounded-md px-2 py-1 text-[11px] ${r.grupo ? "bg-violeta text-white" : "bg-noche/60 text-texto-suave"}`}>{nombreGrupo(c)}</span>
-            <span className={`w-14 shrink-0 rounded-md px-1 py-1 text-center text-sm ${r.numero === "igual" ? "bg-violeta text-white" : "bg-noche/60"}`}>
-              {c.numero} {r.numero === "mayor" ? "⬆️" : r.numero === "menor" ? "⬇️" : "✓"}
+    <div className="space-y-2.5" aria-live="polite">
+      {mensajes.map((m, i) =>
+        m.de === "sibila" ? (
+          <div key={i} className="burbuja-entra flex items-end gap-2" style={{ animationDelay: i === ultimo && i > 0 ? "0.35s" : "0s" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
+            <img src="/juego/sibila.webp" alt="" className="h-8 w-8 shrink-0 rounded-full border border-oro/60" />
+            <p
+              className={`max-w-[85%] rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm ${
+                m.calor === "caliente" ? "bg-oro/15 ring-1 ring-oro/50" : m.calor === "frio" ? "bg-sky-900/30" : i === ultimo && !termino ? "bg-superficie-2 ring-1 ring-oro/40" : "bg-superficie-2"
+              }`}
+            >
+              {i === ultimo && !termino ? <Escribiendo texto={m.texto} /> : m.texto}
+            </p>
+          </div>
+        ) : (
+          <div key={i} className={`burbuja-entra ml-auto flex max-w-[92%] items-center gap-2 rounded-2xl rounded-br-sm p-1.5 pr-2 ${m.r.acierto ? "bg-violeta/40 ring-1 ring-oro/70" : "bg-violeta/15"}`}>
+            <Miniatura carta={m.carta} />
+            <span className={`min-w-0 flex-1 truncate text-sm ${m.r.acierto ? "font-semibold" : ""}`}>{m.carta.nombre}</span>
+            <span className={`voltear-chip shrink-0 rounded-md px-2 py-1 text-[11px] ${m.r.grupo ? "bg-violeta text-white" : "bg-noche/60 text-texto-suave"}`} style={{ animationDelay: "0.1s" }}>
+              {nombreGrupo(m.carta)}
+            </span>
+            <span className={`voltear-chip w-14 shrink-0 rounded-md px-1 py-1 text-center text-sm ${m.r.numero === "igual" ? "bg-violeta text-white" : "bg-noche/60"}`} style={{ animationDelay: "0.3s" }}>
+              {m.carta.numero} {m.r.numero === "mayor" ? "⬆️" : m.r.numero === "menor" ? "⬇️" : "✓"}
             </span>
           </div>
+        ),
+      )}
+      {termino && gano && <p className="sr-only">La encontraste.</p>}
+    </div>
+  );
+}
+
+/** El último mensaje de Sibila aparece letra por letra, como si lo estuviera escribiendo. */
+function Escribiendo({ texto }: { texto: string }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setN((x) => (x >= texto.length ? x : x + 2)), 22);
+    return () => clearInterval(t);
+  }, [texto]);
+  return (
+    <>
+      {texto.slice(0, n)}
+      {n < texto.length && <span className="opacity-0">{texto.slice(n)}</span>}
+    </>
+  );
+}
+
+/** Estrellas doradas que salen de la carta al encontrarla. */
+function Estallido() {
+  return (
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+      {Array.from({ length: 18 }, (_, i) => {
+        const angulo = (i / 18) * Math.PI * 2;
+        const distancia = 110 + (i % 3) * 35;
+        return (
+          <span
+            key={i}
+            className="particula absolute text-oro"
+            style={{ "--x": `${Math.cos(angulo) * distancia}px`, "--y": `${Math.sin(angulo) * distancia}px`, animationDelay: `${(i % 4) * 0.05}s`, fontSize: 12 + (i % 3) * 6 } as React.CSSProperties}
+          >
+            {i % 2 ? "✦" : "★"}
+          </span>
         );
       })}
     </div>
@@ -346,13 +460,14 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
   const posiblesPorGrupo = (g: IdGrupo) => cartasDelGrupo(g).filter((c) => quedan.has(c.id)).length;
 
   function seleccionar(c: CartaTarot) {
+    sonidoTocar();
     setElegida(c.id);
     setPestana(grupo(c) as IdGrupo);
     setTexto("");
   }
 
   return (
-    <div className="space-y-3 border-t border-borde pt-4">
+    <div id="selector-juego" className="scroll-mb-4 space-y-3 border-t border-borde pt-4">
       <p className="text-center text-sm text-texto-suave">¿Qué carta es? Elige un grupo y toca una carta.</p>
 
       <div className="grid grid-cols-5 gap-1 rounded-xl bg-noche/60 p-1">
@@ -520,7 +635,7 @@ function Final({
   }
 
   return (
-    <div className="tarjeta aparecer space-y-5 p-5 text-center sm:p-7">
+    <div id="resultado-juego" className="tarjeta aparecer scroll-mt-24 space-y-5 p-5 text-center sm:p-7">
       <div>
         <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">
           {gano ? (comparaciones.length === 1 ? "¡A la primera!" : `La encontraste en ${comparaciones.length}`) : "Hoy se escondió muy bien"}

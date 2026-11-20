@@ -1322,3 +1322,34 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .voltear-carta, .flotar-carta { animation: none; }
 }
+
+/* El Camino del Loco: conversación con Sibila y efectos */
+@keyframes burbuja-entra {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.burbuja-entra { animation: burbuja-entra 0.35s ease-out both; }
+@keyframes voltear-chip {
+  from { transform: perspective(300px) rotateX(90deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.voltear-chip { animation: voltear-chip 0.45s ease-out both; }
+@keyframes estrella-cae {
+  0% { transform: scale(1.6); opacity: 1; }
+  100% { transform: translateY(3px) scale(1); opacity: 0.25; }
+}
+.estrella-cae { animation: estrella-cae 0.6s ease-out; }
+@keyframes estrella-gana {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.7) rotate(20deg); text-shadow: 0 0 12px #f1d99a; }
+}
+.estrella-gana { animation: estrella-gana 0.9s ease-in-out 2; }
+@keyframes particula {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(var(--x), var(--y)) scale(1) rotate(160deg); opacity: 0; }
+}
+.particula { animation: particula 1.4s cubic-bezier(0.15, 0.8, 0.3, 1) both; text-shadow: 0 0 10px rgba(241, 217, 154, 0.9); }
+@media (prefers-reduced-motion: reduce) {
+  .burbuja-entra, .voltear-chip, .estrella-cae, .estrella-gana, .particula { animation: none; }
+}
