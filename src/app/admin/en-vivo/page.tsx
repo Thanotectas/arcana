@@ -7,7 +7,7 @@ import { vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
 import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
-import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, LanzarJuego, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
 
 export const dynamic = "force-dynamic";
@@ -128,6 +128,15 @@ export default async function PaginaAdminEnVivo() {
           </ul>
         )}
         <CrearCodigo venceSugerido={proximoDomingo} />
+      </section>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl font-semibold">La carta escondida</h2>
+        <p className="text-sm text-texto-suave">
+          Sibila esconde una carta, da cuatro pistas en voz alta (unos 17 segundos entre una y otra) y el chat adivina. Quien la escriba primero pasa de primero en la fila. Sin
+          nadie en la fila, Sibila la lanza sola como mucho cada 20 minutos.
+        </p>
+        <LanzarJuego />
       </section>
 
       <section className="tarjeta space-y-3 p-5">

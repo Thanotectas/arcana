@@ -44,7 +44,23 @@ interface Lectura {
   audio: string | null;
 }
 
-type Respuesta = Lectura | { clase: "espera" } | { clase: "fin" } | { clase: "pausa" } | { clase: "ok" } | { clase: "puente" | "despedida"; texto: string; audio: string | null };
+type Frase = { texto: string; audio: string | null };
+/** «La carta escondida»: el anuncio, las pistas, si alguien ya la encontró y la revelación. */
+type Juego = { clase: "juego"; inicio: Frase; pistas: Frase[] };
+type JuegoEstado = { clase: "juego-estado"; ganador: string | null };
+type JuegoFin = { clase: "juego-fin"; texto: string; audio: string | null; carta: { id: string; nombre: string }; ganador: string | null };
+type Respuesta =
+  | Lectura
+  | Juego
+  | JuegoEstado
+  | JuegoFin
+  | { clase: "espera" }
+  | { clase: "fin" }
+  | { clase: "pausa" }
+  | { clase: "ok" }
+  | { clase: "puente" | "despedida"; texto: string; audio: string | null };
+/** Segundos que el chat tiene para adivinar después de cada pista. */
+const SEGUNDOS_POR_PISTA = 17;
 
 const NOMBRE_TIPO: Record<TipoLectura, string> = {
   tarot: "Tarot",
@@ -171,6 +187,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   const [pausa, setPausa] = useState(false);
   const [cierre, setCierre] = useState<"abierto" | "despidiendo" | "fin">("abierto");
   const [instruccion, setInstruccion] = useState(0);
+  const [juego, setJuego] = useState<{ pistas: string[]; carta: { id: string; nombre: string } | null; ganador: string | null } | null>(null);
   const contexto = useRef<AudioContext | null>(null);
   const desbloquear = useRef<(() => void) | null>(null);
 
@@ -187,7 +204,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   }, [W, H]);
 
   const pedir = useCallback(
-    async (modo: "lectura" | "puente" | "relleno" | "cierre" | "estado", i = 0): Promise<Respuesta | null> => {
+    async (modo: "lectura" | "puente" | "relleno" | "cierre" | "estado" | "juego-estado" | "juego-fin", i = 0): Promise<Respuesta | null> => {
       try {
         const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
         if (res.status === 401) {
@@ -446,6 +463,45 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         }
         setPausa(false);
         emitir({ t: "pausa", on: false });
+        if (r?.clase === "juego") {
+          // «La carta escondida»: el anuncio, una pista a la vez y, entre pistas, se revisa el chat.
+          quietos = 0;
+          setLectura(null);
+          setSinVoz(!r.inicio.audio);
+          setJuego({ pistas: [r.inicio.texto.replace(/^.*Primera pista:\s*/, "Primera pista: ")], carta: null, ganador: null });
+          emitir({ t: "frase", texto: r.inicio.texto, audio: r.inicio.audio, cierre: "abierto" });
+          await hablar(r.inicio.texto, r.inicio.audio);
+          setSubtitulo("");
+          let ganador: string | null = null;
+          for (let k = 0; k <= r.pistas.length && activo && !ganador; k++) {
+            if (k > 0) {
+              const pista = r.pistas[k - 1];
+              setJuego((j) => j && { ...j, pistas: [...j.pistas, pista.texto] });
+              emitir({ t: "frase", texto: pista.texto, audio: pista.audio, cierre: "abierto" });
+              await hablar(pista.texto, pista.audio);
+              setSubtitulo("");
+            }
+            const hasta = Date.now() + SEGUNDOS_POR_PISTA * 1000;
+            while (activo && Date.now() < hasta) {
+              const e = await pedir("juego-estado");
+              if (e?.clase === "juego-estado" && e.ganador) {
+                ganador = e.ganador;
+                break;
+              }
+              await esperar(2500);
+            }
+          }
+          const fin = await pedir("juego-fin");
+          if (fin?.clase === "juego-fin") {
+            setJuego((j) => j && { ...j, carta: fin.carta, ganador: fin.ganador });
+            emitir({ t: "frase", texto: fin.texto, audio: fin.audio, cierre: "abierto" });
+            await hablar(fin.texto, fin.audio);
+            setSubtitulo("");
+            await esperar(5000);
+          }
+          setJuego(null);
+          continue;
+        }
         if (r?.clase === "lectura") {
           quietos = 0;
           setSinVoz(!r.audio);
@@ -638,6 +694,39 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           <p className="mt-5 font-display text-5xl text-oro-suave">Sibila</p>
           <p className="mt-1 text-xl text-texto-suave">Lecturas en vivo · Arcana</p>
         </div>
+        )}
+
+        {/* «La carta escondida»: tapa la pregunta y las cartas mientras dura el juego */}
+        {juego && cierre === "abierto" && (
+          <div className={`absolute ${derecha} z-10 flex flex-col rounded-3xl border border-oro/40 bg-[#0d0820]/95 aparecer ${vertical ? "top-[640px] h-[860px] p-8" : escena ? "top-[110px] h-[640px] p-7" : "top-[170px] h-[720px] p-9"}`}>
+            <p className="text-2xl uppercase tracking-[0.25em] text-violeta-suave">🃏 La carta escondida</p>
+            <p className={`mt-1 font-display leading-tight text-oro-suave ${compacto ? "text-[40px]" : "text-[48px]"}`}>
+              {juego.carta ? (juego.ganador ? `¡${juego.ganador} la encontró!` : "Se escondió muy bien…") : "¿Cuál es? Escríbela en el chat"}
+            </p>
+            <div className={`mt-5 flex flex-1 gap-8 ${vertical ? "flex-col items-center" : ""}`}>
+              <div className={`relative shrink-0 ${compacto ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200 }}>
+                <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: juego.carta ? "rotateY(180deg)" : "none" }}>
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70 vivo-carta" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
+                    <span className="font-display text-[140px] text-oro-suave">?</span>
+                  </div>
+                  {juego.carta && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={`/cartas/rider/${juego.carta.id}.webp`} alt={juego.carta.nombre} className="absolute inset-0 h-full w-full rounded-2xl border-4 border-oro/80 object-cover" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }} />
+                  )}
+                </div>
+                {juego.carta && <div className="pointer-events-none absolute inset-[-30px] rounded-3xl vivo-destello" />}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                {juego.carta && <p className={`font-display text-oro-suave ${compacto ? "text-4xl" : "text-5xl"}`}>{juego.carta.nombre}</p>}
+                {juego.pistas.map((p, i) => (
+                  <p key={i} className={`aparecer rounded-2xl border px-5 py-3 leading-snug ${i === juego.pistas.length - 1 && !juego.carta ? "border-oro/60 bg-oro/10" : "border-borde bg-black/30"} ${compacto ? "text-2xl" : "text-[28px]"}`}>
+                    ✦ {p}
+                  </p>
+                ))}
+                {!juego.carta && <p className={`mt-auto text-texto-suave ${compacto ? "text-xl" : "text-2xl"}`}>Quien la escriba primero pasa de primero en la fila 🏆</p>}
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Pregunta */}

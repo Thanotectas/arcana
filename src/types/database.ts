@@ -257,6 +257,12 @@ type EnVivoEstadoRow = {
   fb_desde: string | null;
   fb_buscado_en: string | null;
   fb_detalle: string | null;
+  juego_pedido_en: string | null;
+  juego_carta: string | null;
+  juego_inicio: string | null;
+  juego_ganador: string | null;
+  juego_ganador_en: string | null;
+  juego_fin: string | null;
   actualizado_en: string;
 };
 
@@ -516,6 +522,12 @@ export type Database = {
         Update: Partial<EnVivoPreguntaRow>;
         Relationships: [];
       };
+      probadores_invitaciones: {
+        Row: { usuario_id: string; invitado_en: string; acepto_en: string | null; gmail: string | null; agregado_en: string | null };
+        Insert: { usuario_id: string; invitado_en?: string; acepto_en?: string | null; gmail?: string | null; agregado_en?: string | null };
+        Update: Partial<{ usuario_id: string; invitado_en: string; acepto_en: string | null; gmail: string | null; agregado_en: string | null }>;
+        Relationships: [];
+      };
       app_instalaciones: {
         Row: { usuario_id: string; plataforma: string; creado_en: string };
         Insert: { usuario_id: string; plataforma: string; creado_en?: string };
@@ -536,7 +548,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "actualizado_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };

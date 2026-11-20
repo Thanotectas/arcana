@@ -13,6 +13,7 @@ import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
 import { codigoVigente } from "@/lib/pagos/codigos";
 import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
+import { ganadorConPrioridad, revisarAdivinanzas, usarPrioridad } from "@/lib/en-vivo-juego";
 import { TELEGRAM } from "@/lib/marca/redes";
 import { createHash } from "node:crypto";
 import { PIDE_CARTA, PIDE_SINASTRIA, fechasEn, prepararCarta, prepararCielo, prepararSinastria } from "@/lib/en-vivo-astro";
@@ -178,10 +179,19 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
 
   // Una sola consulta por persona: sus mensajes del lote se juntan («soy Sagitario» +
   // «¿cómo me ves en el amor?») y, si ya tiene una esperando turno, se le suman.
+  // «La carta escondida»: los mensajes que nombran una carta son intentos de adivinar (el primero que acierta gana)
+  // y no entran a la fila como consulta.
+  const intentosJuego = await revisarAdivinanzas(
+    admin,
+    estado,
+    (r.datos.items ?? [])
+      .filter((m) => m.snippet?.type === "textMessageEvent" && !m.authorDetails?.isChatOwner)
+      .map((m) => ({ id: m.id, autor: (m.authorDetails?.displayName ?? "Alguien").slice(0, 60), texto: m.snippet?.displayMessage ?? "" })),
+  ).catch(() => new Set<string>());
   const porAutor = new Map<string, { mensaje_id: string; autor: string; textos: string[] }>();
   for (const m of r.datos.items ?? []) {
     const texto = (m.snippet?.displayMessage ?? "").trim();
-    if (m.snippet?.type !== "textMessageEvent" || m.authorDetails?.isChatOwner || !pareceConsulta(texto)) continue;
+    if (m.snippet?.type !== "textMessageEvent" || m.authorDetails?.isChatOwner || intentosJuego.has(m.id) || !pareceConsulta(texto)) continue;
     const autor = (m.authorDetails?.displayName ?? "Alguien").slice(0, 60);
     const grupo = porAutor.get(autor);
     if (grupo) grupo.textos.push(texto);
@@ -519,9 +529,13 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       ? await admin.from("en_vivo_preguntas").select("autor").in("origen", ["chat", "facebook"]).eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
       : { data: [] };
     const repiten = new Set((yaLeidas ?? []).map((l) => l.autor));
-    const p = candidatas.find((c) => !esChat(c.origen) || !repiten.has(c.autor)) ?? candidatas[0];
+    // Quien ganó «La carta escondida» pasa de primero con su pregunta.
+    const ganador = await ganadorConPrioridad(admin).catch(() => null);
+    const delGanador = ganador ? candidatas.find((c) => esChat(c.origen) && c.autor === ganador) : undefined;
+    const p = delGanador ?? candidatas.find((c) => !esChat(c.origen) || !repiten.has(c.autor)) ?? candidatas[0];
     const { data: tomada } = await admin.from("en_vivo_preguntas").update({ estado: "leyendo", leida_en: new Date().toISOString() }).eq("id", p.id).eq("estado", "pendiente").select("id").maybeSingle();
     if (!tomada) continue;
+    if (delGanador && p.id === delGanador.id) await usarPrioridad(admin).catch(() => null);
 
     const signo = p.signo ? SIGNOS.find((s) => s.id === p.signo) ?? null : null;
     try {

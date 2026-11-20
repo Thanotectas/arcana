@@ -11,6 +11,7 @@ import { detectarSigno } from "@/lib/redes/sibila-redes";
 import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 import { diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
+import { pedirJuego } from "@/lib/en-vivo-juego";
 
 export interface EstadoEnVivo {
   error?: string;
@@ -199,6 +200,18 @@ export async function accionCierre(_prev: EstadoEnVivo, formData: FormData): Pro
   revalidatePath("/admin/en-vivo");
   const texto = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(cierre);
   return { mensaje: ahora ? "Sibila se despide al terminar la lectura que está en curso." : `Sibila se despide a las ${texto}.` };
+}
+
+/** «La carta escondida»: el escenario la empieza en la siguiente vuelta (después de la lectura en curso). */
+export async function accionJuego(): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  try {
+    await pedirJuego(getSupabaseAdmin());
+  } catch (e) {
+    const m = e instanceof Error ? e.message : String(e);
+    return { error: m.includes("juego_") ? "Falta aplicar la migración 0054 (la carta escondida en el directo)." : m };
+  }
+  return { mensaje: "Listo: al terminar la lectura en curso, Sibila esconde una carta y el chat adivina." };
 }
 
 /**
