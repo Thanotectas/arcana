@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPlataforma } from "@/lib/plataforma";
+import { CREDITOS_PROBADOR, MOTIVO_PROBADOR } from "@/lib/marca/play";
 
 const MOTIVO_APP = "regalo:app";
 
@@ -18,6 +19,19 @@ export async function POST() {
   if (plataforma === "web") return Response.json({ error: "no_instalada" }, { status: 400 });
 
   const admin = getSupabaseAdmin();
+  // App de Google Play (prueba cerrada): quien la abre es probador y recibe sus créditos de prueba, una sola vez.
+  if (plataforma === "android") {
+    const { count } = await admin.from("movimientos_creditos").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).eq("motivo", MOTIVO_PROBADOR);
+    if (!count) {
+      const { error: errorPrueba } = await admin.rpc("devolver_creditos", { p_usuario: user.id, p_cantidad: CREDITOS_PROBADOR, p_motivo: MOTIVO_PROBADOR, p_referencia: "app-android" });
+      if (errorPrueba) {
+        console.error("[app] no se sumaron los créditos de prueba", errorPrueba.message);
+        return Response.json({ error: "credito" }, { status: 500 });
+      }
+      await admin.from("app_instalaciones").upsert({ usuario_id: user.id, plataforma }, { onConflict: "usuario_id", ignoreDuplicates: true });
+      return Response.json({ ok: true, premio: true, creditos: CREDITOS_PROBADOR, probador: true });
+    }
+  }
   const { error } = await admin.from("app_instalaciones").insert({ usuario_id: user.id, plataforma });
   if (error) {
     if (error.code === "23505") return Response.json({ ok: true, premio: false });
@@ -30,5 +44,5 @@ export async function POST() {
     await admin.from("app_instalaciones").delete().eq("usuario_id", user.id);
     return Response.json({ error: "credito" }, { status: 500 });
   }
-  return Response.json({ ok: true, premio: true });
+  return Response.json({ ok: true, premio: true, creditos: 1 });
 }
