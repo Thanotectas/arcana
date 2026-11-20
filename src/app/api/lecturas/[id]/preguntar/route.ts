@@ -103,14 +103,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         .join("\n\n");
       const usuario =
         `Contexto de la consulta original (datos que se usaron para la lectura):\n${base.usuario}\n\n` +
-        `Lectura que ya recibió la persona:\n${lectura.interpretacion}\n\n` +
+        `Lectura que ya recibió la persona:\n${(lectura.interpretacion ?? "").replace(/```json[\s\S]*$/, "").trim()}\n\n` +
         (historial ? `Conversación posterior:\n${historial}\n\n` : "") +
         `Nueva pregunta de la persona: ${datoDeUsuario(pregunta)}\n\n` +
         `Responde solo a esta pregunta, apoyándote en los símbolos de su lectura (cita la carta, el planeta, el número o la línea que corresponda). ` +
         `Sé concreta y cálida, sin repetir la lectura. Si la pregunta se sale del tema esotérico o pide diagnóstico médico, legal o financiero, dilo con amabilidad y redirige. ` +
-        `Extensión: 120 a 220 palabras. Sin título; puedes usar un par de párrafos.`;
+        `Extensión: 120 a 220 palabras. Sin título; puedes usar un par de párrafos. ` +
+        // Las instrucciones de la lectura original piden un bloque JSON al final (marcas de la foto): aquí no va.
+        `No agregues bloques de código, JSON, anexos ni marcas técnicas: solo el texto para la persona.`;
       const texto = await generarTexto(usuario, [base.sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), { idioma, effort: "low", maxTokens: 900 }, enviar);
-      await admin.rpc("finalizar_pregunta", { p_pregunta: fila.id, p_texto: texto });
+      await admin.rpc("finalizar_pregunta", { p_pregunta: fila.id, p_texto: texto.replace(/```json[\s\S]*$/, "").trim() });
     } catch (e) {
       const codigo = clasificarError(e);
       console.error(`[preguntas] fallo (${codigo})`, fila.id, e instanceof Error ? e.message : e);

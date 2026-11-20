@@ -121,7 +121,7 @@ export function ConversacionLectura({
                   <p className="text-peligro">{x.codigo ? t.lecturas.detalle.causas[x.codigo as keyof typeof t.lecturas.detalle.causas] : t.preguntas.fallo}</p>
                 ) : x.respuesta ? (
                   <div>
-                    <Markdown texto={x.respuesta} />
+                    <Markdown texto={x.respuesta.replace(/```json[\s\S]*$/, "")} />
                     {x.estado === "escribiendo" && <span className="cursor-escritura" aria-hidden />}
                   </div>
                 ) : (
