@@ -10,7 +10,7 @@
  * nueva) y Purchase (compra aprobada, con valor y moneda). Nunca lecturas,
  * preguntas, fotos ni datos de nacimiento.
  */
-export const META_PIXEL_ID = "";
+export const META_PIXEL_ID = "1101417126228910";
 
 /** Lo que eligió la persona en el aviso: "si" o "no" (localStorage). */
 export const CLAVE_MEDICION = "arcana_medicion";
