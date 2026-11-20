@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "Cormorant"; src: url("../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Cormorant"; src: url("../../../src/app/fuentes/CormorantGaramond-Italic.ttf"); font-style: italic; }
+@font-face { font-family: "Inter"; src: url("../../../src/app/fuentes/Inter-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("../../../src/app/fuentes/Inter-SemiBold.ttf"); font-weight: 600; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: var(--w); height: var(--h); overflow: hidden; background: #0b0716; }
+body { position: relative; font-family: Inter, sans-serif; color: #f4efff; }
+.fondo { position: absolute; inset: 0;
+  background:
+    radial-gradient(900px 700px at 80% 35%, rgba(139,108,246,.38), transparent 60%),
+    radial-gradient(700px 600px at 15% 85%, rgba(241,217,154,.12), transparent 60%),
+    radial-gradient(1200px 900px at 50% 0%, rgba(80,40,140,.45), transparent 70%), #0b0716; }
+.estrellas { position: absolute; inset: 0; background-image:
+  radial-gradient(2px 2px at 12% 18%, #fff8, transparent), radial-gradient(2px 2px at 88% 12%, #fffa, transparent),
+  radial-gradient(1.5px 1.5px at 70% 8%, #fff9, transparent), radial-gradient(2px 2px at 40% 4%, #f1d99a, transparent),
+  radial-gradient(1.5px 1.5px at 95% 55%, #fff8, transparent), radial-gradient(2px 2px at 5% 50%, #fff6, transparent),
+  radial-gradient(1.5px 1.5px at 55% 92%, #fff7, transparent), radial-gradient(2px 2px at 30% 60%, #f1d99a99, transparent); }
+.sibila { position: absolute; background: url("../../marca/sibila-retrato.jpg") center/cover;
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); }
+.marca { position: absolute; display: flex; align-items: center; gap: 14px; font-family: Cormorant; font-size: 44px; color: #f1d99a; }
+.marca img { width: 54px; height: 54px; }
+.antetitulo { position: absolute; font-size: 25px; letter-spacing: .32em; text-transform: uppercase; color: #b9a6ff; font-weight: 600; }
+h1 { position: absolute; font-family: Cormorant; font-weight: 600; line-height: .98;
+  background: linear-gradient(180deg, #fff6d8, #f1d99a 55%, #c9a25a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h1 em { font-style: normal; color: #fff; -webkit-text-fill-color: #fff; }
+.telefono { position: absolute; border-radius: 56px; padding: 14px; background: linear-gradient(160deg, #2a2148, #120c22);
+  box-shadow: 0 0 0 2px rgba(241,217,154,.45), 0 30px 80px rgba(0,0,0,.7), 0 0 120px rgba(139,108,246,.45); transform: rotate(var(--giro, 4deg)); }
+.pantalla { width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #0b0716 url("captura-juego.png") top center / 100% auto no-repeat; }
+.chips { position: absolute; display: flex; gap: 14px; flex-wrap: wrap; }
+.chip { background: rgba(26,18,48,.85); border: 1.5px solid rgba(241,217,154,.35); border-radius: 999px; padding: 14px 24px; font-size: 27px; font-weight: 600; white-space: nowrap; }
+.cta { position: absolute; border-radius: 999px; background: linear-gradient(180deg, #f6e2a8, #d6b065); color: #1b1230; font-weight: 600; text-align: center; box-shadow: 0 10px 40px rgba(241,217,154,.35); }
+.firma { position: absolute; font-family: Cormorant; font-style: italic; font-size: 40px; color: #f1d99a; }
+
+/* Publicación 1080 × 1350 */
+body.feed { --w: 1080px; --h: 1350px; }
+.feed .sibila { left: -170px; top: 330px; width: 900px; height: 900px; }
+.feed .marca { left: 64px; top: 56px; }
+.feed .antetitulo { left: 64px; top: 152px; }
+.feed h1 { left: 60px; top: 196px; width: 960px; font-size: 104px; }
+.feed .telefono { right: 70px; top: 470px; width: 410px; height: 690px; }
+.feed .firma { left: 90px; top: 1090px; }
+.feed .chips { left: 60px; right: 60px; top: 1176px; justify-content: flex-start; }
+.feed .chip { font-size: 25px; padding: 12px 20px; }
+.feed .cta { display: none; }
+.feed .url { position: absolute; right: 64px; top: 66px; font-size: 28px; font-weight: 600; color: #1b1230; background: linear-gradient(180deg, #f6e2a8, #d6b065); border-radius: 999px; padding: 12px 26px; }
+
+/* Historia / estado 1080 × 1920 */
+body.historia { --w: 1080px; --h: 1920px; }
+.historia .sibila { left: -170px; top: 1220px; width: 660px; height: 660px; }
+.historia .marca { left: 50%; transform: translateX(-50%); top: 110px; }
+.historia .antetitulo { left: 0; right: 0; text-align: center; top: 210px; }
+.historia h1 { left: 70px; right: 70px; top: 262px; text-align: center; font-size: 124px; }
+.historia .telefono { left: 50%; margin-left: -250px; top: 600px; width: 500px; height: 850px; --giro: 3deg; }
+.historia .firma { display: none; }
+.historia .chips { left: 60px; right: 60px; top: 1515px; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 12px; }
+.historia .cta { left: 110px; right: 110px; top: 1770px; font-size: 40px; padding: 26px 0; }
+.historia .url { display: none; }
+</style></head>
+<body>
+<div class="fondo"></div><div class="estrellas"></div>
+<div class="sibila"></div>
+<div class="marca"><img src="../../../public/marca/icono-192.png" alt="">Arcana</div>
+<div class="url">miarcana.com/juego</div>
+<p class="antetitulo">Nuevo · juego diario del tarot</p>
+<h1>¿Adivinas la carta<br>que <em>escondí</em> hoy?</h1>
+<div class="telefono"><div class="pantalla"></div></div>
+<p class="firma">— Sibila</p>
+<div class="chips">
+  <span class="chip">🃏 1 carta escondida cada día</span>
+  <span class="chip">🔍 6 intentos y mis pistas</span>
+  <span class="chip">🔥 7 días seguidos = 1 crédito gratis</span>
+</div>
+<div class="cta">Juega gratis · miarcana.com/juego</div>
+<script>document.body.className = location.hash.slice(1) || "feed";</script>
+</body></html>
