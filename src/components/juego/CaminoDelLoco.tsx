@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type TouchEvent } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { AvisoDiario } from "@/components/AvisoDiario";
@@ -468,14 +468,74 @@ function Estallido() {
 }
 
 /** Selector visual: pestañas por grupo y una casilla por carta. Las que ya no pueden ser se apagan. */
+/** Color, elemento y tema de cada grupo, para que se reconozcan de un vistazo. */
+const ESTILO_GRUPO: Record<IdGrupo, { color: string; elemento: string; tema: string }> = {
+  mayor: { color: "#b69cff", elemento: "Arcanos Mayores", tema: "el viaje del alma" },
+  bastos: { color: "#ff9a4d", elemento: "Fuego", tema: "acción, pasión y proyectos" },
+  copas: { color: "#5cc8ff", elemento: "Agua", tema: "emociones y vínculos" },
+  espadas: { color: "#c9d6ea", elemento: "Aire", tema: "pensamiento y decisiones" },
+  oros: { color: "#f5c84c", elemento: "Tierra", tema: "dinero, cuerpo y lo material" },
+};
+
+/** Símbolo dibujado de cada palo (estrella, bastón, copa, espada y pentáculo). */
+function SimboloGrupo({ id, className = "h-6 w-6" }: { id: IdGrupo; className?: string }) {
+  const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      {id === "mayor" && <path {...trazo} d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2z M18.5 17.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" />}
+      {id === "bastos" && (
+        <g {...trazo}>
+          <path d="M6 21L17 5" />
+          <path d="M17 5c.4-1.5 1.6-2.3 3-2.3-.1 1.4-1 2.5-2.4 2.9" />
+          <path d="M12.2 10.6c-1.6-.4-2.5-1.6-2.6-3.1 1.5 0 2.7.9 3.2 2.3" />
+          <path d="M14.3 7.6c1.6.2 2.7 1.3 2.9 2.8-1.5.1-2.8-.7-3.4-2" />
+        </g>
+      )}
+      {id === "copas" && (
+        <g {...trazo}>
+          <path d="M5.5 3.5h13c0 5-2.9 8.5-6.5 8.5S5.5 8.5 5.5 3.5z" />
+          <path d="M12 12v6M8 21h8M9.5 18h5" />
+          <path d="M7.5 6.5h9" opacity=".6" />
+        </g>
+      )}
+      {id === "espadas" && (
+        <g {...trazo}>
+          <path d="M12 2.5l1.6 2.5v10.5h-3.2V5z" />
+          <path d="M7 15.5h10M12 15.5v4" />
+          <circle cx="12" cy="20.6" r="1.1" />
+        </g>
+      )}
+      {id === "oros" && (
+        <g {...trazo}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 4.6l2.2 6.9-5.8-4.3h7.2l-5.8 4.3z" transform="translate(0 2.2)" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
+const miniCarta = (c: CartaTarot) => `/cartas/rider-mini/${c.id}.webp`;
+
 function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: ReadonlySet<string>; quedan: ReadonlySet<string>; sugerido: IdGrupo | null; onElegir: (id: string) => void }) {
   const [pestana, setPestana] = useState<IdGrupo>(sugerido ?? "mayor");
   const [elegida, setElegida] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
+  const [soloPosibles, setSoloPosibles] = useState(false);
+  const toque = useRef<{ x: number; y: number } | null>(null);
   const cartaElegida = elegida ? cartaPorId(elegida) : undefined;
   const sugerencias = buscarCartas(texto, intentados, 6);
-  const cartas = cartasDelGrupo(pestana);
-  const posiblesPorGrupo = (g: IdGrupo) => cartasDelGrupo(g).filter((c) => quedan.has(c.id)).length;
+  const todas = cartasDelGrupo(pestana);
+  const cartas = soloPosibles ? todas.filter((c) => quedan.has(c.id) && !intentados.has(c.id)) : todas;
+  const posiblesPorGrupo = (g: IdGrupo) => cartasDelGrupo(g).filter((c) => quedan.has(c.id) && !intentados.has(c.id)).length;
+  const estilo = ESTILO_GRUPO[pestana];
+  const posiblesAqui = posiblesPorGrupo(pestana);
+
+  function cambiarGrupo(g: IdGrupo) {
+    if (g === pestana) return;
+    sonidoTocar();
+    setPestana(g);
+  }
 
   function seleccionar(c: CartaTarot) {
     sonidoTocar();
@@ -484,32 +544,71 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
     setTexto("");
   }
 
+  /** Deslizar de lado sobre las cartas pasa al grupo vecino. */
+  function alSoltar(e: TouchEvent) {
+    const ini = toque.current;
+    toque.current = null;
+    if (!ini) return;
+    const dx = e.changedTouches[0].clientX - ini.x;
+    const dy = e.changedTouches[0].clientY - ini.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const i = GRUPOS.findIndex((g) => g.id === pestana);
+    const otro = GRUPOS[(i + (dx < 0 ? 1 : -1) + GRUPOS.length) % GRUPOS.length];
+    cambiarGrupo(otro.id);
+  }
+
   return (
     <div id="selector-juego" className="scroll-mb-4 space-y-3 border-t border-borde pt-4">
       <p className="text-center text-sm text-texto-suave">¿Qué carta es? Elige un grupo y toca una carta.</p>
 
-      <div className="grid grid-cols-5 gap-1 rounded-xl bg-noche/60 p-1">
+      <div className="grid grid-cols-5 gap-1.5 pt-2" role="tablist" aria-label="Grupos del tarot">
         {GRUPOS.map((g) => {
           const n = posiblesPorGrupo(g.id);
+          const activo = pestana === g.id;
+          const color = ESTILO_GRUPO[g.id].color;
           return (
             <button
               key={g.id}
               type="button"
-              onClick={() => setPestana(g.id)}
-              className={`flex flex-col items-center rounded-lg px-1 py-1.5 text-[11px] transition ${pestana === g.id ? "bg-violeta text-white shadow" : n ? "text-texto hover:bg-superficie-2" : "text-texto-suave opacity-40"}`}
+              role="tab"
+              aria-selected={activo}
+              onClick={() => cambiarGrupo(g.id)}
+              style={{ color, borderColor: activo ? color : undefined, background: activo ? `${color}22` : undefined, boxShadow: activo ? `0 0 18px ${color}40` : undefined }}
+              className={`relative flex flex-col items-center rounded-xl border px-0.5 pb-1.5 pt-2 transition active:scale-95 ${activo ? "" : "border-borde bg-superficie-2"} ${n === 0 && !activo ? "opacity-40" : ""}`}
             >
-              <span className="text-base leading-none">{g.icono}</span>
-              <span className="mt-1">{g.nombre}</span>
+              <SimboloGrupo id={g.id} className={`h-6 w-6 transition ${activo ? "scale-110" : ""}`} />
+              <span className={`mt-1 text-[11px] font-medium ${activo ? "text-texto" : "text-texto-suave"}`}>{g.nombre}</span>
+              <span
+                className={`absolute -top-2 right-0.5 min-w-5 rounded-full px-1 text-[10px] font-bold leading-5 tabular-nums ${n === 0 ? "bg-superficie-2 text-texto-suave" : "text-noche"}`}
+                style={n === 0 ? undefined : { background: color }}
+                title={n === 0 ? "Ninguna puede ser" : `${n} posibles`}
+              >
+                {n === 0 ? "✕" : n}
+              </span>
             </button>
           );
         })}
       </div>
 
-      <div className={`grid gap-1.5 ${pestana === "mayor" ? "grid-cols-4 sm:grid-cols-6" : "grid-cols-5 sm:grid-cols-7"}`}>
+      <div className="flex items-center justify-between gap-2 px-1 text-xs">
+        <p className="min-w-0 truncate" style={{ color: estilo.color }}>
+          <strong>{estilo.elemento}</strong> <span className="text-texto-suave">· {estilo.tema}</span>
+        </p>
+        <button type="button" onClick={() => setSoloPosibles(!soloPosibles)} className={`shrink-0 rounded-full border px-2.5 py-1 transition ${soloPosibles ? "border-oro/60 bg-oro/15 text-oro-suave" : "border-borde text-texto-suave"}`}>
+          {soloPosibles ? "✓ Solo posibles" : "Solo posibles"}
+        </button>
+      </div>
+
+      <div
+        key={`${pestana}-${soloPosibles}`}
+        onTouchStart={(e) => (toque.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
+        onTouchEnd={alSoltar}
+        className={`aparecer grid gap-1.5 ${pestana === "mayor" ? "grid-cols-6" : "grid-cols-7"}`}
+      >
         {cartas.map((c) => {
           const r = rotuloCasilla(c);
           const usada = intentados.has(c.id);
-          const descartada = !quedan.has(c.id);
+          const descartada = !quedan.has(c.id) && !usada;
           const activa = elegida === c.id;
           return (
             <button
@@ -517,30 +616,43 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
               type="button"
               disabled={usada}
               onClick={() => seleccionar(c)}
-              title={c.nombre}
-              className={`flex h-14 flex-col items-center justify-center rounded-lg border px-0.5 text-center transition active:scale-95 ${
-                activa
-                  ? "border-oro bg-oro/15 shadow-[0_0_16px_rgba(241,217,154,0.35)]"
-                  : usada
-                    ? "border-transparent bg-noche/40 opacity-30"
-                    : descartada
-                      ? "border-transparent bg-noche/40 opacity-35"
-                      : "border-borde bg-superficie-2 hover:border-violeta-suave"
+              title={usada ? `${c.nombre} (ya la intentaste)` : descartada ? `${c.nombre} (según tus pistas, no puede ser)` : c.nombre}
+              aria-label={c.nombre}
+              style={activa ? { borderColor: estilo.color, boxShadow: `0 0 16px ${estilo.color}aa` } : undefined}
+              className={`group relative aspect-[3/4] overflow-hidden rounded-md border transition active:scale-95 ${
+                activa ? "z-10 -translate-y-1 scale-105 border-2" : usada || descartada ? "border-transparent" : "border-oro/30 hover:-translate-y-0.5 hover:border-oro/70"
               }`}
             >
-              <span className={`font-display text-lg leading-none ${descartada && !activa ? "line-through" : ""}`}>{r.numero}</span>
-              {r.nombre && <span className="mt-0.5 w-full truncate text-[9.5px] leading-tight text-texto-suave">{r.nombre}</span>}
+              {/* eslint-disable-next-line @next/next/no-img-element -- miniatura estática */}
+              <img src={miniCarta(c)} alt="" loading="lazy" className={`h-full w-full object-cover transition ${usada || descartada ? "opacity-25 grayscale" : ""}`} />
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-noche via-noche/85 to-transparent px-0.5 pb-0.5 pt-3 text-center">
+                <span className="block text-[11px] font-bold leading-none tabular-nums text-white drop-shadow">{r.numero}</span>
+                {r.nombre && <span className="block truncate text-[8px] leading-tight text-white/80">{r.nombre}</span>}
+              </span>
+              {descartada && <span className="absolute inset-x-0 top-[18%] text-center text-lg leading-none text-white/70">✕</span>}
+              {usada && <span className="absolute left-1/2 top-[16%] -translate-x-1/2 rounded-full bg-violeta px-1.5 text-[9px] font-semibold leading-4 text-white">ya</span>}
             </button>
           );
         })}
+        {cartas.length === 0 && (
+          <p className="col-span-full rounded-xl border border-borde bg-superficie-2 p-4 text-center text-sm text-texto-suave">
+            Según tus pistas, ninguna carta de {pestana === "mayor" ? "los Arcanos Mayores" : GRUPOS.find((g) => g.id === pestana)?.nombre} puede ser. Prueba otro grupo.
+          </p>
+        )}
       </div>
+      <p className="text-center text-[11px] text-texto-suave">
+        {posiblesAqui} posibles aquí · {quedan.size} en total
+        <span className="sm:hidden"> · desliza para cambiar de grupo</span>
+      </p>
 
-      {cartaElegida ? (
-        <div className="aparecer flex items-center gap-3 rounded-xl border border-oro/40 bg-superficie-2 p-2">
-          <Miniatura carta={cartaElegida} className="w-10" />
+      {cartaElegida && (
+        <div className="aparecer flex items-center gap-3 rounded-xl border bg-superficie-2 p-2" style={{ borderColor: `${ESTILO_GRUPO[grupo(cartaElegida) as IdGrupo].color}88` }}>
+          <Miniatura carta={cartaElegida} className="w-12" />
           <div className="min-w-0 flex-1">
             <p className="truncate font-semibold">{cartaElegida.nombre}</p>
-            {!quedan.has(cartaElegida.id) && <p className="text-xs text-texto-suave">Según tus pistas, esta ya no puede ser.</p>}
+            <p className="text-xs text-texto-suave">
+              {!quedan.has(cartaElegida.id) ? "Según tus pistas, esta ya no puede ser." : `${ESTILO_GRUPO[grupo(cartaElegida) as IdGrupo].elemento} · ¿es esta?`}
+            </p>
           </div>
           <button
             type="button"
@@ -553,8 +665,6 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
             Elegir
           </button>
         </div>
-      ) : (
-        <p className="text-center text-xs text-texto-suave">Quedan {quedan.size} cartas posibles.</p>
       )}
 
       <div className="space-y-2">

@@ -1,0 +1,5 @@
+Imágenes del tarot Rider-Waite-Smith (Pamela Colman Smith, 1909), tomadas de la edición original.
+Dominio público en Estados Unidos (publicada antes de 1930) y en el Reino Unido y la Unión Europea
+(la autora murió en 1951; 70 años post mortem). En países con plazo de 80 años post mortem, como
+Colombia, el plazo vence a fines de 2031. Distribuidas vía el paquete npm @cometpisces/tarot-kit-images
+(código MIT; las imágenes se declaran de dominio público sin garantía). Convertidas a WebP sin retoques.
