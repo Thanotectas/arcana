@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/horoscopo", 0.9, "daily"),
     ...SIGNOS.map((s) => url(`/horoscopo/${s.id}`, 0.8, "daily")),
     url("/luna", 0.8, "weekly"),
+    url("/juego", 0.9, "daily"),
     url("/que-carta-eres", 0.9, "weekly"),
     ...Object.keys(RESULTADOS).map((c) => url(`/que-carta-eres/${c}`, 0.4)),
     url("/matriz-del-destino", 0.8),
