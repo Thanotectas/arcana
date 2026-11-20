@@ -516,6 +516,12 @@ export type Database = {
         Update: Partial<EnVivoPreguntaRow>;
         Relationships: [];
       };
+      juego_partidas: {
+        Row: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; creado_en: string };
+        Insert: { usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada?: boolean; creado_en?: string };
+        Update: Partial<{ usuario_id: string; fecha: string; numero: number; carta: string; intentos: string[]; gano: boolean; premiada: boolean; creado_en: string }>;
+        Relationships: [];
+      };
       en_vivo_espejo: {
         Row: { id: number; seq: number; evento: Json | null; actualizado_en: string };
         Insert: { id?: number; seq?: number; evento?: Json | null; actualizado_en?: string };

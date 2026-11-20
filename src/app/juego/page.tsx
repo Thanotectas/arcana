@@ -24,7 +24,7 @@ export default function PaginaJuego() {
           dice su mensaje para tu día.
         </p>
       </header>
-      <CaminoDelLoco />
+      <CaminoDelLoco clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
     </div>
   );
 }

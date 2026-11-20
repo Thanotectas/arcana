@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
+import { AvisoDiario } from "@/components/AvisoDiario";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
   GRUPOS,
@@ -32,6 +33,30 @@ import {
 } from "@/lib/juego/carta-escondida";
 
 const CLAVE = "arcana-camino-del-loco-v1";
+
+/** Lo que devuelve /api/juego (el progreso guardado en la cuenta). */
+interface ProgresoCuenta {
+  racha: number;
+  mejorRacha: number;
+  jugadas: number;
+  ganadas: number;
+  album: string[];
+  hoy: string[] | null;
+  creditosGanados: number;
+}
+type Sesion = "?" | "si" | "no";
+
+/** Guarda en la cuenta la partida terminada de hoy. null: sin sesión; undefined: falló. */
+async function enviarPartida(fecha: string, intentos: string[]): Promise<{ progreso: ProgresoCuenta; premio: boolean } | null | undefined> {
+  try {
+    const r = await fetch("/api/juego", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fecha, intentos }) });
+    if (r.status === 401) return null;
+    const d = (await r.json()) as { ok: boolean; progreso?: ProgresoCuenta; premio?: boolean };
+    return d.ok && d.progreso ? { progreso: d.progreso, premio: Boolean(d.premio) } : undefined;
+  } catch {
+    return undefined;
+  }
+}
 const DORSO = "/cartas/arcana/dorso.webp";
 
 function leerProgreso(): Progreso {
@@ -54,7 +79,7 @@ function guardarProgreso(p: Progreso) {
 const sinSuscripcion = () => () => {};
 
 /** El juego depende de la fecha y del progreso guardado en el navegador: se pinta solo en el cliente. */
-export function CaminoDelLoco() {
+export function CaminoDelLoco({ clavePublica }: { clavePublica: string | null }) {
   const enCliente = useSyncExternalStore(sinSuscripcion, () => true, () => false);
   if (!enCliente) {
     return (
@@ -65,15 +90,49 @@ export function CaminoDelLoco() {
       </div>
     );
   }
-  return <Juego />;
+  return <Juego clavePublica={clavePublica} />;
 }
 
-function Juego() {
+function Juego({ clavePublica }: { clavePublica: string | null }) {
   const [fecha] = useState(() => fechaBogota());
   const numero = numeroDeJuego(fecha);
   const escondida = useMemo(() => cartaDelJuego(numero), [numero]);
   const [progreso, setProgreso] = useState(leerProgreso);
   const [intentos, setIntentos] = useState<string[]>(() => leerProgreso().partidas[fecha] ?? []);
+  const [sesion, setSesion] = useState<Sesion>("?");
+  const [cuenta, setCuenta] = useState<ProgresoCuenta | null>(null);
+  const [premioNuevo, setPremioNuevo] = useState(false);
+
+  // Con sesión: trae el progreso de la cuenta. Si hoy ya jugó en otro dispositivo, muestra esa partida; si jugó
+  // aquí antes de entrar, la guarda en la cuenta.
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/juego", { cache: "no-store" })
+      .then(async (r) => {
+        if (!vivo) return;
+        if (r.status === 401) return setSesion("no");
+        if (!r.ok) return;
+        const d = (await r.json()) as ProgresoCuenta;
+        if (!vivo) return;
+        setSesion("si");
+        setCuenta(d);
+        const locales = leerProgreso().partidas[fecha] ?? [];
+        const escondidaHoy = cartaDelJuego(numeroDeJuego(fecha)).id;
+        const terminadaAqui = locales.includes(escondidaHoy) || locales.length >= MAX_INTENTOS;
+        if (d.hoy?.length && !locales.length) setIntentos(d.hoy);
+        else if (!d.hoy && terminadaAqui) {
+          const r2 = await enviarPartida(fecha, locales);
+          if (vivo && r2) {
+            setCuenta(r2.progreso);
+            setPremioNuevo(r2.premio);
+          }
+        }
+      })
+      .catch(() => null);
+    return () => {
+      vivo = false;
+    };
+  }, [fecha]);
 
   const cartasIntento = intentos.map((id) => cartaPorId(id)).filter((c) => c !== undefined);
   const comparaciones = cartasIntento.map((c) => comparar(c, escondida));
@@ -81,7 +140,8 @@ function Juego() {
   const termino = gano || intentos.length >= MAX_INTENTOS;
   const fallos = comparaciones.filter((c) => !c.acierto).length;
   const pistasVisibles = pistas(escondida).slice(0, termino ? 6 : 1 + fallos);
-  const racha = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
+  const rachaLocal = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
+  const racha = cuenta ? cuenta.racha : rachaLocal;
   const quedan = posibles(cartasIntento, comparaciones);
 
   function adivinar(id: string) {
@@ -93,6 +153,16 @@ function Juego() {
         ? terminarPartida(progreso, fecha, nuevos, acierta, escondida.id)
         : { ...progreso, partidas: { ...progreso.partidas, [fecha]: nuevos } };
     if (acierta) navigator.vibrate?.([40, 60, 40, 60, 120]);
+    if (acierta || nuevos.length >= MAX_INTENTOS) {
+      void enviarPartida(fecha, nuevos).then((r) => {
+        if (r === null) setSesion("no");
+        else if (r) {
+          setSesion("si");
+          setCuenta(r.progreso);
+          setPremioNuevo(r.premio);
+        }
+      });
+    }
     setIntentos(nuevos);
     setProgreso(siguiente);
     guardarProgreso(siguiente);
@@ -136,7 +206,20 @@ function Juego() {
         {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={cartasIntento.length ? null : "mayor"} onElegir={adivinar} />}
       </div>
 
-      {termino && <Final numero={numero} escondida={escondida} gano={gano} comparaciones={comparaciones} progreso={progreso} racha={racha} />}
+      {termino && (
+        <Final
+          numero={numero}
+          escondida={escondida}
+          gano={gano}
+          comparaciones={comparaciones}
+          progreso={progreso}
+          racha={racha}
+          sesion={sesion}
+          cuenta={cuenta}
+          premioNuevo={premioNuevo}
+          clavePublica={clavePublica}
+        />
+      )}
 
       <Instalar />
 
@@ -316,6 +399,10 @@ function Final({
   comparaciones,
   progreso,
   racha,
+  sesion,
+  cuenta,
+  premioNuevo,
+  clavePublica,
 }: {
   numero: number;
   escondida: CartaTarot;
@@ -323,11 +410,15 @@ function Final({
   comparaciones: Comparacion[];
   progreso: Progreso;
   racha: number;
+  sesion: Sesion;
+  cuenta: ProgresoCuenta | null;
+  premioNuevo: boolean;
+  clavePublica: string | null;
 }) {
   const [copiado, setCopiado] = useState(false);
   const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin);
   const faltan = RACHA_PREMIO - (racha % RACHA_PREMIO);
-  const premio = racha > 0 && racha % RACHA_PREMIO === 0;
+  const stats = cuenta ?? { jugadas: progreso.jugadas, ganadas: progreso.ganadas, mejorRacha: progreso.mejorRacha, album: progreso.album, creditosGanados: 0 };
 
   async function compartir() {
     if (navigator.share) {
@@ -371,10 +462,10 @@ function Final({
 
       <div className="grid grid-cols-4 gap-2 text-center">
         {[
-          { n: progreso.jugadas, t: "Jugadas" },
-          { n: progreso.jugadas ? Math.round((progreso.ganadas / progreso.jugadas) * 100) : 0, t: "% ganadas" },
+          { n: stats.jugadas, t: "Jugadas" },
+          { n: stats.jugadas ? Math.round((stats.ganadas / stats.jugadas) * 100) : 0, t: "% ganadas" },
           { n: racha, t: "Racha 🔥" },
-          { n: progreso.mejorRacha, t: "Mejor racha" },
+          { n: Math.max(stats.mejorRacha, racha), t: "Mejor racha" },
         ].map((x) => (
           <div key={x.t} className="rounded-xl bg-superficie-2 p-3">
             <div className="text-2xl font-semibold tabular-nums">{x.n}</div>
@@ -384,9 +475,12 @@ function Final({
       </div>
 
       <div className="space-y-3 rounded-xl border border-oro/40 p-4 text-sm">
-        {premio ? (
+        {premioNuevo ? (
           <p>
-            🎁 <strong>¡{racha} días seguidos!</strong> Ganaste 1 crédito de regalo para tus lecturas. Muy pronto lo reclamas desde tu cuenta de Arcana.
+            🎁 <strong>¡{racha} días seguidos!</strong> Te sumamos 1 crédito de regalo: ya está en tu cuenta.{" "}
+            <Link href="/tarot" className="text-oro-suave underline">
+              Úsalo en una lectura
+            </Link>
           </p>
         ) : (
           <>
@@ -400,8 +494,29 @@ function Final({
             </div>
           </>
         )}
-        <p className="text-texto-suave">Tu álbum: {progreso.album.length} de 78 cartas descubiertas.</p>
+        <p className="text-texto-suave">
+          Tu álbum: {stats.album.length} de 78 cartas descubiertas.
+          {stats.creditosGanados > 0 && ` Has ganado ${stats.creditosGanados} ${stats.creditosGanados === 1 ? "crédito" : "créditos"} jugando.`}
+        </p>
+        {sesion === "no" && (
+          <div className="space-y-2 border-t border-borde pt-3">
+            <p>
+              Para ganar el crédito, juega con tu cuenta de Arcana: tu racha queda guardada aunque cambies de celular. La racha del regalo cuenta desde el primer día que
+              juegas con tu cuenta.
+            </p>
+            <Link href="/entrar?volver=/juego" className="boton boton-primario inline-flex">
+              Entrar o crear mi cuenta gratis
+            </Link>
+          </div>
+        )}
       </div>
+
+      {sesion === "si" && (
+        <div className="space-y-2 rounded-xl bg-superficie-2 p-4 text-sm">
+          <p>🔔 Activa los avisos y te recuerdo cuando haya carta nueva y tu racha esté en riesgo.</p>
+          <AvisoDiario clavePublica={clavePublica} />
+        </div>
+      )}
 
       <Cuenta />
 
