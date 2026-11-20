@@ -9,8 +9,6 @@ import { leerPractica, leerProgreso } from "./CaminoDelLoco";
 import { Logros } from "./Extras";
 
 const DORSO = "/cartas/arcana/dorso.webp";
-const COLUMNAS = 4;
-const ALTO_FILA = 170;
 const sinSuscripcion = () => () => {};
 
 /** Las cartas descubiertas en este navegador: partidas del día y de práctica que se ganaron. */
@@ -143,41 +141,60 @@ function Carta({ carta, visible, compacta = false }: { carta: CartaTarot; visibl
   );
 }
 
-/** Los 22 mayores en un camino que serpentea (izquierda→derecha, luego derecha→izquierda…). */
+/**
+ * Centro de la ruta dorada de public/juego/mapa.webp (fracción del ancho y del alto), de abajo hacia arriba:
+ * trazada sobre la ilustración. Las 22 cartas se reparten a la misma distancia sobre ella.
+ */
+const RUTA: [number, number][] = [
+  [0.518, 0.955], [0.512, 0.918], [0.578, 0.871], [0.646, 0.823], [0.64, 0.791], [0.554, 0.76], [0.437, 0.728], [0.384, 0.697],
+  [0.48, 0.64], [0.592, 0.586], [0.607, 0.554], [0.577, 0.522], [0.446, 0.491], [0.372, 0.475], [0.27, 0.443], [0.262, 0.427],
+  [0.297, 0.396], [0.348, 0.38], [0.557, 0.348], [0.607, 0.317], [0.592, 0.285], [0.557, 0.269], [0.476, 0.253], [0.372, 0.237],
+  [0.321, 0.222], [0.291, 0.19], [0.306, 0.174], [0.345, 0.158], [0.417, 0.142], [0.479, 0.126], [0.515, 0.095], [0.51, 0.06],
+];
+const PROPORCION_MAPA = 2000 / 1342;
+
+/** n puntos a la misma distancia a lo largo de la ruta (en el espacio real de la imagen). */
+function puntosEnRuta(n: number) {
+  const P = RUTA.map(([x, y]) => [x, y * PROPORCION_MAPA] as const);
+  const tramos = P.slice(1).map((p, i) => Math.hypot(p[0] - P[i][0], p[1] - P[i][1]));
+  const total = tramos.reduce((a, b) => a + b, 0);
+  return Array.from({ length: n }, (_, k) => {
+    let falta = (k / (n - 1)) * total;
+    let i = 0;
+    while (i < tramos.length - 1 && falta > tramos[i]) falta -= tramos[i++];
+    const t = tramos[i] ? falta / tramos[i] : 0;
+    return { x: P[i][0] + (P[i + 1][0] - P[i][0]) * t, y: (P[i][1] + (P[i + 1][1] - P[i][1]) * t) / PROPORCION_MAPA };
+  });
+}
+
+/** Los 22 mayores sobre el mapa del viaje: del Loco (abajo) al Mundo (la luz de arriba). */
 function Camino({ cartas, tiene }: { cartas: CartaTarot[]; tiene: ReadonlySet<string> }) {
-  const filas = Math.ceil(cartas.length / COLUMNAS);
-  const posicion = (i: number) => {
-    const fila = Math.floor(i / COLUMNAS);
-    const col = fila % 2 === 0 ? i % COLUMNAS : COLUMNAS - 1 - (i % COLUMNAS);
-    return { fila, col, x: ((col + 0.5) / COLUMNAS) * 100, y: fila * ALTO_FILA + ALTO_FILA * 0.42 };
-  };
-  const puntos = cartas.map((_, i) => posicion(i));
+  const puntos = puntosEnRuta(cartas.length);
   return (
-    <div className="tarjeta relative overflow-hidden p-3" style={{ height: filas * ALTO_FILA + 24 }}>
-      <svg className="absolute" style={{ left: 12, top: 12, width: "calc(100% - 24px)", height: filas * ALTO_FILA }} viewBox={`0 0 100 ${filas * ALTO_FILA}`} preserveAspectRatio="none" aria-hidden>
-        {puntos.slice(1).map((p, i) => {
-          const a = puntos[i];
-          const encendido = tiene.has(cartas[i].id) && tiene.has(cartas[i + 1].id);
-          return (
-            <line
-              key={i}
-              x1={a.x}
-              y1={a.y}
-              x2={p.x}
-              y2={p.y}
-              stroke={encendido ? "#f1d99a" : "#3a2d5c"}
-              strokeWidth={encendido ? 3 : 2}
-              strokeDasharray={encendido ? undefined : "6 6"}
-              vectorEffect="non-scaling-stroke"
-            />
-          );
-        })}
-      </svg>
+    <div className="relative overflow-hidden rounded-3xl border border-oro/30" style={{ aspectRatio: "1342 / 2000" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
+      <img src="/juego/mapa.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-noche/25" />
       {cartas.map((c, i) => {
         const p = puntos[i];
+        const visible = tiene.has(c.id);
+        const r = rotuloCasilla(c);
         return (
-          <div key={c.id} className="absolute w-[19%] -translate-x-1/2" style={{ left: `calc(12px + (100% - 24px) * ${p.x / 100})`, top: 12 + p.fila * ALTO_FILA + 6 }}>
-            <Carta carta={c} visible={tiene.has(c.id)} compacta />
+          <div key={c.id} className={`absolute -translate-x-1/2 -translate-y-1/2 ${visible ? "z-10 w-[9.5%]" : "w-[6.5%]"}`} style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}>
+            {visible ? (
+              <Link
+                href={`/significado-tarot/${c.id}`}
+                title={c.nombre}
+                className="block aspect-square overflow-hidden rounded-full border-2 border-oro shadow-[0_0_16px_rgba(241,217,154,0.95)] transition hover:scale-125"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
+                <img src={imagenCarta(c) ?? DORSO} alt={c.nombre} className="h-full w-full object-cover object-[50%_30%]" />
+              </Link>
+            ) : (
+              <div title={`${r.numero} · por descubrir`} className="flex aspect-square items-center justify-center rounded-full border border-oro/50 bg-noche/55">
+                <span className="font-display text-[9px] leading-none text-oro-suave/80 sm:text-xs">{r.numero}</span>
+              </div>
+            )}
           </div>
         );
       })}

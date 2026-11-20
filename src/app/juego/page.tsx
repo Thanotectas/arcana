@@ -14,6 +14,7 @@ const BASE: Metadata = {
   openGraph: {
     title: "El Camino del Loco · La carta escondida de hoy",
     description: "¿Adivinas la carta del tarot que Sibila escondió hoy? 6 intentos.",
+    images: [{ url: "/juego/og.jpg", width: 1200, height: 630 }],
   },
 };
 
@@ -41,9 +42,16 @@ export default async function PaginaJuego({ searchParams }: { searchParams: Busq
     <div className="mx-auto max-w-2xl space-y-8">
       <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "El Camino del Loco", href: "/juego" }]} />
       <header className="text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Juego diario · gratis</p>
-        <h1 className="font-display text-4xl font-semibold sm:text-5xl">El Camino del Loco</h1>
-        <p className="mx-auto mt-3 max-w-xl text-texto-suave">
+        <div className="relative -mx-4 overflow-hidden sm:mx-0 sm:rounded-3xl sm:border sm:border-oro/30">
+          {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
+          <img src="/juego/cabecera.webp" alt="El Loco y su perrito caminan por un sendero de cartas doradas hacia una estrella" className="aspect-[2000/1091] w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-noche via-noche/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave sm:text-sm">Juego diario · gratis</p>
+            <h1 className="font-display text-4xl font-semibold drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] sm:text-5xl">El Camino del Loco</h1>
+          </div>
+        </div>
+        <p className="mx-auto mt-4 max-w-xl text-texto-suave">
           Cada día Sibila esconde una carta del tarot. Tienes 6 intentos para descubrirla con sus pistas. Cuando la encuentres, te
           dice su mensaje para tu día.
         </p>
