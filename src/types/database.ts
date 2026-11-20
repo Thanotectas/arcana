@@ -528,6 +528,12 @@ export type Database = {
         Update: Partial<{ usuario_id: string; invitado_en: string; acepto_en: string | null; gmail: string | null; agregado_en: string | null }>;
         Relationships: [];
       };
+      app_eventos: {
+        Row: { id: number; fecha: string; evento: string; sistema: string; plataforma: string; pais: string | null; creado_en: string };
+        Insert: { id?: number; fecha: string; evento: string; sistema: string; plataforma: string; pais?: string | null; creado_en?: string };
+        Update: Partial<{ id: number; fecha: string; evento: string; sistema: string; plataforma: string; pais: string | null; creado_en: string }>;
+        Relationships: [];
+      };
       app_instalaciones: {
         Row: { usuario_id: string; plataforma: string; creado_en: string };
         Insert: { usuario_id: string; plataforma: string; creado_en?: string };

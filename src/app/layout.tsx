@@ -14,6 +14,7 @@ import { MedicionAnuncios } from "@/components/MedicionAnuncios";
 import { ContarVisita } from "@/components/ContarVisita";
 import { BannerInstalar } from "@/components/BannerInstalar";
 import { BienvenidaApp } from "@/components/BienvenidaApp";
+import { ContarApp } from "@/components/ContarApp";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -56,6 +57,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Analytics />
         {/* Primera visita de cada navegador, para el embudo: sin cookies ni datos personales. */}
         <ContarVisita />
+        {/* Instalaciones y primeras aperturas de la app, también sin datos personales. */}
+        <ContarApp />
       </body>
     </html>
   );
