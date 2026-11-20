@@ -12,6 +12,8 @@ import { getPlataforma } from "@/lib/plataforma";
 import { META_PIXEL_ID } from "@/lib/marca/medicion";
 import { MedicionAnuncios } from "@/components/MedicionAnuncios";
 import { ContarVisita } from "@/components/ContarVisita";
+import { BannerInstalar } from "@/components/BannerInstalar";
+import { BienvenidaApp } from "@/components/BienvenidaApp";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -44,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="estrellas" aria-hidden />
           <CieloAnimado />
           <Encabezado />
+          {plataforma === "web" ? <BannerInstalar /> : <BienvenidaApp />}
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />
           <AsistenteFlotante />

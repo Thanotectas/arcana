@@ -7,6 +7,12 @@ import { CLAVE_MEDICION } from "@/lib/marca/medicion";
 
 type Datos = Record<string, string | number>;
 type Fbq = ((...args: unknown[]) => void) & { callMethod?: (...a: unknown[]) => void; queue: unknown[]; push: unknown; loaded: boolean; version: string };
+/** Los eventos estándar de Meta van con "track"; los propios (como JuegoTerminado), con "trackCustom". */
+const ESTANDAR = new Set(["PageView", "CompleteRegistration", "Purchase", "Lead", "ViewContent", "Subscribe", "StartTrial", "InitiateCheckout", "Contact", "Search"]);
+function tipoEvento(evento: string) {
+  return ESTANDAR.has(evento) ? "track" : "trackCustom";
+}
+
 type Ventana = Window & { fbq?: Fbq; _fbq?: Fbq; ArcanaMedir?: (evento: string, datos?: Datos) => void; __arcanaEventos?: [string, Datos | undefined][] };
 
 const leer = () => {
@@ -59,13 +65,13 @@ export function MedicionAnuncios({ pixelId, textos }: { pixelId: string; textos:
     w.fbq!("set", "autoConfig", false, pixelId);
     w.fbq!("init", pixelId);
     w.fbq!("track", "PageView");
-    for (const [evento, datos] of pendientes.current.splice(0)) w.fbq!("track", evento, datos ?? {});
+    for (const [evento, datos] of pendientes.current.splice(0)) w.fbq!(tipoEvento(evento), evento, datos ?? {});
   }
 
   useEffect(() => {
     const w = window as Ventana;
     w.ArcanaMedir = (evento, datos) => {
-      if (activo.current) w.fbq?.("track", evento, datos ?? {});
+      if (activo.current) w.fbq?.(tipoEvento(evento), evento, datos ?? {});
       else if (leer() !== "no") pendientes.current.push([evento, datos]);
     };
     // Eventos que alguna página pidió antes de que este componente montara.

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { AvisoDiario } from "@/components/AvisoDiario";
+import { estaInstalada, pedirInstalacion, usePuedeInstalar } from "@/lib/instalar";
+import { medir } from "@/lib/marca/medicion";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
   GRUPOS,
@@ -154,6 +156,8 @@ function Juego({ clavePublica }: { clavePublica: string | null }) {
         : { ...progreso, partidas: { ...progreso.partidas, [fecha]: nuevos } };
     if (acierta) navigator.vibrate?.([40, 60, 40, 60, 120]);
     if (acierta || nuevos.length >= MAX_INTENTOS) {
+      // Para los anuncios (solo si la persona aceptó la medición): quién jugó, sin decir qué carta.
+      medir("JuegoTerminado", { gano: acierta ? 1 : 0, intentos: nuevos.length });
       void enviarPartida(fecha, nuevos).then((r) => {
         if (r === null) setSesion("no");
         else if (r) {
@@ -542,23 +546,10 @@ function Cuenta() {
   );
 }
 
-interface EventoInstalar extends Event {
-  prompt: () => Promise<void>;
-}
-
 /** Invita a instalar Arcana para jugar cada día desde la pantalla de inicio (no se muestra si ya está instalada). */
 function Instalar() {
-  const [instalada] = useState(() => window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
-  const [iphone] = useState(() => /iphone|ipad|ipod/i.test(navigator.userAgent));
-  const [evento, setEvento] = useState<EventoInstalar | null>(null);
-  useEffect(() => {
-    const guardar = (e: Event) => {
-      e.preventDefault();
-      setEvento(e as EventoInstalar);
-    };
-    window.addEventListener("beforeinstallprompt", guardar);
-    return () => window.removeEventListener("beforeinstallprompt", guardar);
-  }, []);
+  const [instalada] = useState(estaInstalada);
+  const puede = usePuedeInstalar();
   if (instalada) return null;
   return (
     <div className="tarjeta flex items-center gap-4 p-4">
@@ -566,25 +557,16 @@ function Instalar() {
       <img src="/marca/icono-192.png" alt="" className="h-12 w-12 rounded-xl" />
       <div className="min-w-0 flex-1 text-sm">
         <p className="font-semibold">Juega cada día desde tu pantalla</p>
-        <p className="text-texto-suave">
-          {evento
-            ? "Instala Arcana: abre el juego con un toque y no pierdas tu racha."
-            : iphone
-              ? "En iPhone: toca Compartir ⬆️ y luego «Agregar a inicio»."
-              : "En el menú del navegador (⋮), toca «Instalar app» o «Agregar a la pantalla de inicio»."}
-        </p>
+        <p className="text-texto-suave">Instala Arcana: abre el juego con un toque, no pierdas tu racha y recibe 1 crédito de regalo.</p>
       </div>
-      {evento && (
-        <button
-          type="button"
-          onClick={async () => {
-            await evento.prompt().catch(() => null);
-            setEvento(null);
-          }}
-          className="boton boton-primario shrink-0 px-4 py-2"
-        >
+      {puede ? (
+        <button type="button" onClick={() => void pedirInstalacion()} className="boton boton-primario shrink-0 px-4 py-2">
           Instalar
         </button>
+      ) : (
+        <Link href="/app" className="boton boton-primario shrink-0 px-4 py-2">
+          Instalar
+        </Link>
       )}
     </div>
   );
