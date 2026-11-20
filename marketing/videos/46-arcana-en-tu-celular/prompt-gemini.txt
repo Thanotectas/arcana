@@ -1,0 +1,32 @@
+VIDEO 46 — «ARCANA EN TU CELULAR» (campaña para instalar la app, miarcana.com/app, 1 crédito de regalo).
+Gemini / Flow (Veo), 2 clips de 8 s, vertical 9:16, con la imagen de Sibila (sibila-referencia.jpg = public/marca/sibila/base.jpg).
+Sibila NO habla en cámara: la voz va encima, con Marcela. La pantalla del teléfono va sin contenido legible: en el montaje
+se suma la grabación real de la instalación y del juego.
+
+CÓMO: «Ingredientes a video» (o en Gemini: adjunta la imagen y pide el video). Vertical 9:16, 8 s. El clip 2 con «Extender».
+Si cambia la cara: repite agregando «keep exactly the same face, hair and dress as the reference image».
+
+==================== PROMPT 1 · «Sibila en tu celular» (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight, magical and modern atmosphere. The woman from the reference image (exactly the
+same face, long dark wavy hair, golden forehead jewel, deep violet dress with golden embroidery) sits at her wooden table
+with the crystal ball, lit candles and tarot cards, in the same room with gothic windows and a starry night sky. She picks up
+a modern smartphone from the table; its screen glows with a soft violet light and a small golden four-pointed star in the
+center, nothing else on the screen. The violet light illuminates her face from below; she smiles, curious and delighted,
+then slowly turns the phone toward the camera, holding it beside her face. Slow camera push-in to a medium close-up.
+Sound: candles crackling, a soft magical chime when the screen lights up. No music, no voices, she does not speak.
+No readable text, no letters, no logos on the screen or anywhere. Same face as the reference image throughout.
+
+==================== PROMPT 2 · «Las cartas salen del teléfono» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same woman, same face, hair, dress, table, candles and crystal ball, holding the same smartphone
+with the violet glowing screen and the golden star. She taps the screen once with one finger: golden sparkles and three tiny
+glowing tarot cards (violet backs with golden stars, no text) fly out of the screen and slowly orbit around her like
+fireflies. She follows them with her eyes, laughs softly with her mouth closed, then looks directly into the camera and makes
+a small inviting gesture with her open hand toward the viewer. For the last 2 seconds: she holds still, smiling at the camera,
+and the camera stays fixed.
+Sound: a light tap, a sparkling magical sound, candles. No music, no voices, she does not speak.
+No readable text, no letters, no logos. Same face as the reference image throughout.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela) ====================
+01-celular.mp3: "¿Sabías que me puedes llevar en tu celular?"
+02-instalar.mp3: "Entra a mi arcana punto com, barra app. En un par de toques me instalas… y te regalo un crédito."
+03-aviso.mp3: "Así, cada día te aviso cuando esconda una carta nueva. Te espero."

@@ -1,0 +1,31 @@
+VIDEO 45 — «¿ADIVINAS LA CARTA QUE ESCONDÍ HOY?» (lanzamiento de El Camino del Loco, miarcana.com/juego).
+Gemini / Flow (Veo), 2 clips de 8 s, vertical 9:16, con la imagen de Sibila (sibila-referencia.jpg = public/marca/sibila/base.jpg).
+Sibila NO habla en cámara (boca cerrada, sonrisa): la voz va encima, con Marcela. En el montaje se suman capturas reales del juego.
+
+CÓMO: «Ingredientes a video» (o en Gemini: adjunta la imagen y pide el video). Vertical 9:16, 8 s. El clip 2 con «Extender».
+Si cambia la cara: repite agregando «keep exactly the same face, hair and dress as the reference image».
+
+==================== PROMPT 1 · «La carta escondida» (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight, magical and playful atmosphere. The woman from the reference image (exactly
+the same face, long dark wavy hair, golden forehead jewel, deep violet dress with golden embroidery) sits at her wooden
+table with the crystal ball, lit candles and a deck of tarot cards, in the same room with gothic windows and a starry
+night sky. She fans the deck, slowly pulls out one single card and peeks at its face, holding it so the viewer only sees
+its back (deep violet with a golden star mandala). She smiles mischievously, as if keeping a delicious secret, and lays
+the card face down on the table, covering it with her open hand. Slow camera push-in from a medium shot to a close-up
+of her face and the hidden card.
+Sound: cards sliding, candles crackling, a soft magical chime when she hides the card. No music, no voices, she does not
+speak. No text, no letters, no logos. Same face as the reference image throughout. Warm, elegant, nothing scary.
+
+==================== PROMPT 2 · «¿Te atreves?» (8 s, Extender desde el clip 1) ====================
+Continue the same scene: same woman, same face, hair, dress, table, candles and crystal ball. The face-down card under her
+hand begins to glow from beneath with a soft golden light, and a small glowing golden question-mark shape of light rises
+from it and floats above the table. She lifts one playful eyebrow, taps the card twice with one finger, then leans slightly
+toward the camera with a warm, challenging smile, mouth closed, as if daring the viewer to guess. For the last 2 seconds:
+she holds still, smiling at the camera, and the camera stays fixed.
+Sound: a soft shimmer when the light rises, two light taps on wood, candles. No music, no voices, she does not speak.
+No text, no letters, no logos (except the floating light shape). Same face as the reference image throughout.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela) ====================
+01-escondi.mp3: "Hoy escondí una carta… y no te la voy a mostrar."
+02-pistas.mp3: "Tienes seis intentos. Y con cada error… te doy una pista."
+03-reto.mp3: "¿Te atreves? Entra a mi arcana punto com, barra juego… y cuéntame en cuántos la encontraste."
