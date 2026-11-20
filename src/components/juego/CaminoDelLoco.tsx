@@ -6,6 +6,7 @@ import { imagenCarta } from "@/components/CartaVisual";
 import { AvisoDiario } from "@/components/AvisoDiario";
 import { estaInstalada, pedirInstalacion, usePuedeInstalar } from "@/lib/instalar";
 import { medir } from "@/lib/marca/medicion";
+import { Logros, Tutorial, VozSibila } from "./Extras";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
@@ -229,6 +230,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
 
   return (
     <div className="space-y-6">
+      {!practica && intentos.length === 0 && <Tutorial />}
       {reto && !practica && <Reto reto={reto} numeroHoy={numeroHoy} />}
       {practica && (
         <div className="tarjeta flex items-center justify-between gap-3 border border-violeta-suave/40 p-3 text-sm">
@@ -291,9 +293,12 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `La encontraste en ${comparaciones.length}` : "Esta se escondió muy bien"}</p>
           <h2 className="brillo-oro font-display text-4xl font-semibold">{escondida.nombre}</h2>
           <p className="mx-auto max-w-lg text-texto">{mensajeDelDia(escondida)}</p>
-          <Link href="/juego" className="boton boton-primario inline-flex">
-            Jugar la carta de hoy
-          </Link>
+          <VozSibila carta={escondida.id} />
+          <div>
+            <Link href="/juego" className="boton boton-primario inline-flex">
+              Jugar la carta de hoy
+            </Link>
+          </div>
         </div>
       )}
 
@@ -646,6 +651,7 @@ function Final({
       <p className="mx-auto max-w-lg text-sm text-texto-suave">
         <span className="text-oro">En el amor:</span> {escondida.amor}
       </p>
+      <VozSibila carta={escondida.id} />
 
       <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-left font-sans text-sm leading-relaxed">{texto}</pre>
       <div className="flex flex-wrap justify-center gap-3">
@@ -722,6 +728,14 @@ function Final({
           <AvisoDiario clavePublica={clavePublica} />
         </div>
       )}
+
+      <Logros
+        datos={{
+          album: new Set([...stats.album, ...progreso.album]),
+          mejorRacha: Math.max(stats.mejorRacha, progreso.mejorRacha, racha),
+          distribucion: progreso.distribucion,
+        }}
+      />
 
       <Cuenta />
 

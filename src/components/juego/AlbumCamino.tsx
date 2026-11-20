@@ -6,6 +6,7 @@ import { imagenCarta } from "@/components/CartaVisual";
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
 import { GRUPOS, cartaDelJuego, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
 import { leerPractica, leerProgreso } from "./CaminoDelLoco";
+import { Logros } from "./Extras";
 
 const DORSO = "/cartas/arcana/dorso.webp";
 const COLUMNAS = 4;
@@ -69,6 +70,11 @@ function Album() {
           </p>
         )}
       </div>
+
+      <section className="tarjeta space-y-3 p-5">
+        <h2 className="font-display text-2xl">Tus logros</h2>
+        <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion }} />
+      </section>
 
       <section className="space-y-3">
         <h2 className="font-display text-2xl">El camino del Loco</h2>
