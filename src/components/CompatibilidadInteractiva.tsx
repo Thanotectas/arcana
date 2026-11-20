@@ -109,6 +109,7 @@ function PanelPersona({
       <div>
         <label className="etiqueta" htmlFor={`fecha_${sufijo}`}>{t.compatibilidad.fecha}</label>
         <input id={`fecha_${sufijo}`} name={`fecha_${sufijo}`} type="date" className="campo" value={persona.fecha} onChange={(e) => setPersona({ ...persona, fecha: e.target.value, signo: "" })} />
+        <p className="mt-1 text-xs text-oro-suave">{t.compatibilidad.conFecha}</p>
       </div>
       <p className="text-xs text-texto-suave">{t.compatibilidad.oSigno}</p>
       <RuedaSignos seleccionado={signo?.id} alElegir={(id) => setPersona({ ...persona, signo: id, fecha: "" })} />

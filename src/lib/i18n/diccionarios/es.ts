@@ -727,6 +727,7 @@ export const es = {
     nombre: "Nombre",
     fecha: "Fecha de nacimiento",
     oSigno: "o toca su signo en la rueda",
+    conFecha: "Con la fecha sumo su Luna, Venus, Marte y Mercurio: la lectura sale mucho más completa.",
     afinidad: "afinidad",
     analizar: "Analizar compatibilidad",
     niveles: { baja: "Reto interesante", media: "Equilibrio con trabajo", alta: "Gran afinidad", muyAlta: "Almas afines" },

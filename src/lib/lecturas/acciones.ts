@@ -9,6 +9,7 @@ import { TIRADAS, cartasDesdeAbanico, type TipoTirada } from "../tarot/tiradas";
 import { calcularCarta, type DatosNacimiento } from "../astro/carta";
 import { calcularPerfil } from "../numerologia";
 import { signoPorFecha, signoPorId, compatibilidadSignos } from "../zodiaco";
+import { dimensionesCompatibilidad, planetasPorFecha } from "../astro/compatibilidad";
 import { getPerfil } from "../dal";
 import { getIdioma } from "../i18n/servidor";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
@@ -455,14 +456,26 @@ export async function accionCompatibilidad(_prev: EstadoAccion, formData: FormDa
   const b = resolver(fechaB, signoIdB);
   if (!a || !b) return { error: "compatibilidad.faltan" };
 
+  // Con las dos fechas, además del Sol: Luna, Mercurio, Venus y Marte, y la afinidad por dimensión.
+  const planetasA = planetasPorFecha(fechaA);
+  const planetasB = planetasPorFecha(fechaB);
+  const detalle = planetasA && planetasB ? dimensionesCompatibilidad(planetasA, planetasB) : null;
+  const solA = planetasA ? (signoPorId(planetasA.sol) ?? a) : a;
+  const solB = planetasB ? (signoPorId(planetasB.sol) ?? b) : b;
+
   let id: string;
   try {
-    const puntaje = compatibilidadSignos(a, b);
+    const puntaje = detalle?.puntaje ?? compatibilidadSignos(solA, solB);
     id = await crearLectura({
       tipo: "compatibilidad",
-      titulo: `${nombreA} (${a.nombre}) y ${nombreB} (${b.nombre})`,
-      entrada: { nombreA, nombreB, signoA: a.id, signoB: b.id },
-      resultado: { puntaje, signoA: a.id, signoB: b.id },
+      titulo: `${nombreA} (${solA.nombre}) y ${nombreB} (${solB.nombre})`,
+      entrada: { nombreA, nombreB, signoA: solA.id, signoB: solB.id, ...(planetasA && planetasB ? { fechaA, fechaB } : {}) },
+      resultado: {
+        puntaje,
+        signoA: solA.id,
+        signoB: solB.id,
+        ...(detalle && planetasA && planetasB ? { planetas: { a: planetasA, b: planetasB }, dimensiones: detalle.dimensiones } : {}),
+      },
     });
   } catch (e) {
     return manejarError(e);

@@ -725,6 +725,7 @@ export const pt: Diccionario = {
     nombre: "Nome",
     fecha: "Data de nascimento",
     oSigno: "ou toque no signo na roda",
+    conFecha: "Com a data eu somo a Lua, Vênus, Marte e Mercúrio: a leitura fica muito mais completa.",
     afinidad: "afinidade",
     analizar: "Analisar compatibilidade",
     niveles: { baja: "Desafio interessante", media: "Equilíbrio com esforço", alta: "Grande afinidade", muyAlta: "Almas afins" },

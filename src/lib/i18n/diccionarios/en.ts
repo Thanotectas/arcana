@@ -728,6 +728,7 @@ export const en: Diccionario = {
     nombre: "Name",
     fecha: "Date of birth",
     oSigno: "or tap their sign on the wheel",
+    conFecha: "With the date I add their Moon, Venus, Mars and Mercury: the reading is much richer.",
     afinidad: "affinity",
     analizar: "Analyze compatibility",
     niveles: { baja: "Interesting challenge", media: "Balance with effort", alta: "Great affinity", muyAlta: "Kindred souls" },

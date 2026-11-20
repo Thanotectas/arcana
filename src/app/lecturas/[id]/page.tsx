@@ -24,6 +24,7 @@ import { CompartirLectura } from "@/components/CompartirLectura";
 import { TIRADAS, POSICIONES_I18N, cartasDeTirada, type CartaTirada, type TipoTirada } from "@/lib/tarot/tiradas";
 import { MAZOS, esMazo, type IdMazo } from "@/lib/tarot/mazos";
 import { signoPorId, imagenSigno } from "@/lib/zodiaco";
+import { NOMBRE_DIMENSION, type DimensionCompatibilidad } from "@/lib/astro/compatibilidad";
 import type { PerfilNumerologico } from "@/lib/numerologia";
 import { cuadricula, deudasKarmicas, edad, etapas, hoyColombia, mesYDia, planoNombre } from "@/lib/numerologia-avanzada";
 import { CLAVES_NUMEROLOGIA, CicloNumerologia, CuadriculaPitagoras, EtapasVida, FichaNumero, MandalaNumerologia, MesDiaPersonal, NombreNumeros } from "@/components/GraficosNumerologia";
@@ -87,7 +88,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       )}
       {lectura.tipo === "carta_astral" && <VistaCartaAstral resultado={lectura.resultado} entrada={lectura.entrada} t={t} />}
       {lectura.tipo === "numerologia" && <VistaNumerologia resultado={lectura.resultado as unknown as PerfilNumerologico} entrada={lectura.entrada} t={t} />}
-      {lectura.tipo === "compatibilidad" && <VistaCompatibilidad resultado={lectura.resultado} t={t} />}
+      {lectura.tipo === "compatibilidad" && <VistaCompatibilidad entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
       {lectura.tipo === "iching" && <VistaIChing resultado={lectura.resultado as unknown as ResultadoIChing} t={t} />}
       {lectura.tipo === "chino" && <VistaChino resultado={lectura.resultado as unknown as ResultadoChino} t={t} />}
       {lectura.tipo === "cruce" && <VistaCruce entrada={lectura.entrada} resultado={lectura.resultado} t={t} />}
@@ -292,11 +293,15 @@ function VistaNumerologia({ resultado, entrada, t }: { resultado: PerfilNumerolo
   );
 }
 
-function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unknown>; t: Diccionario }) {
+function VistaCompatibilidad({ entrada, resultado, t }: { entrada: Record<string, unknown>; resultado: Record<string, unknown>; t: Diccionario }) {
   const a = signoPorId(String(resultado.signoA));
   const b = signoPorId(String(resultado.signoB));
   const puntaje = Number(resultado.puntaje);
+  const dimensiones = (resultado.dimensiones as DimensionCompatibilidad[] | undefined) ?? [];
+  const nombreA = String(entrada.nombreA ?? "") || "A";
+  const nombreB = String(entrada.nombreB ?? "") || "B";
   return (
+    <>
     <section className="tarjeta flex flex-wrap items-center justify-center gap-8 p-6 text-center">
       <div>
         {/* eslint-disable-next-line @next/next/no-img-element -- moneda estática pequeña */}
@@ -313,6 +318,48 @@ function VistaCompatibilidad({ resultado, t }: { resultado: Record<string, unkno
         <p className="font-display text-xl">{b?.nombre}</p>
       </div>
     </section>
+    {dimensiones.length > 0 && (
+      <section className="tarjeta space-y-4 p-6">
+        <h2 className="font-display text-2xl">Su afinidad, planeta por planeta</h2>
+        {dimensiones.map((d) => {
+          const sa = signoPorId(d.signos[0]);
+          const sb = signoPorId(d.signos[1]);
+          return (
+            <div key={d.clave} className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span>
+                  <strong>{NOMBRE_DIMENSION[d.clave].nombre}</strong> <span className="text-texto-suave">· {NOMBRE_DIMENSION[d.clave].planetas}</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-texto-suave">
+                  {/* eslint-disable @next/next/no-img-element -- monedas estáticas pequeñas */}
+                  {sa && <img src={imagenSigno(sa.id)} alt="" width={22} height={22} />}
+                  {sa?.nombre} ↔ {sb?.nombre}
+                  {sb && <img src={imagenSigno(sb.id)} alt="" width={22} height={22} />}
+                  {/* eslint-enable @next/next/no-img-element */}
+                </span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-superficie-2">
+                <div className="h-full rounded-full bg-gradient-to-r from-violeta to-oro" style={{ width: `${d.puntaje}%` }} />
+              </div>
+              <p className="text-right text-xs text-texto-suave">{d.puntaje}%</p>
+            </div>
+          );
+        })}
+        <p className="text-xs text-texto-suave">
+          {nombreA} y {nombreB}: calculado con la fecha de nacimiento, sin hora. {((resultado.planetas as { a?: { lunaDudosa?: boolean }; b?: { lunaDudosa?: boolean } } | undefined)?.a?.lunaDudosa || (resultado.planetas as { b?: { lunaDudosa?: boolean } } | undefined)?.b?.lunaDudosa) && "Alguna Luna es aproximada: con la hora sería exacta."}
+        </p>
+      </section>
+    )}
+    <section className="tarjeta flex flex-wrap items-center justify-between gap-4 border border-oro/40 p-5">
+      <div className="max-w-md">
+        <p className="font-display text-xl">¿Quieren verlo completo?</p>
+        <p className="text-sm text-texto-suave">La sinastría compara sus dos cartas astrales con hora y lugar: los aspectos exactos entre sus planetas, sus casas y la carta de la pareja.</p>
+      </div>
+      <Link href="/sinastria" className="boton boton-primario shrink-0">
+        Ver nuestra sinastría
+      </Link>
+    </section>
+    </>
   );
 }
 

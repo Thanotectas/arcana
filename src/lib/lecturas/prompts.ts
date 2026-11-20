@@ -1,5 +1,6 @@
-import { datoDeUsuario } from "../seguridad";
 import "server-only";
+import { NOMBRE_DIMENSION, describirPlanetas, type DimensionCompatibilidad, type PlanetasPersona } from "../astro/compatibilidad";
+import { datoDeUsuario } from "../seguridad";
 import type { OpcionesTexto, ImagenEntrada } from "../ia";
 import type { TipoLectura } from "../creditos";
 import { TIRADAS, resumenTirada, type CartaTirada, type TipoTirada } from "../tarot/tiradas";
@@ -424,12 +425,28 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
   if (!a || !b) throw new Error("Lectura de compatibilidad incompleta.");
   const nombreA = datoDeUsuario(entrada.nombreA, 80) || "Persona A";
   const nombreB = datoDeUsuario(entrada.nombreB, 80) || "Persona B";
+  const planetas = resultado.planetas as { a: PlanetasPersona; b: PlanetasPersona } | undefined;
+  const dimensiones = resultado.dimensiones as DimensionCompatibilidad[] | undefined;
+  if (planetas && dimensiones?.length) {
+    const puntajes = dimensiones.map((d) => `${NOMBRE_DIMENSION[d.clave].nombre} (${NOMBRE_DIMENSION[d.clave].planetas}): ${d.puntaje}/100`).join("; ");
+    return {
+      usuario:
+        `Analiza la compatibilidad astrológica entre ${nombreA} y ${nombreB} con sus planetas personales (calculados con la fecha de nacimiento, sin hora: no hay ascendente ni casas).\n` +
+        `${describirPlanetas(nombreA, planetas.a)}.\n${describirPlanetas(nombreB, planetas.b)}.\n` +
+        `Afinidad por dimensión (por elementos y modalidades): ${puntajes}. Afinidad general: ${Number(resultado.puntaje)}/100.\n\n` +
+        `Estructura: ## Lo que los une (los Soles: quiénes son), ## Cómo se sienten juntos (las Lunas: lo emocional, la casa, la ternura), ## La atracción (Venus de uno con Marte del otro, en los dos sentidos), ## Cómo se hablan (los Mercurios: discusiones, humor, planes), ## Dónde chocan (sé concreta y honesta, con salida), ## Lo que se anuncia (si la relación tiene futuro, de qué tipo y qué etapa viene), ## Consejo para que funcione. ` +
+        `Nombra los signos de cada planeta y usa los nombres de los dos. Si una Luna es aproximada, dilo en media frase. Al final, en una frase, menciona que con la hora y el lugar de nacimiento la sinastría completa muestra los aspectos exactos y las casas. Extensión: 800 a 1000 palabras.`,
+      sistemaExtra:
+        "Compatibilidad por planetas personales: el Sol habla de la esencia y el rumbo; la Luna, de las necesidades emocionales y cómo se cuidan; Venus, de cómo ama y qué le atrae; Marte, de cómo desea, actúa y pelea; Mercurio, de cómo piensa y se comunica. Venus de uno en armonía con Marte del otro es química. Elementos afines (fuego y aire, tierra y agua, o el mismo) fluyen; los que chocan piden esfuerzo, no son condena. Nunca digas que una pareja está condenada ni que es perfecta.",
+      opciones: { idioma, effort: "medium", maxTokens: 3400 },
+    };
+  }
   return {
     usuario:
       `Analiza la compatibilidad astrológica entre ${nombreA} (${a.nombre}, ${a.elemento}, ${a.modalidad}, regente ${a.regente}) y ${nombreB} (${b.nombre}, ${b.elemento}, ${b.modalidad}, regente ${b.regente}). ` +
       `Afinidad calculada por elementos y modalidades: ${Number(resultado.puntaje)}/100.\n\n` +
       `Estructura: ## Lo que los une, ## Dónde chocan, ## En el amor, ## En la amistad y el trabajo, ## Lo que se anuncia (si la relación tiene futuro, de qué tipo y qué etapa viene), ## Consejo para que funcione. Usa los nombres. Extensión: 600 a 750 palabras.`,
-    opciones: { idioma, effort: "low", maxTokens: 2200 },
+    opciones: { idioma, effort: "medium", maxTokens: 2400 },
   };
 }
 
