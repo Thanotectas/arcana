@@ -21,6 +21,8 @@ export const LOGROS: Logro[] = [
   { id: "camino", icono: "🧭", nombre: "El Camino del Loco", descripcion: "Descubre los 22 Arcanos Mayores" },
   { id: "mazo", icono: "👑", nombre: "Todo el tarot", descripcion: "Descubre las 78 cartas" },
   { id: "maestro", icono: "🌙", nombre: "Ojo de maestro", descripcion: "Supera un reto maestro" },
+  { id: "dorada", icono: "✨", nombre: "Toque de oro", descripcion: "Desbloquea tu primera carta dorada" },
+  { id: "doradas-22", icono: "👑", nombre: "Colección dorada", descripcion: "Desbloquea las 22 cartas doradas" },
 ];
 
 export interface DatosLogros {
@@ -30,6 +32,8 @@ export interface DatosLogros {
   distribucion: number[];
   /** Retos maestros superados. */
   maestros?: number;
+  /** Cartas doradas desbloqueadas. */
+  doradas?: number;
 }
 
 export function logrosObtenidos(d: DatosLogros): Set<string> {
@@ -46,5 +50,7 @@ export function logrosObtenidos(d: DatosLogros): Set<string> {
   if (tiene("mayor")) s.add("camino");
   if (d.album.size >= MAZO.length) s.add("mazo");
   if ((d.maestros ?? 0) > 0) s.add("maestro");
+  if ((d.doradas ?? 0) > 0) s.add("dorada");
+  if ((d.doradas ?? 0) >= 22) s.add("doradas-22");
   return s;
 }

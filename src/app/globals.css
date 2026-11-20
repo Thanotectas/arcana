@@ -1385,3 +1385,13 @@ body {
   .emblema-gira, .emblema-destello { animation: none; }
   .emblema-destello { display: none; }
 }
+
+/* Cartas doradas del Tarot Arcana (El Camino del Loco): un brillo dorado que respira. */
+@keyframes dorada-brillo {
+  0%, 100% { box-shadow: 0 0 10px rgba(241, 217, 154, 0.55), 0 0 0 1px rgba(241, 217, 154, 0.8); }
+  50% { box-shadow: 0 0 26px rgba(241, 217, 154, 0.95), 0 0 0 2px rgba(255, 236, 170, 1); }
+}
+.dorada-brillo { animation: dorada-brillo 2.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .dorada-brillo { animation: none; box-shadow: 0 0 18px rgba(241, 217, 154, 0.8); }
+}

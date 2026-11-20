@@ -71,7 +71,7 @@ export async function sintetizar(texto: string): Promise<Buffer> {
 }
 
 /** Duración en segundos de un audio (ffmpeg la escribe al leerlo). */
-async function duracion(ruta: string): Promise<number> {
+export async function duracion(ruta: string): Promise<number> {
   const { stderr } = await ejecutar(rutaFfmpeg(), ["-hide_banner", "-i", ruta, "-f", "null", "-"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 });
   const m = /Duration: (\d+):(\d+):([\d.]+)/.exec(stderr);
   if (!m) throw new Error("No se pudo medir la narración.");

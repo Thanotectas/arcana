@@ -165,6 +165,11 @@ export function RankingSemanal() {
         </p>
       )}
 
+      <Link href="/juego/ligas" className="flex items-center justify-between rounded-lg border border-violeta-suave/40 bg-violeta/10 px-3 py-2 text-sm transition hover:border-violeta-suave">
+        <span>👥 Crea una liga con tu gente y compitan entre ustedes</span>
+        <span className="text-oro-suave">→</span>
+      </Link>
+
       <details className="text-xs text-texto-suave">
         <summary className="cursor-pointer">¿Cómo se suman los puntos?</summary>
         <p className="mt-1">

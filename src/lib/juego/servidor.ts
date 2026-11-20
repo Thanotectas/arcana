@@ -9,6 +9,7 @@ import {
   cartaMaestra,
   cartaPorId,
   diaAnterior,
+  doradasDe,
   esComodin,
   fechaBogota,
   inicioSemana,
@@ -36,6 +37,8 @@ export interface ProgresoCuenta {
   maestros: number;
   /** Intentos del reto maestro de hoy, si lo jugó. */
   maestroHoy: string[] | null;
+  /** Mayores con su carta dorada del Tarot Arcana desbloqueada. */
+  doradas: string[];
 }
 
 /** Días seguidos jugados que terminan en `hasta` (0 si ese día no jugó). */
@@ -79,6 +82,12 @@ export async function progresoDeCuenta(usuarioId: string): Promise<ProgresoCuent
     creditosGanados: (premios ?? []).reduce((s, p) => s + p.cantidad, 0),
     maestros: (maestro ?? []).filter((m) => m.gano).length,
     maestroHoy: (maestro ?? []).find((m) => m.fecha === hoy)?.intentos ?? null,
+    doradas: [
+      ...doradasDe(
+        Object.fromEntries(filas.map((f) => [f.fecha, f.intentos])),
+        Object.fromEntries((maestro ?? []).map((m) => [m.fecha, m.intentos])),
+      ),
+    ],
   };
 }
 
@@ -223,7 +232,7 @@ export interface Ranking {
   campeon: { apodo: string; puntos: number } | null;
 }
 
-async function puntosDeSemana(desde: string, hasta: string) {
+export async function puntosDeSemana(desde: string, hasta: string) {
   const admin = getSupabaseAdmin();
   type Fila = { usuario_id: string; intentos: string[]; gano: boolean; comodin: string | null };
   const conComodin = await admin.from("juego_partidas").select("usuario_id, intentos, gano, comodin").gte("fecha", desde).lte("fecha", hasta).limit(50_000);
@@ -329,7 +338,7 @@ export async function rankingSemanal(usuarioId: string | null): Promise<Ranking>
   };
 }
 
-const PALABRAS_VETADAS = ["puta", "puto", "mierda", "verga", "pene", "sexo", "marica", "gonorrea", "malparid", "hijueputa", "hp", "culo", "idiota", "estupid", "nazi", "admin", "arcana", "sibila", "soporte"];
+export const PALABRAS_VETADAS = ["puta", "puto", "mierda", "verga", "pene", "sexo", "marica", "gonorrea", "malparid", "hijueputa", "hp", "culo", "idiota", "estupid", "nazi", "admin", "arcana", "sibila", "soporte"];
 
 export type ResultadoApodo = { ok: true; apodo: string } | { ok: false; error: "formato" | "vetado" | "ocupado" | "guardar" };
 

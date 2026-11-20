@@ -15,6 +15,10 @@ import type { CartaTarot } from "@/lib/tarot/deck";
 import {
   COMODINES,
   GRUPOS,
+  INTENTOS_DORADA,
+  cartaDorada,
+  doradasDe,
+  imagenDorada,
   emblemaGrupo,
   MAX_INTENTOS,
   MAX_INTENTOS_MAESTRO,
@@ -72,6 +76,7 @@ interface ProgresoCuenta {
   creditosGanados: number;
   maestros?: number;
   maestroHoy?: string[] | null;
+  doradas?: string[];
 }
 interface PremioNuevo {
   id: string;
@@ -816,7 +821,9 @@ function Final({
 }) {
   const [copiado, setCopiado] = useState(false);
   const [generando, setGenerando] = useState(false);
+  const [video, setVideo] = useState<"listo" | "preparando" | "error">("listo");
   const [maestrosLocales] = useState(maestrosGanados);
+  const [doradasLocales] = useState(() => doradasDe(leerProgreso().partidas, leerMaestro()));
   const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin, conComodin);
   const urlImagen = `/api/juego/imagen?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&formato=historia`;
 
@@ -839,6 +846,28 @@ function Final({
       window.open(urlImagen, "_blank");
     } finally {
       setGenerando(false);
+    }
+  }
+  /** Video vertical del resultado (sin revelar la carta) para TikTok, Reels y estados. */
+  async function compartirVideo() {
+    setVideo("preparando");
+    try {
+      const r = await fetch(`/api/juego/video?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&idioma=es`);
+      if (!r.ok) throw new Error(String(r.status));
+      const blob = await r.blob();
+      const archivo = new File([blob], `camino-del-loco-${numero}.mp4`, { type: "video/mp4" });
+      if (navigator.canShare?.({ files: [archivo] })) {
+        await navigator.share({ files: [archivo], text: `¿Adivinas la carta de hoy? ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = archivo.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }
+      setVideo("listo");
+    } catch {
+      setVideo("error");
     }
   }
   const faltan = RACHA_PREMIO - (racha % RACHA_PREMIO);
@@ -877,6 +906,15 @@ function Final({
       </p>
       <VozSibila carta={escondida.id} />
 
+      {escondida.arcano === "mayor" &&
+        (gano && comparaciones.length <= INTENTOS_DORADA ? (
+          <BannerDorada carta={escondida} />
+        ) : (
+          <p className="text-xs text-texto-suave">
+            ✨ Los Arcanos Mayores tienen carta dorada: encuéntralos en {INTENTOS_DORADA} intentos o menos para desbloquearla en tu álbum.
+          </p>
+        ))}
+
       <MensajeSibila carta={escondida.nombre} />
 
       <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-left font-sans text-sm leading-relaxed">{texto}</pre>
@@ -889,6 +927,9 @@ function Final({
         </a>
         <button type="button" onClick={compartirImagen} disabled={generando} className="boton boton-secundario">
           {generando ? "Preparando la imagen…" : "📸 Imagen para historias"}
+        </button>
+        <button type="button" onClick={() => void compartirVideo()} disabled={video === "preparando"} className="boton boton-secundario">
+          {video === "preparando" ? "🎬 Preparando tu video (unos 20 s)…" : video === "error" ? "🎬 No se pudo: intenta de nuevo" : "🎬 Video para TikTok y Reels"}
         </button>
       </div>
 
@@ -988,11 +1029,35 @@ function Final({
           mejorRacha: Math.max(stats.mejorRacha, progreso.mejorRacha, racha),
           distribucion: progreso.distribucion,
           maestros: Math.max(cuenta?.maestros ?? 0, maestrosLocales),
+          doradas: new Set([...doradasLocales, ...(cuenta?.doradas ?? [])]).size,
         }}
       />
 
       <Cuenta />
 
+    </div>
+  );
+}
+
+/** Al encontrar un Mayor rápido (o en el reto maestro): su versión dorada del Tarot Arcana entra al álbum. */
+function BannerDorada({ carta }: { carta: CartaTarot }) {
+  const d = cartaDorada(carta);
+  if (!d) return null;
+  return (
+    <div className="logro-nuevo flex items-center gap-4 rounded-2xl border border-oro/70 bg-gradient-to-r from-oro/20 via-oro/5 to-transparent p-3 text-left">
+      {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
+      <img src={imagenDorada(carta)} alt={d.nombre} className="dorada-brillo voltear-carta w-16 shrink-0 rounded-lg" />
+      <div className="min-w-0">
+        <p className="text-xs uppercase tracking-[0.2em] text-oro-suave">Carta dorada desbloqueada</p>
+        <p className="font-display text-2xl leading-tight">{d.nombre}</p>
+        <p className="text-xs text-texto-suave">
+          Es {carta.nombre} en Tarot Arcana, nuestro mazo propio. Ya brilla en{" "}
+          <Link href="/juego/album" className="text-oro-suave underline">
+            tu álbum
+          </Link>
+          .
+        </p>
+      </div>
     </div>
   );
 }
@@ -1152,6 +1217,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
           <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `Maestría en ${intentos.length}` : "Se te escondió"}</p>
           <p className="brillo-oro font-display text-3xl">{escondida.nombre}</p>
           <p className="text-sm text-texto">{mensajeDelDia(escondida)}</p>
+          {gano && escondida.arcano === "mayor" && <BannerDorada carta={escondida} />}
           <p className="text-sm text-texto-suave">
             {gano
               ? sesion === "si"

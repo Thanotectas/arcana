@@ -564,6 +564,18 @@ export type Database = {
         Update: Partial<{ usuario_id: string; apodo: string; ultimo_puesto: number | null; semana_puesto: string | null; creado_en: string; actualizado_en: string }>;
         Relationships: [];
       };
+      juego_ligas: {
+        Row: { id: string; codigo: string; nombre: string; creador: string; creado_en: string };
+        Insert: { id?: string; codigo: string; nombre: string; creador: string; creado_en?: string };
+        Update: Partial<{ id: string; codigo: string; nombre: string; creador: string; creado_en: string }>;
+        Relationships: [];
+      };
+      juego_liga_miembros: {
+        Row: { liga_id: string; usuario_id: string; unido_en: string };
+        Insert: { liga_id: string; usuario_id: string; unido_en?: string };
+        Update: Partial<{ liga_id: string; usuario_id: string; unido_en: string }>;
+        Relationships: [];
+      };
       juego_mensajes: {
         Row: { fecha: string; signo: string; carta: string; texto: string; creado_en: string };
         Insert: { fecha: string; signo: string; carta: string; texto: string; creado_en?: string };

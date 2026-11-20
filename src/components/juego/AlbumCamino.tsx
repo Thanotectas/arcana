@@ -4,8 +4,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
-import { GRUPOS, cartaDelJuego, emblemaGrupo, premioDelGrupo, type IdGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
-import { leerPractica, leerProgreso, maestrosGanados } from "./CaminoDelLoco";
+import { GRUPOS, INTENTOS_DORADA, cartaDelJuego, cartaDorada, doradasDe, emblemaGrupo, imagenDorada, premioDelGrupo, type IdGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
+import { leerMaestro, leerPractica, leerProgreso, maestrosGanados } from "./CaminoDelLoco";
 import { Logros } from "./Extras";
 
 const DORSO = "/cartas/arcana/dorso.webp";
@@ -29,18 +29,20 @@ export function AlbumCamino() {
 
 function Album() {
   const [locales] = useState(descubiertasLocales);
-  const [deCuenta, setDeCuenta] = useState<string[]>([]);
+  const [doradasLocales] = useState(() => doradasDe(leerProgreso().partidas, leerMaestro()));
+  const [deCuenta, setDeCuenta] = useState<{ album: string[]; doradas: string[] }>({ album: [], doradas: [] });
   useEffect(() => {
     let vivo = true;
     fetch("/api/juego", { cache: "no-store" })
-      .then((r) => (r.ok ? (r.json() as Promise<{ album: string[] }>) : null))
-      .then((d) => vivo && d && setDeCuenta(d.album))
+      .then((r) => (r.ok ? (r.json() as Promise<{ album: string[]; doradas?: string[] }>) : null))
+      .then((d) => vivo && d && setDeCuenta({ album: d.album, doradas: d.doradas ?? [] }))
       .catch(() => null);
     return () => {
       vivo = false;
     };
   }, []);
-  const tiene = new Set([...locales, ...deCuenta]);
+  const tiene = new Set([...locales, ...deCuenta.album]);
+  const doradas = new Set([...doradasLocales, ...deCuenta.doradas]);
   const mayores = cartasDelGrupo("mayor");
   const enCamino = mayores.filter((c) => tiene.has(c.id)).length;
 
@@ -71,7 +73,7 @@ function Album() {
 
       <section className="tarjeta space-y-3 p-5">
         <h2 className="font-display text-2xl">Tus logros</h2>
-        <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion, maestros: maestrosGanados() }} />
+        <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion, maestros: maestrosGanados(), doradas: doradas.size }} />
       </section>
 
       <section className="space-y-3">
@@ -84,7 +86,41 @@ function Album() {
           Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.{" "}
           <PremioGrupo id="mayor" tienes={mayores.filter((c) => tiene.has(c.id)).length} />
         </p>
-        <Camino cartas={mayores} tiene={tiene} />
+        <Camino cartas={mayores} tiene={tiene} doradas={doradas} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="flex items-center justify-between font-display text-2xl">
+          <span className="brillo-oro">✨ Colección dorada</span>
+          <span className="font-sans text-sm text-texto-suave">{doradas.size} de 22</span>
+        </h2>
+        <p className="text-sm text-texto-suave">
+          Las cartas de <strong className="text-oro-suave">Tarot Arcana</strong>, nuestro mazo propio. Encuentra un Arcano Mayor en {INTENTOS_DORADA} intentos o menos
+          (o en el reto maestro) y desbloquea su versión dorada.
+        </p>
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+          {mayores.map((c) => {
+            const d = cartaDorada(c);
+            const tieneDorada = doradas.has(c.id);
+            return (
+              <div key={c.id} className="text-center">
+                <div className={`relative aspect-[2/3] overflow-hidden rounded-lg border ${tieneDorada ? "dorada-brillo border-oro" : "border-borde bg-superficie-2"}`}>
+                  {tieneDorada ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- ilustración estática
+                    <img src={imagenDorada(c)} alt={d?.nombre ?? c.nombre} loading="lazy" className="h-full w-full object-cover" />
+                  ) : (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
+                      <img src={DORSO} alt="" loading="lazy" className="h-full w-full object-cover opacity-25 grayscale" />
+                      <span className="absolute inset-0 flex items-center justify-center font-display text-lg text-oro-suave/70">{rotuloCasilla(c).numero}</span>
+                    </>
+                  )}
+                </div>
+                <p className={`mt-1 truncate text-[10px] ${tieneDorada ? "text-oro-suave" : "text-texto-suave"}`}>{tieneDorada ? d?.nombre : c.nombre}</p>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {GRUPOS.filter((g) => g.id !== "mayor").map((g) => {
@@ -180,7 +216,7 @@ function puntosEnRuta(n: number) {
 }
 
 /** Los 22 mayores sobre el mapa del viaje: del Loco (abajo) al Mundo (la luz de arriba). */
-function Camino({ cartas, tiene }: { cartas: CartaTarot[]; tiene: ReadonlySet<string> }) {
+function Camino({ cartas, tiene, doradas }: { cartas: CartaTarot[]; tiene: ReadonlySet<string>; doradas: ReadonlySet<string> }) {
   const puntos = puntosEnRuta(cartas.length);
   return (
     <div className="relative overflow-hidden rounded-3xl border border-oro/30" style={{ aspectRatio: "1342 / 2000" }}>
@@ -190,17 +226,18 @@ function Camino({ cartas, tiene }: { cartas: CartaTarot[]; tiene: ReadonlySet<st
       {cartas.map((c, i) => {
         const p = puntos[i];
         const visible = tiene.has(c.id);
+        const dorada = doradas.has(c.id);
         const r = rotuloCasilla(c);
         return (
           <div key={c.id} className={`absolute -translate-x-1/2 -translate-y-1/2 ${visible ? "z-10 w-[9.5%]" : "w-[6.5%]"}`} style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}>
             {visible ? (
               <Link
                 href={`/significado-tarot/${c.id}`}
-                title={c.nombre}
-                className="block aspect-square overflow-hidden rounded-full border-2 border-oro shadow-[0_0_16px_rgba(241,217,154,0.95)] transition hover:scale-125"
+                title={dorada ? `${c.nombre} · carta dorada: ${cartaDorada(c)?.nombre}` : c.nombre}
+                className={`block aspect-square overflow-hidden rounded-full border-2 border-oro shadow-[0_0_16px_rgba(241,217,154,0.95)] transition hover:scale-125 ${dorada ? "dorada-brillo" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
-                <img src={imagenCarta(c) ?? DORSO} alt={c.nombre} className="h-full w-full object-cover object-[50%_30%]" />
+                <img src={(dorada ? imagenDorada(c) : imagenCarta(c)) ?? DORSO} alt={c.nombre} className="h-full w-full object-cover object-[50%_30%]" />
               </Link>
             ) : (
               <div title={`${r.numero} · por descubrir`} className="flex aspect-square items-center justify-center rounded-full border border-oro/50 bg-noche/55">

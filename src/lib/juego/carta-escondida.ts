@@ -1,4 +1,5 @@
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
+import { TAROT_ARCANA } from "@/lib/tarot/arcana";
 
 /**
  * «El Camino del Loco», fase 1: la carta escondida del día.
@@ -100,6 +101,46 @@ export function pistasMaestras(c: CartaTarot): string[] {
     `Un eco suyo: «${c.palabrasClave[2] ?? c.palabrasClave[1] ?? c.palabrasClave[0]}». Y otra sombra: «${s2 ?? s1}».`,
     `Cuando se voltea dice: «${ocultarNombre(sombra, c).replace(/^Invertid[ao],?\s*/i, "")}»`,
   ];
+}
+
+// ───────────────────────── Cartas doradas (Tarot Arcana) ─────────────────────────
+
+/** Encontrar un Arcano Mayor en este número de intentos o menos desbloquea su versión dorada. */
+export const INTENTOS_DORADA = 3;
+
+/** La carta del mazo propio Tarot Arcana que equivale a un Arcano Mayor clásico (mismo número). */
+export function cartaDorada(c: CartaTarot): CartaTarot | undefined {
+  return c.arcano === "mayor" ? TAROT_ARCANA.find((a) => a.numero === c.numero) : undefined;
+}
+
+export const imagenDorada = (c: CartaTarot) => {
+  const d = cartaDorada(c);
+  return d ? `/cartas/arcana/${d.id}.webp` : undefined;
+};
+
+/** ¿Esta partida desbloquea la dorada? Mayor encontrado en 3 intentos o menos, o en el reto maestro. */
+export function ganaDorada(c: CartaTarot, intentos: string[], maestro = false) {
+  if (c.arcano !== "mayor") return false;
+  const i = intentos.indexOf(c.id);
+  return i >= 0 && (maestro || i < INTENTOS_DORADA);
+}
+
+/** Ids (del mazo clásico) de los Mayores con su versión dorada desbloqueada. */
+export function doradasDe(partidas: Record<string, string[]>, maestros: Record<string, string[]> = {}) {
+  const s = new Set<string>();
+  for (const [fecha, intentos] of Object.entries(partidas)) {
+    const n = numeroDeJuego(fecha);
+    if (n < 1) continue;
+    const c = cartaDelJuego(n);
+    if (ganaDorada(c, intentos)) s.add(c.id);
+  }
+  for (const [fecha, intentos] of Object.entries(maestros)) {
+    const n = numeroDeJuego(fecha);
+    if (n < 1) continue;
+    const c = cartaMaestra(n);
+    if (ganaDorada(c, intentos, true)) s.add(c.id);
+  }
+  return s;
 }
 
 // ───────────────────────── Comodín de Sibila ─────────────────────────

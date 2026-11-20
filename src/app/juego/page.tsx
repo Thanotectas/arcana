@@ -57,10 +57,13 @@ export default async function PaginaJuego({ searchParams }: { searchParams: Busq
         </p>
         <p className="mt-3 flex justify-center gap-4 text-sm">
           <Link href="/juego/album" className="text-oro-suave underline">
-            📖 Mi álbum de cartas
+            📖 Mi álbum
           </Link>
           <Link href="/juego/ranking" className="text-oro-suave underline">
-            🏆 Ranking de la semana
+            🏆 Ranking
+          </Link>
+          <Link href="/juego/ligas" className="text-oro-suave underline">
+            👥 Ligas
           </Link>
         </p>
       </header>
