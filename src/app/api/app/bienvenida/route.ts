@@ -19,10 +19,14 @@ export async function POST() {
   if (plataforma === "web") return Response.json({ error: "no_instalada" }, { status: 400 });
 
   const admin = getSupabaseAdmin();
-  // App de Google Play (prueba cerrada): quien la abre es probador y recibe sus créditos de prueba, una sola vez.
+  // App de Google Play: los créditos de prueba son solo para quien se invitó y se agregó en Play Console
+  // (si la app sale al público, el resto recibe el crédito de bienvenida normal). Una sola vez.
   if (plataforma === "android") {
-    const { count } = await admin.from("movimientos_creditos").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).eq("motivo", MOTIVO_PROBADOR);
-    if (!count) {
+    const [{ count }, { data: invitacion }] = await Promise.all([
+      admin.from("movimientos_creditos").select("id", { count: "exact", head: true }).eq("usuario_id", user.id).eq("motivo", MOTIVO_PROBADOR),
+      admin.from("probadores_invitaciones").select("agregado_en").eq("usuario_id", user.id).maybeSingle(),
+    ]);
+    if (!count && invitacion?.agregado_en) {
       const { error: errorPrueba } = await admin.rpc("devolver_creditos", { p_usuario: user.id, p_cantidad: CREDITOS_PROBADOR, p_motivo: MOTIVO_PROBADOR, p_referencia: "app-android" });
       if (errorPrueba) {
         console.error("[app] no se sumaron los créditos de prueba", errorPrueba.message);
