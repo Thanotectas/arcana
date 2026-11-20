@@ -11,6 +11,7 @@ import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, son
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
   GRUPOS,
+  emblemaGrupo,
   MAX_INTENTOS,
   PROGRESO_VACIO,
   RACHA_PREMIO,
@@ -477,44 +478,6 @@ const ESTILO_GRUPO: Record<IdGrupo, { color: string; elemento: string; tema: str
   oros: { color: "#f5c84c", elemento: "Tierra", tema: "dinero, cuerpo y lo material" },
 };
 
-/** Símbolo dibujado de cada palo (estrella, bastón, copa, espada y pentáculo). */
-function SimboloGrupo({ id, className = "h-6 w-6" }: { id: IdGrupo; className?: string }) {
-  const trazo = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round" } as const;
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      {id === "mayor" && <path {...trazo} d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2L12 19.5l-2.2-6.3L3.5 11l6.3-2.2z M18.5 17.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" />}
-      {id === "bastos" && (
-        <g {...trazo}>
-          <path d="M6 21L17 5" />
-          <path d="M17 5c.4-1.5 1.6-2.3 3-2.3-.1 1.4-1 2.5-2.4 2.9" />
-          <path d="M12.2 10.6c-1.6-.4-2.5-1.6-2.6-3.1 1.5 0 2.7.9 3.2 2.3" />
-          <path d="M14.3 7.6c1.6.2 2.7 1.3 2.9 2.8-1.5.1-2.8-.7-3.4-2" />
-        </g>
-      )}
-      {id === "copas" && (
-        <g {...trazo}>
-          <path d="M5.5 3.5h13c0 5-2.9 8.5-6.5 8.5S5.5 8.5 5.5 3.5z" />
-          <path d="M12 12v6M8 21h8M9.5 18h5" />
-          <path d="M7.5 6.5h9" opacity=".6" />
-        </g>
-      )}
-      {id === "espadas" && (
-        <g {...trazo}>
-          <path d="M12 2.5l1.6 2.5v10.5h-3.2V5z" />
-          <path d="M7 15.5h10M12 15.5v4" />
-          <circle cx="12" cy="20.6" r="1.1" />
-        </g>
-      )}
-      {id === "oros" && (
-        <g {...trazo}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 4.6l2.2 6.9-5.8-4.3h7.2l-5.8 4.3z" transform="translate(0 2.2)" />
-        </g>
-      )}
-    </svg>
-  );
-}
-
 const miniCarta = (c: CartaTarot) => `/cartas/rider-mini/${c.id}.webp`;
 
 function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: ReadonlySet<string>; quedan: ReadonlySet<string>; sugerido: IdGrupo | null; onElegir: (id: string) => void }) {
@@ -574,9 +537,18 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
               aria-selected={activo}
               onClick={() => cambiarGrupo(g.id)}
               style={{ color, borderColor: activo ? color : undefined, background: activo ? `${color}22` : undefined, boxShadow: activo ? `0 0 18px ${color}40` : undefined }}
-              className={`relative flex flex-col items-center rounded-xl border px-0.5 pb-1.5 pt-2 transition active:scale-95 ${activo ? "" : "border-borde bg-superficie-2"} ${n === 0 && !activo ? "opacity-40" : ""}`}
+              className={`relative flex flex-col items-center rounded-xl border px-0.5 pb-1.5 pt-1.5 transition active:scale-95 ${activo ? "" : "border-borde bg-superficie-2"} ${n === 0 && !activo ? "opacity-40" : ""}`}
             >
-              <SimboloGrupo id={g.id} className={`h-6 w-6 transition ${activo ? "scale-110" : ""}`} />
+              <span key={activo ? "activo" : "inactivo"} className={`relative block h-11 w-11 ${activo ? "emblema-gira" : ""}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
+                <img
+                  src={emblemaGrupo(g.id)}
+                  alt=""
+                  className={`h-full w-full rounded-full transition ${n === 0 ? "opacity-50 grayscale" : activo ? "" : "opacity-80"}`}
+                  style={activo ? { filter: `drop-shadow(0 0 8px ${color})` } : undefined}
+                />
+                {activo && <span className="emblema-destello absolute inset-0 rounded-full border-2" style={{ borderColor: color }} />}
+              </span>
               <span className={`mt-1 text-[11px] font-medium ${activo ? "text-texto" : "text-texto-suave"}`}>{g.nombre}</span>
               <span
                 className={`absolute -top-2 right-0.5 min-w-5 rounded-full px-1 text-[10px] font-bold leading-5 tabular-nums ${n === 0 ? "bg-superficie-2 text-texto-suave" : "text-noche"}`}

@@ -4,7 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
-import { GRUPOS, cartaDelJuego, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
+import { GRUPOS, cartaDelJuego, emblemaGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
 import { leerPractica, leerProgreso } from "./CaminoDelLoco";
 import { Logros } from "./Extras";
 
@@ -75,7 +75,11 @@ function Album() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-2xl">El camino del Loco</h2>
+        <h2 className="flex items-center gap-2 font-display text-2xl">
+          {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
+          <img src={emblemaGrupo("mayor")} alt="" className="h-9 w-9" />
+          El camino del Loco
+        </h2>
         <p className="text-sm text-texto-suave">Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.</p>
         <Camino cartas={mayores} tiene={tiene} />
       </section>
@@ -85,9 +89,11 @@ function Album() {
         const n = cartas.filter((c) => tiene.has(c.id)).length;
         return (
           <section key={g.id} className="space-y-3">
-            <h2 className="flex items-baseline justify-between font-display text-2xl">
-              <span>
-                {g.icono} {g.nombre}
+            <h2 className="flex items-center justify-between font-display text-2xl">
+              <span className="flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
+                <img src={emblemaGrupo(g.id)} alt="" className="h-9 w-9" />
+                {g.nombre}
               </span>
               <span className="font-sans text-sm text-texto-suave">
                 {n} de {cartas.length}

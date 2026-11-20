@@ -241,6 +241,9 @@ export const GRUPOS = [
 ] as const;
 export type IdGrupo = (typeof GRUPOS)[number]["id"];
 
+/** Emblema ilustrado de cada grupo (estrella, bastón, copa, espada y pentáculo). */
+export const emblemaGrupo = (id: IdGrupo) => `/juego/grupos/${id}.webp`;
+
 export function cartasDelGrupo(g: IdGrupo) {
   return MAZO.filter((c) => grupo(c) === g).sort((a, b) => a.numero - b.numero);
 }
