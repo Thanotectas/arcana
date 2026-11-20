@@ -111,7 +111,21 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         `Extensión: 120 a 220 palabras. Sin título; puedes usar un par de párrafos. ` +
         // Las instrucciones de la lectura original piden un bloque JSON al final (marcas de la foto): aquí no va.
         `No agregues bloques de código, JSON, anexos ni marcas técnicas: solo el texto para la persona.`;
-      const texto = await generarTexto(usuario, [base.sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"), { idioma, effort: "low", maxTokens: 900 }, enviar);
+      // En las lecturas con foto (mano, taza, café, huevo, tabaco, velas) Sibila vuelve a mirar la foto y su manual
+      // al responder; las lecturas premium responden con más cuidado.
+      const conFoto = Boolean(base.opciones.imagenes?.length);
+      const premium = base.opciones.nivel === "premium";
+      const texto = await generarTexto(
+        conFoto ? `${usuario}\n\nTienes delante la misma foto de su lectura: si la pregunta toca algo que se ve, míralo y nómbralo con precisión (dónde está, cómo es).` : usuario,
+        [base.sistemaExtra ?? "", memoria].filter(Boolean).join("\n\n"),
+        {
+          idioma,
+          effort: premium ? "medium" : "low",
+          maxTokens: premium ? 1400 : 900,
+          ...(conFoto ? { imagenes: base.opciones.imagenes, conocimiento: base.opciones.conocimiento } : {}),
+        },
+        enviar,
+      );
       await admin.rpc("finalizar_pregunta", { p_pregunta: fila.id, p_texto: texto.replace(/```json[\s\S]*$/, "").trim() });
     } catch (e) {
       const codigo = clasificarError(e);
