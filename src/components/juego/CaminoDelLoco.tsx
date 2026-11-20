@@ -43,6 +43,11 @@ import {
 
 const CLAVE = "arcana-camino-del-loco-v1";
 
+/** Las caras de Sibila según el momento de la partida (public/juego/sibila-*.webp). */
+type Cara = "pista" | "tibio" | "caliente" | "gana" | "pierde";
+const cara = (c: Cara) => `/juego/sibila-${c}.webp`;
+const CARA_CALOR: Record<string, Cara> = { frio: "tibio", tibio: "tibio", caliente: "caliente" };
+
 /** Lo que devuelve /api/juego (el progreso guardado en la cuenta). */
 interface ProgresoCuenta {
   racha: number;
@@ -169,6 +174,8 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
   const termino = gano || intentos.length >= MAX_INTENTOS;
   const fallos = comparaciones.filter((c) => !c.acierto).length;
   const todasLasPistas = pistas(escondida);
+  const ultimaCarta = cartasIntento[cartasIntento.length - 1];
+  const caraActual: Cara = termino ? (gano ? "gana" : "pierde") : ultimaCarta ? CARA_CALOR[reaccion(ultimaCarta, escondida, cartasIntento.length).calor] : "pista";
   const [sonido, setSonido] = useState(sonidoActivo);
   const [celebrar, setCelebrar] = useState(false);
   const rachaLocal = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
@@ -265,6 +272,12 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
         </div>
 
         <div className="relative flex justify-center py-1">
+          {/* Sibila mira la partida: su cara cambia con cada intento. */}
+          <figure className="absolute left-0 top-1 flex w-20 flex-col items-center sm:w-24">
+            {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
+            <img key={caraActual} src={cara(caraActual)} alt="Sibila" className="burbuja-entra h-16 w-16 rounded-full border-2 border-oro/70 shadow-[0_0_24px_rgba(241,217,154,0.35)] sm:h-20 sm:w-20" />
+            <figcaption className="mt-1 font-display text-sm text-oro-suave">Sibila</figcaption>
+          </figure>
           {termino ? (
             // eslint-disable-next-line @next/next/no-img-element -- ilustración estática de la carta
             <img src={imagenCarta(escondida) ?? DORSO} alt={escondida.nombre} className="voltear-carta w-40 rounded-xl sm:w-48" />
@@ -371,17 +384,17 @@ function Conversacion({
   termino: boolean;
   gano: boolean;
 }) {
-  type Mensaje = { de: "sibila"; texto: string; calor?: string } | { de: "tu"; carta: CartaTarot; r: Comparacion };
-  const mensajes: Mensaje[] = [{ de: "sibila", texto: pistas[0] }];
+  type Mensaje = { de: "sibila"; texto: string; calor?: string; cara: Cara } | { de: "tu"; carta: CartaTarot; r: Comparacion };
+  const mensajes: Mensaje[] = [{ de: "sibila", texto: pistas[0], cara: "pista" }];
   cartas.forEach((carta, i) => {
     const r = comparaciones[i];
     mensajes.push({ de: "tu", carta, r });
-    if (r.acierto) mensajes.push({ de: "sibila", texto: "¡Ahí está! ✨ La encontraste." });
-    else if (i === MAX_INTENTOS - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙` });
+    if (r.acierto) mensajes.push({ de: "sibila", texto: "¡Ahí está! ✨ La encontraste.", cara: "gana" });
+    else if (i === MAX_INTENTOS - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙`, cara: "pierde" });
     else {
       const re = reaccion(carta, escondida, i + 1);
-      mensajes.push({ de: "sibila", texto: re.texto, calor: re.calor });
-      if (pistas[i + 1]) mensajes.push({ de: "sibila", texto: pistas[i + 1] });
+      mensajes.push({ de: "sibila", texto: re.texto, calor: re.calor, cara: CARA_CALOR[re.calor] });
+      if (pistas[i + 1]) mensajes.push({ de: "sibila", texto: pistas[i + 1], cara: "pista" });
     }
   });
   const ultimo = mensajes.length - 1;
@@ -391,7 +404,7 @@ function Conversacion({
         m.de === "sibila" ? (
           <div key={i} className="burbuja-entra flex items-end gap-2" style={{ animationDelay: i === ultimo && i > 0 ? "0.35s" : "0s" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
-            <img src="/juego/sibila.webp" alt="" className="h-8 w-8 shrink-0 rounded-full border border-oro/60" />
+            <img src={cara(m.cara)} alt="" className="h-8 w-8 shrink-0 rounded-full border border-oro/60" />
             <p
               className={`max-w-[85%] rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm ${
                 m.calor === "caliente" ? "bg-oro/15 ring-1 ring-oro/50" : m.calor === "frio" ? "bg-sky-900/30" : i === ultimo && !termino ? "bg-superficie-2 ring-1 ring-oro/40" : "bg-superficie-2"
