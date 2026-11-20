@@ -3,6 +3,9 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generarTexto } from "@/lib/ia";
 import { SIGNOS, signoPorFecha, signoPorId } from "@/lib/zodiaco";
 import { cartaDelJuego, fechaBogota, mensajeDelDia, numeroDeJuego } from "./carta-escondida";
+import { nombreCarta, palabrasCarta } from "./cartas-idiomas";
+import { SIGNOS_IDIOMA } from "./textos";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 /**
  * Del juego a la lectura: al terminar, Sibila le da a cada signo un mensaje corto con la carta del día.
@@ -26,34 +29,38 @@ export function esSigno(id: unknown): id is string {
 }
 
 /** El mensaje de hoy para un signo (de la caché o recién escrito). */
-export async function mensajeParaSigno(signoId: string): Promise<{ fecha: string; signo: string; texto: string }> {
+export async function mensajeParaSigno(signoId: string, idioma: Idioma = "es"): Promise<{ fecha: string; signo: string; texto: string }> {
   const fecha = fechaBogota();
   const carta = cartaDelJuego(numeroDeJuego(fecha));
   const signo = signoPorId(signoId);
   if (!signo) throw new Error("signo");
   const admin = getSupabaseAdmin();
-  const { data: guardado, error } = await admin.from("juego_mensajes").select("texto").eq("fecha", fecha).eq("signo", signo.id).maybeSingle();
+  // En otros idiomas se guarda como «aries:en» (una fila por signo e idioma).
+  const clave = idioma === "es" ? signo.id : `${signo.id}:${idioma}`;
+  const nombreSigno = idioma === "es" ? signo.nombre : (SIGNOS_IDIOMA[idioma][signo.id] ?? signo.nombre);
+  const respaldo = idioma === "es" ? `${signo.nombre}: ${mensajeDelDia(carta)}` : `${nombreSigno} · ${nombreCarta(carta, idioma)}: ${palabrasCarta(carta, idioma).luz.join(", ")}.`;
+  const { data: guardado, error } = await admin.from("juego_mensajes").select("texto").eq("fecha", fecha).eq("signo", clave).maybeSingle();
   if (guardado?.texto) return { fecha, signo: signo.id, texto: guardado.texto };
-  // Sin la tabla (migración 0057 pendiente) no se llama a la IA en cada visita: se usa el mensaje del día.
-  if (error) return { fecha, signo: signo.id, texto: `${signo.nombre}: ${mensajeDelDia(carta)}` };
+  // Sin la tabla (migración 0057 pendiente) no se llama a la IA en cada visita: se usa un mensaje sencillo.
+  if (error) return { fecha, signo: signo.id, texto: respaldo };
 
   const datos = [
-    `Carta del día: ${carta.nombre}. Palabras clave: ${carta.palabrasClave.join(", ")}.`,
+    `Carta del día: ${carta.nombre}${idioma === "es" ? "" : ` (en el idioma de la respuesta: ${nombreCarta(carta, idioma)})`}. Palabras clave: ${carta.palabrasClave.join(", ")}.`,
     `Significado: ${carta.significado}`,
     `En el amor: ${carta.amor} En el trabajo: ${carta.trabajo}`,
-    `Signo de la persona: ${signo.nombre} (${signo.elemento}, ${signo.modalidad}, regido por ${signo.regente}; rasgos: ${signo.rasgos.join(", ")}).`,
+    `Signo de la persona: ${signo.nombre}${idioma === "es" ? "" : ` (${nombreSigno})`} (${signo.elemento}, ${signo.modalidad}, regido por ${signo.regente}; rasgos: ${signo.rasgos.join(", ")}).`,
   ].join("\n");
   let texto: string;
   try {
-    texto = (await generarTexto(datos, INSTRUCCION, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" }))
+    texto = (await generarTexto(datos, INSTRUCCION, { effort: "low", maxTokens: 400, nivel: "estandar", idioma }))
       .replace(/[*_#>]/g, "")
       .replace(/\s+/g, " ")
       .trim();
   } catch (e) {
     console.error("[juego] mensaje por signo", e);
-    return { fecha, signo: signo.id, texto: `${signo.nombre}: ${mensajeDelDia(carta)}` };
+    return { fecha, signo: signo.id, texto: respaldo };
   }
-  await admin.from("juego_mensajes").upsert({ fecha, signo: signo.id, carta: carta.id, texto }, { onConflict: "fecha,signo", ignoreDuplicates: true });
+  await admin.from("juego_mensajes").upsert({ fecha, signo: clave, carta: carta.id, texto }, { onConflict: "fecha,signo", ignoreDuplicates: true });
   return { fecha, signo: signo.id, texto };
 }
 

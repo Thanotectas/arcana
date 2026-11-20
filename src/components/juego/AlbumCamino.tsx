@@ -4,9 +4,11 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { imagenCarta } from "@/components/CartaVisual";
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
-import { GRUPOS, INTENTOS_DORADA, cartaDelJuego, cartaDorada, doradasDe, emblemaGrupo, imagenDorada, premioDelGrupo, type IdGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
+import { GRUPOS, INTENTOS_DORADA, nombrePestana, cartaDelJuego, cartaDorada, doradasDe, emblemaGrupo, imagenDorada, premioDelGrupo, type IdGrupo, cartasDelGrupo, rotuloCasilla } from "@/lib/juego/carta-escondida";
 import { leerMaestro, leerPractica, leerProgreso, maestrosGanados } from "./CaminoDelLoco";
 import { Logros } from "./Extras";
+import { useJ } from "@/lib/juego/useJuego";
+import { nombreCarta } from "@/lib/juego/cartas-idiomas";
 
 const DORSO = "/cartas/arcana/dorso.webp";
 const sinSuscripcion = () => () => {};
@@ -28,6 +30,7 @@ export function AlbumCamino() {
 }
 
 function Album() {
+  const { t, idioma } = useJ();
   const [locales] = useState(descubiertasLocales);
   const [doradasLocales] = useState(() => doradasDe(leerProgreso().partidas, leerMaestro()));
   const [deCuenta, setDeCuenta] = useState<{ album: string[]; doradas: string[] }>({ album: [], doradas: [] });
@@ -51,10 +54,10 @@ function Album() {
       <div className="tarjeta space-y-3 p-5">
         <div className="flex items-end justify-between">
           <p className="font-display text-3xl">
-            {tiene.size} <span className="text-lg text-texto-suave">de {MAZO.length} cartas</span>
+            {tiene.size} <span className="text-lg text-texto-suave">{t("de")} {MAZO.length} {t("cartas")}</span>
           </p>
           <p className="text-sm text-texto-suave">
-            Camino: <strong className="text-oro">{enCamino}</strong> de 22
+            {t("Camino:")} <strong className="text-oro">{enCamino}</strong> {t("de")} 22
           </p>
         </div>
         <div className="h-3 overflow-hidden rounded-full bg-superficie-2">
@@ -62,17 +65,17 @@ function Album() {
         </div>
         {tiene.size === 0 && (
           <p className="text-sm text-texto-suave">
-            Todavía no has descubierto ninguna.{" "}
+            {t("Todavía no has descubierto ninguna.")}{" "}
             <Link href="/juego" className="text-oro-suave underline">
-              Juega la carta de hoy
+              {t("Juega la carta de hoy")}
             </Link>{" "}
-            y empieza tu álbum.
+            {t("y empieza tu álbum.")}
           </p>
         )}
       </div>
 
       <section className="tarjeta space-y-3 p-5">
-        <h2 className="font-display text-2xl">Tus logros</h2>
+        <h2 className="font-display text-2xl">{t("Tus logros")}</h2>
         <Logros datos={{ album: tiene, mejorRacha: leerProgreso().mejorRacha, distribucion: leerProgreso().distribucion, maestros: maestrosGanados(), doradas: doradas.size }} />
       </section>
 
@@ -80,10 +83,10 @@ function Album() {
         <h2 className="flex items-center gap-2 font-display text-2xl">
           {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
           <img src={emblemaGrupo("mayor")} alt="" className="h-9 w-9" />
-          El camino del Loco
+          {t("El camino del Loco")}
         </h2>
         <p className="text-sm text-texto-suave">
-          Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.{" "}
+          {t("Los 22 Arcanos Mayores, del Loco al Mundo. Cada uno que descubres ilumina un paso del viaje.")}{" "}
           <PremioGrupo id="mayor" tienes={mayores.filter((c) => tiene.has(c.id)).length} />
         </p>
         <Camino cartas={mayores} tiene={tiene} doradas={doradas} />
@@ -91,12 +94,12 @@ function Album() {
 
       <section className="space-y-3">
         <h2 className="flex items-center justify-between font-display text-2xl">
-          <span className="brillo-oro">✨ Colección dorada</span>
-          <span className="font-sans text-sm text-texto-suave">{doradas.size} de 22</span>
+          <span className="brillo-oro">{t("✨ Colección dorada")}</span>
+          <span className="font-sans text-sm text-texto-suave">{t("{n} de 22", { n: doradas.size })}</span>
         </h2>
         <p className="text-sm text-texto-suave">
-          Las cartas de <strong className="text-oro-suave">Tarot Arcana</strong>, nuestro mazo propio. Encuentra un Arcano Mayor en {INTENTOS_DORADA} intentos o menos
-          (o en el reto maestro) y desbloquea su versión dorada.
+          {t("Las cartas de")} <strong className="text-oro-suave">Tarot Arcana</strong>
+          {t(", nuestro mazo propio. Encuentra un Arcano Mayor en {n} intentos o menos (o en el reto maestro) y desbloquea su versión dorada.", { n: INTENTOS_DORADA })}
         </p>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
           {mayores.map((c) => {
@@ -116,7 +119,7 @@ function Album() {
                     </>
                   )}
                 </div>
-                <p className={`mt-1 truncate text-[10px] ${tieneDorada ? "text-oro-suave" : "text-texto-suave"}`}>{tieneDorada ? d?.nombre : c.nombre}</p>
+                <p className={`mt-1 truncate text-[10px] ${tieneDorada ? "text-oro-suave" : "text-texto-suave"}`}>{tieneDorada ? d?.nombre : nombreCarta(c, idioma)}</p>
               </div>
             );
           })}
@@ -132,7 +135,7 @@ function Album() {
               <span className="flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
                 <img src={emblemaGrupo(g.id)} alt="" className="h-9 w-9" />
-                {g.nombre}
+                {nombrePestana(g.id, idioma)}
               </span>
               <span className="font-sans text-sm text-texto-suave">
                 {n} de {cartas.length}
@@ -160,12 +163,13 @@ function Album() {
 }
 
 function Carta({ carta, visible, compacta = false }: { carta: CartaTarot; visible: boolean; compacta?: boolean }) {
-  const r = rotuloCasilla(carta);
+  const { t, idioma } = useJ();
+  const r = rotuloCasilla(carta, idioma);
   const imagen = (
     // eslint-disable-next-line @next/next/no-img-element -- ilustración estática
     <img
       src={visible ? (imagenCarta(carta) ?? DORSO) : DORSO}
-      alt={visible ? carta.nombre : "Carta por descubrir"}
+      alt={visible ? nombreCarta(carta, idioma) : t("por descubrir")}
       loading="lazy"
       className={`w-full rounded-md border ${visible ? "border-oro/60 shadow-[0_0_18px_rgba(241,217,154,0.35)]" : "border-borde opacity-35 grayscale"}`}
     />
@@ -183,7 +187,7 @@ function Carta({ carta, visible, compacta = false }: { carta: CartaTarot; visibl
         </div>
       )}
       <span className={`w-full truncate leading-tight ${compacta ? "text-[10px]" : "text-[10px] sm:text-xs"} ${visible ? "text-texto" : "text-texto-suave"}`}>
-        {visible ? carta.nombre : r.numero + (r.nombre && carta.arcano === "menor" ? ` · ${r.nombre}` : "")}
+        {visible ? nombreCarta(carta, idioma) : r.numero + (r.nombre && carta.arcano === "menor" ? ` · ${r.nombre}` : "")}
       </span>
     </div>
   );
@@ -217,6 +221,7 @@ function puntosEnRuta(n: number) {
 
 /** Los 22 mayores sobre el mapa del viaje: del Loco (abajo) al Mundo (la luz de arriba). */
 function Camino({ cartas, tiene, doradas }: { cartas: CartaTarot[]; tiene: ReadonlySet<string>; doradas: ReadonlySet<string> }) {
+  const { t, idioma } = useJ();
   const puntos = puntosEnRuta(cartas.length);
   return (
     <div className="relative overflow-hidden rounded-3xl border border-oro/30" style={{ aspectRatio: "1342 / 2000" }}>
@@ -233,14 +238,14 @@ function Camino({ cartas, tiene, doradas }: { cartas: CartaTarot[]; tiene: Reado
             {visible ? (
               <Link
                 href={`/significado-tarot/${c.id}`}
-                title={dorada ? `${c.nombre} · carta dorada: ${cartaDorada(c)?.nombre}` : c.nombre}
+                title={dorada ? `${nombreCarta(c, idioma)} · ${cartaDorada(c)?.nombre}` : nombreCarta(c, idioma)}
                 className={`block aspect-square overflow-hidden rounded-full border-2 border-oro shadow-[0_0_16px_rgba(241,217,154,0.95)] transition hover:scale-125 ${dorada ? "dorada-brillo" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
-                <img src={(dorada ? imagenDorada(c) : imagenCarta(c)) ?? DORSO} alt={c.nombre} className="h-full w-full object-cover object-[50%_30%]" />
+                <img src={(dorada ? imagenDorada(c) : imagenCarta(c)) ?? DORSO} alt={nombreCarta(c, idioma)} className="h-full w-full object-cover object-[50%_30%]" />
               </Link>
             ) : (
-              <div title={`${r.numero} · por descubrir`} className="flex aspect-square items-center justify-center rounded-full border border-oro/50 bg-noche/55">
+              <div title={`${r.numero} · ${t("por descubrir")}`} className="flex aspect-square items-center justify-center rounded-full border border-oro/50 bg-noche/55">
                 <span className="font-display text-[9px] leading-none text-oro-suave/80 sm:text-xs">{r.numero}</span>
               </div>
             )}
@@ -253,13 +258,14 @@ function Camino({ cartas, tiene, doradas }: { cartas: CartaTarot[]; tiene: Reado
 
 /** Lo que se gana al completar el grupo (con cuenta): «Complétalo y gana 2 créditos» o «Completo». */
 function PremioGrupo({ id, tienes }: { id: IdGrupo; tienes: number }) {
+  const { t } = useJ();
   const p = premioDelGrupo(id);
   if (!p) return null;
   return tienes >= p.cartas.length ? (
-    <span className="text-oro-suave">🏆 ¡Completo! Ganaste {p.creditos} créditos.</span>
+    <span className="text-oro-suave">{t("🏆 ¡Completo! Ganaste {n} créditos.", { n: p.creditos })}</span>
   ) : (
     <span>
-      🎁 Complétalo y gana <strong className="text-oro-suave">{p.creditos} créditos</strong> (jugando con tu cuenta).
+      {t("🎁 Complétalo y gana")} <strong className="text-oro-suave">{t("{n} créditos", { n: p.creditos })}</strong> {t("(jugando con tu cuenta).")}
     </span>
   );
 }

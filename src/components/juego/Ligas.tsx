@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useJ } from "@/lib/juego/useJuego";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 interface Liga {
   codigo: string;
@@ -47,21 +49,22 @@ async function postLiga(cuerpo: Record<string, string>) {
 
 /** Para entrar a una liga hace falta apodo (es lo único que ven las demás personas). */
 function PedirApodo({ alListo }: { alListo: () => void }) {
+  const { t } = useJ();
   const [apodo, setApodo] = useState("");
   const [error, setError] = useState("");
   async function guardar() {
     const r = await fetch("/api/juego/apodo", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ apodo }) });
     const d = (await r.json().catch(() => ({ ok: false }))) as { ok: boolean; error?: string };
     if (d.ok) alListo();
-    else setError(ERRORES[d.error ?? ""] ?? ERRORES.guardar);
+    else setError(t(ERRORES[d.error ?? ""] ?? ERRORES.guardar));
   }
   return (
     <div className="space-y-2 rounded-xl border border-oro/40 bg-oro/5 p-3">
-      <p className="text-sm">Primero elige tu apodo: es lo único que verán en la liga (nunca tu nombre ni tu correo).</p>
+      <p className="text-sm">{t("Primero elige tu apodo: es lo único que verán en la liga (nunca tu nombre ni tu correo).")}</p>
       <div className="flex gap-2">
-        <input value={apodo} onChange={(e) => setApodo(e.target.value)} maxLength={20} placeholder="Tu apodo" aria-label="Apodo" className="campo min-w-0 flex-1 text-sm" />
+        <input value={apodo} onChange={(e) => setApodo(e.target.value)} maxLength={20} placeholder={t("Tu apodo")} aria-label={t("Apodo")} className="campo min-w-0 flex-1 text-sm" />
         <button type="button" onClick={() => void guardar()} disabled={apodo.trim().length < 3} className="boton boton-primario shrink-0 px-4 py-2">
-          Guardar
+          {t("Guardar")}
         </button>
       </div>
       {error && <p className="text-xs text-red-300">{error}</p>}
@@ -71,6 +74,7 @@ function PedirApodo({ alListo }: { alListo: () => void }) {
 
 /** /juego/ligas: mis ligas, crear una y unirse con un código. */
 export function MisLigas() {
+  const { t } = useJ();
   const router = useRouter();
   const [ligas, setLigas] = useState<Liga[] | null>(null);
   const [sinSesion, setSinSesion] = useState(false);
@@ -102,15 +106,15 @@ export function MisLigas() {
     setOcupado(false);
     if (r.ok && r.codigo) return router.push(`/juego/liga/${r.codigo}`);
     if (r.error === "sin_apodo") return setPideApodo(() => () => void hacer(cuerpo));
-    setError(ERRORES[r.error ?? ""] ?? ERRORES.guardar);
+    setError(t(ERRORES[r.error ?? ""] ?? ERRORES.guardar));
   }
 
   if (sinSesion) {
     return (
       <div className="tarjeta space-y-3 p-5 text-center">
-        <p>Las ligas son para jugar con tu cuenta: así tus puntos cuentan aunque cambies de celular.</p>
+        <p>{t("Las ligas son para jugar con tu cuenta: así tus puntos cuentan aunque cambies de celular.")}</p>
         <Link href="/entrar?volver=/juego/ligas" className="boton boton-primario inline-flex">
-          Entrar o crear mi cuenta gratis
+          {t("Entrar o crear mi cuenta gratis")}
         </Link>
       </div>
     );
@@ -130,9 +134,9 @@ export function MisLigas() {
       )}
 
       <section className="tarjeta space-y-3 p-5">
-        <h2 className="font-display text-2xl">Tus ligas</h2>
+        <h2 className="font-display text-2xl">{t("Tus ligas")}</h2>
         {ligas.length === 0 ? (
-          <p className="text-sm text-texto-suave">Todavía no estás en ninguna. Crea una e invita a tu gente, o únete con el código que te pasaron.</p>
+          <p className="text-sm text-texto-suave">{t("Todavía no estás en ninguna. Crea una e invita a tu gente, o únete con el código que te pasaron.")}</p>
         ) : (
           <ul className="space-y-2">
             {ligas.map((l) => (
@@ -141,8 +145,8 @@ export function MisLigas() {
                   <span className="min-w-0">
                     <span className="block truncate font-semibold">{l.nombre}</span>
                     <span className="text-xs text-texto-suave">
-                      {l.miembros} {l.miembros === 1 ? "persona" : "personas"} · código {l.codigo}
-                      {l.creador ? " · la creaste tú" : ""}
+                      {l.miembros} {l.miembros === 1 ? t("persona") : t("personas")} · {t("código")} {l.codigo}
+                      {l.creador ? ` · ${t("la creaste tú")}` : ""}
                     </span>
                   </span>
                   <span className="text-oro-suave">→</span>
@@ -155,24 +159,24 @@ export function MisLigas() {
 
       <section className="grid gap-4 sm:grid-cols-2">
         <div className="tarjeta space-y-2 p-5">
-          <h2 className="font-display text-xl">👥 Crear una liga</h2>
-          <input value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={40} placeholder="Ej.: Las brujas de la oficina" aria-label="Nombre de la liga" className="campo w-full text-sm" />
+          <h2 className="font-display text-xl">{t("👥 Crear una liga")}</h2>
+          <input value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={40} placeholder={t("Ej.: Las brujas de la oficina")} aria-label={t("Nombre de la liga")} className="campo w-full text-sm" />
           <button type="button" disabled={ocupado || nombre.trim().length < 3} onClick={() => void hacer({ accion: "crear", nombre })} className="boton boton-primario w-full">
-            Crear y obtener el enlace
+            {t("Crear y obtener el enlace")}
           </button>
         </div>
         <div className="tarjeta space-y-2 p-5">
-          <h2 className="font-display text-xl">🔑 Unirme con un código</h2>
+          <h2 className="font-display text-xl">{t("🔑 Unirme con un código")}</h2>
           <input
             value={codigo}
             onChange={(e) => setCodigo(e.target.value.toUpperCase())}
             maxLength={6}
             placeholder="ABC123"
-            aria-label="Código de la liga"
+            aria-label={t("Código de la liga")}
             className="campo w-full text-center font-mono text-lg tracking-[0.3em] uppercase"
           />
           <button type="button" disabled={ocupado || codigo.replace(/[^A-Z0-9]/g, "").length !== 6} onClick={() => void hacer({ accion: "unirse", codigo })} className="boton boton-secundario w-full">
-            Unirme
+            {t("Unirme")}
           </button>
         </div>
       </section>
@@ -181,12 +185,13 @@ export function MisLigas() {
   );
 }
 
-function fechaCorta(f: string) {
-  return new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
+function fechaCorta(f: string, idioma: Idioma = "es") {
+  return new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
 }
 
 /** /juego/liga/CODIGO: la tabla de la semana de la liga, unirse e invitar. */
 export function LigaDetalle({ codigo }: { codigo: string }) {
+  const { t, idioma } = useJ();
   const router = useRouter();
   const [d, setD] = useState<Detalle | null | "no">(null);
   const [version, setVersion] = useState(0);
@@ -213,22 +218,22 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
     const r = await postLiga({ accion: "unirse", codigo });
     if (r.ok) return setVersion((v) => v + 1);
     if (r.error === "sin_apodo") return setPideApodo(true);
-    setError(ERRORES[r.error ?? ""] ?? ERRORES.guardar);
+    setError(t(ERRORES[r.error ?? ""] ?? ERRORES.guardar));
   }
 
   if (d === null) return <div className="tarjeta h-60 animate-pulse" />;
   if (d === "no") {
     return (
       <div className="tarjeta space-y-3 p-5 text-center">
-        <p>No encontré esa liga. Puede que el código esté mal escrito o que la hayan cerrado.</p>
+        <p>{t("No encontré esa liga. Puede que el código esté mal escrito o que la hayan cerrado.")}</p>
         <Link href="/juego/ligas" className="boton boton-primario inline-flex">
-          Ver mis ligas
+          {t("Ver mis ligas")}
         </Link>
       </div>
     );
   }
   const enlace = typeof window === "undefined" ? "" : `${window.location.origin}/juego/liga/${d.codigo}`;
-  const invitacion = `🔮 Únete a mi liga «${d.nombre}» en El Camino del Loco, el juego diario de tarot de Arcana. Cada día adivinamos la carta escondida y competimos en la tabla de la semana: ${enlace}`;
+  const invitacion = t("🔮 Únete a mi liga «{nombre}» en El Camino del Loco, el juego diario de tarot de Arcana. Cada día adivinamos la carta escondida y competimos en la tabla de la semana: {enlace}", { nombre: d.nombre, enlace });
 
   async function compartir() {
     if (navigator.share) {
@@ -252,10 +257,10 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
       <section className="tarjeta space-y-3 p-5">
         <div className="flex items-baseline justify-between gap-2">
           <p className="text-sm text-texto-suave">
-            {d.miembros} {d.miembros === 1 ? "persona" : "personas"} · código <strong className="font-mono text-texto">{d.codigo}</strong>
+            {d.miembros} {d.miembros === 1 ? t("persona") : t("personas")} · {t("código")} <strong className="font-mono text-texto">{d.codigo}</strong>
           </p>
           <p className="shrink-0 text-xs text-texto-suave">
-            {fechaCorta(d.desde)} – {fechaCorta(d.hasta)}
+            {fechaCorta(d.desde, idioma)} – {fechaCorta(d.hasta, idioma)}
           </p>
         </div>
         <ol className="space-y-1">
@@ -264,14 +269,14 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
               <span className="w-7 shrink-0 text-center tabular-nums">{f.puntos > 0 ? (MEDALLA[f.puesto - 1] ?? f.puesto) : "·"}</span>
               <span className="min-w-0 flex-1 truncate">
                 {f.apodo}
-                {f.yo && <span className="text-texto-suave"> (tú)</span>}
+                {f.yo && <span className="text-texto-suave"> {t("(tú)")}</span>}
               </span>
               <span className="shrink-0 text-xs text-texto-suave">{f.dias} d</span>
               <span className="w-12 shrink-0 text-right font-semibold tabular-nums">{f.puntos}</span>
             </li>
           ))}
         </ol>
-        <p className="text-xs text-texto-suave">Mismos puntos que el ranking general. La tabla se reinicia cada lunes.</p>
+        <p className="text-xs text-texto-suave">{t("Mismos puntos que el ranking general. La tabla se reinicia cada lunes.")}</p>
       </section>
 
       {pideApodo && (
@@ -285,38 +290,38 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
 
       {!d.sesion ? (
         <div className="tarjeta space-y-3 p-5 text-center">
-          <p>Te invitaron a esta liga. Entra con tu cuenta (es gratis) para unirte y sumar tus puntos.</p>
+          <p>{t("Te invitaron a esta liga. Entra con tu cuenta (es gratis) para unirte y sumar tus puntos.")}</p>
           <Link href={`/entrar?volver=/juego/liga/${d.codigo}`} className="boton boton-primario inline-flex">
-            Entrar y unirme
+            {t("Entrar y unirme")}
           </Link>
         </div>
       ) : !d.soyMiembro ? (
         <div className="text-center">
           <button type="button" onClick={() => void unirme()} className="boton boton-primario">
-            Unirme a «{d.nombre}»
+            {t("Unirme a «{nombre}»", { nombre: d.nombre })}
           </button>
         </div>
       ) : (
         <div className="tarjeta space-y-3 p-5 text-center">
-          <p className="font-semibold">Invita a tu gente</p>
+          <p className="font-semibold">{t("Invita a tu gente")}</p>
           <div className="flex flex-wrap justify-center gap-3">
             <a href={`https://wa.me/?text=${encodeURIComponent(invitacion)}`} target="_blank" rel="noopener noreferrer" className="boton boton-whatsapp">
-              Invitar por WhatsApp
+              {t("Invitar por WhatsApp")}
             </a>
             <button type="button" onClick={() => void compartir()} className="boton boton-secundario">
-              {copiado ? "¡Copiado!" : "Compartir enlace"}
+              {copiado ? t("¡Copiado!") : t("Compartir enlace")}
             </button>
           </div>
           <button
             type="button"
             onClick={async () => {
-              if (!confirm(`¿Salir de «${d.nombre}»?`)) return;
+              if (!confirm(t("¿Salir de «{nombre}»?", { nombre: d.nombre }))) return;
               await postLiga({ accion: "salir", codigo: d.codigo });
               router.push("/juego/ligas");
             }}
             className="text-xs text-texto-suave underline"
           >
-            Salir de la liga
+            {t("Salir de la liga")}
           </button>
         </div>
       )}
@@ -324,7 +329,7 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
 
       <p className="text-center">
         <Link href="/juego" className="boton boton-primario inline-flex">
-          Jugar la carta de hoy
+          {t("Jugar la carta de hoy")}
         </Link>
       </p>
     </div>

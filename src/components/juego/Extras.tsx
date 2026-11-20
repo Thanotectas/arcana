@@ -2,9 +2,12 @@
 
 import { useRef, useState } from "react";
 import { LOGROS, logrosObtenidos, type DatosLogros } from "@/lib/juego/logros";
+import { LOGROS_IDIOMA } from "@/lib/juego/textos";
+import { useJ } from "@/lib/juego/useJuego";
 
 /** Botón para escuchar el mensaje de la carta en la voz de Sibila. */
 export function VozSibila({ carta }: { carta: string }) {
+  const { t } = useJ();
   const [estado, setEstado] = useState<"listo" | "cargando" | "sonando" | "error">("listo");
   const [pedido, setPedido] = useState(false);
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -42,7 +45,7 @@ export function VozSibila({ carta }: { carta: string }) {
         ) : (
           <span aria-hidden>{estado === "cargando" ? "⏳" : "🔊"}</span>
         )}
-        {estado === "sonando" ? "Sibila te está hablando…" : estado === "cargando" ? "Sibila toma aire…" : estado === "error" ? "La voz no está disponible ahora" : "Escúchalo en la voz de Sibila"}
+        {estado === "sonando" ? "Sibila te está hablando…" : estado === "cargando" ? "Sibila toma aire…" : estado === "error" ? "La voz no está disponible ahora" : t("Escúchalo en la voz de Sibila")}
       </button>
     </>
   );
@@ -53,6 +56,8 @@ const medalla = (id: string) => `/juego/logros/${id}.webp`;
 
 /** Logros conseguidos y por conseguir; los recién ganados se destacan una vez. */
 export function Logros({ datos }: { datos: DatosLogros }) {
+  const { t, idioma } = useJ();
+  const texto = (l: (typeof LOGROS)[number]) => (idioma === "es" ? { nombre: l.nombre, descripcion: l.descripcion } : { nombre: LOGROS_IDIOMA[idioma][l.id]?.[0] ?? l.nombre, descripcion: LOGROS_IDIOMA[idioma][l.id]?.[1] ?? l.descripcion });
   const obtenidos = logrosObtenidos(datos);
   const [nuevos] = useState<Set<string>>(() => {
     try {
@@ -75,20 +80,18 @@ export function Logros({ datos }: { datos: DatosLogros }) {
               <img key={l.id} src={medalla(l.id)} alt="" className="h-20 w-20 drop-shadow-[0_0_14px_rgba(241,217,154,0.7)]" />
             ))}
           </div>
-          {recien.length === 1 ? "¡Nuevo logro!" : `¡${recien.length} logros nuevos!`}{" "}
+          {recien.length === 1 ? t("¡Nuevo logro!") : t("¡{n} logros nuevos!", { n: recien.length })}{" "}
           {recien.map((l, i) => (
             <span key={l.id}>
               {i > 0 && " · "}
-              <strong>
-                {l.nombre}
-              </strong>
-              {recien.length === 1 && ` · ${l.descripcion}`}
+              <strong>{texto(l).nombre}</strong>
+              {recien.length === 1 && ` · ${texto(l).descripcion}`}
             </span>
           ))}
         </div>
       )}
       <p className="text-center text-sm text-texto-suave">
-        Logros: <strong className="text-texto">{obtenidos.size}</strong> de {LOGROS.length}
+        {t("Logros:")} <strong className="text-texto">{obtenidos.size}</strong> {t("de")} {LOGROS.length}
       </p>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
         {LOGROS.map((l) => {
@@ -96,17 +99,17 @@ export function Logros({ datos }: { datos: DatosLogros }) {
           return (
             <div
               key={l.id}
-              title={`${l.nombre}: ${l.descripcion}`}
+              title={`${texto(l).nombre}: ${texto(l).descripcion}`}
               className={`flex flex-col items-center text-center ${nuevos.has(l.id) ? "logro-nuevo" : ""}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- medalla estática */}
               <img
                 src={medalla(l.id)}
-                alt={tiene ? l.nombre : `${l.nombre} (por conseguir)`}
+                alt={tiene ? texto(l).nombre : `${texto(l).nombre} ${t("(por conseguir)")}`}
                 loading="lazy"
                 className={`aspect-square w-full ${tiene ? "drop-shadow-[0_0_10px_rgba(241,217,154,0.55)]" : "opacity-35 grayscale"}`}
               />
-              <span className={`mt-1 line-clamp-2 text-[10px] leading-tight ${tiene ? "text-texto" : "text-texto-suave"}`}>{l.nombre}</span>
+              <span className={`mt-1 line-clamp-2 text-[10px] leading-tight ${tiene ? "text-texto" : "text-texto-suave"}`}>{texto(l).nombre}</span>
             </div>
           );
         })}
@@ -124,6 +127,7 @@ const PASOS = [
 
 /** Tres pasos animados la primera vez que alguien juega. */
 export function Tutorial() {
+  const { t } = useJ();
   const [paso, setPaso] = useState<number | null>(() => {
     try {
       return localStorage.getItem(TUTORIAL) ? null : 0;
@@ -142,11 +146,11 @@ export function Tutorial() {
   };
   const p = PASOS[paso];
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-noche/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Cómo se juega">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-noche/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={t("Cómo se juega")}>
       <div key={paso} className="tarjeta burbuja-entra w-full max-w-sm space-y-4 p-6 text-center">
         <p className="text-5xl">{p.icono}</p>
-        <p className="font-display text-2xl">{p.titulo}</p>
-        <p className="text-sm text-texto-suave">{p.texto}</p>
+        <p className="font-display text-2xl">{t(p.titulo)}</p>
+        <p className="text-sm text-texto-suave">{t(p.texto)}</p>
         <div className="flex justify-center gap-1.5" aria-hidden>
           {PASOS.map((_, i) => (
             <span key={i} className={`h-1.5 w-6 rounded-full ${i === paso ? "bg-oro" : "bg-superficie-2"}`} />
@@ -154,10 +158,10 @@ export function Tutorial() {
         </div>
         <div className="flex justify-between gap-3">
           <button type="button" onClick={cerrar} className="text-sm text-texto-suave underline">
-            Saltar
+            {t("Saltar")}
           </button>
           <button type="button" onClick={() => (paso < PASOS.length - 1 ? setPaso(paso + 1) : cerrar())} className="boton boton-primario px-5 py-2">
-            {paso < PASOS.length - 1 ? "Siguiente" : "¡A jugar!"}
+            {paso < PASOS.length - 1 ? t("Siguiente") : t("¡A jugar!")}
           </button>
         </div>
       </div>

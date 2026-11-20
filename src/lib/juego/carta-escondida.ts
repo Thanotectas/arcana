@@ -1,5 +1,7 @@
 import { MAZO, type CartaTarot } from "@/lib/tarot/deck";
 import { TAROT_ARCANA } from "@/lib/tarot/arcana";
+import type { Idioma } from "@/lib/i18n/idiomas";
+import { nombreCarta, palabrasCarta } from "./cartas-idiomas";
 
 /**
  * «El Camino del Loco», fase 1: la carta escondida del día.
@@ -92,7 +94,19 @@ const ELEMENTO_EN_CLAVE: Record<CartaTarot["elemento"], string> = {
 };
 
 /** Pistas del reto maestro: más simbólicas, empiezan por su sombra. */
-export function pistasMaestras(c: CartaTarot): string[] {
+const ELEMENTO_EN_CLAVE_IDIOMA: Record<Exclude<Idioma, "es">, Record<CartaTarot["elemento"], string>> = {
+  en: { fuego: "It burns, even if you can't see it.", agua: "It flows and slips through the cracks.", aire: "It cuts like the wind.", tierra: "It weighs like a stone in your hand.", espiritu: "It belongs to no element." },
+  pt: { fuego: "Arde, mesmo que você não veja.", agua: "Flui e entra pelas frestas.", aire: "Corta como o vento.", tierra: "Pesa como uma pedra na mão.", espiritu: "Não pertence a nenhum elemento." },
+};
+
+export function pistasMaestras(c: CartaTarot, idioma: Idioma = "es"): string[] {
+  if (idioma !== "es") {
+    const { luz, sombra } = palabrasCarta(c, idioma);
+    const e = ELEMENTO_EN_CLAVE_IDIOMA[idioma][c.elemento];
+    return idioma === "en"
+      ? [`Sibila speaks in riddles: its shadow is called “${sombra[0]}”.`, e, `An echo of it: “${luz[2]}”. And another shadow: “${sombra[1] ?? sombra[0]}”.`, `When it turns over, it whispers: “${luz[3] ?? luz[0]}”.`]
+      : [`Sibila fala em enigmas: sua sombra se chama “${sombra[0]}”.`, e, `Um eco dela: “${luz[2]}”. E outra sombra: “${sombra[1] ?? sombra[0]}”.`, `Quando se vira, sussurra: “${luz[3] ?? luz[0]}”.`];
+  }
   const [s1, s2] = c.palabrasClaveInvertida;
   const sombra = (c.significadoInvertido.match(/[^.!?]+[.!?]+/g) ?? [c.significadoInvertido])[0].trim();
   return [
@@ -153,6 +167,21 @@ export const COMODINES: { id: Comodin; titulo: string; descripcion: string }[] =
   { id: "paridad", titulo: "Par o impar", descripcion: "Te digo si su número es par o impar." },
   { id: "rango", titulo: "¿Alto o bajo?", descripcion: "Te digo si su número es 10 o menos, u 11 o más." },
 ];
+const COMODINES_IDIOMA: Record<Exclude<Idioma, "es">, typeof COMODINES> = {
+  en: [
+    { id: "grupo", titulo: "Its group", descripcion: "I'll tell you if it's a Major Arcana or which suit it is." },
+    { id: "paridad", titulo: "Even or odd", descripcion: "I'll tell you if its number is even or odd." },
+    { id: "rango", titulo: "High or low?", descripcion: "I'll tell you if its number is 10 or less, or 11 or more." },
+  ],
+  pt: [
+    { id: "grupo", titulo: "Seu grupo", descripcion: "Digo se é um Arcano Maior ou de qual naipe é." },
+    { id: "paridad", titulo: "Par ou ímpar", descripcion: "Digo se o número é par ou ímpar." },
+    { id: "rango", titulo: "Alto ou baixo?", descripcion: "Digo se o número é 10 ou menos, ou 11 ou mais." },
+  ],
+};
+export function comodines(idioma: Idioma = "es") {
+  return idioma === "es" ? COMODINES : COMODINES_IDIOMA[idioma];
+}
 
 export function esComodin(x: unknown): x is Comodin {
   return x === "grupo" || x === "paridad" || x === "rango";
@@ -169,7 +198,18 @@ export function cumpleComodin(c: CartaTarot, tipo: Comodin, escondida: CartaTaro
   return rasgo(c, tipo) === rasgo(escondida, tipo);
 }
 
-export function textoComodin(tipo: Comodin, escondida: CartaTarot) {
+export function textoComodin(tipo: Comodin, escondida: CartaTarot, idioma: Idioma = "es") {
+  const par = escondida.numero % 2 === 0;
+  if (idioma === "en") {
+    if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 My wildcard: it's a Major Arcana." : `🔮 My wildcard: it's from ${nombreGrupo(escondida, "en")}.`;
+    if (tipo === "paridad") return `🔮 My wildcard: its number is ${par ? "even" : "odd"}.`;
+    return escondida.numero <= 10 ? "🔮 My wildcard: its number is 10 or less." : "🔮 My wildcard: its number is 11 or more (in the suits, that's a court card: Page, Knight, Queen or King).";
+  }
+  if (idioma === "pt") {
+    if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Meu coringa: é um Arcano Maior." : `🔮 Meu coringa: é de ${nombreGrupo(escondida, "pt")}.`;
+    if (tipo === "paridad") return `🔮 Meu coringa: o número é ${par ? "par" : "ímpar"}.`;
+    return escondida.numero <= 10 ? "🔮 Meu coringa: o número é 10 ou menos." : "🔮 Meu coringa: o número é 11 ou mais (nos naipes, é uma figura: Valete, Cavaleiro, Rainha ou Rei).";
+  }
   if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Mi comodín: es un Arcano Mayor." : `🔮 Mi comodín: es de ${nombreGrupo(escondida)}.`;
   if (tipo === "paridad") return `🔮 Mi comodín: su número es ${escondida.numero % 2 === 0 ? "par" : "impar"}.`;
   return escondida.numero <= 10
@@ -232,11 +272,27 @@ export function cartaPorId(id: string) {
 }
 
 const NOMBRE_GRUPO: Record<string, string> = { mayor: "Arcanos Mayores", bastos: "Bastos", copas: "Copas", espadas: "Espadas", oros: "Oros" };
+const NOMBRE_GRUPO_IDIOMA: Record<Exclude<Idioma, "es">, Record<string, string>> = {
+  en: { mayor: "Major Arcana", bastos: "Wands", copas: "Cups", espadas: "Swords", oros: "Pentacles" },
+  pt: { mayor: "Arcanos Maiores", bastos: "Paus", copas: "Copas", espadas: "Espadas", oros: "Ouros" },
+};
+/** Nombre corto de cada grupo en las pestañas del selector. */
+const NOMBRE_PESTANA: Record<Idioma, Record<string, string>> = {
+  es: { mayor: "Mayores", bastos: "Bastos", copas: "Copas", espadas: "Espadas", oros: "Oros" },
+  en: { mayor: "Majors", bastos: "Wands", copas: "Cups", espadas: "Swords", oros: "Pentacles" },
+  pt: { mayor: "Maiores", bastos: "Paus", copas: "Copas", espadas: "Espadas", oros: "Ouros" },
+};
 export function grupo(c: CartaTarot) {
   return c.arcano === "mayor" ? "mayor" : (c.palo ?? "");
 }
-export function nombreGrupo(c: CartaTarot) {
-  return NOMBRE_GRUPO[grupo(c)] ?? "";
+export function nombreGrupoId(id: string, idioma: Idioma = "es") {
+  return (idioma === "es" ? NOMBRE_GRUPO : NOMBRE_GRUPO_IDIOMA[idioma])[id] ?? "";
+}
+export function nombreGrupo(c: CartaTarot, idioma: Idioma = "es") {
+  return nombreGrupoId(grupo(c), idioma);
+}
+export function nombrePestana(id: string, idioma: Idioma = "es") {
+  return NOMBRE_PESTANA[idioma][id] ?? id;
 }
 
 export interface Comparacion {
@@ -258,6 +314,23 @@ export function emojiDe(c: Comparacion) {
   return `${c.grupo ? "🟪" : "⬛"}${c.numero === "igual" ? "🟪" : c.numero === "mayor" ? "⬆️" : "⬇️"}${c.acierto ? " ✨" : ""}`;
 }
 
+const ELEMENTO_IDIOMA: Record<Exclude<Idioma, "es">, Record<CartaTarot["elemento"], string>> = {
+  en: {
+    fuego: "Its element is fire: it calls for action.",
+    agua: "Its element is water: it speaks of emotions.",
+    aire: "Its element is air: it lives in the mind and in words.",
+    tierra: "Its element is earth: the concrete, the body and money.",
+    espiritu: "It has no earthly element: it is a card of the spirit.",
+  },
+  pt: {
+    fuego: "Seu elemento é o fogo: pede ação.",
+    agua: "Seu elemento é a água: fala de emoções.",
+    aire: "Seu elemento é o ar: vive na mente e na palavra.",
+    tierra: "Seu elemento é a terra: o concreto, o corpo e o dinheiro.",
+    espiritu: "Não tem elemento terreno: é uma carta do espírito.",
+  },
+};
+
 const ELEMENTO: Record<CartaTarot["elemento"], string> = {
   fuego: "Su elemento es el fuego: pide acción.",
   agua: "Su elemento es el agua: habla de emociones.",
@@ -276,7 +349,14 @@ function ocultarNombre(texto: string, c: CartaTarot) {
  * Pistas de Sibila, en orden: la primera se ve desde el comienzo y se suma una
  * por cada intento fallido (hasta cinco más).
  */
-export function pistas(c: CartaTarot): string[] {
+export function pistas(c: CartaTarot, idioma: Idioma = "es"): string[] {
+  if (idioma !== "es") {
+    const { luz, sombra } = palabrasCarta(c, idioma);
+    const e = ELEMENTO_IDIOMA[idioma][c.elemento];
+    return idioma === "en"
+      ? [`Sibila whispers: “${luz[0]}”.`, e, `Another word that goes with it: “${luz[1]}”.`, `One more: “${luz[2]}”.`, `And this one too: “${luz[3] ?? luz[2]}”.`, `Its shadow, when reversed: “${sombra.join(", ")}”.`]
+      : [`Sibila sussurra: “${luz[0]}”.`, e, `Outra palavra que a acompanha: “${luz[1]}”.`, `Mais uma: “${luz[2]}”.`, `E esta também: “${luz[3] ?? luz[2]}”.`, `Sua sombra, quando sai invertida: “${sombra.join(", ")}”.`];
+  }
   const [p1, p2, p3] = c.palabrasClave;
   return [
     `Sibila susurra: «${p1}».`,
@@ -299,10 +379,10 @@ export function normalizar(texto: string) {
   return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
-export function buscarCartas(texto: string, excluir: ReadonlySet<string>, limite = 8) {
+export function buscarCartas(texto: string, excluir: ReadonlySet<string>, limite = 8, idioma: Idioma = "es") {
   const q = normalizar(texto);
   if (!q) return [];
-  return MAZO.filter((c) => !excluir.has(c.id) && normalizar(c.nombre).includes(q)).slice(0, limite);
+  return MAZO.filter((c) => !excluir.has(c.id) && (normalizar(nombreCarta(c, idioma)).includes(q) || normalizar(c.nombre).includes(q))).slice(0, limite);
 }
 
 // ───────────────────────── Progreso guardado en el navegador ─────────────────────────
@@ -381,12 +461,19 @@ export function enlaceResultado(sitio: string, numero: number, comparaciones: Co
 }
 
 /** Texto para compartir: sin revelar la carta. */
-export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string, comodin = false) {
+const COMPARTIR: Record<Idioma, { juego: string; comodin: string; racha: (n: number) => string; reto: string }> = {
+  es: { juego: "El Camino del Loco", comodin: " (con comodín)", racha: (n) => `🔥 ${n} días seguidos`, reto: "¿Adivinas la carta de hoy?" },
+  en: { juego: "The Fool's Journey", comodin: " (with wildcard)", racha: (n) => `🔥 ${n}-day streak`, reto: "Can you guess today's card?" },
+  pt: { juego: "O Caminho do Louco", comodin: " (com coringa)", racha: (n) => `🔥 ${n} dias seguidos`, reto: "Você adivinha a carta de hoje?" },
+};
+
+export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string, comodin = false, idioma: Idioma = "es") {
+  const t = COMPARTIR[idioma];
   return [
-    `🔮 El Camino del Loco #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}${comodin ? " (con comodín)" : ""}`,
+    `🔮 ${t.juego} #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}${comodin ? t.comodin : ""}`,
     ...comparaciones.map(emojiDe),
-    racha > 1 ? `🔥 ${racha} días seguidos` : "",
-    `¿Adivinas la carta de hoy? ${enlaceResultado(sitio, numero, comparaciones, racha)}`,
+    racha > 1 ? t.racha(racha) : "",
+    `${t.reto} ${enlaceResultado(sitio, numero, comparaciones, racha)}`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -414,9 +501,14 @@ const ROMANOS = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X
 const CORTE: Record<number, string> = { 1: "As", 11: "Sota", 12: "Caballo", 13: "Reina", 14: "Rey" };
 
 /** Lo que se ve en la casilla del selector: número arriba y nombre corto abajo. */
-export function rotuloCasilla(c: CartaTarot) {
-  if (c.arcano === "mayor") return { numero: ROMANOS[c.numero] ?? String(c.numero), nombre: c.nombre.replace(/^(El|La|Los|Las)\s+/, "") };
-  return { numero: String(c.numero), nombre: CORTE[c.numero] ?? "" };
+const CORTE_IDIOMA: Record<Exclude<Idioma, "es">, Record<number, string>> = {
+  en: { 1: "Ace", 11: "Page", 12: "Knight", 13: "Queen", 14: "King" },
+  pt: { 1: "Ás", 11: "Valete", 12: "Cavaleiro", 13: "Rainha", 14: "Rei" },
+};
+
+export function rotuloCasilla(c: CartaTarot, idioma: Idioma = "es") {
+  if (c.arcano === "mayor") return { numero: ROMANOS[c.numero] ?? String(c.numero), nombre: nombreCarta(c, idioma).replace(/^(El|La|Los|Las|The|O|A|Os|As)\s+/, "") };
+  return { numero: String(c.numero), nombre: (idioma === "es" ? CORTE : CORTE_IDIOMA[idioma])[c.numero] ?? "" };
 }
 
 /** Cartas que todavía pueden ser la escondida según lo que dijeron los intentos. */
@@ -447,10 +539,23 @@ const FRASES: Record<Calor, string[]> = {
  * Lo que Sibila dice después de un intento fallido: caliente si acertó el grupo y el número está a 2 o menos,
  * tibio si acertó el grupo o el número está cerca, frío si no.
  */
-export function reaccion(intento: CartaTarot, escondida: CartaTarot, vez: number): { texto: string; calor: Calor } {
+const FRASES_IDIOMA: Record<Exclude<Idioma, "es">, Record<Calor, string[]>> = {
+  en: {
+    caliente: ["Ooh, so close! 🔥 You're right there.", "Hot, hot! 🔥 It's right next to it.", "I got goosebumps 🔥 You're almost there.", "There, there! 🔥 One more little step."],
+    tibio: ["You're on the right path ✨", "Warm… 🌙 There's something to it.", "Mmm, you're getting closer ✨", "Not that one, but you're doing well 🌙"],
+    frio: ["Cold, cold ❄️", "Not that one… it's far away ❄️", "Not even close 😏 Listen to my clue.", "It hid better than that ❄️"],
+  },
+  pt: {
+    caliente: ["Uau, quase! 🔥 Está muito perto.", "Quente, quente! 🔥 Está do lado.", "Me arrepiei 🔥 Falta nada.", "Aí, aí! 🔥 Só mais um passinho."],
+    tibio: ["Você está no caminho certo ✨", "Morno… 🌙 Tem algo aí.", "Hmm, está chegando perto ✨", "Não é essa, mas você vai bem 🌙"],
+    frio: ["Frio, frio ❄️", "Essa não… está longe ❄️", "Nem perto 😏 Escute minha pista.", "Ela se escondeu melhor que isso ❄️"],
+  },
+};
+
+export function reaccion(intento: CartaTarot, escondida: CartaTarot, vez: number, idioma: Idioma = "es"): { texto: string; calor: Calor } {
   const mismoGrupo = grupo(intento) === grupo(escondida);
   const distancia = Math.abs(intento.numero - escondida.numero);
   const calor: Calor = mismoGrupo && distancia <= 2 ? "caliente" : mismoGrupo || distancia <= 2 ? "tibio" : "frio";
-  const frases = FRASES[calor];
+  const frases = (idioma === "es" ? FRASES : FRASES_IDIOMA[idioma])[calor];
   return { texto: frases[(vez + escondida.numero) % frases.length], calor };
 }

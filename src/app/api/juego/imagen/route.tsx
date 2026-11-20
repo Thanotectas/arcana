@@ -57,17 +57,25 @@ function Cuadritos({ filas, lado }: { filas: Comparacion[]; lado: number }) {
   );
 }
 
+const TEXTOS_IMAGEN = {
+  es: { gano: (n: number) => `La encontré en ${n}/${MAX_INTENTOS}`, perdio: "Hoy se me escondió", racha: (n: number) => `${n} días seguidos`, rachaLarga: (n: number) => `${n} días seguidos jugando`, reto: "¿Adivinas la de hoy?", juego: "EL CAMINO DEL LOCO", carta: (n: number) => `Carta escondida #${n}` },
+  en: { gano: (n: number) => `Found it in ${n}/${MAX_INTENTOS}`, perdio: "It hid from me today", racha: (n: number) => `${n}-day streak`, rachaLarga: (n: number) => `${n}-day streak`, reto: "Can you guess today's?", juego: "THE FOOL'S JOURNEY", carta: (n: number) => `Hidden card #${n}` },
+  pt: { gano: (n: number) => `Encontrei em ${n}/${MAX_INTENTOS}`, perdio: "Hoje ela se escondeu", racha: (n: number) => `${n} dias seguidos`, rachaLarga: (n: number) => `${n} dias seguidos jogando`, reto: "Você adivinha a de hoje?", juego: "O CAMINHO DO LOUCO", carta: (n: number) => `Carta escondida #${n}` },
+};
+
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams;
   const r = leerResultado(q.get("n"), q.get("f"), q.get("ra"));
   if (!r) return new Response("Resultado no válido", { status: 400 });
   const historia = q.get("formato") === "historia";
+  const pedido = q.get("idioma");
+  const T = TEXTOS_IMAGEN[pedido === "en" || pedido === "pt" ? pedido : "es"];
   const [sibila, dorso, tipos] = await Promise.all([
     webpComoDataUri(join(process.cwd(), "public/juego/sibila.webp"), { lado: 360 }),
     webpComoDataUri(join(process.cwd(), "public/cartas/arcana/dorso.webp"), { alto: 420 }),
     fuentes(),
   ]);
-  const titulo = r.gano ? `La encontré en ${r.filas.length}/${MAX_INTENTOS}` : "Hoy se me escondió";
+  const titulo = r.gano ? T.gano(r.filas.length) : T.perdio;
   const fondo =
     "radial-gradient(900px 700px at 50% 0%, rgba(139,108,246,0.42), transparent 60%), radial-gradient(700px 600px at 100% 100%, rgba(217,180,90,0.18), transparent 60%), #0b0716";
 
@@ -91,15 +99,15 @@ export async function GET(request: NextRequest) {
         <div style={{ width: "100%", height: "100%", display: "flex", background: fondo, color: "#ece6f7", padding: "56px 64px", fontFamily: "Inter" }}>
           <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between" }}>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", fontSize: 24, letterSpacing: 6, color: "#b9a6ff" }}>{`EL CAMINO DEL LOCO · CARTA #${r.numero}`}</div>
+              <div style={{ display: "flex", fontSize: 24, letterSpacing: 6, color: "#b9a6ff" }}>{`${T.juego} · #${r.numero}`}</div>
               <div style={{ fontFamily: "Cormorant", fontSize: 76, color: ORO, marginTop: 8 }}>{titulo}</div>
             </div>
             <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
               <Cuadritos filas={r.filas} lado={r.filas.length > 4 ? 46 : 58} />
-              {r.racha > 1 && <div style={{ display: "flex", fontSize: 30, color: "#fff" }}>{`${r.racha} días seguidos`}</div>}
+              {r.racha > 1 && <div style={{ display: "flex", fontSize: 30, color: "#fff" }}>{T.racha(r.racha)}</div>}
             </div>
             <div style={{ display: "flex", fontSize: 30 }}>
-              <span style={{ color: "#ece6f7" }}>¿Adivinas la de hoy?</span>
+              <span style={{ color: "#ece6f7" }}>{T.reto}</span>
               <span style={{ color: ORO, marginLeft: 14 }}>miarcana.com/juego</span>
             </div>
           </div>
@@ -114,15 +122,15 @@ export async function GET(request: NextRequest) {
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", background: fondo, color: "#ece6f7", padding: "190px 72px 240px", fontFamily: "Inter" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ fontSize: 30, letterSpacing: 8, color: "#b9a6ff" }}>EL CAMINO DEL LOCO</div>
+          <div style={{ fontSize: 30, letterSpacing: 8, color: "#b9a6ff" }}>{T.juego}</div>
           <div style={{ fontFamily: "Cormorant", fontSize: 108, color: ORO, marginTop: 14, textAlign: "center", lineHeight: 1 }}>{titulo}</div>
-          <div style={{ fontSize: 32, color: "#cdbfff", marginTop: 16 }}>{`Carta escondida #${r.numero}`}</div>
+          <div style={{ fontSize: 32, color: "#cdbfff", marginTop: 16 }}>{T.carta(r.numero)}</div>
         </div>
         {retrato(300)}
         <Cuadritos filas={r.filas} lado={r.filas.length > 4 ? 76 : 96} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
-          {r.racha > 1 && <div style={{ display: "flex", fontSize: 40, color: "#fff" }}>{`${r.racha} días seguidos jugando`}</div>}
-          <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 64, color: "#fff" }}>¿Adivinas la de hoy?</div>
+          {r.racha > 1 && <div style={{ display: "flex", fontSize: 40, color: "#fff" }}>{T.rachaLarga(r.racha)}</div>}
+          <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 64, color: "#fff" }}>{T.reto}</div>
           <div style={{ display: "flex", padding: "18px 46px", borderRadius: 999, background: "linear-gradient(180deg,#f6e2a8,#d6b065)", color: "#1b1230", fontSize: 46 }}>miarcana.com/juego</div>
         </div>
       </div>

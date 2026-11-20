@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MAX_INTENTOS, PUNTOS_MAESTRO } from "@/lib/juego/carta-escondida";
+import { useJ } from "@/lib/juego/useJuego";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 interface Fila {
   puesto: number;
@@ -29,12 +31,13 @@ const ERRORES: Record<string, string> = {
   guardar: "No pude guardarlo. Intenta de nuevo en un momento.",
 };
 
-function fechaCorta(f: string) {
-  return new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
+function fechaCorta(f: string, idioma: Idioma = "es") {
+  return new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
 }
 
 /** La tabla de la semana: los 10 primeros, tu puesto y, si no tienes apodo, el formulario para elegirlo. */
 export function RankingSemanal() {
+  const { t, idioma } = useJ();
   const [datos, setDatos] = useState<Datos | null>(null);
   const [version, setVersion] = useState(0);
   const [editando, setEditando] = useState(false);
@@ -62,9 +65,9 @@ export function RankingSemanal() {
       if (d.ok) {
         setEditando(false);
         setVersion((v) => v + 1);
-      } else setError(ERRORES[d.error ?? ""] ?? ERRORES.guardar);
+      } else setError(t(ERRORES[d.error ?? ""] ?? ERRORES.guardar));
     } catch {
-      setError(ERRORES.guardar);
+      setError(t(ERRORES.guardar));
     } finally {
       setGuardando(false);
     }
@@ -77,22 +80,22 @@ export function RankingSemanal() {
   return (
     <div className="space-y-3 rounded-xl border border-oro/30 bg-superficie-2/60 p-4 text-left text-sm">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="font-display text-xl">🏆 Ranking de la semana</p>
+        <p className="font-display text-xl">{t("🏆 Ranking de la semana")}</p>
         <p className="shrink-0 text-xs text-texto-suave">
-          {fechaCorta(datos.desde)} – {fechaCorta(datos.hasta)}
+          {fechaCorta(datos.desde, idioma)} – {fechaCorta(datos.hasta, idioma)}
         </p>
       </div>
       <p className="rounded-lg bg-oro/10 px-2 py-1.5 text-xs">
-        🎁 Cada lunes el podio gana créditos para sus lecturas: <strong>🥇 3 · 🥈 2 · 🥉 1</strong>
+        {t("🎁 Cada lunes el podio gana créditos para sus lecturas:")} <strong>🥇 3 · 🥈 2 · 🥉 1</strong>
       </p>
       {datos.campeon && (
         <p className="text-xs text-texto-suave">
-          👑 La semana pasada ganó <strong className="text-oro-suave">{datos.campeon.apodo}</strong> con {datos.campeon.puntos} puntos.
+          {t("👑 La semana pasada ganó")} <strong className="text-oro-suave">{datos.campeon.apodo}</strong> {t("con {n} puntos.", { n: datos.campeon.puntos })}
         </p>
       )}
 
       {datos.top.length === 0 ? (
-        <p className="rounded-lg bg-noche/40 p-3 text-center text-texto-suave">Todavía nadie aparece esta semana. ¡El primer puesto está libre!</p>
+        <p className="rounded-lg bg-noche/40 p-3 text-center text-texto-suave">{t("Todavía nadie aparece esta semana. ¡El primer puesto está libre!")}</p>
       ) : (
         <ol className="space-y-1">
           {datos.top.map((f) => (
@@ -100,7 +103,7 @@ export function RankingSemanal() {
               <span className="w-7 shrink-0 text-center tabular-nums">{MEDALLA[f.puesto - 1] ?? f.puesto}</span>
               <span className="min-w-0 flex-1 truncate">
                 {f.apodo}
-                {f.yo && <span className="text-texto-suave"> (tú)</span>}
+                {f.yo && <span className="text-texto-suave"> {t("(tú)")}</span>}
               </span>
               <span className="shrink-0 text-xs text-texto-suave">{f.dias} d</span>
               <span className="w-12 shrink-0 text-right font-semibold tabular-nums">{f.puntos}</span>
@@ -112,39 +115,35 @@ export function RankingSemanal() {
       {yoFuera && datos.yo && (
         <p className="rounded-lg bg-noche/40 px-2 py-1.5">
           {datos.yo.apodo ? (
-            <>
-              Vas en el puesto <strong>{datos.yo.puesto}</strong> con <strong>{datos.yo.puntos}</strong> puntos.
-            </>
+            t("Vas en el puesto {p} con {n} puntos.", { p: datos.yo.puesto, n: datos.yo.puntos })
           ) : (
-            <>
-              Con tus <strong>{datos.yo.puntos}</strong> puntos irías en el puesto <strong>{datos.yo.puesto}</strong>. Elige un apodo para aparecer.
-            </>
+            t("Con tus {n} puntos irías en el puesto {p}. Elige un apodo para aparecer.", { p: datos.yo.puesto, n: datos.yo.puntos })
           )}
         </p>
       )}
 
       {pedirApodo ? (
         <div className="space-y-2 border-t border-borde pt-3">
-          <p className="text-xs text-texto-suave">En el ranking solo se ve el apodo que elijas: nunca tu nombre ni tu correo.</p>
+          <p className="text-xs text-texto-suave">{t("En el ranking solo se ve el apodo que elijas: nunca tu nombre ni tu correo.")}</p>
           <div className="flex gap-2">
             <input
               value={apodo}
               onChange={(e) => setApodo(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && apodo.trim() && void guardar()}
               maxLength={20}
-              placeholder="Tu apodo, ej.: Luna Errante"
-              aria-label="Apodo para el ranking"
+              placeholder={t("Tu apodo, ej.: Luna Errante")}
+              aria-label={t("Apodo para el ranking")}
               className="campo min-w-0 flex-1 text-sm"
             />
             <button type="button" onClick={() => void guardar()} disabled={guardando || apodo.trim().length < 3} className="boton boton-primario shrink-0 px-4 py-2">
-              {guardando ? "…" : "Guardar"}
+              {guardando ? "…" : t("Guardar")}
             </button>
           </div>
           {error && <p className="text-xs text-red-300">{error}</p>}
         </div>
       ) : datos.sesion ? (
         <p className="text-xs text-texto-suave">
-          Apareces como <strong className="text-texto">{datos.apodo}</strong> ·{" "}
+          {t("Apareces como")} <strong className="text-texto">{datos.apodo}</strong> ·{" "}
           <button
             type="button"
             onClick={() => {
@@ -153,28 +152,30 @@ export function RankingSemanal() {
             }}
             className="underline"
           >
-            cambiar
+            {t("cambiar")}
           </button>
         </p>
       ) : (
         <p className="text-xs text-texto-suave">
           <Link href="/entrar?volver=/juego" className="text-oro-suave underline">
-            Entra con tu cuenta
+            {t("Entra con tu cuenta")}
           </Link>{" "}
-          para sumar puntos y aparecer en el ranking.
+          {t("para sumar puntos y aparecer en el ranking.")}
         </p>
       )}
 
       <Link href="/juego/ligas" className="flex items-center justify-between rounded-lg border border-violeta-suave/40 bg-violeta/10 px-3 py-2 text-sm transition hover:border-violeta-suave">
-        <span>👥 Crea una liga con tu gente y compitan entre ustedes</span>
+        <span>{t("👥 Crea una liga con tu gente y compitan entre ustedes")}</span>
         <span className="text-oro-suave">→</span>
       </Link>
 
       <details className="text-xs text-texto-suave">
-        <summary className="cursor-pointer">¿Cómo se suman los puntos?</summary>
+        <summary className="cursor-pointer">{t("¿Cómo se suman los puntos?")}</summary>
         <p className="mt-1">
-          Encontrarla en 1 intento da 7 puntos, en 2 da 6… y en {MAX_INTENTOS} da 2. Jugar sin encontrarla da 1. El comodín de Sibila resta 1 y el reto maestro suma{" "}
-          {PUNTOS_MAESTRO}. Si hay empate, gana quien jugó más días. La tabla se reinicia cada lunes (hora de Colombia).
+          {t(
+            "Encontrarla en 1 intento da 7 puntos, en 2 da 6… y en {n} da 2. Jugar sin encontrarla da 1. El comodín de Sibila resta 1 y el reto maestro suma {p}. Si hay empate, gana quien jugó más días. La tabla se reinicia cada lunes (hora de Colombia).",
+            { n: MAX_INTENTOS, p: PUNTOS_MAESTRO },
+          )}
         </p>
       </details>
     </div>

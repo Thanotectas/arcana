@@ -10,10 +10,14 @@ import { Logros, Tutorial, VozSibila } from "./Extras";
 import { RankingSemanal } from "./Ranking";
 import { MensajeSibila } from "./MensajeSibila";
 import { contarEvento } from "@/lib/juego/eventos";
+import { useJ } from "@/lib/juego/useJuego";
+import { nombreCarta, palabrasCarta } from "@/lib/juego/cartas-idiomas";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
-  COMODINES,
+  comodines,
+  nombreGrupoId,
+  nombrePestana,
   GRUPOS,
   INTENTOS_DORADA,
   cartaDorada,
@@ -185,12 +189,13 @@ const sinSuscripcion = () => () => {};
 /** El juego depende de la fecha y del progreso guardado en el navegador: se pinta solo en el cliente. */
 export function CaminoDelLoco({ clavePublica, diaPractica = null, reto = null }: { clavePublica: string | null; diaPractica?: number | null; reto?: ResultadoCompartido | null }) {
   const enCliente = useSyncExternalStore(sinSuscripcion, () => true, () => false);
+  const { t } = useJ();
   if (!enCliente) {
     return (
       <div className="tarjeta flex flex-col items-center gap-4 p-10 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
         <img src={DORSO} alt="" className="w-28 animate-pulse rounded-xl border border-oro/50" />
-        <p className="text-texto-suave">Sibila está escondiendo la carta de hoy…</p>
+        <p className="text-texto-suave">{t("Sibila está escondiendo la carta de hoy…")}</p>
       </div>
     );
   }
@@ -198,6 +203,7 @@ export function CaminoDelLoco({ clavePublica, diaPractica = null, reto = null }:
 }
 
 function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | null; diaPractica: number | null; reto: ResultadoCompartido | null }) {
+  const { t, idioma } = useJ();
   const [fecha] = useState(() => fechaBogota());
   const numeroHoy = numeroDeJuego(fecha);
   const practica = diaPractica !== null && diaPractica >= 1 && diaPractica < numeroHoy;
@@ -249,9 +255,9 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
   const gano = comparaciones.some((c) => c.acierto);
   const termino = gano || intentos.length >= MAX_INTENTOS;
   const fallos = comparaciones.filter((c) => !c.acierto).length;
-  const todasLasPistas = pistas(escondida);
+  const todasLasPistas = pistas(escondida, idioma);
   const ultimaCarta = cartasIntento[cartasIntento.length - 1];
-  const caraActual: Cara = termino ? (gano ? "gana" : "pierde") : ultimaCarta ? CARA_CALOR[reaccion(ultimaCarta, escondida, cartasIntento.length).calor] : "pista";
+  const caraActual: Cara = termino ? (gano ? "gana" : "pierde") : ultimaCarta ? CARA_CALOR[reaccion(ultimaCarta, escondida, cartasIntento.length, idioma).calor] : "pista";
   const [sonido, setSonido] = useState(sonidoActivo);
   const [celebrar, setCelebrar] = useState(false);
   const rachaLocal = progreso.ultima === fecha || progreso.ultima === diaAnterior(fecha) ? progreso.racha : 0;
@@ -332,19 +338,22 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
       {practica && (
         <div className="tarjeta flex items-center justify-between gap-3 border border-violeta-suave/40 p-3 text-sm">
           <span>
-            🧭 <strong>Práctica:</strong> carta del {new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${fechaDeNumero(numero)}T12:00:00Z`))}. No cuenta para tu racha.
+            🧭 <strong>{t("Práctica:")}</strong>{" "}
+            {t("carta del {fecha}. No cuenta para tu racha.", {
+              fecha: new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${fechaDeNumero(numero)}T12:00:00Z`)),
+            })}
           </span>
           <Link href="/juego" className="shrink-0 text-oro-suave underline">
-            Ir a la de hoy
+            {t("Ir a la de hoy")}
           </Link>
         </div>
       )}
       <div className="tarjeta space-y-5 p-4 sm:p-7">
         <div className="flex items-center justify-between text-sm text-texto-suave">
-          <span className="rounded-full bg-superficie-2 px-3 py-1">Carta #{numero}</span>
+          <span className="rounded-full bg-superficie-2 px-3 py-1">{t("Carta #{n}", { n: numero })}</span>
           <Vidas usados={intentos.length} gano={gano} />
           <span className="flex items-center gap-1.5">
-            <span className="rounded-full bg-superficie-2 px-3 py-1" title="Días seguidos jugando">
+            <span className="rounded-full bg-superficie-2 px-3 py-1" title={t("Días seguidos jugando")}>
               🔥 {racha}
             </span>
             <button
@@ -353,7 +362,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
                 guardarSonido(!sonido);
                 setSonido(!sonido);
               }}
-              aria-label={sonido ? "Silenciar el juego" : "Activar el sonido"}
+              aria-label={sonido ? t("Silenciar el juego") : t("Activar el sonido")}
               className="rounded-full bg-superficie-2 px-2 py-1"
             >
               {sonido ? "🔊" : "🔇"}
@@ -370,13 +379,13 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           </figure>
           {termino ? (
             // eslint-disable-next-line @next/next/no-img-element -- ilustración estática de la carta
-            <img src={imagenCarta(escondida) ?? DORSO} alt={escondida.nombre} className="voltear-carta w-40 rounded-xl sm:w-48" />
+            <img src={imagenCarta(escondida) ?? DORSO} alt={nombreCarta(escondida, idioma)} className="voltear-carta w-40 rounded-xl sm:w-48" />
           ) : (
             <div className="flotar-carta relative">
               {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
               <img
                 src={DORSO}
-                alt="Carta escondida"
+                alt={t("Carta escondida")}
                 className="w-28 rounded-xl border border-oro/50 transition-shadow duration-700 sm:w-36"
                 style={{ boxShadow: `0 0 ${30 + fallos * 12}px rgba(139,108,246,${0.4 + fallos * 0.08})` }}
               />
@@ -393,7 +402,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           escondida={escondida}
           termino={termino}
           gano={gano}
-          comodin={comodin ? { texto: textoComodin(comodin.tipo, escondida), en: comodin.en } : null}
+          comodin={comodin ? { texto: textoComodin(comodin.tipo, escondida, idioma), en: comodin.en } : null}
         />
 
         {!termino && !comodin && <ComodinSibila onUsar={usarComodin} />}
@@ -411,13 +420,12 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
 
       {termino && practica && (
         <div className="tarjeta aparecer space-y-4 p-5 text-center sm:p-7">
-          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `La encontraste en ${comparaciones.length}` : "Esta se escondió muy bien"}</p>
-          <h2 className="brillo-oro font-display text-4xl font-semibold">{escondida.nombre}</h2>
-          <p className="mx-auto max-w-lg text-texto">{mensajeDelDia(escondida)}</p>
-          <VozSibila carta={escondida.id} />
+          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? t("La encontraste en {n}", { n: comparaciones.length }) : t("Esta se escondió muy bien")}</p>
+          <h2 className="brillo-oro font-display text-4xl font-semibold">{nombreCarta(escondida, idioma)}</h2>
+          <MensajeCarta carta={escondida} />
           <div>
             <Link href="/juego" className="boton boton-primario inline-flex">
-              Jugar la carta de hoy
+              {t("Jugar la carta de hoy")}
             </Link>
           </div>
         </div>
@@ -446,21 +454,22 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
       <Instalar />
 
       <details className="tarjeta p-5 text-sm text-texto-suave">
-        <summary className="cursor-pointer font-semibold text-texto">¿Cómo se juega?</summary>
+        <summary className="cursor-pointer font-semibold text-texto">{t("¿Cómo se juega?")}</summary>
         <div className="mt-3 space-y-2">
-          <p>Cada día Sibila esconde una de las 78 cartas del tarot. Es la misma para todos y cambia a medianoche (hora de Colombia).</p>
+          <p>{t("Cada día Sibila esconde una de las 78 cartas del tarot. Es la misma para todos y cambia a medianoche (hora de Colombia).")}</p>
           <p>
-            Tienes {MAX_INTENTOS} intentos. Elige un grupo (Mayores, Bastos, Copas, Espadas u Oros) y una carta. Verás si acertaste el grupo y si el número de la
-            escondida es mayor ⬆️ o menor ⬇️. Las cartas que ya no pueden ser se apagan. En los menores, el As es 1, la Sota 11, el Caballo 12, la Reina 13 y el Rey 14.
+            {t(
+              "Tienes {n} intentos. Elige un grupo (Mayores, Bastos, Copas, Espadas u Oros) y una carta. Verás si acertaste el grupo y si el número de la escondida es mayor ⬆️ o menor ⬇️. Las cartas que ya no pueden ser se apagan. En los menores, el As es 1, la Sota 11, el Caballo 12, la Reina 13 y el Rey 14.",
+              { n: MAX_INTENTOS },
+            )}
           </p>
-          <p>Con cada fallo, Sibila te da una pista más. Si te atascas, pídele su comodín (uno por carta): te revela el grupo, si el número es par o impar, o si es alto o bajo.</p>
+          <p>{t("Con cada fallo, Sibila te da una pista más. Si te atascas, pídele su comodín (uno por carta): te revela el grupo, si el número es par o impar, o si es alto o bajo.")}</p>
+          <p>{t("Cada carta que descubres entra en tu álbum. Si juegas {n} días seguidos te regalamos 1 crédito; si completas un palo, 2 créditos; los 22 Arcanos Mayores, 3; y las 78 cartas, 5.", { n: RACHA_PREMIO })}</p>
           <p>
-            Cada carta que descubres entra en tu álbum. Si juegas {RACHA_PREMIO} días seguidos te regalamos 1 crédito; si completas un palo, 2 créditos; los 22 Arcanos
-            Mayores, 3; y las 78 cartas, 5.
-          </p>
-          <p>
-            Cuando encuentras la carta del día se abre el <strong>reto maestro</strong>: otra carta, {MAX_INTENTOS_MAESTRO} intentos y pistas en clave. Y cada semana hay
-            ranking: encontrarla en 1 intento da 7 puntos, en 2 da 6… en 6 da 2; jugar sin encontrarla da 1; el comodín resta 1 y el reto maestro suma {PUNTOS_MAESTRO}.
+            {t(
+              "Cuando encuentras la carta del día se abre el reto maestro: otra carta, {n} intentos y pistas en clave. Y cada semana hay ranking: encontrarla en 1 intento da 7 puntos, en 2 da 6… en 6 da 2; jugar sin encontrarla da 1; el comodín resta 1 y el reto maestro suma {p}.",
+              { n: MAX_INTENTOS_MAESTRO, p: PUNTOS_MAESTRO },
+            )}
           </p>
         </div>
       </details>
@@ -470,8 +479,9 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
 
 /** Seis estrellas: se apagan con cada intento. */
 function Vidas({ usados, gano, max = MAX_INTENTOS }: { usados: number; gano: boolean; max?: number }) {
+  const { t } = useJ();
   return (
-    <span className="flex gap-1" aria-label={`${max - usados} intentos restantes`}>
+    <span className="flex gap-1" aria-label={t("{n} intentos restantes", { n: max - usados })}>
       {Array.from({ length: max }, (_, i) => (
         <span key={i} className={`text-base transition-opacity ${i < usados ? (gano && i === usados - 1 ? "text-oro estrella-gana" : "opacity-25 estrella-cae") : "text-oro"}`}>
           ★
@@ -507,6 +517,7 @@ function Conversacion({
   comodin?: { texto: string; en: number } | null;
   max?: number;
 }) {
+  const { t, idioma } = useJ();
   type Mensaje = { de: "sibila"; texto: string; calor?: string; cara: Cara; comodin?: boolean } | { de: "tu"; carta: CartaTarot; r: Comparacion };
   const mensajes: Mensaje[] = [{ de: "sibila", texto: pistas[0], cara: "pista" }];
   const ponerComodin = () => comodin && mensajes.push({ de: "sibila", texto: comodin.texto, cara: "caliente", comodin: true });
@@ -514,10 +525,10 @@ function Conversacion({
   cartas.forEach((carta, i) => {
     const r = comparaciones[i];
     mensajes.push({ de: "tu", carta, r });
-    if (r.acierto) mensajes.push({ de: "sibila", texto: "¡Ahí está! ✨ La encontraste.", cara: "gana" });
-    else if (i === max - 1) mensajes.push({ de: "sibila", texto: `Hoy se escondió muy bien… era ${escondida.nombre}. 🌙`, cara: "pierde" });
+    if (r.acierto) mensajes.push({ de: "sibila", texto: t("¡Ahí está! ✨ La encontraste."), cara: "gana" });
+    else if (i === max - 1) mensajes.push({ de: "sibila", texto: t("Hoy se escondió muy bien… era {carta}. 🌙", { carta: nombreCarta(escondida, idioma) }), cara: "pierde" });
     else {
-      const re = reaccion(carta, escondida, i + 1);
+      const re = reaccion(carta, escondida, i + 1, idioma);
       mensajes.push({ de: "sibila", texto: re.texto, calor: re.calor, cara: CARA_CALOR[re.calor] });
       if (pistas[i + 1]) mensajes.push({ de: "sibila", texto: pistas[i + 1], cara: "pista" });
     }
@@ -542,9 +553,9 @@ function Conversacion({
         ) : (
           <div key={i} className={`burbuja-entra ml-auto flex max-w-[92%] items-center gap-2 rounded-2xl rounded-br-sm p-1.5 pr-2 ${m.r.acierto ? "bg-violeta/40 ring-1 ring-oro/70" : "bg-violeta/15"}`}>
             <Miniatura carta={m.carta} />
-            <span className={`min-w-0 flex-1 truncate text-sm ${m.r.acierto ? "font-semibold" : ""}`}>{m.carta.nombre}</span>
+            <span className={`min-w-0 flex-1 truncate text-sm ${m.r.acierto ? "font-semibold" : ""}`}>{nombreCarta(m.carta, idioma)}</span>
             <span className={`voltear-chip shrink-0 rounded-md px-2 py-1 text-[11px] ${m.r.grupo ? "bg-violeta text-white" : "bg-noche/60 text-texto-suave"}`} style={{ animationDelay: "0.1s" }}>
-              {nombreGrupo(m.carta)}
+              {nombreGrupo(m.carta, idioma)}
             </span>
             <span className={`voltear-chip w-14 shrink-0 rounded-md px-1 py-1 text-center text-sm ${m.r.numero === "igual" ? "bg-violeta text-white" : "bg-noche/60"}`} style={{ animationDelay: "0.3s" }}>
               {m.carta.numero} {m.r.numero === "mayor" ? "⬆️" : m.r.numero === "menor" ? "⬇️" : "✓"}
@@ -552,7 +563,7 @@ function Conversacion({
           </div>
         ),
       )}
-      {termino && gano && <p className="sr-only">La encontraste.</p>}
+      {termino && gano && <p className="sr-only">{t("La encontraste.")}</p>}
     </div>
   );
 }
@@ -606,13 +617,14 @@ const ESTILO_GRUPO: Record<IdGrupo, { color: string; elemento: string; tema: str
 const miniCarta = (c: CartaTarot) => `/cartas/rider-mini/${c.id}.webp`;
 
 function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: ReadonlySet<string>; quedan: ReadonlySet<string>; sugerido: IdGrupo | null; onElegir: (id: string) => void }) {
+  const { t, idioma } = useJ();
   const [pestana, setPestana] = useState<IdGrupo>(sugerido ?? "mayor");
   const [elegida, setElegida] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
   const [soloPosibles, setSoloPosibles] = useState(false);
   const toque = useRef<{ x: number; y: number } | null>(null);
   const cartaElegida = elegida ? cartaPorId(elegida) : undefined;
-  const sugerencias = buscarCartas(texto, intentados, 6);
+  const sugerencias = buscarCartas(texto, intentados, 6, idioma);
   const todas = cartasDelGrupo(pestana);
   const cartas = soloPosibles ? todas.filter((c) => quedan.has(c.id) && !intentados.has(c.id)) : todas;
   const posiblesPorGrupo = (g: IdGrupo) => cartasDelGrupo(g).filter((c) => quedan.has(c.id) && !intentados.has(c.id)).length;
@@ -647,9 +659,9 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
 
   return (
     <div id="selector-juego" className="scroll-mb-4 space-y-3 border-t border-borde pt-4">
-      <p className="text-center text-sm text-texto-suave">¿Qué carta es? Elige un grupo y toca una carta.</p>
+      <p className="text-center text-sm text-texto-suave">{t("¿Qué carta es? Elige un grupo y toca una carta.")}</p>
 
-      <div className="grid grid-cols-5 gap-1.5 pt-2" role="tablist" aria-label="Grupos del tarot">
+      <div className="grid grid-cols-5 gap-1.5 pt-2" role="tablist" aria-label={t("Grupos del tarot")}>
         {GRUPOS.map((g) => {
           const n = posiblesPorGrupo(g.id);
           const activo = pestana === g.id;
@@ -674,11 +686,11 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
                 />
                 {activo && <span className="emblema-destello absolute inset-0 rounded-full border-2" style={{ borderColor: color }} />}
               </span>
-              <span className={`mt-1 text-[11px] font-medium ${activo ? "text-texto" : "text-texto-suave"}`}>{g.nombre}</span>
+              <span className={`mt-1 text-[11px] font-medium ${activo ? "text-texto" : "text-texto-suave"}`}>{nombrePestana(g.id, idioma)}</span>
               <span
                 className={`absolute -top-2 right-0.5 min-w-5 rounded-full px-1 text-[10px] font-bold leading-5 tabular-nums ${n === 0 ? "bg-superficie-2 text-texto-suave" : "text-noche"}`}
                 style={n === 0 ? undefined : { background: color }}
-                title={n === 0 ? "Ninguna puede ser" : `${n} posibles`}
+                title={n === 0 ? t("Ninguna puede ser") : t("{n} posibles", { n })}
               >
                 {n === 0 ? "✕" : n}
               </span>
@@ -689,10 +701,10 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
 
       <div className="flex items-center justify-between gap-2 px-1 text-xs">
         <p className="min-w-0 truncate" style={{ color: estilo.color }}>
-          <strong>{estilo.elemento}</strong> <span className="text-texto-suave">· {estilo.tema}</span>
+          <strong>{t(estilo.elemento)}</strong> <span className="text-texto-suave">· {t(estilo.tema)}</span>
         </p>
         <button type="button" onClick={() => setSoloPosibles(!soloPosibles)} className={`shrink-0 rounded-full border px-2.5 py-1 transition ${soloPosibles ? "border-oro/60 bg-oro/15 text-oro-suave" : "border-borde text-texto-suave"}`}>
-          {soloPosibles ? "✓ Solo posibles" : "Solo posibles"}
+          {soloPosibles ? t("✓ Solo posibles") : t("Solo posibles")}
         </button>
       </div>
 
@@ -703,7 +715,8 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
         className={`aparecer grid gap-1.5 ${pestana === "mayor" ? "grid-cols-6" : "grid-cols-7"}`}
       >
         {cartas.map((c) => {
-          const r = rotuloCasilla(c);
+          const r = rotuloCasilla(c, idioma);
+          const nombre = nombreCarta(c, idioma);
           const usada = intentados.has(c.id);
           const descartada = !quedan.has(c.id) && !usada;
           const activa = elegida === c.id;
@@ -713,8 +726,8 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
               type="button"
               disabled={usada}
               onClick={() => seleccionar(c)}
-              title={usada ? `${c.nombre} (ya la intentaste)` : descartada ? `${c.nombre} (según tus pistas, no puede ser)` : c.nombre}
-              aria-label={c.nombre}
+              title={usada ? t("{carta} (ya la intentaste)", { carta: nombre }) : descartada ? t("{carta} (según tus pistas, no puede ser)", { carta: nombre }) : nombre}
+              aria-label={nombre}
               style={activa ? { borderColor: estilo.color, boxShadow: `0 0 16px ${estilo.color}aa` } : undefined}
               className={`group relative aspect-[3/4] overflow-hidden rounded-md border transition active:scale-95 ${
                 activa ? "z-10 -translate-y-1 scale-105 border-2" : usada || descartada ? "border-transparent" : "border-oro/30 hover:-translate-y-0.5 hover:border-oro/70"
@@ -727,28 +740,28 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
                 {r.nombre && <span className="block truncate text-[8px] leading-tight text-white/80">{r.nombre}</span>}
               </span>
               {descartada && <span className="absolute inset-x-0 top-[18%] text-center text-lg leading-none text-white/70">✕</span>}
-              {usada && <span className="absolute left-1/2 top-[16%] -translate-x-1/2 rounded-full bg-violeta px-1.5 text-[9px] font-semibold leading-4 text-white">ya</span>}
+              {usada && <span className="absolute left-1/2 top-[16%] -translate-x-1/2 rounded-full bg-violeta px-1.5 text-[9px] font-semibold leading-4 text-white">{t("ya")}</span>}
             </button>
           );
         })}
         {cartas.length === 0 && (
           <p className="col-span-full rounded-xl border border-borde bg-superficie-2 p-4 text-center text-sm text-texto-suave">
-            Según tus pistas, ninguna carta de {pestana === "mayor" ? "los Arcanos Mayores" : GRUPOS.find((g) => g.id === pestana)?.nombre} puede ser. Prueba otro grupo.
+            {t("Según tus pistas, ninguna carta de {grupo} puede ser. Prueba otro grupo.", { grupo: nombreGrupoId(pestana, idioma) })}
           </p>
         )}
       </div>
       <p className="text-center text-[11px] text-texto-suave">
-        {posiblesAqui} posibles aquí · {quedan.size} en total
-        <span className="sm:hidden"> · desliza para cambiar de grupo</span>
+        {t("{n} posibles aquí · {total} en total", { n: posiblesAqui, total: quedan.size })}
+        <span className="sm:hidden">{t(" · desliza para cambiar de grupo")}</span>
       </p>
 
       {cartaElegida && (
         <div className="aparecer flex items-center gap-3 rounded-xl border bg-superficie-2 p-2" style={{ borderColor: `${ESTILO_GRUPO[grupo(cartaElegida) as IdGrupo].color}88` }}>
           <Miniatura carta={cartaElegida} className="w-12" />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{cartaElegida.nombre}</p>
+            <p className="truncate font-semibold">{nombreCarta(cartaElegida, idioma)}</p>
             <p className="text-xs text-texto-suave">
-              {!quedan.has(cartaElegida.id) ? "Según tus pistas, esta ya no puede ser." : `${ESTILO_GRUPO[grupo(cartaElegida) as IdGrupo].elemento} · ¿es esta?`}
+              {!quedan.has(cartaElegida.id) ? t("Según tus pistas, esta ya no puede ser.") : t("{elemento} · ¿es esta?", { elemento: t(ESTILO_GRUPO[grupo(cartaElegida) as IdGrupo].elemento) })}
             </p>
           </div>
           <button
@@ -759,7 +772,7 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
             }}
             className="boton boton-primario shrink-0 px-4 py-2"
           >
-            Elegir
+            {t("Elegir")}
           </button>
         </div>
       )}
@@ -771,16 +784,16 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
           onKeyDown={(e) => {
             if (e.key === "Enter" && sugerencias[0]) seleccionar(sugerencias[0]);
           }}
-          placeholder="…o escríbela: «Luna», «As de Copas»"
+          placeholder={t("…o escríbela: «Luna», «As de Copas»")}
           autoComplete="off"
-          aria-label="Buscar carta por nombre"
+          aria-label={t("Buscar carta por nombre")}
           className="campo w-full text-sm"
         />
         {sugerencias.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {sugerencias.map((c) => (
               <button key={c.id} type="button" onClick={() => seleccionar(c)} className="boton boton-secundario px-3 py-1.5 text-sm">
-                {c.nombre}
+                {nombreCarta(c, idioma)}
               </button>
             ))}
           </div>
@@ -819,13 +832,14 @@ function Final({
   fecha: string;
   clavePublica: string | null;
 }) {
+  const { t, idioma } = useJ();
   const [copiado, setCopiado] = useState(false);
   const [generando, setGenerando] = useState(false);
   const [video, setVideo] = useState<"listo" | "preparando" | "error">("listo");
   const [maestrosLocales] = useState(maestrosGanados);
   const [doradasLocales] = useState(() => doradasDe(leerProgreso().partidas, leerMaestro()));
-  const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin, conComodin);
-  const urlImagen = `/api/juego/imagen?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&formato=historia`;
+  const texto = textoParaCompartir(numero, comparaciones, gano, racha, window.location.origin, conComodin, idioma);
+  const urlImagen = `/api/juego/imagen?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&formato=historia&idioma=${idioma}`;
 
   /** La imagen para estados e historias: se comparte directo (celular) o se descarga. */
   async function compartirImagen() {
@@ -834,7 +848,7 @@ function Final({
       const blob = await (await fetch(urlImagen)).blob();
       const archivo = new File([blob], `camino-del-loco-${numero}.png`, { type: "image/png" });
       if (navigator.canShare?.({ files: [archivo] })) {
-        await navigator.share({ files: [archivo], text: `¿Adivinas la carta de hoy? ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
+        await navigator.share({ files: [archivo], text: `${t("¿Adivinas la carta de hoy?")} ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
       } else {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -852,12 +866,12 @@ function Final({
   async function compartirVideo() {
     setVideo("preparando");
     try {
-      const r = await fetch(`/api/juego/video?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&idioma=es`);
+      const r = await fetch(`/api/juego/video?n=${numero}&f=${codigoResultado(comparaciones)}&ra=${racha}&idioma=${idioma}`);
       if (!r.ok) throw new Error(String(r.status));
       const blob = await r.blob();
       const archivo = new File([blob], `camino-del-loco-${numero}.mp4`, { type: "video/mp4" });
       if (navigator.canShare?.({ files: [archivo] })) {
-        await navigator.share({ files: [archivo], text: `¿Adivinas la carta de hoy? ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
+        await navigator.share({ files: [archivo], text: `${t("¿Adivinas la carta de hoy?")} ${enlaceResultado(window.location.origin, numero, comparaciones, racha)}` }).catch(() => null);
       } else {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -896,40 +910,36 @@ function Final({
     <div id="resultado-juego" className="tarjeta aparecer scroll-mt-24 space-y-5 p-5 text-center sm:p-7">
       <div>
         <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">
-          {gano ? (comparaciones.length === 1 ? "¡A la primera!" : `La encontraste en ${comparaciones.length}`) : "Hoy se escondió muy bien"}
+          {gano ? (comparaciones.length === 1 ? t("¡A la primera!") : t("La encontraste en {n}", { n: comparaciones.length })) : t("Hoy se escondió muy bien")}
         </p>
-        <h2 className="brillo-oro font-display text-4xl font-semibold">{escondida.nombre}</h2>
+        <h2 className="brillo-oro font-display text-4xl font-semibold">{nombreCarta(escondida, idioma)}</h2>
       </div>
-      <p className="mx-auto max-w-lg text-texto">{mensajeDelDia(escondida)}</p>
-      <p className="mx-auto max-w-lg text-sm text-texto-suave">
-        <span className="text-oro">En el amor:</span> {escondida.amor}
-      </p>
-      <VozSibila carta={escondida.id} />
+      <MensajeCarta carta={escondida} amor />
 
       {escondida.arcano === "mayor" &&
         (gano && comparaciones.length <= INTENTOS_DORADA ? (
           <BannerDorada carta={escondida} />
         ) : (
           <p className="text-xs text-texto-suave">
-            ✨ Los Arcanos Mayores tienen carta dorada: encuéntralos en {INTENTOS_DORADA} intentos o menos para desbloquearla en tu álbum.
+            {t("✨ Los Arcanos Mayores tienen carta dorada: encuéntralos en {n} intentos o menos para desbloquearla en tu álbum.", { n: INTENTOS_DORADA })}
           </p>
         ))}
 
-      <MensajeSibila carta={escondida.nombre} />
+      <MensajeSibila carta={nombreCarta(escondida, idioma)} />
 
       <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-left font-sans text-sm leading-relaxed">{texto}</pre>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" onClick={compartir} className="boton boton-primario">
-          {copiado ? "¡Copiado! Pégalo donde quieras" : "Compartir resultado"}
+          {copiado ? t("¡Copiado! Pégalo donde quieras") : t("Compartir resultado")}
         </button>
         <a href={`https://wa.me/?text=${encodeURIComponent(texto)}`} target="_blank" rel="noopener noreferrer" className="boton boton-whatsapp">
-          Enviar por WhatsApp
+          {t("Enviar por WhatsApp")}
         </a>
         <button type="button" onClick={compartirImagen} disabled={generando} className="boton boton-secundario">
-          {generando ? "Preparando la imagen…" : "📸 Imagen para historias"}
+          {generando ? t("Preparando la imagen…") : t("📸 Imagen para historias")}
         </button>
         <button type="button" onClick={() => void compartirVideo()} disabled={video === "preparando"} className="boton boton-secundario">
-          {video === "preparando" ? "🎬 Preparando tu video (unos 20 s)…" : video === "error" ? "🎬 No se pudo: intenta de nuevo" : "🎬 Video para TikTok y Reels"}
+          {video === "preparando" ? t("🎬 Preparando tu video (unos 20 s)…") : video === "error" ? t("🎬 No se pudo: intenta de nuevo") : t("🎬 Video para TikTok y Reels")}
         </button>
       </div>
 
@@ -937,10 +947,10 @@ function Final({
 
       <div className="grid grid-cols-4 gap-2 text-center">
         {[
-          { n: stats.jugadas, t: "Jugadas" },
-          { n: stats.jugadas ? Math.round((stats.ganadas / stats.jugadas) * 100) : 0, t: "% ganadas" },
-          { n: racha, t: "Racha 🔥" },
-          { n: Math.max(stats.mejorRacha, racha), t: "Mejor racha" },
+          { n: stats.jugadas, t: t("Jugadas") },
+          { n: stats.jugadas ? Math.round((stats.ganadas / stats.jugadas) * 100) : 0, t: t("% ganadas") },
+          { n: racha, t: t("Racha 🔥") },
+          { n: Math.max(stats.mejorRacha, racha), t: t("Mejor racha") },
         ].map((x) => (
           <div key={x.t} className="rounded-xl bg-superficie-2 p-3">
             <div className="text-2xl font-semibold tabular-nums">{x.n}</div>
@@ -952,15 +962,16 @@ function Final({
       <div className="space-y-3 rounded-xl border border-oro/40 p-4 text-sm">
         {premioNuevo ? (
           <p>
-            🎁 <strong>¡{racha} días seguidos!</strong> Te sumamos 1 crédito de regalo: ya está en tu cuenta.{" "}
+            🎁 <strong>{t("¡{n} días seguidos!", { n: racha })}</strong> {t("Te sumamos 1 crédito de regalo: ya está en tu cuenta.")}{" "}
             <Link href="/tarot" className="text-oro-suave underline">
-              Úsalo en una lectura
+              {t("Úsalo en una lectura")}
             </Link>
           </p>
         ) : (
           <>
             <p>
-              🔥 Llevas {racha} {racha === 1 ? "día" : "días"} seguidos. Te {faltan === 1 ? "falta 1 día" : `faltan ${faltan} días`} para ganar <strong>1 crédito de regalo</strong>.
+              {racha === 1 ? t("🔥 Llevas 1 día jugando.") : t("🔥 Llevas {n} días seguidos.", { n: racha })}{" "}
+              {faltan === 1 ? t("Te falta 1 día para ganar") : t("Te faltan {n} días para ganar", { n: faltan })} <strong>{t("1 crédito de regalo")}</strong>.
             </p>
             <div className="flex justify-center gap-1.5" aria-hidden>
               {Array.from({ length: RACHA_PREMIO }, (_, i) => (
@@ -974,7 +985,7 @@ function Final({
             {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
             <img src={emblemaPremio(p.id)} alt="" className="h-14 w-14 shrink-0 drop-shadow-[0_0_12px_rgba(241,217,154,0.7)]" />
             <p>
-              🏆 <strong>¡Completaste {p.nombre}!</strong> Te sumamos {p.creditos} créditos de regalo: ya están en tu cuenta.
+              🏆 <strong>{t("¡Completaste {nombre}!", { nombre: t(p.nombre) })}</strong> {t("Te sumamos {n} créditos de regalo: ya están en tu cuenta.", { n: p.creditos })}
             </p>
           </div>
         ))}
@@ -984,7 +995,7 @@ function Final({
             <img src={emblemaPremio(proximo.id)} alt="" className="h-10 w-10 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="text-xs">
-                Próximo premio: completa <strong>{proximo.nombre}</strong> ({proximo.tienes} de {proximo.total}) y gana <strong>{proximo.creditos} créditos</strong>.
+                {t("Próximo premio: completa")} <strong>{t(proximo.nombre)}</strong> ({proximo.tienes} {t("de")} {proximo.total}) {t("y gana")} <strong>{t("{n} créditos", { n: proximo.creditos })}</strong>.
               </p>
               <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-superficie-2">
                 <div className="h-full rounded-full bg-oro" style={{ width: `${(proximo.tienes / proximo.total) * 100}%` }} />
@@ -994,19 +1005,20 @@ function Final({
         )}
         <p className="text-texto-suave">
           <Link href="/juego/album" className="text-oro-suave underline">
-            Tu álbum
+            {t("Tu álbum")}
           </Link>
-          : {album.size} de 78 cartas descubiertas.
-          {stats.creditosGanados > 0 && ` Has ganado ${stats.creditosGanados} ${stats.creditosGanados === 1 ? "crédito" : "créditos"} jugando.`}
+          {t(": {n} de 78 cartas descubiertas.", { n: album.size })}
+          {stats.creditosGanados > 0 && (stats.creditosGanados === 1 ? t(" Has ganado 1 crédito jugando.") : t(" Has ganado {n} créditos jugando.", { n: stats.creditosGanados }))}
         </p>
         {sesion === "no" && (
           <div className="space-y-2 border-t border-borde pt-3">
             <p>
-              Para ganar el crédito, juega con tu cuenta de Arcana: tu racha queda guardada aunque cambies de celular. La racha del regalo cuenta desde el primer día que
-              juegas con tu cuenta.
+              {t(
+                "Para ganar el crédito, juega con tu cuenta de Arcana: tu racha queda guardada aunque cambies de celular. La racha del regalo cuenta desde el primer día que juegas con tu cuenta.",
+              )}
             </p>
             <Link href="/entrar?volver=/juego" className="boton boton-primario inline-flex">
-              Entrar o crear mi cuenta gratis
+              {t("Entrar o crear mi cuenta gratis")}
             </Link>
           </div>
         )}
@@ -1018,7 +1030,7 @@ function Final({
 
       {sesion === "si" && (
         <div className="space-y-2 rounded-xl bg-superficie-2 p-4 text-sm">
-          <p>🔔 Activa los avisos y te recuerdo cuando haya carta nueva y tu racha esté en riesgo.</p>
+          <p>{t("🔔 Activa los avisos y te recuerdo cuando haya carta nueva y tu racha esté en riesgo.")}</p>
           <AvisoDiario clavePublica={clavePublica} />
         </div>
       )}
@@ -1039,8 +1051,36 @@ function Final({
   );
 }
 
+/**
+ * El mensaje de la carta descubierta: en español, su significado (y el amor) con la voz de Sibila; en inglés y
+ * portugués, sus palabras clave (el significado completo solo está escrito en español).
+ */
+function MensajeCarta({ carta, amor = false, sinVoz = false }: { carta: CartaTarot; amor?: boolean; sinVoz?: boolean }) {
+  const { t, idioma } = useJ();
+  if (idioma !== "es") {
+    const { luz } = palabrasCarta(carta, idioma);
+    return (
+      <p className="mx-auto max-w-lg text-texto">
+        <span className="text-oro">{t("Palabras de esta carta:")}</span> {luz.join(" · ")}
+      </p>
+    );
+  }
+  return (
+    <>
+      <p className="mx-auto max-w-lg text-texto">{mensajeDelDia(carta)}</p>
+      {amor && (
+        <p className="mx-auto max-w-lg text-sm text-texto-suave">
+          <span className="text-oro">En el amor:</span> {carta.amor}
+        </p>
+      )}
+      {!sinVoz && <VozSibila carta={carta.id} />}
+    </>
+  );
+}
+
 /** Al encontrar un Mayor rápido (o en el reto maestro): su versión dorada del Tarot Arcana entra al álbum. */
 function BannerDorada({ carta }: { carta: CartaTarot }) {
+  const { t, idioma } = useJ();
   const d = cartaDorada(carta);
   if (!d) return null;
   return (
@@ -1048,12 +1088,12 @@ function BannerDorada({ carta }: { carta: CartaTarot }) {
       {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
       <img src={imagenDorada(carta)} alt={d.nombre} className="dorada-brillo voltear-carta w-16 shrink-0 rounded-lg" />
       <div className="min-w-0">
-        <p className="text-xs uppercase tracking-[0.2em] text-oro-suave">Carta dorada desbloqueada</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-oro-suave">{t("Carta dorada desbloqueada")}</p>
         <p className="font-display text-2xl leading-tight">{d.nombre}</p>
         <p className="text-xs text-texto-suave">
-          Es {carta.nombre} en Tarot Arcana, nuestro mazo propio. Ya brilla en{" "}
+          {t("Es {carta} en Tarot Arcana, nuestro mazo propio. Ya brilla en", { carta: nombreCarta(carta, idioma) })}{" "}
           <Link href="/juego/album" className="text-oro-suave underline">
-            tu álbum
+            {t("tu álbum")}
           </Link>
           .
         </p>
@@ -1081,6 +1121,7 @@ function proximoPremio(album: ReadonlySet<string>) {
 
 /** Una ayuda por carta: Sibila revela un rasgo de la escondida (grupo, paridad o si el número es alto o bajo). */
 function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
+  const { t, idioma } = useJ();
   const [abierto, setAbierto] = useState(false);
   if (!abierto) {
     return (
@@ -1095,7 +1136,7 @@ function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
           <img src={cara("caliente")} alt="" className="h-7 w-7 rounded-full border border-oro/60" />
-          Pedirle el comodín a Sibila <span className="text-xs text-texto-suave">(1 por carta)</span>
+          {t("Pedirle el comodín a Sibila")} <span className="text-xs text-texto-suave">{t("(1 por carta)")}</span>
         </button>
       </div>
     );
@@ -1103,11 +1144,11 @@ function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
   return (
     <div className="aparecer space-y-3 rounded-xl border border-violeta-suave/50 bg-violeta/10 p-3">
       <p className="text-center text-sm">
-        🔮 <strong>¿Qué quieres que te revele?</strong>
-        <span className="block text-xs text-texto-suave">Solo una vez por carta. En el ranking resta 1 punto.</span>
+        🔮 <strong>{t("¿Qué quieres que te revele?")}</strong>
+        <span className="block text-xs text-texto-suave">{t("Solo una vez por carta. En el ranking resta 1 punto.")}</span>
       </p>
       <div className="grid grid-cols-3 gap-2">
-        {COMODINES.map((k) => (
+        {comodines(idioma).map((k) => (
           <button key={k.id} type="button" onClick={() => onUsar(k.id)} className="rounded-xl border border-borde bg-superficie-2 p-2 text-center transition hover:border-violeta-suave active:scale-95">
             <span className="block text-sm font-semibold">{k.titulo}</span>
             <span className="mt-1 block text-[11px] leading-tight text-texto-suave">{k.descripcion}</span>
@@ -1115,7 +1156,7 @@ function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
         ))}
       </div>
       <button type="button" onClick={() => setAbierto(false)} className="mx-auto block text-xs text-texto-suave underline">
-        Mejor no, sigo sin ayuda
+        {t("Mejor no, sigo sin ayuda")}
       </button>
     </div>
   );
@@ -1123,6 +1164,7 @@ function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
 
 /** El reto maestro: se abre al encontrar la carta del día. Otra carta, 4 intentos, pistas en clave y sin comodín. */
 function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero: number; sesion: Sesion; cuenta: ProgresoCuenta | null }) {
+  const { t, idioma } = useJ();
   const escondida = useMemo(() => cartaMaestra(numero), [numero]);
   const [locales, setIntentos] = useState<string[]>(() => leerMaestro()[fecha] ?? []);
   const intentos = locales.length ? locales : (cuenta?.maestroHoy ?? []);
@@ -1151,7 +1193,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
         sonidoPerder();
       } else {
         const c = cartaPorId(id);
-        if (c) (reaccion(c, escondida, nuevos.length).calor === "frio" ? sonidoFrio : sonidoCerca)();
+        if (c) (reaccion(c, escondida, nuevos.length, idioma).calor === "frio" ? sonidoFrio : sonidoCerca)();
         setTimeout(sonidoPista, 650);
       }
     }, 450);
@@ -1170,11 +1212,13 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
   if (!abierto) {
     return (
       <div className="relative overflow-hidden rounded-2xl border border-violeta-suave/60 bg-gradient-to-br from-violeta/30 via-noche to-noche p-5 text-left">
-        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">Desbloqueado</p>
-        <p className="mt-1 font-display text-2xl">🌙 El reto maestro de hoy</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t("Desbloqueado")}</p>
+        <p className="mt-1 font-display text-2xl">{t("🌙 El reto maestro de hoy")}</p>
         <p className="mt-2 text-sm text-texto-suave">
-          Sibila escondió otra carta, más difícil: {MAX_INTENTOS_MAESTRO} intentos, pistas en clave y sin comodín. Si la encuentras sumas {PUNTOS_MAESTRO} puntos en el
-          ranking y ganas la medalla de maestría.
+          {t(
+            "Sibila escondió otra carta, más difícil: {n} intentos, pistas en clave y sin comodín. Si la encuentras sumas {p} puntos en el ranking y ganas la medalla de maestría.",
+            { n: MAX_INTENTOS_MAESTRO, p: PUNTOS_MAESTRO },
+          )}
         </p>
         <button
           type="button"
@@ -1185,7 +1229,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
           }}
           className="boton boton-primario mt-4"
         >
-          Aceptar el reto
+          {t("Aceptar el reto")}
         </button>
       </div>
     );
@@ -1194,36 +1238,36 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
   return (
     <div id="reto-maestro" className="scroll-mt-24 space-y-4 rounded-2xl border border-violeta-suave/60 bg-gradient-to-b from-violeta/20 to-noche p-4 text-left">
       <div className="flex items-center justify-between">
-        <p className="font-display text-xl">🌙 Reto maestro</p>
+        <p className="font-display text-xl">{t("🌙 Reto maestro")}</p>
         <Vidas usados={intentos.length} gano={gano} max={MAX_INTENTOS_MAESTRO} />
       </div>
       <div className="relative flex justify-center py-1">
         {termino ? (
           // eslint-disable-next-line @next/next/no-img-element -- ilustración estática de la carta
-          <img src={imagenCarta(escondida) ?? DORSO} alt={escondida.nombre} className="voltear-carta w-32 rounded-xl" />
+          <img src={imagenCarta(escondida) ?? DORSO} alt={nombreCarta(escondida, idioma)} className="voltear-carta w-32 rounded-xl" />
         ) : (
           <div className="flotar-carta relative">
             {/* eslint-disable-next-line @next/next/no-img-element -- dorso estático */}
-            <img src={DORSO} alt="Carta maestra escondida" className="w-24 rounded-xl border border-violeta-suave/70 hue-rotate-[35deg]" style={{ boxShadow: `0 0 ${34 + fallos * 14}px rgba(182,156,255,${0.5 + fallos * 0.1})` }} />
+            <img src={DORSO} alt={t("Carta maestra escondida")} className="w-24 rounded-xl border border-violeta-suave/70 hue-rotate-[35deg]" style={{ boxShadow: `0 0 ${34 + fallos * 14}px rgba(182,156,255,${0.5 + fallos * 0.1})` }} />
             <span className="absolute inset-0 flex items-center justify-center text-4xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">🌙</span>
           </div>
         )}
         {celebrar && <Estallido />}
       </div>
-      <Conversacion pistas={pistasMaestras(escondida)} cartas={cartas} comparaciones={comparaciones} escondida={escondida} termino={termino} gano={gano} max={MAX_INTENTOS_MAESTRO} />
+      <Conversacion pistas={pistasMaestras(escondida, idioma)} cartas={cartas} comparaciones={comparaciones} escondida={escondida} termino={termino} gano={gano} max={MAX_INTENTOS_MAESTRO} />
       {!termino && <Selector intentados={new Set(intentos)} quedan={quedan} sugerido={null} onElegir={adivinar} />}
       {termino && (
         <div className="aparecer space-y-2 text-center">
-          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? `Maestría en ${intentos.length}` : "Se te escondió"}</p>
-          <p className="brillo-oro font-display text-3xl">{escondida.nombre}</p>
-          <p className="text-sm text-texto">{mensajeDelDia(escondida)}</p>
+          <p className="text-sm uppercase tracking-[0.25em] text-violeta-suave">{gano ? t("Maestría en {n}", { n: intentos.length }) : t("Se te escondió")}</p>
+          <p className="brillo-oro font-display text-3xl">{nombreCarta(escondida, idioma)}</p>
+          <MensajeCarta carta={escondida} sinVoz />
           {gano && escondida.arcano === "mayor" && <BannerDorada carta={escondida} />}
           <p className="text-sm text-texto-suave">
             {gano
               ? sesion === "si"
-                ? `+${PUNTOS_MAESTRO} puntos en el ranking de esta semana. 🌙`
-                : `Entra con tu cuenta para que estos ${PUNTOS_MAESTRO} puntos cuenten en el ranking.`
-              : "Mañana hay otro reto maestro. 🌙"}
+                ? t("+{p} puntos en el ranking de esta semana. 🌙", { p: PUNTOS_MAESTRO })
+                : t("Entra con tu cuenta para que estos {p} puntos cuenten en el ranking.", { p: PUNTOS_MAESTRO })
+              : t("Mañana hay otro reto maestro. 🌙")}
           </p>
         </div>
       )}
@@ -1232,6 +1276,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
 }
 
 function Cuenta() {
+  const { t } = useJ();
   const [ms, setMs] = useState(() => msHastaNuevaCarta());
   useEffect(() => {
     const t = setInterval(() => setMs(msHastaNuevaCarta()), 1000);
@@ -1241,13 +1286,14 @@ function Cuenta() {
   const dos = (n: number) => String(n).padStart(2, "0");
   return (
     <p className="text-sm text-texto-suave">
-      Nueva carta escondida en <span className="font-mono text-texto">{dos(Math.floor(s / 3600))}:{dos(Math.floor((s % 3600) / 60))}:{dos(s % 60)}</span>
+      {t("Nueva carta escondida en")} <span className="font-mono text-texto">{dos(Math.floor(s / 3600))}:{dos(Math.floor((s % 3600) / 60))}:{dos(s % 60)}</span>
     </p>
   );
 }
 
 /** Invita a instalar Arcana para jugar cada día desde la pantalla de inicio (no se muestra si ya está instalada). */
 function Instalar() {
+  const { t } = useJ();
   const [instalada] = useState(estaInstalada);
   const puede = usePuedeInstalar();
   if (instalada) return null;
@@ -1256,16 +1302,16 @@ function Instalar() {
       {/* eslint-disable-next-line @next/next/no-img-element -- ícono estático */}
       <img src="/marca/icono-192.png" alt="" className="h-12 w-12 rounded-xl" />
       <div className="min-w-0 flex-1 text-sm">
-        <p className="font-semibold">Juega cada día desde tu pantalla</p>
-        <p className="text-texto-suave">Instala Arcana: abre el juego con un toque, no pierdas tu racha y recibe 1 crédito de regalo.</p>
+        <p className="font-semibold">{t("Juega cada día desde tu pantalla")}</p>
+        <p className="text-texto-suave">{t("Instala Arcana: abre el juego con un toque, no pierdas tu racha y recibe 1 crédito de regalo.")}</p>
       </div>
       {puede ? (
         <button type="button" onClick={() => void pedirInstalacion()} className="boton boton-primario shrink-0 px-4 py-2">
-          Instalar
+          {t("Instalar")}
         </button>
       ) : (
         <Link href="/app" className="boton boton-primario shrink-0 px-4 py-2">
-          Instalar
+          {t("Instalar")}
         </Link>
       )}
     </div>
@@ -1274,6 +1320,7 @@ function Instalar() {
 
 /** Llegó desde el resultado que alguien compartió: el reto, sin revelar la carta. */
 function Reto({ reto, numeroHoy }: { reto: ResultadoCompartido; numeroHoy: number }) {
+  const { t } = useJ();
   const deHoy = reto.numero === numeroHoy;
   return (
     <div className="tarjeta aparecer flex items-center gap-4 border border-oro/40 p-4">
@@ -1288,11 +1335,12 @@ function Reto({ reto, numeroHoy }: { reto: ResultadoCompartido; numeroHoy: numbe
       <p className="text-sm">
         {deHoy ? (
           <>
-            <strong>Te retaron:</strong> {reto.gano ? `la encontraron en ${reto.filas.length} de ${MAX_INTENTOS} intentos` : "a esta persona se le escondió"}. ¿Puedes hacerlo mejor? 🔮
+            <strong>{t("Te retaron:")}</strong> {reto.gano ? t("la encontraron en {n} de {max} intentos", { n: reto.filas.length, max: MAX_INTENTOS }) : t("a esta persona se le escondió")}
+            {t(". ¿Puedes hacerlo mejor? 🔮")}
           </>
         ) : (
           <>
-            Ese reto era de la carta #{reto.numero}. Hoy Sibila escondió una nueva: <strong>¡a ver en cuántos la encuentras!</strong>
+            {t("Ese reto era de la carta #{n}. Hoy Sibila escondió una nueva:", { n: reto.numero })} <strong>{t("¡a ver en cuántos la encuentras!")}</strong>
           </>
         )}
       </p>
@@ -1308,6 +1356,7 @@ interface ResumenHoy {
 
 /** Cómo le fue hoy a quienes juegan con cuenta: porcentaje que la encontró y en qué intento. */
 function ComoLeFue({ propio }: { propio: number | null }) {
+  const { t } = useJ();
   const [resumen, setResumen] = useState<ResumenHoy | null>(null);
   useEffect(() => {
     let vivo = true;
@@ -1325,13 +1374,8 @@ function ComoLeFue({ propio }: { propio: number | null }) {
   return (
     <div className="space-y-3 rounded-xl bg-superficie-2 p-4 text-left text-sm">
       <p className="text-center">
-        Hoy jugaron <strong>{resumen.jugadores}</strong> personas · el <strong>{Math.round((resumen.ganadas / resumen.jugadores) * 100)}%</strong> la encontró
-        {resumen.ganadas > 0 && (
-          <>
-            {" "}
-            · la mayoría en <strong>{masComun}</strong>
-          </>
-        )}
+        {t("Hoy jugaron {n} personas · el {p}% la encontró", { n: resumen.jugadores, p: Math.round((resumen.ganadas / resumen.jugadores) * 100) })}
+        {resumen.ganadas > 0 && t(" · la mayoría en {m}", { m: masComun })}
       </p>
       <div className="space-y-1.5">
         {resumen.distribucion.map((n, i) => (
@@ -1348,21 +1392,22 @@ function ComoLeFue({ propio }: { propio: number | null }) {
           </div>
         ))}
       </div>
-      {propio && <p className="text-center text-xs text-texto-suave">En dorado, tu resultado.</p>}
+      {propio && <p className="text-center text-xs text-texto-suave">{t("En dorado, tu resultado.")}</p>}
     </div>
   );
 }
 
 /** Las cartas de días anteriores: se pueden jugar como práctica (sin racha). */
 function DiasAnteriores({ numeroHoy, actual, progreso }: { numeroHoy: number; actual: number; progreso: Progreso }) {
+  const { t } = useJ();
   const [practica] = useState(leerPractica);
   if (numeroHoy <= 1) return null;
   const dias = Array.from({ length: Math.min(14, numeroHoy - 1) }, (_, i) => numeroHoy - 1 - i);
   return (
     <div className="tarjeta space-y-3 p-4">
       <div>
-        <p className="font-semibold">Cartas de días anteriores</p>
-        <p className="text-sm text-texto-suave">Juégalas como práctica: no cuentan para la racha, pero sí te enseñan las cartas.</p>
+        <p className="font-semibold">{t("Cartas de días anteriores")}</p>
+        <p className="text-sm text-texto-suave">{t("Juégalas como práctica: no cuentan para la racha, pero sí te enseñan las cartas.")}</p>
       </div>
       <div className="flex flex-wrap gap-2">
         {dias.map((n) => {
@@ -1374,7 +1419,7 @@ function DiasAnteriores({ numeroHoy, actual, progreso }: { numeroHoy: number; ac
           const marca = termino ? (gano ? "✓" : "✗") : intentos.length ? "…" : "";
           const clase = `rounded-lg border px-3 py-1.5 text-sm ${n === actual ? "border-oro bg-oro/15" : "border-borde bg-superficie-2"}`;
           return real && termino ? (
-            <span key={n} className={`${clase} opacity-60`} title="La jugaste ese día">
+            <span key={n} className={`${clase} opacity-60`} title={t("La jugaste ese día")}>
               #{n} {marca}
             </span>
           ) : (

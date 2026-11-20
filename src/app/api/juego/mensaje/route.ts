@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { esSigno, mensajeParaSigno, signoDeFecha } from "@/lib/juego/lectura";
+import { esIdioma } from "@/lib/i18n/idiomas";
 
 export const maxDuration = 60;
 
@@ -10,6 +11,8 @@ export const maxDuration = 60;
  */
 export async function GET(request: NextRequest) {
   let signo = request.nextUrl.searchParams.get("signo");
+  const pedido = request.nextUrl.searchParams.get("idioma");
+  const idioma = esIdioma(pedido) ? pedido : "es";
   if (!esSigno(signo)) {
     const supabase = await createClient();
     const {
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
   }
   if (!esSigno(signo)) return Response.json({ error: "signo" }, { status: 400 });
   try {
-    return Response.json(await mensajeParaSigno(signo), { headers: { "Cache-Control": "private, max-age=600" } });
+    return Response.json(await mensajeParaSigno(signo, idioma), { headers: { "Cache-Control": "private, max-age=600" } });
   } catch {
     return Response.json({ error: "mensaje" }, { status: 500 });
   }
