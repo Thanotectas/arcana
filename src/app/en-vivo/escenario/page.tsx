@@ -33,7 +33,8 @@ export default async function PaginaEscenario({ searchParams }: { searchParams: 
       video = null;
     }
   }
-  // ?formato=vertical: 1080×1920 para TikTok LIVE; &camara=grande: la cámara del presentador arriba y Sibila en un círculo;
+  // ?formato=vertical: 1080×1920 para TikTok LIVE; &camara=grande: la cámara del presentador arriba y Sibila en un círculo
+  // (&camara=completa: la cámara ocupa la mitad de arriba y la lectura va compacta debajo);
   // &espejo=1: no toma consultas, repite lo que muestra y dice el escenario principal (para transmitir a dos plataformas).
-  return <EscenarioEnVivo clave={clave as string} qr={qr} retrato={retrato} video={video} vertical={formato === "vertical"} camaraGrande={camara === "grande"} espejo={espejo === "1"} />;
+  return <EscenarioEnVivo clave={clave as string} qr={qr} retrato={retrato} video={video} vertical={formato === "vertical"} camaraGrande={camara === "grande"} camaraCompleta={camara === "completa"} espejo={espejo === "1"} />;
 }

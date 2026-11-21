@@ -171,7 +171,27 @@ type EventoEspejo =
   | { t: "pausa"; on: boolean }
   | { t: "cierre"; estado: "abierto" | "despidiendo" | "fin" };
 
-export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = false, camaraGrande = false, espejo = false }: { clave: string; qr: string; retrato: string | null; video?: string | null; vertical?: boolean; camaraGrande?: boolean; espejo?: boolean }) {
+export function EscenarioEnVivo({
+  clave,
+  qr,
+  retrato,
+  video = null,
+  vertical = false,
+  camaraGrande = false,
+  camaraCompleta = false,
+  espejo = false,
+}: {
+  clave: string;
+  qr: string;
+  retrato: string | null;
+  video?: string | null;
+  vertical?: boolean;
+  camaraGrande?: boolean;
+  /** Vertical con la cámara del presentador en la mitad de arriba (960×820) y la lectura de Sibila, compacta, debajo. */
+  camaraCompleta?: boolean;
+  espejo?: boolean;
+}) {
+  const xl = vertical && camaraCompleta;
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
   // los comentarios, solo lo secundario. Misma lógica (voz, fila, oráculos, relleno, cierre).
   const W = vertical ? 1080 : ANCHO;
@@ -543,7 +563,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
   const escena = retrato !== null;
   // Zona de la lectura: el tercio derecho en horizontal; todo el ancho en vertical.
-  const derecha = vertical ? "left-[110px] right-[110px]" : escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
+  const derecha = xl ? "left-[90px] right-[90px]" : vertical ? "left-[110px] right-[110px]" : escena ? "left-[1190px] right-[56px]" : "left-[700px] right-16";
   // Tamaños: en vertical se usan los de la escena (más compactos).
   const compacto = escena || vertical;
   const cartas = lectura?.cartas ?? [
@@ -570,7 +590,32 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
           background: "linear-gradient(180deg, #160d33 0%, #0b0716 75%)",
         }}
       >
-        {vertical && camaraGrande ? (
+        {xl ? (
+          <>
+            {/* Cámara completa: el presentador ocupa la mitad de arriba (960×820) y se ve que hay una persona en vivo;
+                Sibila lee desde un círculo abajo, con sus subtítulos, y las cartas van compactas entre los dos. */}
+            <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1400 }} nivel={nivel} modo="cielo" />
+            <div className="absolute left-[60px] right-[60px] top-[110px] h-[820px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
+              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] px-10 text-center text-3xl text-violeta-suave">
+                Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)
+              </div>
+              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> En vivo · mi mesa
+              </div>
+            </div>
+            <div className="absolute left-[60px] top-[1395px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
+              {escena ? (
+                <div className="absolute" style={{ left: -174, top: -64, width: 792, height: 445 }}>
+                  <RetratoSibila nivel={nivel} version={retrato ?? ""} video={video} />
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <RostroSibila tamano={130} nivel={nivel} />
+                </div>
+              )}
+            </div>
+          </>
+        ) : vertical && camaraGrande ? (
           <>
             {/* Cámara grande: TikTok marca como «contenido pregrabado» un LIVE donde la persona ocupa un rincón. Aquí la
                 cámara del presentador es lo principal (arriba, 860×484) y Sibila habla desde un círculo junto a sus subtítulos. */}
@@ -698,12 +743,12 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {/* «La carta escondida»: tapa la pregunta y las cartas mientras dura el juego */}
         {juego && cierre === "abierto" && (
-          <div className={`absolute ${derecha} z-10 flex flex-col rounded-3xl border border-oro/40 bg-[#0d0820]/95 aparecer ${vertical ? "top-[640px] h-[860px] p-8" : escena ? "top-[110px] h-[640px] p-7" : "top-[170px] h-[720px] p-9"}`}>
+          <div className={`absolute ${derecha} z-10 flex flex-col rounded-3xl border border-oro/40 bg-[#0d0820]/95 aparecer ${xl ? "top-[945px] h-[590px] overflow-hidden p-6" : vertical ? "top-[640px] h-[860px] p-8" : escena ? "top-[110px] h-[640px] p-7" : "top-[170px] h-[720px] p-9"}`}>
             <p className="text-2xl uppercase tracking-[0.25em] text-violeta-suave">🃏 La carta escondida</p>
             <p className={`mt-1 font-display leading-tight text-oro-suave ${compacto ? "text-[40px]" : "text-[48px]"}`}>
               {juego.carta ? (juego.ganador ? `¡${juego.ganador} la encontró!` : "Se escondió muy bien…") : "¿Cuál es? Escríbela en el chat"}
             </p>
-            <div className={`mt-5 flex flex-1 gap-8 ${vertical ? "flex-col items-center" : ""}`}>
+            <div className={`mt-5 flex flex-1 gap-8 ${vertical && !xl ? "flex-col items-center" : ""}`}>
               <div className={`relative shrink-0 ${compacto ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200 }}>
                 <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: juego.carta ? "rotateY(180deg)" : "none" }}>
                   <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70 vivo-carta" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
@@ -730,7 +775,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         )}
 
         {/* Pregunta */}
-        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/55 aparecer ${vertical ? "top-[650px] px-7 py-4" : escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
+        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/55 aparecer ${xl ? "top-[950px] px-6 py-3" : vertical ? "top-[650px] px-7 py-4" : escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
           {cierre !== "abierto" ? (
             <>
               <p className="text-2xl text-violeta-suave">Se acabó el tiempo por esta noche</p>
@@ -755,14 +800,17 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {/* Lo que se lee: cartas, foto, aura, número o signo (al cerrar, la invitación a suscribirse) */}
         {cierre !== "abierto" ? (
-          <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${vertical ? "top-[800px] h-[420px]" : escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
+          <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${xl ? "top-[1090px] h-[300px]" : vertical ? "top-[800px] h-[420px]" : escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
             <Bell className={`text-oro-suave vivo-campana ${compacto ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
             <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>{vertical ? "Sígueme y activa las notificaciones" : "Suscríbete y activa la campanita"}</p>
             <p className={`text-texto ${compacto ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
             <p className={`text-violeta-suave ${compacto ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
           </div>
         ) : !lectura || (Boolean(lectura.cartas?.length) && !lectura.grafico) ? (
-        <div className={`absolute ${derecha} flex justify-center ${vertical ? "top-[800px] gap-6" : escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}>
+        <div
+          className={`absolute ${derecha} flex justify-center ${xl ? "top-[1100px] gap-6" : vertical ? "top-[800px] gap-6" : escena ? "top-[330px] gap-6" : "top-[400px] gap-12"}`}
+          style={xl ? { transform: "scale(0.6)", transformOrigin: "top center" } : undefined}
+        >
           {cartas.map((c, i) => {
             const visible = Boolean(lectura && c.id && volteadas > i);
             return (
@@ -792,11 +840,11 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         </div>
         ) : lectura.grafico ? (
           // Carta astral, sinastría o cielo del horóscopo: se dibuja a tamaño completo.
-          <div className={`absolute ${derecha} flex justify-center ${vertical ? "top-[790px]" : escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
-            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={vertical ? 470 : escena ? 440 : 520} />
+          <div className={`absolute ${derecha} flex justify-center ${xl ? "top-[1090px]" : vertical ? "top-[790px]" : escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
+            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={xl ? 290 : vertical ? 470 : escena ? 440 : 520} />
           </div>
         ) : (
-          <div className={`absolute ${derecha} flex items-center justify-center ${vertical ? "top-[790px] h-[460px]" : escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: compacto ? "scale(0.82)" : undefined }}>
+          <div className={`absolute ${derecha} flex items-center justify-center ${xl ? "top-[1030px] h-[420px]" : vertical ? "top-[790px] h-[460px]" : escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: xl ? "scale(0.62)" : compacto ? "scale(0.82)" : undefined }}>
             {(tipo === "chocolate" || tipo === "mano" || tipo === "huevo") && lectura.imagen && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={lectura.imagen} alt="" className="h-[440px] max-w-[720px] rounded-3xl border-4 border-oro/70 object-cover shadow-[0_30px_80px_rgba(0,0,0,0.6)]" />
@@ -865,8 +913,8 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
 
         {/* Subtítulos */}
         {!(cierre === "fin" && !subtitulo) && (
-        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${vertical ? `${camaraGrande ? "left-[262px]" : "left-[100px]"} right-[100px] top-[1275px] bg-black/60` : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
-          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
+        <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${xl ? "left-[230px] right-[60px] top-[1395px] bg-black/60" : vertical ? `${camaraGrande ? "left-[262px]" : "left-[100px]"} right-[100px] top-[1275px] bg-black/60` : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
+          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${xl ? "text-[30px]" : compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
         )}
 
@@ -895,7 +943,7 @@ export function EscenarioEnVivo({ clave, qr, retrato, video = null, vertical = f
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
         {sinVoz && <div className="absolute left-16 top-[130px] rounded-full bg-red-900/80 px-5 py-2 text-lg text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
         {pausa && (
-          <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-full border border-oro/50 bg-black/70 px-6 py-2 text-2xl text-oro-suave ${vertical ? "top-[1200px]" : "bottom-[200px]"}`}>
+          <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-full border border-oro/50 bg-black/70 px-6 py-2 text-2xl text-oro-suave ${xl ? "top-[880px]" : vertical ? "top-[1200px]" : "bottom-[200px]"}`}>
             <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> Un momento: te hablan desde la mesa
           </div>
         )}
