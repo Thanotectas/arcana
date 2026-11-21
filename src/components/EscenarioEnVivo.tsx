@@ -54,7 +54,7 @@ type Respuesta =
   | Juego
   | JuegoEstado
   | JuegoFin
-  | { clase: "espera" }
+  | { clase: "espera"; motivo?: string | null }
   | { clase: "fin" }
   | { clase: "pausa" }
   | { clase: "ok" }
@@ -290,6 +290,8 @@ export function EscenarioEnVivo({
   const [nivel, setNivel] = useState(0);
   const [bloqueado, setBloqueado] = useState(false);
   const [aviso, setAviso] = useState("");
+  /** Hay gente en la fila pero no sale lectura: el motivo que manda el servidor (tope del día, error…). */
+  const [motivo, setMotivo] = useState<string | null>(null);
   const [sinVoz, setSinVoz] = useState(false);
   const [pausa, setPausa] = useState(false);
   const [cierre, setCierre] = useState<"abierto" | "despidiendo" | "fin">("abierto");
@@ -629,6 +631,7 @@ export function EscenarioEnVivo({
           setJuego(null);
           continue;
         }
+        setMotivo(r?.clase === "espera" ? (r.motivo ?? null) : null);
         if (r?.clase === "lectura") {
           quietos = 0;
           setSinVoz(!r.audio);
@@ -1037,6 +1040,7 @@ export function EscenarioEnVivo({
         )}
 
         {aviso && <div className="absolute inset-x-0 top-1/2 mx-auto w-fit rounded-2xl bg-red-900/90 px-8 py-5 text-3xl">{aviso}</div>}
+        {motivo && <div className={`absolute inset-x-0 z-30 mx-auto w-fit max-w-[860px] rounded-2xl bg-red-900/90 px-6 py-3 text-center text-xl text-red-50 ${vertical ? "bottom-[150px]" : "bottom-[140px]"}`}>⚠ {motivo}</div>}
         {sinVoz && <div className="absolute left-16 top-[130px] rounded-full bg-red-900/80 px-5 py-2 text-lg text-red-100">Esta lectura llegó sin voz (ElevenLabs): revisa «Probar la voz» en /admin/redes</div>}
         {pausa && (
           <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-full border border-oro/50 bg-black/70 px-6 py-2 text-2xl text-oro-suave ${xl ? "top-[880px]" : vertical ? "top-[1200px]" : "bottom-[200px]"}`}>

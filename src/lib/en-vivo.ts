@@ -504,6 +504,20 @@ async function limpiarFotos(admin: Admin) {
 }
 
 /** Toma la siguiente consulta de la cola (primero las agregadas a mano, luego fotos y chat) y la lee. */
+/**
+ * Si hay consultas en la fila y aun así no salió lectura, por qué (para que el escenario lo diga en pantalla).
+ * null si la fila está vacía.
+ */
+export async function porQueNoLee(admin: Admin): Promise<string | null> {
+  const { count: pendientes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
+  if (!pendientes) return null;
+  const inicioDia = new Date(new Date().toISOString().slice(0, 10) + "T05:00:00Z");
+  if (inicioDia.getTime() > Date.now()) inicioDia.setUTCDate(inicioDia.getUTCDate() - 1);
+  const { count: leidas } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "leida").gte("leida_en", inicioDia.toISOString());
+  if ((leidas ?? 0) >= maximoDiario()) return `Hay ${pendientes} en la fila, pero se llegó al tope de hoy (${leidas} de ${maximoDiario()}). Súbelo con EN_VIVO_MAX en Vercel.`;
+  return `Hay ${pendientes} en la fila y no se pudo leer. Mira «Últimas lecturas» en el panel.`;
+}
+
 export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | null> {
   const inicioDia = new Date(new Date().toISOString().slice(0, 10) + "T05:00:00Z"); // medianoche de Bogotá
   if (inicioDia.getTime() > Date.now()) inicioDia.setUTCDate(inicioDia.getUTCDate() - 1);
