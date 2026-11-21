@@ -56,6 +56,10 @@ export default async function PaginaProbador({ searchParams }: { searchParams: P
           ) : (
             <p className="text-sm text-texto-suave">El enlace te llega por correo en unas horas.</p>
           )}
+          <p className="text-sm text-texto-suave">
+            Para que Google apruebe la app, ábrela <strong className="text-oro-suave">cada día durante 14 días</strong> (la carta escondida del juego toma un minuto), no la
+            desinstales en ese tiempo y cuéntame qué mejorarías con el botón «Tu opinión» que está dentro de la app. 💜
+          </p>
         </div>
       ) : fila?.acepto_en || q.listo ? (
         <div className="tarjeta space-y-3 p-6 text-center">

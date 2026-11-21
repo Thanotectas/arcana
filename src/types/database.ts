@@ -576,6 +576,12 @@ export type Database = {
         Update: Partial<{ liga_id: string; usuario_id: string; unido_en: string }>;
         Relationships: [];
       };
+      app_opiniones: {
+        Row: { id: number; usuario_id: string | null; plataforma: string; calificacion: number | null; texto: string; pagina: string | null; atendida: boolean; creado_en: string };
+        Insert: { usuario_id?: string | null; plataforma: string; calificacion?: number | null; texto: string; pagina?: string | null; atendida?: boolean; creado_en?: string };
+        Update: Partial<{ usuario_id: string | null; plataforma: string; calificacion: number | null; texto: string; pagina: string | null; atendida: boolean; creado_en: string }>;
+        Relationships: [];
+      };
       juego_mensajes: {
         Row: { fecha: string; signo: string; carta: string; texto: string; creado_en: string };
         Insert: { fecha: string; signo: string; carta: string; texto: string; creado_en?: string };

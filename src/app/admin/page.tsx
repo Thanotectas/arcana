@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2 } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2, MessageSquareHeart } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
@@ -8,6 +8,7 @@ export const metadata: Metadata = { title: "Administración", robots: { index: f
 const HERRAMIENTAS = [
   { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes a las 7:00." },
   { href: "/admin/juego", icono: Gamepad2, titulo: "El Camino del Loco", texto: "Jugadores por día, cuántos vuelven, cuántos crean cuenta y cuántos compran lecturas después de jugar." },
+  { href: "/admin/opiniones", icono: MessageSquareHeart, titulo: "Opiniones de la app", texto: "Lo que escriben con el botón «Tu opinión» (probadores de Google Play): qué arreglar en cada versión." },
   { href: "/admin/app", icono: Smartphone, titulo: "App instalada", texto: "Cuántas personas instalaron Arcana y la abren desde el ícono, por sistema y por día, y cuántas juegan." },
   { href: "/admin/embudo", icono: Filter, titulo: "Embudo", texto: "De la visita al pago: qué parte de la gente llega a cada paso, por origen y por país, en 7, 30 o 90 días." },
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },

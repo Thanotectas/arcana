@@ -15,6 +15,7 @@ import { ContarVisita } from "@/components/ContarVisita";
 import { BannerInstalar } from "@/components/BannerInstalar";
 import { BienvenidaApp } from "@/components/BienvenidaApp";
 import { ContarApp } from "@/components/ContarApp";
+import { BotonOpinion } from "@/components/BotonOpinion";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const cormorant = Cormorant_Garamond({
@@ -51,6 +52,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
           <PiePagina />
           <AsistenteFlotante />
+          {/* En la app (Google Play o instalada): recoger opiniones para mejorar cada versión. */}
+          {plataforma !== "web" && <BotonOpinion />}
           {pixel && <MedicionAnuncios pixelId={pixel} textos={t.medicion} />}
         </ProveedorIdioma>
         {/* Visitas anónimas y sin cookies (Vercel Web Analytics). */}

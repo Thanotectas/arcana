@@ -3,7 +3,7 @@
  * Verificadores). Solo funciona con los Gmail que estén en la lista de verificadores. Vacío = aún no se ha pegado aquí:
  * la página /probador dice que el enlace llega por correo.
  */
-export const ENLACE_PRUEBA_PLAY = "";
+export const ENLACE_PRUEBA_PLAY = "https://play.google.com/apps/testing/com.miarcana.app";
 
 /** Créditos de regalo para quien prueba la app de Android (se cargan solos la primera vez que la abre con su cuenta). */
 export const CREDITOS_PROBADOR = 30;
