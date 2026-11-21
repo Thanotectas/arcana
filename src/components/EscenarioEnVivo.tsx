@@ -171,6 +171,93 @@ type EventoEspejo =
   | { t: "pausa"; on: boolean }
   | { t: "cierre"; estado: "abierto" | "despidiendo" | "fin" };
 
+/** #rrggbb con transparencia. */
+function conAlfa(hex: string, alfa: number) {
+  const n = Number.parseInt(hex.replace("#", ""), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, alfa)).toFixed(2)})`;
+}
+
+/** Chispas que salen del borde del marco hacia afuera (la cámara tapa el centro). */
+function ChispasMarco({ color, cantidad = 22 }: { color: string; cantidad?: number }) {
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      {Array.from({ length: cantidad }, (_, i) => {
+        // Un punto del perímetro (en %) y su dirección hacia afuera.
+        const lado = i % 4;
+        const t = ((i * 37) % 100) / 100;
+        const [left, top, dx, dy] = lado === 0 ? [t * 100, 0, (t - 0.5) * 60, -70] : lado === 1 ? [100, t * 100, 70, (t - 0.5) * 60] : lado === 2 ? [t * 100, 100, (t - 0.5) * 60, 70] : [0, t * 100, -70, (t - 0.5) * 60];
+        return (
+          <span
+            key={i}
+            className="particula absolute"
+            style={{ left: `${left}%`, top: `${top}%`, color, fontSize: 18 + (i % 3) * 10, animationDelay: `${(i % 5) * 0.06}s`, "--x": `${dx}px`, "--y": `${dy}px` } as React.CSSProperties}
+          >
+            {i % 2 ? "✦" : "★"}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * El marco donde LIVE Studio pone la cámara del presentador. Como la cámara tapa el centro, los efectos van en el
+ * borde y por fuera: un halo que respira con la voz de Sibila, una luz que recorre el borde mientras lee, un
+ * destello al empezar cada lectura, chispas al voltear cada carta y al ganar el juego, y el color del aura.
+ */
+function MarcoCamara({
+  posicion,
+  etiqueta,
+  nivel,
+  lectura,
+  volteadas,
+  ganador,
+  pequeno = false,
+  children,
+}: {
+  posicion: string;
+  etiqueta: string;
+  nivel: number;
+  lectura: Lectura | null;
+  volteadas: number;
+  ganador: string | null;
+  pequeno?: boolean;
+  children: React.ReactNode;
+}) {
+  const color = lectura?.tipo === "aura" ? (COLOR_AURA[lectura.color ?? "violeta"] ?? "#8b6cf6") : "#f1d99a";
+  return (
+    <div className={`absolute ${posicion}`}>
+      {/* Halo exterior: respira con la voz de Sibila. */}
+      <div className="pointer-events-none absolute -inset-2 rounded-[22px]" style={{ boxShadow: `0 0 ${28 + nivel * 110}px ${conAlfa(color, 0.3 + nivel * 0.55)}`, transition: "box-shadow 90ms linear" }} />
+      <div className="absolute inset-0 rounded-2xl border-2 bg-black/80 p-[6px]" style={{ borderColor: conAlfa(color, 0.8) }}>
+        <div className={`flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] px-8 text-center text-violeta-suave ${pequeno ? "text-lg" : "text-3xl"}`}>{children}</div>
+      </div>
+      {/* Luz que recorre el borde mientras Sibila lee. */}
+      {lectura && <div className="marco-luz pointer-events-none absolute -inset-[5px] rounded-[20px]" style={{ "--marco-color": color } as React.CSSProperties} />}
+      {/* Destello al empezar cada lectura. */}
+      {lectura && <div key={`destello-${lectura.id}`} className="marco-destello pointer-events-none absolute -inset-3 rounded-[26px] border-4" style={{ borderColor: color }} />}
+      {/* Chispas al voltear cada carta y al ganar «La carta escondida». */}
+      {lectura && volteadas > 0 && <ChispasMarco key={`chispas-${lectura.id}-${volteadas}`} color={color} cantidad={pequeno ? 12 : 22} />}
+      {ganador && <ChispasMarco key={`gana-${ganador}`} color="#f1d99a" cantidad={pequeno ? 16 : 36} />}
+      {/* Estrellas en las esquinas. */}
+      {!pequeno &&
+        (["-left-4 -top-4", "-right-4 -top-4", "-bottom-4 -left-4", "-bottom-4 -right-4"] as const).map((pos, i) => (
+          <span key={pos} className={`pointer-events-none absolute ${pos} vivo-girar text-3xl`} style={{ color, animationDuration: `${14 + i * 3}s`, textShadow: `0 0 14px ${conAlfa(color, 0.9)}` }} aria-hidden>
+            ✦
+          </span>
+        ))}
+      <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> {etiqueta}
+      </div>
+      {lectura && !pequeno && (
+        <div key={`para-${lectura.id}`} className="aparecer absolute -top-5 right-6 max-w-[60%] truncate rounded-full border px-4 py-1 text-xl text-texto" style={{ borderColor: conAlfa(color, 0.8), background: "rgba(22,13,51,0.95)", boxShadow: `0 0 18px ${conAlfa(color, 0.5)}` }}>
+          ✦ Sibila lee para <span className="text-oro-suave">{lectura.autor}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function EscenarioEnVivo({
   clave,
   qr,
@@ -595,14 +682,9 @@ export function EscenarioEnVivo({
             {/* Cámara completa: el presentador ocupa la mitad de arriba (960×820) y se ve que hay una persona en vivo;
                 Sibila lee desde un círculo abajo, con sus subtítulos, y las cartas van compactas entre los dos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1400 }} nivel={nivel} modo="cielo" />
-            <div className="absolute left-[60px] right-[60px] top-[110px] h-[820px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
-              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] px-10 text-center text-3xl text-violeta-suave">
-                Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)
-              </div>
-              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> En vivo · mi mesa
-              </div>
-            </div>
+            <MarcoCamara posicion="left-[60px] right-[60px] top-[110px] h-[820px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
+              Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)
+            </MarcoCamara>
             <div className="absolute left-[60px] top-[1395px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
               {escena ? (
                 <div className="absolute" style={{ left: -174, top: -64, width: 792, height: 445 }}>
@@ -620,12 +702,9 @@ export function EscenarioEnVivo({
             {/* Cámara grande: TikTok marca como «contenido pregrabado» un LIVE donde la persona ocupa un rincón. Aquí la
                 cámara del presentador es lo principal (arriba, 860×484) y Sibila habla desde un círculo junto a sus subtítulos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1330 }} nivel={nivel} modo="cielo" />
-            <div className="absolute left-[110px] right-[110px] top-[118px] h-[484px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
-              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] text-center text-2xl text-violeta-suave">Aquí va tu cámara (ponla encima, del mismo tamaño)</div>
-              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> En vivo · mi mesa
-              </div>
-            </div>
+            <MarcoCamara posicion="left-[110px] right-[110px] top-[118px] h-[484px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
+              Aquí va tu cámara (ponla encima, del mismo tamaño)
+            </MarcoCamara>
             <div className="absolute left-[96px] top-[1262px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
               {escena ? (
                 <div className="absolute" style={{ left: -174, top: -64, width: 792, height: 445 }}>
@@ -658,12 +737,9 @@ export function EscenarioEnVivo({
             {/* Todo lo importante queda entre x 110 y 970: en celulares altos (19,5:9) TikTok recorta ~96 px por lado. */}
             {/* La mesa en vivo: recuadro (16:9) donde LIVE Studio pone, encima, la cámara de las manos, la vela y la baraja.
                 TikTok castiga como «pregrabado» un LIVE sin nada en tiempo real; así se ve que hay alguien, sin mostrar la cara. */}
-            <div className="absolute right-[110px] top-[400px] h-[214px] w-[380px] rounded-2xl border-2 border-oro/70 bg-black/80 p-[6px]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.25)" }}>
-              <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] text-center text-lg text-violeta-suave">Aquí va la cámara de la mesa</div>
-              <div className="absolute -top-4 left-4 flex items-center gap-2 rounded-full border border-oro/60 bg-[#160d33] px-3 py-0.5 text-sm uppercase tracking-[0.2em] text-oro-suave">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> Mi mesa · en vivo
-              </div>
-            </div>
+            <MarcoCamara posicion="right-[110px] top-[400px] h-[214px] w-[380px]" etiqueta="Mi mesa · en vivo" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null} pequeno>
+              Aquí va la cámara de la mesa
+            </MarcoCamara>
           </>
         ) : (
           <>
