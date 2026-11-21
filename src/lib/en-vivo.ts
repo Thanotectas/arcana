@@ -751,9 +751,32 @@ async function vozGuardada(admin: Admin, texto: string): Promise<string | null> 
   }
 }
 
-export async function audioPuente(admin: Admin, i: number) {
-  const codigo = await codigoVigente(admin).catch(() => null);
-  const frases = frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
+/**
+ * Frases de espera para TikTok: TikTok restringe los LIVE que mandan gente fuera de la app, así que aquí no se
+ * nombran páginas, códigos, grupos ni otras redes. Mismo número de frases que frasesPuente.
+ */
+export function frasesPuenteTikTok() {
+  return [
+    "Bienvenidas, bienvenidos. Soy Sibila. Esta noche tú eliges: tu carta astral dibujada en vivo, tu sinastría con alguien especial, o una pregunta para las cartas. Escríbelo en los comentarios.",
+    "¿Quieres ver tu carta astral dibujada aquí, planeta por planeta? Escribe carta astral, tu fecha de nacimiento, la hora y la ciudad donde naciste.",
+    "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos.",
+    "Mientras llega la siguiente pregunta, cuéntame en los comentarios tu signo: quiero saber quién me acompaña esta noche.",
+    "No necesitas saber nada de astrología: solo tu fecha, tu hora y tu ciudad. Escribe carta astral y mira cómo aparece tu cielo en la pantalla.",
+    "Si te gusta este espacio, sígueme y activa las notificaciones: así te aviso cada vez que vuelva a leer en vivo.",
+    "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
+    "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
+    "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha.",
+    "Comparte este directo con alguien que necesite una señal hoy: entre más seamos, más preguntas leemos juntos.",
+    "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
+    "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",
+    "¿Una pregunta de sí o no? Escribe péndulo y tu pregunta. Y si quieres un consejo más hondo, escribe I Ching, runas o baraja española. Escríbeme en tu idioma: yo te leo en el tuyo.",
+    "Gracias por los corazones y por quedarte. Cada pregunta que escribes me ayuda a leer mejor para todos.",
+  ].slice(0, FRASES_PUENTE);
+}
+
+export async function audioPuente(admin: Admin, i: number, tiktok = false) {
+  const codigo = tiktok ? null : await codigoVigente(admin).catch(() => null);
+  const frases = tiktok ? frasesPuenteTikTok() : frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
   const texto = frases[((i % frases.length) + frases.length) % frases.length];
   return { texto, audio: await vozGuardada(admin, texto) };
 }
@@ -775,8 +798,14 @@ export function frasesCierre() {
   ];
 }
 
-export async function audioCierre(admin: Admin, i: number) {
-  const frases = frasesCierre();
+export async function audioCierre(admin: Admin, i: number, tiktok = false) {
+  const frases = tiktok
+    ? [
+        "La lectura en vivo de esta noche terminó. Gracias por acompañarme y por cada pregunta.",
+        "Pronto vuelvo a leer en vivo. Sígueme y activa las notificaciones, para que te avise cuando empiece.",
+        "Que esta semana te encuentre con la mente clara y el corazón abierto. Nos vemos en el próximo directo.",
+      ]
+    : frasesCierre();
   const texto = frases[((i % frases.length) + frases.length) % frases.length];
   return { texto, audio: await vozGuardada(admin, texto) };
 }

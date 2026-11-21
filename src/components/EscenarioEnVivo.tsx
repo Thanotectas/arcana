@@ -313,7 +313,8 @@ export function EscenarioEnVivo({
   const pedir = useCallback(
     async (modo: "lectura" | "puente" | "relleno" | "cierre" | "estado" | "juego-estado" | "juego-fin", i = 0): Promise<Respuesta | null> => {
       try {
-        const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
+        // En vertical (TikTok) Sibila no nombra páginas, códigos ni otras redes: TikTok restringe los LIVE que sacan gente de la app.
+        const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}${vertical ? "&tiktok=1" : ""}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
         if (res.status === 401) {
           setAviso("Clave del escenario inválida: copia otra vez la dirección desde /admin/en-vivo.");
           return null;
@@ -323,7 +324,7 @@ export function EscenarioEnVivo({
         return null;
       }
     },
-    [clave],
+    [clave, vertical],
   );
 
   // El principal publica cada paso para el espejo (sin esperar: si falla, el principal sigue igual).
@@ -375,11 +376,23 @@ export function EscenarioEnVivo({
       analizador.connect(contexto.current.destination);
       if (contexto.current.state === "suspended") await contexto.current.resume().catch(() => null);
       if (contexto.current.state === "suspended") {
-        // El navegador exige un clic antes de sonar (en OBS no pasa).
+        // El navegador exige un clic antes de sonar (en OBS no pasa). Se espera un rato; si nadie toca (LIVE Studio no
+        // deja hacer clic), Sibila sigue con subtítulos y sin voz en vez de quedarse quieta para siempre.
         setBloqueado(true);
-        await new Promise<void>((r) => (desbloquear.current = r));
+        const tocado = await Promise.race([new Promise<boolean>((r) => (desbloquear.current = () => r(true))), esperar(8000).then(() => false)]);
         setBloqueado(false);
-        await contexto.current.resume().catch(() => null);
+        if (tocado) await contexto.current.resume().catch(() => null);
+        else {
+          desbloquear.current = null;
+          setSinVoz(true);
+          const duracion = Math.max(4000, (texto.split(/\s+/).length / 2.6) * 1000);
+          const inicio = Date.now();
+          while (Date.now() - inicio < duracion) {
+            setSubtitulo(fraseEn((Date.now() - inicio) / duracion));
+            await esperar(150);
+          }
+          return;
+        }
       }
     } catch {
       analizador = null;
@@ -402,10 +415,17 @@ export function EscenarioEnVivo({
           marco = requestAnimationFrame(latir);
         },
         async () => {
-          // El navegador bloqueó el sonido: se espera un clic (en OBS no pasa).
+          // El navegador bloqueó el sonido: se espera un clic un rato (en OBS no pasa); si no llega, se sigue sin voz.
           setBloqueado(true);
-          await new Promise<void>((r) => (desbloquear.current = r));
+          const tocado = await Promise.race([new Promise<boolean>((r) => (desbloquear.current = () => r(true))), esperar(8000).then(() => false)]);
           setBloqueado(false);
+          if (!tocado) {
+            desbloquear.current = null;
+            setSinVoz(true);
+            await esperar(Math.max(4000, (texto.split(/\s+/).length / 2.6) * 1000));
+            listo();
+            return;
+          }
           await contexto.current?.resume();
           elemento.play().then(() => (marco = requestAnimationFrame(latir)), () => listo());
         },

@@ -25,10 +25,10 @@ export async function GET(request: NextRequest) {
   const admin = getSupabaseAdmin();
   await latido(admin).catch(() => null);
   if (q.get("modo") === "puente") {
-    return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1")) }, { headers: { "Cache-Control": "no-store" } });
   }
   if (q.get("modo") === "cierre") {
-    return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0)) }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1")) }, { headers: { "Cache-Control": "no-store" } });
   }
   // «La carta escondida»: mientras Sibila da las pistas, el escenario pregunta si alguien ya la encontró
   // (?modo=juego-estado, que también lee el chat) y al final pide la revelación (?modo=juego-fin).
