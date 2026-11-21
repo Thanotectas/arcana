@@ -370,31 +370,17 @@ export function EscenarioEnVivo({
     const elemento = new Audio(`data:audio/mpeg;base64,${audio}`);
     let analizador: AnalyserNode | null = null;
     try {
+      // El medidor (para mover el círculo de Sibila) solo se usa si el AudioContext ya puede sonar. Si está suspendido
+      // (LIVE Studio y otras ventanas donde no se puede hacer clic), el audio va directo al elemento: así suena igual,
+      // porque conectarlo a un contexto suspendido lo dejaría mudo.
       contexto.current ??= new AudioContext();
-      const fuente = contexto.current.createMediaElementSource(elemento);
-      analizador = contexto.current.createAnalyser();
-      analizador.fftSize = 256;
-      fuente.connect(analizador);
-      analizador.connect(contexto.current.destination);
       if (contexto.current.state === "suspended") await contexto.current.resume().catch(() => null);
-      if (contexto.current.state === "suspended") {
-        // El navegador exige un clic antes de sonar (en OBS no pasa). Se espera un rato; si nadie toca (LIVE Studio no
-        // deja hacer clic), Sibila sigue con subtítulos y sin voz en vez de quedarse quieta para siempre.
-        setBloqueado(true);
-        const tocado = await Promise.race([new Promise<boolean>((r) => (desbloquear.current = () => r(true))), esperar(8000).then(() => false)]);
-        setBloqueado(false);
-        if (tocado) await contexto.current.resume().catch(() => null);
-        else {
-          desbloquear.current = null;
-          setSinVoz(true);
-          const duracion = Math.max(4000, (texto.split(/\s+/).length / 2.6) * 1000);
-          const inicio = Date.now();
-          while (Date.now() - inicio < duracion) {
-            setSubtitulo(fraseEn((Date.now() - inicio) / duracion));
-            await esperar(150);
-          }
-          return;
-        }
+      if (contexto.current.state === "running") {
+        const fuente = contexto.current.createMediaElementSource(elemento);
+        analizador = contexto.current.createAnalyser();
+        analizador.fftSize = 256;
+        fuente.connect(analizador);
+        analizador.connect(contexto.current.destination);
       }
     } catch {
       analizador = null;
@@ -405,7 +391,7 @@ export function EscenarioEnVivo({
       if (analizador) {
         analizador.getByteFrequencyData(datos);
         setNivel(Math.min(1, datos.reduce((s, v) => s + v, 0) / datos.length / 90));
-      }
+      } else setNivel(0.3 + Math.random() * 0.4);
       if (elemento.duration) setSubtitulo(fraseEn(elemento.currentTime / elemento.duration));
       marco = requestAnimationFrame(latir);
     };
