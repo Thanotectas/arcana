@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { accionCierre } from "@/lib/en-vivo-acciones";
 
 /** Parte de la pantalla donde está el chat, en fracciones (0 a 1) del ancho y el alto. */
 interface Region {
@@ -84,17 +85,20 @@ export function LectorPantalla({ children }: { children?: ReactNode }) {
   const [fila, setFila] = useState<Consulta[]>([]);
   const [ultima, setUltima] = useState<Consulta | null>(null);
   const [letra, setLetra] = useState(22);
+  const [estadoEscenario, setEstadoEscenario] = useState<{ cierre: string; escenario: boolean; motivo: string | null } | null>(null);
+  const [reabriendo, setReabriendo] = useState(false);
 
   // La fila y la última lectura de Sibila, cada 3 segundos.
   useEffect(() => {
     let vivo = true;
     const traer = () =>
       fetch("/api/en-vivo/pantalla", { cache: "no-store" })
-        .then((r) => (r.ok ? (r.json() as Promise<{ fila: Consulta[]; ultima: Consulta | null }>) : null))
+        .then((r) => (r.ok ? (r.json() as Promise<{ fila: Consulta[]; ultima: Consulta | null; cierre: string; escenario: boolean; motivo: string | null }>) : null))
         .then((d) => {
           if (!vivo || !d) return;
           setFila(d.fila);
           setUltima(d.ultima);
+          setEstadoEscenario({ cierre: d.cierre, escenario: d.escenario, motivo: d.motivo });
         })
         .catch(() => null);
     void traer();
@@ -215,8 +219,41 @@ export function LectorPantalla({ children }: { children?: ReactNode }) {
     ? { x: Math.min(arrastre.x0, arrastre.x1), y: Math.min(arrastre.y0, arrastre.y1), w: Math.abs(arrastre.x1 - arrastre.x0), h: Math.abs(arrastre.y1 - arrastre.y0) }
     : region;
 
+  async function reabrir() {
+    setReabriendo(true);
+    const fd = new FormData();
+    fd.set("hora", "23:59");
+    const r = await accionCierre({}, fd).catch(() => ({ error: "No se pudo." }));
+    anotar(r.error ? `No se pudo reabrir: ${r.error}` : "Directo reabierto hasta las 11:59 p. m. Si el escenario sigue en «Se acabó el tiempo», dale Actualizar en LIVE Studio.", r.error ? "error" : "info");
+    setReabriendo(false);
+  }
+
   return (
     <div className="space-y-4">
+      {estadoEscenario && (
+        <section
+          className={`space-y-2 rounded-xl border p-3 text-sm ${estadoEscenario.escenario && estadoEscenario.cierre === "abierto" && !estadoEscenario.motivo ? "border-emerald-500/50 bg-emerald-900/20" : "border-red-400/60 bg-red-900/30"}`}
+        >
+          <p>
+            <strong>Escenario:</strong>{" "}
+            {estadoEscenario.escenario ? "✅ conectado (LIVE Studio lo tiene abierto)" : "❌ no está abierto. En LIVE Studio agrega o actualiza la fuente del escenario (/en-vivo/escenario…)."}
+          </p>
+          <p>
+            <strong>Directo:</strong>{" "}
+            {estadoEscenario.cierre === "abierto"
+              ? "✅ abierto: Sibila lee la fila."
+              : estadoEscenario.cierre === "terminado"
+                ? "❌ cerrado («Se acabó el tiempo por esta noche»): Sibila no lee."
+                : "⚠️ llegó la hora de cierre: Sibila se está despidiendo."}
+          </p>
+          {estadoEscenario.cierre !== "abierto" && (
+            <button type="button" onClick={() => void reabrir()} disabled={reabriendo} className="boton boton-primario text-sm">
+              {reabriendo ? "Reabriendo…" : "🔓 Reabrir el directo (hasta las 11:59 p. m.)"}
+            </button>
+          )}
+          {estadoEscenario.motivo && <p className="text-red-200">⚠️ {estadoEscenario.motivo}</p>}
+        </section>
+      )}
       <section className="space-y-3 rounded-xl border border-oro/40 bg-superficie-2/60 p-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-2xl">Lo que está en pantalla</h2>

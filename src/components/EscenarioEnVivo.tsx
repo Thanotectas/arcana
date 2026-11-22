@@ -619,11 +619,14 @@ export function EscenarioEnVivo({
           await esperar(6000);
           continue;
         }
-        if (despedida && r) {
-          // Se corrió la hora de cierre en el panel: Sibila sigue leyendo.
-          despedida = false;
+        if (r) {
+          // Se corrió la hora de cierre en el panel: Sibila sigue leyendo (y la pantalla de despedida se quita siempre
+          // que llega cualquier otra respuesta, para que nunca tape una lectura).
+          if (despedida) {
+            despedida = false;
+            emitir({ t: "cierre", estado: "abierto" });
+          }
           setCierre("abierto");
-          emitir({ t: "cierre", estado: "abierto" });
         }
         if (r?.clase === "pausa") {
           // Habla el presentador: silencio, sin frases de espera.

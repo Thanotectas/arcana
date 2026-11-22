@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { encolarMensajes, faltaFecha } from "@/lib/en-vivo";
+import { encolarMensajes, escenarioActivo, estadoCierre, faltaFecha, porQueNoLee } from "@/lib/en-vivo";
 import { claveComentario, leerChatDePantalla } from "@/lib/en-vivo-pantalla";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,12 @@ export async function GET() {
     admin.from("en_vivo_preguntas").select("id, tipo, autor, texto, estado").in("estado", ["pendiente", "leyendo"]).order("creado_en").limit(30),
     admin.from("en_vivo_preguntas").select("id, tipo, autor, texto, lectura, leida_en").eq("estado", "leida").order("leida_en", { ascending: false }).limit(1).maybeSingle(),
   ]);
-  return NextResponse.json({ fila: (fila ?? []).map((f) => ({ ...f, esperaFecha: faltaFecha(f.tipo, f.texto) })), ultima: ultima ?? null }, { headers: { "Cache-Control": "no-store" } });
+  const [cierre, escenario, motivo] = await Promise.all([
+    estadoCierre(admin).catch(() => "abierto" as const),
+    escenarioActivo(admin).catch(() => false),
+    fila?.length ? porQueNoLee(admin).catch(() => null) : Promise.resolve(null),
+  ]);
+  return NextResponse.json({ fila: (fila ?? []).map((f) => ({ ...f, esperaFecha: faltaFecha(f.tipo, f.texto) })), ultima: ultima ?? null, cierre, escenario, motivo }, { headers: { "Cache-Control": "no-store" } });
 }
 
 /**
