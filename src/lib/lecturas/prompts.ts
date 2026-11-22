@@ -39,6 +39,8 @@ import { resumenRevolucion, type ResultadoRevolucion } from "../astro/revolucion
 import { resumenVidasPasadas, type ResultadoVidasPasadas } from "../astro/vidas-pasadas";
 import { resumenAkashicos, type EntradaAkashicos, type ResultadoAkashicos } from "../akashicos";
 
+import { PROMPTS_EXTERNOS } from "./externos";
+
 export interface LecturaParaPrompt {
   tipo: TipoLectura;
   entrada: unknown;
@@ -73,6 +75,18 @@ function anuncio(titulo = "## Lo que se anuncia") {
   return `${titulo} (de 3 a 5 predicciones concretas, cada una en un párrafo corto que empieza con el área en negrita —**Amor**, **Dinero y trabajo**, **Familia y amistades**, **Cambios y viajes**, **Tu energía**—; usa solo las áreas que tu lectura sostenga, nombra el símbolo de donde sale cada una y dale un plazo amplio)`;
 }
 
+/**
+ * Los sueños se leen distinto en cada cultura: además de la lectura simbólica general, Sibila usa los sentidos
+ * tradicionales que la persona reconoce en su idioma (sin dictámenes religiosos ni miedo).
+ */
+const TRADICION_SUENOS_IDIOMA: Partial<Record<Idioma, string>> = {
+  ar: "Tradición del lector: en el mundo árabe los sueños se leen con la tradición clásica de interpretación (los diccionarios de tafsir al-ahlam, como el atribuido a Ibn Sirin). Cuando un símbolo tenga allí un sentido conocido (agua, leche, miel, dientes, lluvia, serpiente, casarse, viajar), menciónalo como «en la tradición árabe de interpretación de sueños…», con respeto y sin dar dictámenes religiosos ni decir qué sueño viene de dónde. Nada de miedo.",
+  tr: "Tradición del lector: en Turquía los sueños se leen con la tradición del rüya tabiri (los sentidos populares turcos de cada símbolo: agua clara, dientes que caen, oro, serpiente, casarse, ver a un difunto). Cuando un símbolo tenga un sentido conocido allí, menciónalo («en el rüya tabiri…»), sin dictámenes religiosos ni miedo.",
+  id: "Tradición del lector: en Indonesia se usa mucho la tradición javanesa del primbon y los «arti mimpi» populares (dientes que caen, serpiente, agua, casarse, ver a un difunto). Cuando un símbolo tenga allí un sentido conocido, menciónalo como tradición («dalam primbon…»), con calma y sin anunciar desgracias.",
+  hi: "Tradición del lector: en India se conoce el swapna shastra (la tradición hindú de los sueños: el momento de la noche en que se sueña, animales, agua, templos, dientes, serpientes). Cuando un símbolo tenga allí un sentido conocido, menciónalo como tradición («स्वप्न शास्त्र के अनुसार…»), sin remedios, rituales pagados ni miedo.",
+  fr: "Tradición del lector: en el mundo francófono (Francia y África occidental) se reconocen la clave de los sueños europea y la lectura simbólica; en África occidental los sueños con antepasados y con agua tienen mucho peso. Menciónalo con respeto cuando aplique, sin miedo.",
+};
+
 function idiomaDe(entrada: Objeto): Idioma {
   return esIdioma(entrada.idioma) ? entrada.idioma : IDIOMA_PREDETERMINADO;
 }
@@ -82,6 +96,10 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
   const entrada = (l.entrada ?? {}) as Objeto;
   const resultado = (l.resultado ?? {}) as Objeto;
   const idioma = idiomaDe(entrada);
+
+  // Productos con módulo propio (kundli, weton, abjad, geomancia, Marsella, iskambil…).
+  const externo = PROMPTS_EXTERNOS[l.tipo];
+  if (externo) return externo(entrada, resultado, idioma);
 
   if (l.tipo in TIRADAS) {
     const tipo = l.tipo as TipoTirada;
@@ -307,18 +325,24 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const e = entrada as unknown as EntradaFoto;
     const imagen = await descargarPalma(e.foto);
     const esCafe = l.tipo === "cafe";
+    // Café: fotos extra de los lados y del plato (tradición turca: el plato también se lee).
+    const extras = esCafe ? (await Promise.all((e.fotosExtra ?? []).slice(0, 2).map((f) => descargarPalma(f)))).filter((x): x is NonNullable<typeof x> => Boolean(x)) : [];
+    const notaExtras = extras.length
+      ? `\n\nAdemás de la foto principal (el fondo de la taza) van ${extras.length} foto(s) más: los lados de la taza${extras.length > 1 ? " y el plato" : " o el plato"}. Léelas también: en la tradición turca (kahve falı) los lados hablan de lo que se acerca y el plato de cómo se resuelve; nómbralo en «Lo que veo en tu taza».`
+      : "";
     return {
       usuario: esCafe
         ? `Lee la borra del café de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenCafe(e)}\n\n` +
           `Estructura: ## Lo que veo en tu taza (recorrido concreto: zonas limpias y zonas de borra espesa, y cada figura que sí se distingue, con su posición: borde o fondo, lado del asa o enfrente, si sube o baja; al menos cinco elementos si la foto lo permite), ## Figura por figura (su sentido tradicional y lo que puede decir para esta persona), ## Cómo se relacionan (la historia que cuentan juntas), ## Lo que el café responde (la pregunta, o el mensaje del momento), ${anuncio("## Lo que el café anuncia")}, ## Un consejo para los próximos días. ` +
           `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer lo que nombras. Extensión: 800 a 1100 palabras.\n\n` +
-          instruccionFiguras(true)
+          instruccionFiguras(true) +
+          notaExtras
         : `Lee el huevo de esta limpia (foto adjunta del vaso). Mira la imagen con detalle antes de escribir.\n\n${resumenHuevo(e)}\n\n` +
           `Estructura: ## Lo que veo en el vaso (la yema, la clara, burbujas, hilos, manchas y figuras, con su posición: arriba, abajo, alrededor), ## Señal por señal (su sentido tradicional y lo que dice de tu energía), ## Lo que la limpia se llevó (lo que soltaste y cómo puedes sentirte en los próximos días), ${anuncio("## Lo que el huevo anuncia")}, ## Cómo cerrar la limpia (qué hacer con el agua y el huevo, y un gesto de protección sencillo para esta semana). ` +
           `Extensión: 600 a 850 palabras.\n\n` +
           INSTRUCCION_SENALES,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
-      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
+      opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: [...(imagen ? [imagen] : []), ...extras], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
     };
   }
 
@@ -414,7 +438,8 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         (e.recurrente ? "## Por qué vuelve (qué pide un sueño que se repite), " : "") +
         `## Lo que puede estar anunciando (dos o tres anuncios concretos que la tradición asocia a sus símbolos, con plazo amplio), ## Lo que te está diciendo (la síntesis: un mensaje claro y una pregunta para llevar al día). Extensión: 700 a 950 palabras.`,
       sistemaExtra:
-        "Interpretación de sueños: combina la lectura simbólica clásica (arquetipos junguianos, la tradición de los diccionarios de sueños, la mitología y los cuatro elementos) con el contexto de la persona. Habla de lo que la persona vive, teme o desea y, cuando la tradición le da a un símbolo sentido de anuncio (agua clara, dientes, boda, viaje, dinero, nacimiento), dilo como un anuncio probable y simbólico, nunca literal ni fatal. Nombra los símbolos concretos del relato, no generalidades. Si el sueño incluye violencia, muerte o pérdida, trátalo con calma: en los sueños suelen hablar de cambios y cierres, no de hechos. Si el relato sugiere angustia persistente, pesadillas repetidas o un trauma, sugiere con delicadeza hablar con un profesional de salud mental, sin diagnosticar. No inventes detalles que no estén en el relato.",
+        "Interpretación de sueños: combina la lectura simbólica clásica (arquetipos junguianos, la tradición de los diccionarios de sueños, la mitología y los cuatro elementos) con el contexto de la persona. Habla de lo que la persona vive, teme o desea y, cuando la tradición le da a un símbolo sentido de anuncio (agua clara, dientes, boda, viaje, dinero, nacimiento), dilo como un anuncio probable y simbólico, nunca literal ni fatal. Nombra los símbolos concretos del relato, no generalidades. Si el sueño incluye violencia, muerte o pérdida, trátalo con calma: en los sueños suelen hablar de cambios y cierres, no de hechos. Si el relato sugiere angustia persistente, pesadillas repetidas o un trauma, sugiere con delicadeza hablar con un profesional de salud mental, sin diagnosticar. No inventes detalles que no estén en el relato." +
+        (TRADICION_SUENOS_IDIOMA[idioma] ? `\n${TRADICION_SUENOS_IDIOMA[idioma]}` : ""),
       opciones: { idioma, effort: "medium", maxTokens: 3200 },
     };
   }

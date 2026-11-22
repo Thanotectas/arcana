@@ -11,7 +11,6 @@ import { calcularPerfil } from "../numerologia";
 import { signoPorFecha, signoPorId, compatibilidadSignos } from "../zodiaco";
 import { dimensionesCompatibilidad, planetasPorFecha } from "../astro/compatibilidad";
 import { getPerfil } from "../dal";
-import { getIdioma } from "../i18n/servidor";
 import { MAZOS, esMazo, type IdMazo } from "../tarot/mazos";
 import type { EntradaQuiromancia, Mano } from "../quiromancia";
 import { resolverHexagramas, hexagramaPorNumero, type ValorLinea } from "../iching";
@@ -36,82 +35,10 @@ import { calcularRevolucion } from "../astro/revolucion";
 import { calcularVidasPasadas } from "../astro/vidas-pasadas";
 import { PREGUNTA_MAX, PREGUNTA_MIN, calcularAkashicos, esTemaAkashico, type EntradaAkashicos } from "../akashicos";
 import { randomInt } from "node:crypto";
-import type { Json } from "@/types/database";
 import { tipoImagenReal, zonaHorariaValida } from "../seguridad";
+import { crearLectura, manejarError, usuarioActual, type EstadoAccion } from "./crear";
 
-export interface EstadoAccion {
-  error?: string;
-}
-
-async function usuarioActual() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/entrar");
-  return { supabase, user };
-}
-
-/**
- * Cobra la lectura y la guarda en estado 'pendiente'. La interpretación la
- * escribe después /api/lecturas/[id]/generar mientras la persona la ve.
- * Solo el servidor crea lecturas (la tabla no admite inserts de usuarios).
- */
-async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada: unknown; resultado: unknown }) {
-  const { supabase, user } = await usuarioActual();
-  const perfil = await getPerfil();
-  const idioma = await getIdioma();
-  const entrada = { ...(datos.entrada as Record<string, unknown>), idioma };
-  // Las cuentas ilimitadas pasan por el cobro (queda registro) sin pagar nada.
-  const costo = perfil?.ilimitado ? 0 : COSTOS[datos.tipo];
-  const costoTarifa = COSTOS[datos.tipo];
-  const referencia = `${datos.tipo}-${Date.now()}`;
-
-  if (costoTarifa > 0) {
-    const { data: ok, error } = await supabase.rpc("consumir_creditos", {
-      p_cantidad: costoTarifa,
-      p_motivo: `lectura:${datos.tipo}`,
-      p_referencia: referencia,
-    });
-    if (error) throw new Error("No se pudo procesar el cobro. Intenta de nuevo.");
-    if (!ok) throw new Error("SIN_CREDITOS");
-  }
-
-  const admin = getSupabaseAdmin();
-  const { data, error } = await admin
-    .from("lecturas")
-    .insert({
-      usuario_id: user.id,
-      tipo: datos.tipo,
-      titulo: datos.titulo,
-      entrada: entrada as Json,
-      resultado: datos.resultado as Json,
-      creditos_usados: costo,
-      estado: "pendiente",
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) {
-    if (costo > 0) {
-      await admin.rpc("devolver_creditos", { p_usuario: user.id, p_cantidad: costo, p_motivo: `reembolso:${datos.tipo}`, p_referencia: referencia });
-    }
-    throw new Error("No se pudo guardar la lectura. No se cobró nada.");
-  }
-
-  revalidatePath("/inicio");
-  revalidatePath("/lecturas");
-  return data.id as string;
-}
-
-function manejarError(e: unknown): EstadoAccion {
-  const msg = e instanceof Error ? e.message : "Ocurrió un error inesperado.";
-  if (msg === "SIN_CREDITOS") {
-    return { error: "SIN_CREDITOS" };
-  }
-  console.error("[lecturas]", e);
-  return { error: msg };
-}
+export type { EstadoAccion } from "./crear";
 
 // ---------------------------------------------------------------------------
 // Tarot: la persona elige posiciones del abanico; el servidor decide las cartas.
@@ -841,12 +768,25 @@ async function lecturaPorFoto(formData: FormData, tipo: "cafe" | "huevo", titulo
     console.error(`[${tipo}] subida fallida`, errorSubida);
     return { error: "FOTO_SUBIR" };
   }
+  // Café: hasta dos fotos más (los lados de la taza y el plato), opcionales; una que no sirva se ignora.
+  const extras: string[] = [];
+  if (tipo === "cafe") {
+    for (const campo of ["foto2", "foto3"]) {
+      const f = formData.get(campo);
+      if (!(f instanceof File) || f.size === 0 || !TIPOS_FOTO.has(f.type) || f.size > TAMANO_MAX_FOTO) continue;
+      if (tipoImagenReal(new Uint8Array(await f.slice(0, 16).arrayBuffer())) !== f.type) continue;
+      const ext = f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg";
+      const r = `${user.id}/${tipo}-${crypto.randomUUID()}.${ext}`;
+      const { error: e } = await admin.storage.from("palmas").upload(r, f, { contentType: f.type, upsert: false });
+      if (!e) extras.push(r);
+    }
+  }
   let id: string;
   try {
-    const entrada: EntradaFoto = { foto: ruta, pregunta };
+    const entrada: EntradaFoto = { foto: ruta, pregunta, ...(extras.length ? { fotosExtra: extras } : {}) };
     id = await crearLectura({ tipo, titulo: pregunta ? `${titulo}: ${pregunta}` : titulo, entrada, resultado: {} });
   } catch (e) {
-    await admin.storage.from("palmas").remove([ruta]);
+    await admin.storage.from("palmas").remove([ruta, ...extras]);
     return manejarError(e);
   }
   redirect(`/lecturas/${id}`);

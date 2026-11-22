@@ -29,7 +29,16 @@ export type TipoLectura =
   | "huevo"
   | "maya"
   | "vidas_pasadas"
-  | "akashicos";
+  | "akashicos"
+  // Productos para los mercados nuevos (cada uno con su módulo en src/lib/<producto>/):
+  | "kundli" // India: carta védica (sideral), nakshatras y dashas
+  | "kundli_milan" // India: compatibilidad de pareja por gunas (Ashtakoot)
+  | "weton" // Indonesia: weton javanés (Primbon)
+  | "weton_jodoh" // Indonesia: compatibilidad de pareja por weton
+  | "abjad" // mundo árabe: valor abjad del nombre
+  | "geomancia" // África y mundo árabe: geomancia de 16 figuras
+  | "marsella" // Francia: tarot de Marsella, tirada en cruz
+  | "iskambil"; // Turquía: lectura con la baraja francesa (iskambil falı)
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -58,6 +67,14 @@ export const COSTOS: Record<TipoLectura, number> = {
   maya: 2,
   vidas_pasadas: 4, // premium: carta kármica + numerología kármica + tres cartas
   akashicos: 3,
+  kundli: 5,
+  kundli_milan: 4,
+  weton: 2,
+  weton_jodoh: 3,
+  abjad: 2,
+  geomancia: 2,
+  marsella: 2,
+  iskambil: 2,
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -87,6 +104,14 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   maya: "Calendario maya",
   vidas_pasadas: "Tus vidas pasadas",
   akashicos: "Registros akáshicos",
+  kundli: "Kundli védica",
+  kundli_milan: "Kundli milan (compatibilidad védica)",
+  weton: "Weton javanés",
+  weton_jodoh: "Compatibilidad por weton",
+  abjad: "Numerología abjad",
+  geomancia: "Geomancia",
+  marsella: "Tarot de Marsella",
+  iskambil: "Iskambil falı (baraja francesa)",
 };
 
 /** Pregunta de seguimiento sobre una lectura. */

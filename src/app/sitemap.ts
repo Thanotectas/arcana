@@ -10,7 +10,7 @@ const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replac
 
 /** Mapa del sitio para Google: solo páginas públicas que se pueden leer sin cuenta. */
 /** Páginas cuyo contenido completo está en todos los idiomas: van también con su dirección por idioma (/fr/…). */
-const TRADUCIDAS = ["/", "/explorar", "/horoscopo", ...SIGNOS.map((s) => `/horoscopo/${s.id}`), "/luna", "/piedras", "/rituales", "/velas"];
+const TRADUCIDAS = ["/", "/explorar", "/horoscopo", ...SIGNOS.map((s) => `/horoscopo/${s.id}`), "/luna", "/piedras", "/rituales", "/velas", "/si-o-no", "/calculadora-ascendente", "/compatibilidad-nombres", "/numeros-angelicales", ..."000 111 222 333 444 555 666 777 888 999 0101 1001 1010 1111 1122 1144 1212 1221 1234 1313 1414 1515 2020 2121 2222 2323 3333 4444 5555 911".split(" ").map((n) => `/numeros-angelicales/${n}`)];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const url = (ruta: string, prioridad: number, frecuencia: MetadataRoute.Sitemap[number]["changeFrequency"] = "monthly") => ({
@@ -31,6 +31,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...SIGNOS.map((s) => url(`/horoscopo/${s.id}`, 0.8, "daily")),
     url("/luna", 0.8, "weekly"),
     url("/juego", 0.9, "daily"),
+    url("/si-o-no", 0.8, "weekly"),
+    url("/calculadora-ascendente", 0.8),
+    url("/compatibilidad-nombres", 0.7),
+    url("/numeros-angelicales", 0.8),
+    ...["000", "111", "222", "333", "444", "555", "666", "777", "888", "999", "1010", "1111", "1212", "1221", "1234", "1313", "1414", "1515", "2020", "2121", "2222", "0101", "1001", "1122", "1144", "2323", "3333", "4444", "5555", "911"].map((n) => url(`/numeros-angelicales/${n}`, 0.6)),
     url("/que-carta-eres", 0.9, "weekly"),
     ...Object.keys(RESULTADOS).map((c) => url(`/que-carta-eres/${c}`, 0.4)),
     url("/matriz-del-destino", 0.8),

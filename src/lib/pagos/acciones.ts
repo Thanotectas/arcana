@@ -8,7 +8,8 @@ import { nuevaReferencia, pagosConfigurados } from "./bold";
 import { crearCheckout, pagosInternacionalesConfigurados } from "./lemon";
 import { getSupabaseAdmin } from "../supabase/admin";
 import { comprasVisibles } from "../plataforma";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { precioUSDPara } from "./paridad";
 import { COOKIE_CODIGO, validarCodigo } from "./codigos";
 import { origenPendiente } from "../origen";
 
@@ -87,11 +88,13 @@ export async function accionComprarInternacional(formData: FormData) {
   const admin = getSupabaseAdmin();
   const { codigo, extra } = await (await extrasPorCodigo(paquete.id))(formData);
   const origen = (await origenPendiente())?.fuente;
+  // Precio ajustado al país de quien compra (India, Indonesia, África, Turquía…); el webhook valida este monto.
+  const monto = precioUSDPara(paquete.precioUSDCentavos, (await headers()).get("x-vercel-ip-country"));
   const { error } = await admin.from("ordenes").insert({
     usuario_id: user.id,
     paquete: paquete.id,
     creditos: paquete.creditos + extra,
-    monto_centavos: paquete.precioUSDCentavos,
+    monto_centavos: monto,
     moneda: "USD",
     referencia,
     estado: "pendiente",
@@ -105,7 +108,7 @@ export async function accionComprarInternacional(formData: FormData) {
 
   const { data: perfil } = await supabase.from("perfiles").select("nombre").eq("id", user.id).maybeSingle();
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
-  const url = await crearCheckout({ paquete: idPaquete, referencia, email: user.email, nombre: perfil?.nombre, urlRetorno: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}` });
+  const url = await crearCheckout({ paquete: idPaquete, referencia, email: user.email, nombre: perfil?.nombre, urlRetorno: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}`, precioCentavos: monto !== paquete.precioUSDCentavos ? monto : undefined });
   if (!url) {
     await admin.from("ordenes").update({ estado: "error" }).eq("referencia", referencia);
     redirect("/creditos?moneda=usd&error=checkout");

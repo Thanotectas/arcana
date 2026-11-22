@@ -51,7 +51,7 @@ export function varianteDe(paquete: string) {
 }
 
 /** Crea un checkout alojado y devuelve su URL. */
-export async function crearCheckout(opciones: { paquete: string; referencia: string; email: string; nombre?: string | null; urlRetorno: string }): Promise<string | null> {
+export async function crearCheckout(opciones: { paquete: string; referencia: string; email: string; nombre?: string | null; urlRetorno: string; precioCentavos?: number }): Promise<string | null> {
   const { apiKey, storeId } = lemonEnv();
   const variante = varianteDe(opciones.paquete);
   if (!apiKey || !storeId || !variante) return null;
@@ -67,6 +67,8 @@ export async function crearCheckout(opciones: { paquete: string; referencia: str
         checkout_options: { embed: false, media: false, logo: true, button_color: "#d9b45a" },
         product_options: { redirect_url: opciones.urlRetorno, receipt_button_text: "Volver a Arcana", receipt_link_url: opciones.urlRetorno },
         expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+        // Precio ajustado por país (paridad de poder adquisitivo); sin él, el precio de la variante.
+        ...(opciones.precioCentavos ? { custom_price: opciones.precioCentavos } : {}),
       },
       relationships: {
         store: { data: { type: "stores", id: storeId } },

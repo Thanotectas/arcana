@@ -43,6 +43,14 @@ const ICONO: Record<TipoLectura, string> = {
   vidas_pasadas: "∞",
   akashicos: "❖",
   maya: "◈",
+  kundli: "🕉",
+  kundli_milan: "💞",
+  weton: "🌙",
+  weton_jodoh: "💑",
+  abjad: "ء",
+  geomancia: "⚏",
+  marsella: "✦",
+  iskambil: "🂡",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

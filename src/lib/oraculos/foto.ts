@@ -6,6 +6,8 @@ import { datoDeUsuario } from "../seguridad";
  */
 export interface EntradaFoto {
   foto: string;
+  /** Café: fotos opcionales de los lados de la taza y del plato (así se lee en Turquía). */
+  fotosExtra?: string[];
   pregunta: string;
   idioma?: string;
 }

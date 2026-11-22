@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { requerirUsuario, getPerfil, getHaComprado, circuloActivo } from "@/lib/dal";
 import { Gift, ShieldCheck, Lock, Sparkles, Sunrise } from "lucide-react";
+import { precioUSDPara } from "@/lib/pagos/paridad";
 import { PAQUETES, PAQUETE_CIRCULO, PAQUETE_PRUEBA, OFERTA_FUNDADORES, CIRCULO, COSTOS, formatoCOP, formatoUSD, BONO_PRIMERA_COMPRA, precioCirculoPorDia, type TipoLectura } from "@/lib/creditos";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { CuentaRegresiva } from "@/components/CuentaRegresiva";
@@ -44,8 +45,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   const fuera = !internacional && pais !== "CO";
   // En pesos, debajo de cada precio va el aproximado en la moneda que elija la persona (o la de su país).
   // Fuera de Colombia el precio grande va en dólares (lo que entiende cualquier visitante) y debajo lo que se cobra en pesos.
+  // En dólares, el precio va ajustado al país (paridad de poder adquisitivo: India, Indonesia, África, Turquía…).
+  const usd = (centavos: number) => precioUSDPara(centavos, pais);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) =>
-    internacional ? formatoUSD(p.precioUSDCentavos) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={p.precioUSDCentavos} />;
+    internacional ? formatoUSD(usd(p.precioUSDCentavos)) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
     return (
@@ -57,7 +60,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
     );
   }
   const precioAstral = internacional || fuera
-    ? formatoUSD(Math.round((PAQUETES[1].precioUSDCentavos / PAQUETES[1].creditos) * COSTOS.carta_astral))
+    ? formatoUSD(Math.round((usd(PAQUETES[1].precioUSDCentavos) / PAQUETES[1].creditos) * COSTOS.carta_astral))
     : formatoCOP(Math.round((PAQUETES[1].precioCOP / PAQUETES[1].creditos) * COSTOS.carta_astral));
   const configurado = internacional ? internacionalDisponible : pagosConfigurados();
   const errores = t.creditos.errores as Record<string, string>;
@@ -133,7 +136,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
               <h2 className="font-display mt-1 text-2xl font-semibold">{textos?.nombre ?? p.nombre}</h2>
               <p className="mt-2 text-3xl font-semibold text-oro-suave">{precio(p)}</p>
               <p className="text-sm text-texto-suave">
-                {p.creditos} {t.comun.creditos} · {plantilla(t.creditos.porCredito, { precio: internacional || fuera ? formatoUSD(Math.round(p.precioUSDCentavos / p.creditos)) : formatoCOP(Math.round(porCredito)) })}
+                {p.creditos} {t.comun.creditos} · {plantilla(t.creditos.porCredito, { precio: internacional || fuera ? formatoUSD(Math.round(usd(p.precioUSDCentavos) / p.creditos)) : formatoCOP(Math.round(porCredito)) })}
               </p>
               <p className="mt-1 text-sm text-oro-suave">
                 {plantilla(t.persuasion.equivale, { texto: (t.persuasion.equivalencias as Record<string, string>)[p.id] ?? "" })}

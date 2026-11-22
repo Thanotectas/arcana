@@ -14,8 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Todos los productos de Arcana, por grupo, con su descripción y su costo. Pública. */
 export default async function PaginaExplorar() {
-  const [t, usuario] = await Promise.all([getT(), getUsuarioOpcional()]);
-  const items = catalogoConTextos(t, { conCuenta: true });
+  const [t, usuario, idioma] = await Promise.all([getT(), getUsuarioOpcional(), getIdioma()]);
+  const items = catalogoConTextos(t, { conCuenta: true, idioma });
   const grupos = t.nav.grupos as Record<GrupoCatalogo, string>;
   const descripciones = t.explorar.grupos as Record<GrupoCatalogo, string>;
   return (

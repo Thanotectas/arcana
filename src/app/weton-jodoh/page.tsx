@@ -1,0 +1,56 @@
+import type { Metadata } from "next";
+import { requerirUsuario, getPerfil } from "@/lib/dal";
+import { COSTOS } from "@/lib/creditos";
+import { accionWetonJodoh } from "@/lib/weton/acciones";
+import { textosWeton } from "@/lib/weton/textos";
+import { FormularioLectura } from "@/components/FormularioLectura";
+import { CamposWeton } from "@/components/weton/CamposWeton";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
+import { plantilla } from "@/lib/i18n/formato";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const tw = textosWeton(await getIdioma());
+  return { title: tw.tituloJodoh, description: tw.introJodoh };
+}
+
+export default async function PaginaWetonJodoh() {
+  await requerirUsuario();
+  const [perfil, t, idioma] = await Promise.all([getPerfil(), getT(), getIdioma()]);
+  const tw = textosWeton(idioma);
+  // Si el perfil ya tiene una hora de nacimiento de las 18:00 en adelante, la casilla del atardecer viene marcada.
+  const atardecer = (perfil?.hora_nacimiento ?? "").slice(0, 5) >= "18:00";
+  const campos = { fecha: tw.fecha, atardecer: tw.atardecer, atardecerAyuda: tw.atardecerAyuda, neptu: tw.neptu, wuku: tw.wuku };
+  return (
+    <div className="mx-auto max-w-3xl space-y-8">
+      <div>
+        <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{tw.seccion}</p>
+        <h1 className="font-display text-4xl font-semibold">{tw.tituloJodoh}</h1>
+        <p className="mt-2 text-texto-suave">
+          {tw.introJodoh} {perfil?.ilimitado ? t.comun.tuCuentaIlimitada : plantilla(t.comun.tienesCreditos, { n: perfil?.creditos ?? 0 })}
+        </p>
+      </div>
+      <div className="tarjeta p-6">
+        <FormularioLectura accion={accionWetonJodoh} textoBoton={plantilla(tw.calcularJodoh, { n: COSTOS.weton_jodoh })} textoCargando={tw.calculandoJodoh}>
+          <div className="grid gap-6 md:grid-cols-2">
+            <fieldset className="space-y-4">
+              <legend className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-violeta-suave">{tw.persona1}</legend>
+              <div>
+                <label className="etiqueta" htmlFor="nombre_a">{tw.nombrePareja}</label>
+                <input id="nombre_a" name="nombre_a" className="campo" defaultValue={perfil?.nombre ?? ""} required maxLength={80} />
+              </div>
+              <CamposWeton prefijo="_a" fechaInicial={perfil?.fecha_nacimiento ?? ""} atardecerInicial={atardecer} textos={campos} />
+            </fieldset>
+            <fieldset className="space-y-4">
+              <legend className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-violeta-suave">{tw.persona2}</legend>
+              <div>
+                <label className="etiqueta" htmlFor="nombre_b">{tw.nombrePareja}</label>
+                <input id="nombre_b" name="nombre_b" className="campo" required maxLength={80} />
+              </div>
+              <CamposWeton prefijo="_b" fechaInicial="" atardecerInicial={false} textos={campos} />
+            </fieldset>
+          </div>
+        </FormularioLectura>
+      </div>
+    </div>
+  );
+}

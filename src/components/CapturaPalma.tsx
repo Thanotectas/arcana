@@ -385,7 +385,7 @@ function luminanciaMedia(ctx: CanvasRenderingContext2D, w: number, h: number) {
   return n ? suma / n : 255;
 }
 
-async function reducirImagen(archivo: File): Promise<{ archivo: File; oscura: boolean }> {
+export async function reducirImagen(archivo: File): Promise<{ archivo: File; oscura: boolean }> {
   const bitmap = await createImageBitmap(archivo).catch(async () => {
     const img = new Image();
     img.src = URL.createObjectURL(archivo);

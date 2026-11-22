@@ -47,6 +47,14 @@ export const RUTAS: Record<TipoLectura, string> = {
   cafe: "/cafe",
   huevo: "/huevo",
   maya: "/calendario-maya",
+  kundli: "/kundli",
+  kundli_milan: "/kundli-milan",
+  weton: "/weton",
+  weton_jodoh: "/weton-jodoh",
+  abjad: "/abjad",
+  geomancia: "/geomancia",
+  marsella: "/tarot-marsella",
+  iskambil: "/iskambil",
 };
 
 /** Sistema para el chat: quién es, qué sabe de la persona y de la app. */

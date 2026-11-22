@@ -4,7 +4,7 @@ import { Logotipo } from "./Logo";
 import { getPerfil, getUsuarioOpcional } from "@/lib/dal";
 import { esAdmin } from "@/lib/admin";
 import { accionSalir } from "@/lib/auth/acciones";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { SelectorIdioma } from "./SelectorIdioma";
 import { comprasVisibles } from "@/lib/plataforma";
 import { catalogoConTextos, type GrupoCatalogo } from "@/lib/catalogo";
@@ -15,7 +15,7 @@ export async function Encabezado() {
   const [perfil, t, compras, usuario] = await Promise.all([getPerfil(), getT(), comprasVisibles(), getUsuarioOpcional()]);
   // Acceso visible a /admin solo para las cuentas administradoras.
   const admin = Boolean(perfil) && esAdmin(usuario?.email);
-  const items = catalogoConTextos(t, { conCuenta: Boolean(perfil) });
+  const items = catalogoConTextos(t, { conCuenta: Boolean(perfil), idioma: await getIdioma() });
   const grupos = t.nav.grupos as Record<GrupoCatalogo, string>;
   const directos = [
     ...(perfil ? [{ href: "/hoy", etiqueta: t.nav.hoy }] : []),

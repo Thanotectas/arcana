@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { createElement } from "react";
+import { VISTAS_EXTERNAS } from "@/components/vistas";
 import { AudioSibila } from "@/components/AudioSibila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -108,6 +110,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
       {lectura.tipo === "vidas_pasadas" && <VistaVidasPasadas resultado={lectura.resultado as unknown as ResultadoVidasPasadas} t={t} />}
       {lectura.tipo === "aura" && <VistaAura resultado={lectura.resultado as unknown as ResultadoAura} t={t} />}
       {lectura.tipo === "sinastria" && <VistaSinastria resultado={lectura.resultado as unknown as ResultadoSinastria} entrada={lectura.entrada as { a?: DatosNacimiento; b?: DatosNacimiento }} t={t} />}
+      {VISTAS_EXTERNAS[lectura.tipo] && createElement(VISTAS_EXTERNAS[lectura.tipo]!, { entrada: (lectura.entrada ?? {}) as Record<string, unknown>, resultado: (lectura.resultado ?? {}) as Record<string, unknown>, idioma })}
       {lectura.tipo === "suenos" && <VistaSueno entrada={lectura.entrada as unknown as EntradaSueno} resultado={lectura.resultado as unknown as ResultadoSueno} t={t} />}
 
       {esQuiromancia ? (
