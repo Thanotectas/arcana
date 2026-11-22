@@ -1,5 +1,6 @@
 import "server-only";
 import { manual } from "@/lib/conocimiento";
+import { esIdioma } from "@/lib/i18n/idiomas";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -73,18 +74,19 @@ async function api<T>(ruta: string, token: string): Promise<{ ok: boolean; statu
  */
 const PREGUNTA_SIN_SIGNO = /\b((c[oó]mo|qu[eé])\s+(me|te|le|nos|voy|vamos|va|van|est[aá]|ser[aá]|viene|sigue|ves|hago|pasa|dice|dicen|pinta)|cu[aá]ndo|d[oó]nde|por\s?qu[eé]|ser[aá]|voy a|va a|me ves|me va|amor|pareja|novi[oa]|trabajo|empleo|negocio|dinero|plata|examen|viaje|futuro|salud|familia|este mes|este a[nñ]o|esta semana)\b/i;
 
-/** Lo mismo en inglés y portugués (Sibila responde en el idioma en que le escriben). */
-const PREGUNTA_OTROS_IDIOMAS = /\b(what|when|will i|should i|how (is|will|do|does|can)|tell me|my (love|job|future|life)|love|boyfriend|girlfriend|relationship|job|work|career|money|business|future|family|this (week|month|year)|como (vai|vou|fica|est[aá])|o que|quando|vou|namorad[oa]|relacionamento|trabalho|emprego|dinheiro|neg[oó]cio|fam[ií]lia|essa semana|este m[eê]s)\b/i;
+/** Lo mismo en inglés, portugués, francés y turco (Sibila responde en el idioma en que le escriben). */
+const PREGUNTA_OTROS_IDIOMAS = /\b(est-ce que|quand|comment|mon avenir|mon amour|mon travail|l'amour|le travail|l'argent|ma vie|cette (semaine|ann[eé]e)|ne zaman|nas[ıi]l|a[şs]k[ıi]m|i[şs]im|gelece[ğg]im|evlilik|sevgilim|kahve fal[ıi]|what|when|will i|should i|how (is|will|do|does|can)|tell me|my (love|job|future|life)|love|boyfriend|girlfriend|relationship|job|work|career|money|business|future|family|this (week|month|year)|como (vai|vou|fica|est[aá])|o que|quando|vou|namorad[oa]|relacionamento|trabalho|emprego|dinheiro|neg[oó]cio|fam[ií]lia|essa semana|este m[eê]s)\b/i;
 
 /**
  * Idioma de la pregunta, contado por palabras propias de cada idioma. El contexto que acompaña la lectura (cartas,
  * horóscopo, lecturas previas) va en español y arrastraba la respuesta al español: por eso se fija aparte.
  */
-const PALABRAS_IDIOMA: { codigo: "en" | "pt" | "fr" | "it" | "de"; nombre: string; palabras: RegExp }[] = [
+const PALABRAS_IDIOMA: { codigo: "en" | "pt" | "fr" | "it" | "de" | "tr"; nombre: string; palabras: RegExp }[] = [
   { codigo: "en", nombre: "inglés (English)", palabras: /\b(the|my|is|are|will|what|when|how|why|who|i|i'm|you|your|me|and|for|with|should|about|love|job|work|money|future|this|can|do|does|get|going|have|has|it|of|to|in|be|please|hello|hi|thanks|reading|sign|life|week|month|year|relationship|boyfriend|girlfriend|husband|wife|taurus|gemini|scorpio|sagittarius|capricorn|aquarius)\b/gi },
   { codigo: "pt", nombre: "portugués de Brasil (português)", palabras: /\b(voc[eê]|meu|minha|n[aã]o|vai|vou|est[aá]|t[aá]|quando|isso|essa|esse|uma|um|com|obrigad[oa]|ol[aá]|oi|trabalho|dinheiro|namorad[oa]|relacionamento|fam[ií]lia|vida|sim|tamb[eé]m|muito|ent[aã]o|ser[aá]|tenho|sou|seu|sua|pra|gente|qual|leitura|signo de)\b/gi },
   { codigo: "fr", nombre: "francés (français)", palabras: /\b(je|mon|ma|mes|est|quand|comment|amour|travail|argent|avec|pour|une|vais|suis|et|le|les|des|pas|qui|quoi|bonjour|merci|vie|avenir|ann[eé]e|semaine)\b/gi },
   { codigo: "it", nombre: "italiano", palabras: /\b(il|mio|mia|quando|come|amore|lavoro|soldi|sono|che|per|una|non|ciao|grazie|vita|futuro|anno|settimana|cosa|sar[aà]|gli|della|anche)\b/gi },
+  { codigo: "tr", nombre: "turco (Türkçe)", palabras: /(?<![\p{L}])(ben|benim|bana|sen|senin|ne|nasıl|nasil|zaman|ne zaman|aşk|ask|iş|is|para|sevgili|gelecek|hayat|evlilik|aile|bu|ve|bir|mi|mı|mu|mü|olacak|merhaba|selam|teşekkürler|tesekkurler|fal|burç|burc|yıl|yil|hafta|ay|doğum|dogum|haritam|kahve)(?![\p{L}])/giu },
   { codigo: "de", nombre: "alemán (Deutsch)", palabras: /\b(ich|mein|meine|wann|wie|liebe|arbeit|geld|ist|und|f[uü]r|mit|eine|werde|nicht|was|hallo|danke|leben|zukunft|jahr|woche|bin|habe)\b/gi },
 ];
 const PALABRAS_ESPANOL = /\b(el|la|los|las|mi|mis|que|qu[eé]|c[oó]mo|cu[aá]ndo|para|con|una|un|es|me|trabajo|dinero|va|voy|soy|y|en|de|por|amor|pareja|novi[oa]|hola|gracias|vida|futuro|a[nñ]o|semana|est[aá]|ser[aá]|tengo|pregunta|lectura|plata|mes|qu[eé] me)\b/gi;
@@ -112,7 +114,7 @@ export function idiomaDeTexto(texto: string): { codigo: string; nombre: string }
   let mejor: (typeof PALABRAS_IDIOMA)[number] | null = null;
   let puntos = 0;
   for (const l of PALABRAS_IDIOMA) {
-    const n = (t.match(l.palabras) ?? []).length + (l.codigo === "pt" && /[ãõç]/i.test(t) ? 2 : 0);
+    const n = (t.match(l.palabras) ?? []).length + (l.codigo === "pt" && /[ãõç]/i.test(t) ? 2 : 0) + (l.codigo === "tr" && /[ığşİ]/.test(t) ? 3 : 0);
     if (n > puntos) [mejor, puntos] = [l, n];
   }
   if (!mejor || puntos < 2 || puntos <= espanol) return null;
@@ -614,7 +616,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const sistemaFinal = otroIdioma
         ? `${sistema}\nIDIOMA: la persona escribió en ${otroIdioma.nombre}. Toda la lectura, de la primera a la última palabra, va en ${otroIdioma.nombre}, aunque el contexto, las cartas y las notas lleguen en español: tradúcelo todo (nombres de cartas y signos con su nombre tradicional en ese idioma). Solo la línea «COLOR:» va en español.`
         : sistema;
-      let texto = (await generarTexto(entrada, sistemaFinal, { effort: "low", maxTokens: 500, idioma: otroIdioma?.codigo === "en" || otroIdioma?.codigo === "pt" ? otroIdioma.codigo : "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
+      let texto = (await generarTexto(entrada, sistemaFinal, { effort: "low", maxTokens: 500, idioma: otroIdioma && esIdioma(otroIdioma.codigo) && otroIdioma.codigo !== "es" ? otroIdioma.codigo : "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {

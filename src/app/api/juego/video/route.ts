@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams;
   const r = leerResultado(q.get("n"), q.get("f"), q.get("ra"));
   if (!r || r.numero > numeroDeJuego(fechaBogota())) return new Response("Resultado no válido", { status: 400 });
-  const idioma = esIdioma(q.get("idioma")) ? (q.get("idioma") as "es" | "en" | "pt") : "es";
+  const pedido = q.get("idioma");
+  const idioma = esIdioma(pedido) ? pedido : "es";
   try {
     const { url, video } = await videoResultado(r, idioma);
     if (!video) return Response.redirect(url, 302);

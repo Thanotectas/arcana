@@ -41,6 +41,30 @@ const TEXTOS = {
     cerrar: "Fechar",
     estrellas: "Nota",
   },
+  fr: {
+    boton: "Ton avis",
+    titulo: "Que penses-tu de l'appli ?",
+    ayuda: "Dis-nous ce qui t'a plu, ce qui n'a pas marché ou ce que tu améliorerais. On lit tout et on s'en sert pour la prochaine version.",
+    lugar: "Ce qui t'a plu, ce qui n'a pas marché ou ce que tu améliorerais…",
+    enviar: "Envoyer",
+    enviando: "Envoi en cours…",
+    gracias: "Merci ! On le lit et on améliore la prochaine version. 💜",
+    error: "Impossible d'envoyer. Réessaie dans un instant.",
+    cerrar: "Fermer",
+    estrellas: "Note",
+  },
+  tr: {
+    boton: "Görüşün",
+    titulo: "Uygulama hakkında ne düşünüyorsun?",
+    ayuda: "Neyi beğendiğini, neyin aksadığını ya da neyin daha iyi olabileceğini bize anlat. Hepsini okuyor ve bir sonraki sürümde kullanıyoruz.",
+    lugar: "Neyi beğendin, ne aksadı, ne daha iyi olabilir…",
+    enviar: "Gönder",
+    enviando: "Gönderiliyor…",
+    gracias: "Teşekkürler! Okuyup bir sonraki sürümü daha iyi yapacağız. 💜",
+    error: "Gönderilemedi. Birazdan tekrar dene.",
+    cerrar: "Kapat",
+    estrellas: "Puan",
+  },
 };
 
 const OCULTO_EN = ["/en-vivo", "/vivo", "/admin"];

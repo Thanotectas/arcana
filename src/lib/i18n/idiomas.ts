@@ -1,5 +1,5 @@
 /** Idiomas en los que sale la aplicación. El primero es el predeterminado. */
-export const IDIOMAS = ["es", "en", "pt"] as const;
+export const IDIOMAS = ["es", "en", "pt", "fr", "tr"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export const IDIOMA_PREDETERMINADO: Idioma = "es";
@@ -9,6 +9,8 @@ export const NOMBRES_IDIOMA: Record<Idioma, string> = {
   es: "Español",
   en: "English",
   pt: "Português",
+  fr: "Français",
+  tr: "Türkçe",
 };
 
 /** Nombre del idioma tal como se le indica al modelo de IA. */
@@ -16,6 +18,8 @@ export const IDIOMA_PARA_IA: Record<Idioma, string> = {
   es: "español neutro latinoamericano",
   en: "English",
   pt: "português do Brasil",
+  fr: "français (tutoiement chaleureux, comme une amie qui lit les cartes)",
+  tr: "Türkçe (samimi, \"sen\" diye hitap eden sıcak bir dille)",
 };
 
 /** Código regional para fechas y monedas. */
@@ -23,6 +27,8 @@ export const LOCALE_INTL: Record<Idioma, string> = {
   es: "es-CO",
   en: "en-US",
   pt: "pt-BR",
+  fr: "fr-FR",
+  tr: "tr-TR",
 };
 
 export function esIdioma(valor: unknown): valor is Idioma {

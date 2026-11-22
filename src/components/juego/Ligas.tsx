@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useJ } from "@/lib/juego/useJuego";
-import type { Idioma } from "@/lib/i18n/idiomas";
+import { LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
 
 interface Liga {
   codigo: string;
@@ -186,7 +186,7 @@ export function MisLigas() {
 }
 
 function fechaCorta(f: string, idioma: Idioma = "es") {
-  return new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
+  return new Intl.DateTimeFormat(LOCALE_INTL[idioma], { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
 }
 
 /** /juego/liga/CODIGO: la tabla de la semana de la liga, unirse e invitar. */

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MAX_INTENTOS, PUNTOS_MAESTRO } from "@/lib/juego/carta-escondida";
 import { useJ } from "@/lib/juego/useJuego";
-import type { Idioma } from "@/lib/i18n/idiomas";
+import { LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
 
 interface Fila {
   puesto: number;
@@ -32,7 +32,7 @@ const ERRORES: Record<string, string> = {
 };
 
 function fechaCorta(f: string, idioma: Idioma = "es") {
-  return new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
+  return new Intl.DateTimeFormat(LOCALE_INTL[idioma], { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${f}T12:00:00Z`));
 }
 
 /** La tabla de la semana: los 10 primeros, tu puesto y, si no tienes apodo, el formulario para elegirlo. */

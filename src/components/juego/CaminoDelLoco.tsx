@@ -12,6 +12,7 @@ import { MensajeSibila } from "./MensajeSibila";
 import { contarEvento } from "@/lib/juego/eventos";
 import { useJ } from "@/lib/juego/useJuego";
 import { nombreCarta, palabrasCarta } from "@/lib/juego/cartas-idiomas";
+import { LOCALE_INTL } from "@/lib/i18n/idiomas";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
@@ -340,7 +341,7 @@ function Juego({ clavePublica, diaPractica, reto }: { clavePublica: string | nul
           <span>
             🧭 <strong>{t("Práctica:")}</strong>{" "}
             {t("carta del {fecha}. No cuenta para tu racha.", {
-              fecha: new Intl.DateTimeFormat(idioma === "es" ? "es-CO" : idioma === "pt" ? "pt-BR" : "en-US", { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${fechaDeNumero(numero)}T12:00:00Z`)),
+              fecha: new Intl.DateTimeFormat(LOCALE_INTL[idioma], { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${fechaDeNumero(numero)}T12:00:00Z`)),
             })}
           </span>
           <Link href="/juego" className="shrink-0 text-oro-suave underline">
@@ -1052,8 +1053,8 @@ function Final({
 }
 
 /**
- * El mensaje de la carta descubierta: en español, su significado (y el amor) con la voz de Sibila; en inglés y
- * portugués, sus palabras clave (el significado completo solo está escrito en español).
+ * El mensaje de la carta descubierta: en español, su significado (y el amor) con la voz de Sibila; en los otros
+ * idiomas, sus palabras clave (el significado completo solo está escrito en español).
  */
 function MensajeCarta({ carta, amor = false, sinVoz = false }: { carta: CartaTarot; amor?: boolean; sinVoz?: boolean }) {
   const { t, idioma } = useJ();

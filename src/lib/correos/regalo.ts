@@ -2,7 +2,7 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { enviarCorreo, escaparHtml, sitio, urlBaja } from "@/lib/correo";
-import { esIdioma, IDIOMA_PREDETERMINADO, type Idioma } from "@/lib/i18n/idiomas";
+import { esIdioma, IDIOMA_PREDETERMINADO, LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
 
 /**
  * Correo «tu vaso de hoy»: a quien se quedó sin créditos, Sibila le regala una lectura del vaso (3 créditos).
@@ -39,8 +39,7 @@ export function urlRegalo(usuarioId: string, vence: number) {
 
 /** Fecha límite en palabras («miércoles 11 de noviembre»), en la zona de Colombia. */
 export function fechaLimite(vence: number, idioma: Idioma) {
-  const local = idioma === "en" ? "en-US" : idioma === "pt" ? "pt-BR" : "es-CO";
-  return new Intl.DateTimeFormat(local, { timeZone: "America/Bogota", weekday: "long", day: "numeric", month: "long" }).format(new Date(vence * 1000));
+  return new Intl.DateTimeFormat(LOCALE_INTL[idioma], { timeZone: "America/Bogota", weekday: "long", day: "numeric", month: "long" }).format(new Date(vence * 1000));
 }
 
 const TEXTOS = {
@@ -107,7 +106,52 @@ const TEXTOS = {
     porque: "Você recebe este e-mail porque tem uma conta na Arcana.",
     baja: "Não receber mais e-mails",
   },
+  fr: {
+    asunto: (n: string) => `${n}, ton verre a quelque chose à te dire 🥚`,
+    previa: "Je t'ai laissé un cadeau : ta prochaine lecture du verre, c'est moi qui l'offre.",
+    saludo: (n: string) => `Bonjour ${n},`,
+    titulo: "Il y a des choses qu'on ne voit que lorsque l'eau devient immobile",
+    p1: "Un fil qui monte tout droit, une couronne de bulles autour du jaune, un voile qui s'ouvre comme un manteau… Chaque verre est différent, et le tien garde un message que nous n'avons pas encore lu.",
+    p2: "C'est pour ça que cette semaine, je veux te faire un cadeau : ta prochaine lecture du verre, c'est moi qui l'offre. Complète, avec ta photo annotée de lignes, ce qui est apparu et ce qui t'attend. Sans rien payer.",
+    tarjeta: "Ton cadeau",
+    lectura: "1 lecture du verre",
+    hasta: (f: string) => `Tu peux l'ouvrir jusqu'au ${f}`,
+    pasos: "C'est tout simple :",
+    paso1: "Fais ton nettoyage tranquillement, ce soir ou quand tu en sens le besoin.",
+    paso2: "Prends le verre en photo de côté, à hauteur de l'eau et avec une bonne lumière.",
+    paso3: "Envoie-la et je te trace des lignes sur ce qui est apparu et sur ce que ça annonce.",
+    boton: "Ouvrir mon cadeau 🎁",
+    prueba: "Nous sommes déjà plus de 1\u00a0300 sur TikTok à découvrir ce que dit notre verre.",
+    ps: (f: string) => `P.-S. : si aujourd'hui n'est pas le jour de ton nettoyage, garde cet e-mail. Ton cadeau t'attend jusqu'au ${f}.`,
+    firma: "Avec tendresse,\nSibila, d'Arcana",
+    porque: "Tu reçois cet e-mail parce que tu as un compte sur Arcana.",
+    baja: "Ne plus recevoir d'e-mails",
+  },
+  tr: {
+    asunto: (n: string) => `${n}, bardağının sana söyleyecekleri var 🥚`,
+    previa: "Sana bir hediye bıraktım: bir sonraki bardak okuman benden.",
+    saludo: (n: string) => `Merhaba ${n},`,
+    titulo: "Bazı şeyler ancak su durulduğunda görünür",
+    p1: "Dümdüz yükselen bir iplik, sarının etrafında kabarcıklardan bir taç, bir pelerin gibi açılan bir tül… Her bardak farklıdır ve seninki henüz okumadığımız bir mesaj saklıyor.",
+    p2: "Bu yüzden bu hafta sana bir hediye vermek istiyorum: bir sonraki bardak okuman benden. Eksiksiz bir okuma; çizgilerle işaretlenmiş fotoğrafınla neler çıktığını ve seni neyin beklediğini göreceksin. Hiçbir ücret ödemeden.",
+    tarjeta: "Hediyen",
+    lectura: "1 bardak okuması",
+    hasta: (f: string) => `Son açma tarihi: ${f}`,
+    pasos: "Çok kolay:",
+    paso1: "Arınmanı acele etmeden yap; bu gece ya da ihtiyaç duyduğunu hissettiğin bir zaman.",
+    paso2: "Bardağın fotoğrafını yandan, su hizasından ve iyi bir ışıkta çek.",
+    paso3: "Fotoğrafı yükle; neler çıktığını ve neyin habercisi olduğunu ben çizgilerle işaretleyeyim.",
+    boton: "Hediyemi aç 🎁",
+    prueba: "TikTok'ta bardağının ne söylediğini keşfeden 1.300'den fazla kişiyiz bile.",
+    ps: (f: string) => `Not: Bugün arınma günün değilse bu e-postayı sakla. Hediyen seni bekliyor, son tarih: ${f}.`,
+    firma: "Sevgiyle,\nArcana'dan Sibila",
+    porque: "Bu e-postayı Arcana'da bir hesabın olduğu için alıyorsun.",
+    baja: "E-posta almayı bırak",
+  },
 } as const;
+
+/** Cómo se le llama a la persona cuando no hay nombre. */
+const SIN_NOMBRE: Record<Idioma, string> = { es: "querida alma", en: "friend", pt: "querida alma", fr: "chère âme", tr: "canım" };
 
 const ORO = "#d9b45a";
 const ORO_SUAVE = "#f1d99a";
@@ -119,7 +163,7 @@ const TEXTO_SUAVE = "#a89fc0";
 export function correoRegaloVaso(d: { nombre: string | null; idioma: Idioma; vence: number; url: string; urlBaja: string }) {
   const t = TEXTOS[d.idioma] ?? TEXTOS.es;
   const base = sitio();
-  const nombre = d.nombre?.trim().split(/\s+/)[0] || (d.idioma === "en" ? "friend" : d.idioma === "pt" ? "querida alma" : "querida alma");
+  const nombre = d.nombre?.trim().split(/\s+/)[0] || SIN_NOMBRE[d.idioma];
   const limite = fechaLimite(d.vence, d.idioma);
   const asunto = t.asunto(nombre);
   const p = (texto: string, extra = "") => `<p style="margin:14px 0 0;font:16px/1.65 Inter,Arial,sans-serif;color:${TEXTO};${extra}">${escaparHtml(texto)}</p>`;

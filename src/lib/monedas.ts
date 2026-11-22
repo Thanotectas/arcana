@@ -29,24 +29,33 @@ export const MONEDAS: Moneda[] = [
   { codigo: "PYG", nombre: "guaraníes", paises: "Paraguay" },
   { codigo: "BRL", nombre: "reales", paises: "Brasil" },
   { codigo: "EUR", nombre: "euros", paises: "España y Europa" },
+  { codigo: "TRY", nombre: "liras turcas", paises: "Turquía" },
+  { codigo: "XOF", nombre: "francos CFA (África occidental)", paises: "Senegal, Costa de Marfil, Malí, Burkina Faso, Benín, Togo, Níger" },
+  { codigo: "XAF", nombre: "francos CFA (África central)", paises: "Camerún, Gabón, Congo, Chad, República Centroafricana" },
+  { codigo: "CAD", nombre: "dólares canadienses", paises: "Canadá" },
+  { codigo: "CHF", nombre: "francos suizos", paises: "Suiza" },
+  { codigo: "MAD", nombre: "dírhams marroquíes", paises: "Marruecos" },
 ];
 
 /** Moneda que se muestra según el país (código ISO de Vercel o de la región del idioma del navegador). */
 export const PAIS_MONEDA: Record<string, string> = {
   MX: "MXN", US: "USD", EC: "USD", SV: "USD", PA: "USD", PR: "USD", VE: "USD", AR: "ARS", CL: "CLP", PE: "PEN", BO: "BOB",
   GT: "GTQ", HN: "HNL", NI: "NIO", CR: "CRC", DO: "DOP", UY: "UYU", PY: "PYG", BR: "BRL", CO: "COP",
-  ES: "EUR", FR: "EUR", IT: "EUR", DE: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", IE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+  ES: "EUR", FR: "EUR", IT: "EUR", DE: "EUR", PT: "EUR", NL: "EUR", BE: "EUR", IE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR", LU: "EUR",
+  TR: "TRY", CA: "CAD", CH: "CHF", MA: "MAD",
+  SN: "XOF", CI: "XOF", ML: "XOF", BF: "XOF", BJ: "XOF", TG: "XOF", NE: "XOF", GW: "XOF",
+  CM: "XAF", GA: "XAF", CG: "XAF", TD: "XAF", CF: "XAF", GQ: "XAF",
 };
 
 /** Bandera de un país por su código ISO (para el selector de moneda). */
 export const BANDERA_MONEDA: Record<string, string> = {
   COP: "🇨🇴", MXN: "🇲🇽", USD: "🇺🇸", ARS: "🇦🇷", CLP: "🇨🇱", PEN: "🇵🇪", BOB: "🇧🇴", GTQ: "🇬🇹", HNL: "🇭🇳", NIO: "🇳🇮",
-  CRC: "🇨🇷", DOP: "🇩🇴", UYU: "🇺🇾", PYG: "🇵🇾", BRL: "🇧🇷", EUR: "🇪🇺",
+  CRC: "🇨🇷", DOP: "🇩🇴", UYU: "🇺🇾", PYG: "🇵🇾", BRL: "🇧🇷", EUR: "🇪🇺", TRY: "🇹🇷", XOF: "🇸🇳", XAF: "🇨🇲", CAD: "🇨🇦", CHF: "🇨🇭", MAD: "🇲🇦",
 };
 
 /** Respaldo aproximado (unidades por 1 USD, nov 2026). Solo se usa si el servicio de tasas no responde. */
 const RESPALDO_POR_USD: Record<string, number> = {
-  COP: 3950, MXN: 18.5, USD: 1, ARS: 1450, CLP: 940, PEN: 3.45, BOB: 6.96, GTQ: 7.67, HNL: 26.2, NIO: 36.7, CRC: 505, DOP: 63, UYU: 40, PYG: 7200, BRL: 5.4, EUR: 0.86,
+  COP: 3950, MXN: 18.5, USD: 1, ARS: 1450, CLP: 940, PEN: 3.45, BOB: 6.96, GTQ: 7.67, HNL: 26.2, NIO: 36.7, CRC: 505, DOP: 63, UYU: 40, PYG: 7200, BRL: 5.4, EUR: 0.86, TRY: 41, XOF: 565, XAF: 565, CAD: 1.4, CHF: 0.8, MAD: 9.2,
 };
 
 type Tasas = { porUSD: Record<string, number>; fuente: "del día" | "aproximadas" };

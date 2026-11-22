@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { webpComoDataUri } from "@/lib/marca/imagenes";
+import { esIdioma, type Idioma } from "@/lib/i18n/idiomas";
 import { MAX_INTENTOS, leerResultado, type Comparacion } from "@/lib/juego/carta-escondida";
 
 /**
@@ -57,10 +58,12 @@ function Cuadritos({ filas, lado }: { filas: Comparacion[]; lado: number }) {
   );
 }
 
-const TEXTOS_IMAGEN = {
+const TEXTOS_IMAGEN: Record<Idioma, { gano: (n: number) => string; perdio: string; racha: (n: number) => string; rachaLarga: (n: number) => string; reto: string; juego: string; carta: (n: number) => string }> = {
   es: { gano: (n: number) => `La encontré en ${n}/${MAX_INTENTOS}`, perdio: "Hoy se me escondió", racha: (n: number) => `${n} días seguidos`, rachaLarga: (n: number) => `${n} días seguidos jugando`, reto: "¿Adivinas la de hoy?", juego: "EL CAMINO DEL LOCO", carta: (n: number) => `Carta escondida #${n}` },
   en: { gano: (n: number) => `Found it in ${n}/${MAX_INTENTOS}`, perdio: "It hid from me today", racha: (n: number) => `${n}-day streak`, rachaLarga: (n: number) => `${n}-day streak`, reto: "Can you guess today's?", juego: "THE FOOL'S JOURNEY", carta: (n: number) => `Hidden card #${n}` },
   pt: { gano: (n: number) => `Encontrei em ${n}/${MAX_INTENTOS}`, perdio: "Hoje ela se escondeu", racha: (n: number) => `${n} dias seguidos`, rachaLarga: (n: number) => `${n} dias seguidos jogando`, reto: "Você adivinha a de hoje?", juego: "O CAMINHO DO LOUCO", carta: (n: number) => `Carta escondida #${n}` },
+  fr: { gano: (n: number) => `Trouvée en ${n}/${MAX_INTENTOS}`, perdio: "Elle m'a échappé aujourd'hui", racha: (n: number) => `${n} jours d'affilée`, rachaLarga: (n: number) => `${n} jours d'affilée à jouer`, reto: "Tu devines celle du jour ?", juego: "LE CHEMIN DU FOU", carta: (n: number) => `Carte cachée n° ${n}` },
+  tr: { gano: (n: number) => `${n}/${MAX_INTENTOS} denemede buldum`, perdio: "Bugün benden saklandı", racha: (n: number) => `Seri: ${n} gün`, rachaLarga: (n: number) => `${n} gündür üst üste oynuyorum`, reto: "Bugünün kartını bulabilir misin?", juego: "DELİ'NİN YOLCULUĞU", carta: (n: number) => `Gizli kart #${n}` },
 };
 
 export async function GET(request: NextRequest) {
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
   if (!r) return new Response("Resultado no válido", { status: 400 });
   const historia = q.get("formato") === "historia";
   const pedido = q.get("idioma");
-  const T = TEXTOS_IMAGEN[pedido === "en" || pedido === "pt" ? pedido : "es"];
+  const T = TEXTOS_IMAGEN[esIdioma(pedido) ? pedido : "es"];
   const [sibila, dorso, tipos] = await Promise.all([
     webpComoDataUri(join(process.cwd(), "public/juego/sibila.webp"), { lado: 360 }),
     webpComoDataUri(join(process.cwd(), "public/cartas/arcana/dorso.webp"), { alto: 420 }),

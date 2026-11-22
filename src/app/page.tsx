@@ -1,3 +1,4 @@
+import { LOCALE_INTL } from "@/lib/i18n/idiomas";
 import Link from "next/link";
 import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
 import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, precioCirculoPorDia } from "@/lib/creditos";
@@ -66,7 +67,7 @@ export default async function Portada() {
           <p className="mx-auto mt-6 max-w-2xl text-lg text-texto-suave">{t.portada.intro}</p>
           {contador >= 50 && (
             <p className="mt-4 inline-block rounded-full border border-exito/40 bg-exito/10 px-4 py-1 text-sm text-exito">
-              ✦ {plantilla(t.persuasion.contadorSemana, { n: contador.toLocaleString("es-CO") })}
+              ✦ {plantilla(t.persuasion.contadorSemana, { n: contador.toLocaleString(LOCALE_INTL[idioma]) })}
             </p>
           )}
           <div className="mt-8 flex flex-wrap justify-center gap-3">

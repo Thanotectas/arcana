@@ -18,40 +18,46 @@ export interface Sello {
   esencia: string;
   /** Concordancia en español y portugués: "Noche Cósmica Azul". */
   femenino: boolean;
+  /** Concordancia en francés (no siempre coincide: Serpent y Aigle son masculinos): "Nuit Cosmique Bleue". */
+  femeninoFr: boolean;
 }
 
 const FEMENINOS = new Set([3, 4, 5, 7, 8, 9, 15, 17, 19]);
+const FEMENINOS_FR = new Set([3, 4, 7, 8, 9, 17, 19]);
 
-const S = (numero: number, es: string, en: string, pt: string, color: ColorMaya, accion: string, poder: string, esencia: string): Sello => ({ numero, nombre: { es, en, pt }, color, accion, poder, esencia, femenino: FEMENINOS.has(numero) });
+const S = (numero: number, es: string, en: string, pt: string, fr: string, tr: string, color: ColorMaya, accion: string, poder: string, esencia: string): Sello => ({ numero, nombre: { es, en, pt, fr, tr }, color, accion, poder, esencia, femenino: FEMENINOS.has(numero), femeninoFr: FEMENINOS_FR.has(numero) });
 
 export const SELLOS: Sello[] = [
-  S(1, "Dragón", "Dragon", "Dragão", "rojo", "nutrir", "nacimiento", "ser"),
-  S(2, "Viento", "Wind", "Vento", "blanco", "comunicar", "espíritu", "aliento"),
-  S(3, "Noche", "Night", "Noite", "azul", "soñar", "abundancia", "intuición"),
-  S(4, "Semilla", "Seed", "Semente", "amarillo", "enfocar", "florecimiento", "percepción"),
-  S(5, "Serpiente", "Serpent", "Serpente", "rojo", "sobrevivir", "fuerza vital", "instinto"),
-  S(6, "Enlazador de Mundos", "Worldbridger", "Enlaçador de Mundos", "blanco", "igualar", "muerte (soltar)", "oportunidad"),
-  S(7, "Mano", "Hand", "Mão", "azul", "conocer", "realización", "curación"),
-  S(8, "Estrella", "Star", "Estrela", "amarillo", "embellecer", "elegancia", "arte"),
-  S(9, "Luna", "Moon", "Lua", "rojo", "purificar", "agua universal", "flujo"),
-  S(10, "Perro", "Dog", "Cachorro", "blanco", "amar", "corazón", "lealtad"),
-  S(11, "Mono", "Monkey", "Macaco", "azul", "jugar", "magia", "ilusión"),
-  S(12, "Humano", "Human", "Humano", "amarillo", "influenciar", "libre albedrío", "sabiduría"),
-  S(13, "Caminante del Cielo", "Skywalker", "Caminhante do Céu", "rojo", "explorar", "espacio", "vigilancia"),
-  S(14, "Mago", "Wizard", "Mago", "blanco", "encantar", "atemporalidad", "receptividad"),
-  S(15, "Águila", "Eagle", "Águia", "azul", "crear", "visión", "mente"),
-  S(16, "Guerrero", "Warrior", "Guerreiro", "amarillo", "cuestionar", "inteligencia", "intrepidez"),
-  S(17, "Tierra", "Earth", "Terra", "rojo", "evolucionar", "navegación", "sincronía"),
-  S(18, "Espejo", "Mirror", "Espelho", "blanco", "reflejar", "sinfín", "orden"),
-  S(19, "Tormenta", "Storm", "Tormenta", "azul", "catalizar", "autogeneración", "energía"),
-  S(20, "Sol", "Sun", "Sol", "amarillo", "iluminar", "fuego universal", "vida"),
+  S(1, "Dragón", "Dragon", "Dragão", "Dragon", "Ejderha", "rojo", "nutrir", "nacimiento", "ser"),
+  S(2, "Viento", "Wind", "Vento", "Vent", "Rüzgâr", "blanco", "comunicar", "espíritu", "aliento"),
+  S(3, "Noche", "Night", "Noite", "Nuit", "Gece", "azul", "soñar", "abundancia", "intuición"),
+  S(4, "Semilla", "Seed", "Semente", "Graine", "Tohum", "amarillo", "enfocar", "florecimiento", "percepción"),
+  S(5, "Serpiente", "Serpent", "Serpente", "Serpent", "Yılan", "rojo", "sobrevivir", "fuerza vital", "instinto"),
+  S(6, "Enlazador de Mundos", "Worldbridger", "Enlaçador de Mundos", "Enchaîneur de Mondes", "Dünyalar Köprüsü", "blanco", "igualar", "muerte (soltar)", "oportunidad"),
+  S(7, "Mano", "Hand", "Mão", "Main", "El", "azul", "conocer", "realización", "curación"),
+  S(8, "Estrella", "Star", "Estrela", "Étoile", "Yıldız", "amarillo", "embellecer", "elegancia", "arte"),
+  S(9, "Luna", "Moon", "Lua", "Lune", "Ay", "rojo", "purificar", "agua universal", "flujo"),
+  S(10, "Perro", "Dog", "Cachorro", "Chien", "Köpek", "blanco", "amar", "corazón", "lealtad"),
+  S(11, "Mono", "Monkey", "Macaco", "Singe", "Maymun", "azul", "jugar", "magia", "ilusión"),
+  S(12, "Humano", "Human", "Humano", "Humain", "İnsan", "amarillo", "influenciar", "libre albedrío", "sabiduría"),
+  S(13, "Caminante del Cielo", "Skywalker", "Caminhante do Céu", "Marcheur du Ciel", "Gökyüzü Yürüyücüsü", "rojo", "explorar", "espacio", "vigilancia"),
+  S(14, "Mago", "Wizard", "Mago", "Sorcier", "Büyücü", "blanco", "encantar", "atemporalidad", "receptividad"),
+  S(15, "Águila", "Eagle", "Águia", "Aigle", "Kartal", "azul", "crear", "visión", "mente"),
+  S(16, "Guerrero", "Warrior", "Guerreiro", "Guerrier", "Savaşçı", "amarillo", "cuestionar", "inteligencia", "intrepidez"),
+  S(17, "Tierra", "Earth", "Terra", "Terre", "Dünya", "rojo", "evolucionar", "navegación", "sincronía"),
+  S(18, "Espejo", "Mirror", "Espelho", "Miroir", "Ayna", "blanco", "reflejar", "sinfín", "orden"),
+  S(19, "Tormenta", "Storm", "Tormenta", "Tempête", "Fırtına", "azul", "catalizar", "autogeneración", "energía"),
+  S(20, "Sol", "Sun", "Sol", "Soleil", "Güneş", "amarillo", "iluminar", "fuego universal", "vida"),
 ];
 
-export const NOMBRE_COLOR: Record<ColorMaya, Texto & { fem: { es: string; pt: string } }> = {
-  rojo: { es: "Rojo", en: "Red", pt: "Vermelho", fem: { es: "Roja", pt: "Vermelha" } },
-  blanco: { es: "Blanco", en: "White", pt: "Branco", fem: { es: "Blanca", pt: "Branca" } },
-  azul: { es: "Azul", en: "Blue", pt: "Azul", fem: { es: "Azul", pt: "Azul" } },
-  amarillo: { es: "Amarillo", en: "Yellow", pt: "Amarelo", fem: { es: "Amarilla", pt: "Amarela" } },
+/** Formas femeninas de los idiomas que concuerdan en género (en inglés y turco no hace falta). */
+type Femenino = { es: string; pt: string; fr: string };
+
+export const NOMBRE_COLOR: Record<ColorMaya, Texto & { fem: Femenino }> = {
+  rojo: { es: "Rojo", en: "Red", pt: "Vermelho", fr: "Rouge", tr: "Kırmızı", fem: { es: "Roja", pt: "Vermelha", fr: "Rouge" } },
+  blanco: { es: "Blanco", en: "White", pt: "Branco", fr: "Blanc", tr: "Beyaz", fem: { es: "Blanca", pt: "Branca", fr: "Blanche" } },
+  azul: { es: "Azul", en: "Blue", pt: "Azul", fr: "Bleu", tr: "Mavi", fem: { es: "Azul", pt: "Azul", fr: "Bleue" } },
+  amarillo: { es: "Amarillo", en: "Yellow", pt: "Amarelo", fr: "Jaune", tr: "Sarı", fem: { es: "Amarilla", pt: "Amarela", fr: "Jaune" } },
 };
 
 export const COLOR_CSS: Record<ColorMaya, string> = { rojo: "#d9534f", blanco: "#f2efe6", azul: "#4a7fd6", amarillo: "#e9c46a" };
@@ -59,28 +65,30 @@ export const COLOR_CSS: Record<ColorMaya, string> = { rojo: "#d9534f", blanco: "
 export interface Tono {
   numero: number;
   nombre: Texto;
-  fem: { es: string; pt: string };
+  fem: Femenino;
   sentido: string;
 }
 
 /** Femenino regular: Magnético → Magnética; los invariables (Lunar, Solar…) quedan igual. */
 const femenino = (x: string) => x.replace(/o$/, "a");
-const T = (numero: number, es: string, en: string, pt: string, sentido: string): Tono => ({ numero, nombre: { es, en, pt }, fem: { es: femenino(es), pt: femenino(pt) }, sentido });
+/** En francés: Résonant → Résonante, Spectral → Spectrale; Magnétique y Cristal quedan igual. */
+const femeninoFr = (x: string) => (/e$/.test(x) || x === "Cristal" ? x : `${x}e`);
+const T = (numero: number, es: string, en: string, pt: string, fr: string, tr: string, sentido: string): Tono => ({ numero, nombre: { es, en, pt, fr, tr }, fem: { es: femenino(es), pt: femenino(pt), fr: femeninoFr(fr) }, sentido });
 
 export const TONOS: Tono[] = [
-  T(1, "Magnético", "Magnetic", "Magnético", "unificar, el propósito: ¿cuál es mi meta?"),
-  T(2, "Lunar", "Lunar", "Lunar", "polarizar, el desafío: ¿qué me frena?"),
-  T(3, "Eléctrico", "Electric", "Elétrico", "activar, el servicio: ¿cómo sirvo mejor?"),
-  T(4, "Autoexistente", "Self-Existing", "Autoexistente", "definir, la forma: ¿qué forma toma mi servicio?"),
-  T(5, "Entonado", "Overtone", "Harmônico", "dar poder, el resplandor: ¿cómo me fortalezco?"),
-  T(6, "Rítmico", "Rhythmic", "Rítmico", "organizar, la igualdad: ¿cómo encuentro equilibrio?"),
-  T(7, "Resonante", "Resonant", "Ressonante", "canalizar, la sintonía: ¿cómo me alineo con lo que siento?"),
-  T(8, "Galáctico", "Galactic", "Galáctico", "armonizar, la integridad: ¿vivo lo que creo?"),
-  T(9, "Solar", "Solar", "Solar", "pulsar, la intención: ¿cómo logro mi propósito?"),
-  T(10, "Planetario", "Planetary", "Planetário", "perfeccionar, la manifestación: ¿cómo lo hago realidad?"),
-  T(11, "Espectral", "Spectral", "Espectral", "disolver, la liberación: ¿qué debo soltar?"),
-  T(12, "Cristal", "Crystal", "Cristal", "dedicarse, la cooperación: ¿cómo comparto?"),
-  T(13, "Cósmico", "Cosmic", "Cósmico", "perdurar, la presencia: ¿cómo trasciendo?"),
+  T(1, "Magnético", "Magnetic", "Magnético", "Magnétique", "Manyetik", "unificar, el propósito: ¿cuál es mi meta?"),
+  T(2, "Lunar", "Lunar", "Lunar", "Lunaire", "Lunar", "polarizar, el desafío: ¿qué me frena?"),
+  T(3, "Eléctrico", "Electric", "Elétrico", "Électrique", "Elektrik", "activar, el servicio: ¿cómo sirvo mejor?"),
+  T(4, "Autoexistente", "Self-Existing", "Autoexistente", "Auto-existant", "Öz Varlıklı", "definir, la forma: ¿qué forma toma mi servicio?"),
+  T(5, "Entonado", "Overtone", "Harmônico", "Harmonique", "Harmonik", "dar poder, el resplandor: ¿cómo me fortalezco?"),
+  T(6, "Rítmico", "Rhythmic", "Rítmico", "Rythmique", "Ritmik", "organizar, la igualdad: ¿cómo encuentro equilibrio?"),
+  T(7, "Resonante", "Resonant", "Ressonante", "Résonant", "Rezonant", "canalizar, la sintonía: ¿cómo me alineo con lo que siento?"),
+  T(8, "Galáctico", "Galactic", "Galáctico", "Galactique", "Galaktik", "armonizar, la integridad: ¿vivo lo que creo?"),
+  T(9, "Solar", "Solar", "Solar", "Solaire", "Solar", "pulsar, la intención: ¿cómo logro mi propósito?"),
+  T(10, "Planetario", "Planetary", "Planetário", "Planétaire", "Gezegensel", "perfeccionar, la manifestación: ¿cómo lo hago realidad?"),
+  T(11, "Espectral", "Spectral", "Espectral", "Spectral", "Spektral", "disolver, la liberación: ¿qué debo soltar?"),
+  T(12, "Cristal", "Crystal", "Cristal", "Cristal", "Kristal", "dedicarse, la cooperación: ¿cómo comparto?"),
+  T(13, "Cósmico", "Cosmic", "Cósmico", "Cosmique", "Kozmik", "perdurar, la presencia: ¿cómo trasciendo?"),
 ];
 
 /** Nawales de la cuenta k'iche' (Guatemala), con su sentido tradicional. */
@@ -178,9 +186,11 @@ export function selloPorNumero(n: number) {
 export function nombreKin(kin: number, idioma: keyof Texto = "es") {
   const s = selloPorNumero(kin);
   const tono = TONOS[mod(kin - 1, 13)];
-  if (idioma === "en") return `${NOMBRE_COLOR[s.color].en} ${tono.nombre.en} ${s.nombre.en}`;
+  // En inglés y en turco el color y el tono van delante: "White Galactic Wizard", "Beyaz Galaktik Büyücü".
+  if (idioma === "en" || idioma === "tr") return `${NOMBRE_COLOR[s.color][idioma]} ${tono.nombre[idioma]} ${s.nombre[idioma]}`;
   const color = NOMBRE_COLOR[s.color];
-  return s.femenino ? `${s.nombre[idioma]} ${tono.fem[idioma]} ${color.fem[idioma]}` : `${s.nombre[idioma]} ${tono.nombre[idioma]} ${color[idioma]}`;
+  const fem = idioma === "fr" ? s.femeninoFr : s.femenino;
+  return fem ? `${s.nombre[idioma]} ${tono.fem[idioma]} ${color.fem[idioma]}` : `${s.nombre[idioma]} ${tono.nombre[idioma]} ${color[idioma]}`;
 }
 
 export function resumenMaya(r: ResultadoMaya, nombre: string, fecha: string) {

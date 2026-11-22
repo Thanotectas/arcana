@@ -3,6 +3,7 @@ import { resumenPanorama } from "./panorama";
 import type { CartaTarot } from "./deck";
 import { MAZOS, type IdMazo } from "./mazos";
 import type { TipoLectura } from "../creditos";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 export type TipoTirada = Extract<TipoLectura, "tarot_carta" | "tarot_tres" | "tarot_celta">;
 
@@ -55,7 +56,7 @@ export const TIRADAS: Record<TipoTirada, Tirada> = {
 };
 
 /** Nombres de posiciones por idioma para las tiradas (la interfaz). */
-export const POSICIONES_I18N: Record<"es" | "en" | "pt", Record<TipoTirada, { nombre: string; descripcion: string }[]>> = {
+export const POSICIONES_I18N: Record<Idioma, Record<TipoTirada, { nombre: string; descripcion: string }[]>> = {
   es: {
     tarot_carta: TIRADAS.tarot_carta.posiciones,
     tarot_tres: TIRADAS.tarot_tres.posiciones,
@@ -99,6 +100,46 @@ export const POSICIONES_I18N: Record<"es" | "en" | "pt", Record<TipoTirada, { no
       { nombre: "O ambiente", descripcion: "Influências de pessoas e circunstâncias." },
       { nombre: "Esperanças e temores", descripcion: "O que você deseja e o que teme." },
       { nombre: "O resultado", descripcion: "Para onde tudo tende." },
+    ],
+  },
+  fr: {
+    tarot_carta: [{ nombre: "Ta carte", descripcion: "L'énergie qui t'accompagne aujourd'hui." }],
+    tarot_tres: [
+      { nombre: "Passé", descripcion: "Les racines et les influences qui ont tracé ton chemin jusqu'ici." },
+      { nombre: "Présent", descripcion: "Le cœur de la situation actuelle." },
+      { nombre: "Futur", descripcion: "La direction probable si rien ne change." },
+    ],
+    tarot_celta: [
+      { nombre: "La situation", descripcion: "Le sujet central." },
+      { nombre: "Le défi", descripcion: "Ce qui croise ou met la situation sous tension." },
+      { nombre: "La racine", descripcion: "L'inconscient, la base du sujet." },
+      { nombre: "Le passé", descripcion: "Ce qui reste derrière toi." },
+      { nombre: "Le conscient", descripcion: "Tes objectifs et ce que tu as en tête." },
+      { nombre: "Le futur proche", descripcion: "Ce qui approche." },
+      { nombre: "Toi", descripcion: "Ton attitude face à la situation." },
+      { nombre: "L'entourage", descripcion: "L'influence des personnes et des circonstances." },
+      { nombre: "Espoirs et craintes", descripcion: "Ce que tu désires et ce que tu crains." },
+      { nombre: "Le résultat", descripcion: "Là où tout tend." },
+    ],
+  },
+  tr: {
+    tarot_carta: [{ nombre: "Kartın", descripcion: "Bugün sana eşlik eden enerji." }],
+    tarot_tres: [
+      { nombre: "Geçmiş", descripcion: "Seni bugüne getiren kökler ve etkiler." },
+      { nombre: "Şimdi", descripcion: "Şu anki durumun özü." },
+      { nombre: "Gelecek", descripcion: "Hiçbir şey değişmezse olası yön." },
+    ],
+    tarot_celta: [
+      { nombre: "Durum", descripcion: "Asıl mesele." },
+      { nombre: "Zorluk", descripcion: "Durumun önüne çıkan ya da onu geren şey." },
+      { nombre: "Kök", descripcion: "Bilinçaltı, meselenin temeli." },
+      { nombre: "Geçmiş", descripcion: "Geride kalanlar." },
+      { nombre: "Bilinç", descripcion: "Hedeflerin ve aklından geçenler." },
+      { nombre: "Yakın gelecek", descripcion: "Yaklaşmakta olan." },
+      { nombre: "Sen", descripcion: "Bu durum karşısındaki tavrın." },
+      { nombre: "Çevre", descripcion: "İnsanların ve koşulların etkisi." },
+      { nombre: "Umutlar ve korkular", descripcion: "Dilediklerin ve korktukların." },
+      { nombre: "Sonuç", descripcion: "Her şeyin yöneldiği yer." },
     ],
   },
 };

@@ -45,8 +45,28 @@ const TEXTOS: Record<Idioma, { titulo: string; gano: (n: number) => string; perd
     vozGano: (n) => (n === 1 ? "Encontrei de primeira! E você, encontra?" : `Encontrei em ${n} tentativas. E você, encontra?`),
     vozPerdio: "Hoje a carta se escondeu de mim. Você encontra?",
   },
+  fr: {
+    titulo: "Ma partie du jour",
+    gano: (n) => `Trouvée en ${n}/${MAX_INTENTOS}`,
+    perdio: "Elle m'a échappé aujourd'hui",
+    racha: (n) => `${n} jours d'affilée`,
+    reto: "Et toi ? Joue gratuitement sur miarcana.com/juego",
+    voz1: "Voici ma partie du jour au Chemin du Fou.",
+    vozGano: (n) => (n === 1 ? "Je l'ai trouvée du premier coup ! Et toi, tu la trouves ?" : `Je l'ai trouvée en ${n} essais. Et toi, tu la trouves ?`),
+    vozPerdio: "Aujourd'hui, la carte m'a échappé. Et toi, tu la trouves ?",
+  },
+  tr: {
+    titulo: "Bugünkü oyunum",
+    gano: (n) => `${n}/${MAX_INTENTOS} denemede buldum`,
+    perdio: "Bugün benden saklandı",
+    racha: (n) => `${n} gündür üst üste oynuyorum`,
+    reto: "Sıra sende! miarcana.com/juego adresinde ücretsiz oyna",
+    voz1: "Deli'nin Yolculuğu'nda bugün böyle geçti.",
+    vozGano: (n) => (n === 1 ? "İlk denemede buldum! Sen de bulabilir misin?" : `${n} denemede buldum. Sen de bulabilir misin?`),
+    vozPerdio: "Bugün kart benden saklandı. Sen bulabilir misin?",
+  },
 };
-const NOMBRE_JUEGO: Record<Idioma, string> = { es: "EL CAMINO DEL LOCO", en: "THE FOOL'S JOURNEY", pt: "O CAMINHO DO LOUCO" };
+const NOMBRE_JUEGO: Record<Idioma, string> = { es: "EL CAMINO DEL LOCO", en: "THE FOOL'S JOURNEY", pt: "O CAMINHO DO LOUCO", fr: "LE CHEMIN DU FOU", tr: "DELİ'NİN YOLCULUĞU" };
 
 const capa = { width: "100%", height: "100%", display: "flex", position: "relative" } as const;
 
