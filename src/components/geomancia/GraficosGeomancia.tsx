@@ -9,20 +9,26 @@ const VIOLETA = "#b7a5ff";
 const ROMANOS = ["I", "II", "III", "IV"];
 
 /** Puntos de una figura dentro de un <svg>: cuatro filas centradas en (cx, cy). */
-function PuntosSVG({ filas, cx, cy, escala = 1, color = ORO }: { filas: Filas; cx: number; cy: number; escala?: number; color?: string }) {
+function PuntosSVG({ filas, cx, cy, escala = 1, color = ORO, retraso }: { filas: Filas; cx: number; cy: number; escala?: number; color?: string; retraso?: number }) {
   const paso = 15 * escala;
   const separacion = 9 * escala;
   const r = 4.2 * escala;
+  // Con `retraso` (segundos), los puntos caen uno a uno, fila por fila, como cuando se marcan en la arena.
+  let orden = 0;
+  const punto = (x: number, y: number, key?: number) => {
+    const animado = retraso !== undefined ? { className: "geo-punto", style: { animationDelay: `${(retraso + orden++ * 0.05).toFixed(2)}s` } } : {};
+    return <circle key={key} cx={x} cy={y} r={r} fill={color} {...animado} />;
+  };
   return (
     <g>
       {filas.map((p, i) => {
         const y = cy + (i - 1.5) * paso;
         return p === 1 ? (
-          <circle key={i} cx={cx} cy={y} r={r} fill={color} />
+          punto(cx, y, i)
         ) : (
           <g key={i}>
-            <circle cx={cx - separacion} cy={y} r={r} fill={color} />
-            <circle cx={cx + separacion} cy={y} r={r} fill={color} />
+            {punto(cx - separacion, y)}
+            {punto(cx + separacion, y)}
           </g>
         );
       })}
@@ -46,20 +52,23 @@ function corto(nombre: string) {
   return nombre.replace(/\s*\(.*\)\s*$/, "");
 }
 
-function Celda({ id, cx, cy, rol, idioma, ancho, escala = 1, destacada = false }: { id: IdFigura; cx: number; cy: number; rol: string; idioma: Idioma; ancho: number; escala?: number; destacada?: boolean }) {
+function Celda({ id, cx, cy, rol, idioma, ancho, escala = 1, destacada = false, retraso }: { id: IdFigura; cx: number; cy: number; rol: string; idioma: Idioma; ancho: number; escala?: number; destacada?: boolean; retraso: number }) {
   const f = figuraPorId(id)!;
   const nombre = corto(f.nombre[idioma]);
   const tamano = 12 * Math.min(escala, 1.3);
   // Si el nombre no cabe en la celda, se comprime para que no se salga.
   const largo = nombre.length * tamano * 0.55 > ancho - 10;
+  // El nombre aparece cuando la figura terminó de caer; el Juez se enciende al final con su halo.
+  const despues = { className: "geo-aparece", style: { animationDelay: `${(retraso + 0.4).toFixed(2)}s` } };
   return (
     <g>
       <text x={cx} y={cy - 46 * escala} textAnchor="middle" fontSize={10 * Math.min(escala, 1.2)} fill={VIOLETA} letterSpacing="1.2" style={{ textTransform: "uppercase" }}>
         {rol}
       </text>
-      {destacada && <circle cx={cx} cy={cy} r={40 * escala} fill="url(#geo-halo)" />}
-      <PuntosSVG filas={f.filas} cx={cx} cy={cy} escala={escala} color={destacada ? "#ffe7a8" : ORO} />
+      {destacada && <circle cx={cx} cy={cy} r={40 * escala} fill="url(#geo-halo)" className="geo-halo" style={{ animationDelay: `${(retraso + 0.3).toFixed(2)}s` }} />}
+      <PuntosSVG filas={f.filas} cx={cx} cy={cy} escala={escala} color={destacada ? "#ffe7a8" : ORO} retraso={retraso} />
       <text
+        {...despues}
         x={cx}
         y={cy + 47 * escala}
         textAnchor="middle"
@@ -85,6 +94,8 @@ export function EscudoGeomantico({ r, t, idioma }: { r: ResultadoGeomancia; t: T
     ...[3, 2, 1, 0].map((i) => ({ id: r.hijas[i], rol: plantilla(t.hija, { n: ROMANOS[i] }) })),
     ...[3, 2, 1, 0].map((i) => ({ id: r.madres[i], rol: plantilla(t.madre, { n: ROMANOS[i] }) })),
   ];
+  // Segundos en que empieza a caer la figura n (0 = Madre I … 14 = Juez).
+  const turno = (n: number) => 0.3 + n * 0.32;
   const sobrinas = [3, 2, 1, 0].map((i) => ({ id: r.sobrinas[i], rol: plantilla(t.sobrina, { n: ROMANOS[i] }) }));
   return (
     // En el teléfono el escudo conserva un ancho legible y se desliza de lado; empieza por la derecha (las Madres),
@@ -119,15 +130,16 @@ export function EscudoGeomantico({ r, t, idioma }: { r: ResultadoGeomancia; t: T
           <line key={x} x1={x} y1="178" x2={x} y2="338" />
         ))}
       </g>
-            {arriba.map((c, k) => (
-        <Celda key={`a${k}`} id={c.id} cx={50 + k * 100} cy={98} rol={c.rol} idioma={idioma} ancho={100} />
+            {/* Se trazan en orden: Madres I–IV y Hijas I–IV (de derecha a izquierda), Sobrinas, Testigos y, al final, el Juez. */}
+      {arriba.map((c, k) => (
+        <Celda key={`a${k}`} id={c.id} cx={50 + k * 100} cy={98} rol={c.rol} idioma={idioma} ancho={100} retraso={turno(7 - k)} />
       ))}
       {sobrinas.map((c, k) => (
-        <Celda key={`s${k}`} id={c.id} cx={100 + k * 200} cy={262} rol={c.rol} idioma={idioma} ancho={200} escala={1.1} />
+        <Celda key={`s${k}`} id={c.id} cx={100 + k * 200} cy={262} rol={c.rol} idioma={idioma} ancho={200} escala={1.1} retraso={turno(11 - k)} />
       ))}
-      <Celda id={r.testigoIzquierdo} cx={230} cy={420} rol={t.testigoIzquierdo} idioma={idioma} ancho={300} escala={1.15} />
-      <Celda id={r.testigoDerecho} cx={570} cy={420} rol={t.testigoDerecho} idioma={idioma} ancho={300} escala={1.15} />
-      <Celda id={r.juez} cx={400} cy={590} rol={t.juez} idioma={idioma} ancho={300} escala={1.35} destacada />
+      <Celda id={r.testigoIzquierdo} cx={230} cy={420} rol={t.testigoIzquierdo} idioma={idioma} ancho={300} escala={1.15} retraso={turno(13)} />
+      <Celda id={r.testigoDerecho} cx={570} cy={420} rol={t.testigoDerecho} idioma={idioma} ancho={300} escala={1.15} retraso={turno(12)} />
+      <Celda id={r.juez} cx={400} cy={590} rol={t.juez} idioma={idioma} ancho={300} escala={1.35} destacada retraso={turno(14) + 0.3} />
     </svg>
     </div>
   );

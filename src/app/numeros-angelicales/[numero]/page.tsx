@@ -44,6 +44,19 @@ export async function generateMetadata({ params }: { params: Promise<{ numero: s
   return { title: plantilla(t.generico.metaTitulo, { n: numero }), description: t.generico.intro, robots: { index: false, follow: true } };
 }
 
+/** El número grande: las cifras suben una a una y luego queda respirando un halo dorado (CSS: .halo-angel, .cifra-angel). */
+function CifrasAngel({ numero }: { numero: string }) {
+  return (
+    <p dir="ltr" className="halo-angel font-display text-7xl [font-variant-numeric:lining-nums] font-semibold text-oro-suave sm:text-8xl" aria-hidden>
+      {[...numero].map((d, i) => (
+        <span key={i} className="cifra-angel brillo-oro" style={{ animationDelay: `${0.15 + i * 0.18}s` }}>
+          {d}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 export default async function PaginaNumero({ params }: { params: Promise<{ numero: string }> }) {
   const { numero } = await params;
   const idioma = await getIdioma();
@@ -75,7 +88,7 @@ export default async function PaginaNumero({ params }: { params: Promise<{ numer
 
       <header className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.etiquetaNumero}</p>
-        <p dir="ltr" className="brillo-oro font-display text-7xl [font-variant-numeric:lining-nums] font-semibold text-oro-suave sm:text-8xl" aria-hidden>{numero}</p>
+        <CifrasAngel numero={numero} />
         <h1 className="font-display text-3xl font-semibold [font-variant-numeric:lining-nums] sm:text-4xl">{plantilla(t.tituloNumero, { n: numero })}</h1>
         <p className="mt-1 text-lg text-texto-suave">{c.lema}</p>
         <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -151,7 +164,7 @@ function LecturaPorCifras({ numero, t, base, lemas, migas }: { numero: string; t
       <MigasNumeros items={migas} />
       <header className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{g.etiqueta}</p>
-        <p dir="ltr" className="brillo-oro font-display text-7xl [font-variant-numeric:lining-nums] font-semibold text-oro-suave sm:text-8xl" aria-hidden>{numero}</p>
+        <CifrasAngel numero={numero} />
         <h1 className="font-display text-3xl font-semibold [font-variant-numeric:lining-nums] sm:text-4xl">{plantilla(g.titulo, { n: numero })}</h1>
         <p className="mx-auto mt-2 max-w-xl text-texto-suave">{g.intro}</p>
       </header>

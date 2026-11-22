@@ -22,6 +22,12 @@ const CASAS: { centro: Punto; numero: Punto; porFila: number; poligono: Punto[] 
   { centro: [300, 36], numero: [300, 86], porFila: 3, poligono: [[400, 0], [300, 100], [200, 0]] },
 ];
 
+/** Tiempos de la aparición (segundos): las casas se encienden una tras otra y después llegan los grahas. */
+const PRIMERA_CASA = 0.7;
+const PASO_CASA = 0.16;
+const LLEGAN_GRAHAS = PRIMERA_CASA + 12 * PASO_CASA + 0.2;
+const ORDEN_GRAHAS: IdGraha[] = ["surya", "chandra", "mangal", "budh", "guru", "shukra", "shani", "rahu", "ketu"];
+
 export interface GrahaEnCarta {
   id: IdGraha;
   casa: number;
@@ -53,12 +59,12 @@ export function CartaKundli({
         </linearGradient>
       </defs>
       <rect x="0" y="0" width="400" height="400" rx="6" fill="url(#kundli-fondo)" stroke="#d9b45a" strokeWidth="2" />
-      {/* El bhava 1 resaltado */}
-      <polygon points={CASAS[0].poligono.map((p) => p.join(",")).join(" ")} fill="rgba(217,180,90,0.10)" />
+      {/* Al aparecer: se trazan las diagonales y el rombo, se enciende casa por casa (1 → 12) y luego llegan los grahas. */}
+      <polygon points={CASAS[0].poligono.map((p) => p.join(",")).join(" ")} fill="rgba(217,180,90,0.10)" className="kundli-aparece" style={{ animationDelay: `${PRIMERA_CASA}s` }} />
       <g stroke="rgba(217,180,90,0.75)" strokeWidth="1.5" fill="none">
-        <line x1="0" y1="0" x2="400" y2="400" />
-        <line x1="400" y1="0" x2="0" y2="400" />
-        <polygon points="200,0 400,200 200,400 0,200" />
+        <line x1="0" y1="0" x2="400" y2="400" pathLength={1} className="kundli-trazo" />
+        <line x1="400" y1="0" x2="0" y2="400" pathLength={1} className="kundli-trazo" style={{ animationDelay: "0.15s" }} />
+        <polygon points="200,0 400,200 200,400 0,200" pathLength={1} className="kundli-trazo" style={{ animationDelay: "0.3s" }} />
       </g>
 
       {CASAS.map((c, i) => {
@@ -68,13 +74,15 @@ export function CartaKundli({
         const alto = 17;
         const ancho = c.porFila === 2 ? 30 : 34;
         const y0 = c.centro[1] - ((filas - 1) * alto) / 2 + 5;
+        const enciende = { animationDelay: `${(PRIMERA_CASA + i * PASO_CASA).toFixed(2)}s` };
         return (
           <g key={i}>
-            <text x={c.numero[0]} y={c.numero[1]} textAnchor="middle" fontSize="12" fill="#a89fc0">
+            <polygon points={c.poligono.map((p) => p.join(",")).join(" ")} fill="#d9b45a" className="kundli-destello" style={enciende} />
+            <text x={c.numero[0]} y={c.numero[1]} textAnchor="middle" fontSize="12" fill="#a89fc0" className="kundli-aparece" style={enciende}>
               {rashi}
             </text>
             {i === 0 && (
-              <text x="200" y="40" textAnchor="middle" fontSize="11" fill="#d9b45a" letterSpacing="0.5">
+              <text x="200" y="40" textAnchor="middle" fontSize="11" fill="#d9b45a" letterSpacing="0.5" className="kundli-aparece" style={enciende}>
                 {marcaCasa1}
               </text>
             )}
@@ -86,7 +94,17 @@ export function CartaKundli({
               const y = y0 + fila * alto + (i === 0 ? 8 : 0);
               const destacado = g.id === "chandra";
               return (
-                <text key={g.id} x={x} y={y} textAnchor="middle" fontSize="13" fontWeight={destacado ? 700 : 500} fill={destacado ? "#f1d99a" : "#ece6f7"}>
+                <text
+                  key={g.id}
+                  x={x}
+                  y={y}
+                  textAnchor="middle"
+                  fontSize="13"
+                  fontWeight={destacado ? 700 : 500}
+                  fill={destacado ? "#f1d99a" : "#ece6f7"}
+                  className="kundli-graha"
+                  style={{ animationDelay: `${(LLEGAN_GRAHAS + ORDEN_GRAHAS.indexOf(g.id) * 0.12).toFixed(2)}s` }}
+                >
                   {abreviaturas[g.id]}
                   {g.retrogrado && g.id !== "rahu" && g.id !== "ketu" && (
                     <tspan fontSize="8" dx="1" dy="-5" fill="#ff9f6b">

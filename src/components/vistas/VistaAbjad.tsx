@@ -44,7 +44,7 @@ function Persona({ p, t, principal }: { p: PersonaAbjad; t: TextosAbjad; princip
         {/* Las letras van de derecha a izquierda, como se escribe el nombre en árabe. */}
         <ol dir="rtl" className="flex flex-wrap gap-2">
           {p.letras.map((l, i) => (
-            <li key={i} className="flex w-16 flex-col items-center rounded-xl border border-borde bg-superficie-2/60 px-1 py-2" style={{ borderTopColor: COLOR_ELEMENTO[l.elemento], borderTopWidth: 3 }}>
+            <li key={i} className="abjad-letra flex w-16 flex-col items-center rounded-xl border border-borde bg-superficie-2/60 px-1 py-2" style={{ borderTopColor: COLOR_ELEMENTO[l.elemento], borderTopWidth: 3, animationDelay: `${0.2 + i * 0.15}s` }}>
               <span lang="ar" className="font-display text-3xl leading-none text-texto">{l.escrita}</span>
               {l.escrita !== l.base && <span lang="ar" className="text-[0.65rem] text-texto-suave">= {l.base}</span>}
               <span className="mt-1 text-sm font-semibold text-oro-suave">{l.valor}</span>

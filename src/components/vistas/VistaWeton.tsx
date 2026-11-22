@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { LOCALE_INTL } from "@/lib/i18n/idiomas";
 import { plantilla } from "@/lib/i18n/formato";
@@ -9,38 +10,48 @@ export function fechaWeton(iso: string, idioma: Idioma) {
   return new Date(`${iso}T12:00:00Z`).toLocaleDateString(LOCALE_INTL[idioma], { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 }
 
-/** Rueda de un ciclo (7 días o 5 pasaran) con el día de la persona resaltado y su neptu. */
+/**
+ * Rueda de un ciclo (7 días o 5 pasaran) con el día de la persona resaltado y su neptu.
+ * Al aparecer, la rueda da dos vueltas y se detiene con el día de la persona arriba; los nombres giran al revés
+ * para quedar siempre derechos (CSS: .weton-rueda / .weton-nodo, con el ángulo final en --giro).
+ */
 export function RuedaCiclo({ nombres, neptus, activo, titulo, color }: { nombres: readonly string[]; neptus: readonly number[]; activo: number; titulo: string; color: "oro" | "violeta" }) {
   const n = nombres.length;
   const radio = n === 7 ? 72 : 66;
   const acento = color === "oro" ? "var(--oro)" : "var(--violeta)";
+  const giro = { "--giro": `${(-activo / n) * 360}deg` } as CSSProperties;
   return (
     <figure className="flex flex-col items-center gap-2">
       <svg viewBox="0 0 200 200" className="h-56 w-56" role="img" aria-label={`${titulo}: ${nombres[activo]}`}>
         <circle cx="100" cy="100" r={radio} fill="none" stroke="var(--borde)" strokeDasharray="2 4" />
-        {nombres.map((nombre, i) => {
-          const ang = (i / n) * 2 * Math.PI - Math.PI / 2;
-          const x = 100 + radio * Math.cos(ang);
-          const y = 100 + radio * Math.sin(ang);
-          const es = i === activo;
-          return (
-            <g key={nombre}>
-              <circle cx={x} cy={y} r={23} fill={es ? acento : "rgba(255,255,255,0.04)"} stroke={es ? acento : "var(--borde)"} />
-              <text x={x} y={y - 1} textAnchor="middle" fontSize="10" fontWeight={es ? 700 : 500} fill={es ? "var(--noche)" : "var(--texto)"}>
-                {nombre}
-              </text>
-              <text x={x} y={y + 11} textAnchor="middle" fontSize="9" fill={es ? "var(--noche)" : "var(--texto-suave)"}>
-                {neptus[i]}
-              </text>
-            </g>
-          );
-        })}
-        <text x="100" y="98" textAnchor="middle" fontSize="15" fontWeight={700} fill={acento}>
-          {nombres[activo]}
-        </text>
-        <text x="100" y="116" textAnchor="middle" fontSize="11" fill="var(--texto-suave)">
-          {neptus[activo]}
-        </text>
+        <circle cx="100" cy={100 - radio} r={28} fill="none" stroke={acento} strokeWidth="1.5" className="weton-pulso" />
+        <g className="weton-rueda" style={giro}>
+          {nombres.map((nombre, i) => {
+            const ang = (i / n) * 2 * Math.PI - Math.PI / 2;
+            const x = 100 + radio * Math.cos(ang);
+            const y = 100 + radio * Math.sin(ang);
+            const es = i === activo;
+            return (
+              <g key={nombre} className="weton-nodo" style={giro}>
+                <circle cx={x} cy={y} r={23} fill={es ? acento : "rgba(255,255,255,0.04)"} stroke={es ? acento : "var(--borde)"} />
+                <text x={x} y={y - 1} textAnchor="middle" fontSize="10" fontWeight={es ? 700 : 500} fill={es ? "var(--noche)" : "var(--texto)"}>
+                  {nombre}
+                </text>
+                <text x={x} y={y + 11} textAnchor="middle" fontSize="9" fill={es ? "var(--noche)" : "var(--texto-suave)"}>
+                  {neptus[i]}
+                </text>
+              </g>
+            );
+          })}
+        </g>
+        <g className="weton-centro">
+          <text x="100" y="98" textAnchor="middle" fontSize="15" fontWeight={700} fill={acento}>
+            {nombres[activo]}
+          </text>
+          <text x="100" y="116" textAnchor="middle" fontSize="11" fill="var(--texto-suave)">
+            {neptus[activo]}
+          </text>
+        </g>
       </svg>
       <figcaption className="text-xs uppercase tracking-[0.2em] text-texto-suave">{titulo}</figcaption>
     </figure>
