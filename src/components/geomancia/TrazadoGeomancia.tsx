@@ -62,9 +62,9 @@ export function TrazadoGeomancia() {
       <p className="text-sm text-texto-suave">{t.instrucciones}</p>
       <input type="hidden" name="toques" value={completo ? JSON.stringify(toques) : "[]"} />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="fondo-arena grid grid-cols-2 gap-3 rounded-2xl border border-oro/20 p-2.5 sm:grid-cols-4 sm:p-3">
         {ROMANOS.map((romano, m) => (
-          <div key={romano} className="rounded-xl border border-borde bg-superficie-2/60 p-2.5">
+          <div key={romano} className="rounded-xl border border-borde/70 bg-black/20 p-2.5">
             <p className="mb-2 text-center text-[0.7rem] uppercase tracking-widest text-violeta-suave">{plantilla(t.madre, { n: romano })}</p>
             <div className="space-y-1.5">
               {t.filas.map((fila, f) => {

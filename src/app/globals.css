@@ -1422,3 +1422,10 @@ html[lang="hi"] [class*="tracking-"],
 html[lang="ar"] [class*="tracking-"] {
   letter-spacing: normal !important;
 }
+
+/* Arena para trazar la geomancia (ʿilm al-raml): la foto de arena con un velo oscuro para que los puntos se lean. */
+.fondo-arena {
+  background:
+    linear-gradient(180deg, rgba(20, 14, 34, 0.1), rgba(20, 14, 34, 0.4)),
+    url("/fondos/arena.webp") center / cover no-repeat;
+}

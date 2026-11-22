@@ -100,10 +100,12 @@ export function EscudoGeomantico({ r, t, idioma }: { r: ResultadoGeomancia; t: T
           <stop offset="100%" stopColor="#8b6cf6" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="geo-fondo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1d1633" />
-          <stop offset="100%" stopColor="#150f26" />
+          <stop offset="0%" stopColor="#1d1633" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#150f26" stopOpacity="0.5" />
         </linearGradient>
       </defs>
+      {/* El escudo se traza sobre arena, como en la geomancia tradicional (ʿilm al-raml, «la ciencia de la arena»). */}
+      <image href="/fondos/arena.webp" x="0" y="0" width="800" height="712" preserveAspectRatio="xMidYMid slice" clipPath="url(#geo-escudo)" />
       <path d={contorno} fill="url(#geo-fondo)" stroke="rgba(241,217,154,0.45)" strokeWidth="2" />
       <g clipPath="url(#geo-escudo)" stroke="rgba(241,217,154,0.18)" strokeWidth="1.2">
         <line x1="0" y1="178" x2="800" y2="178" />
