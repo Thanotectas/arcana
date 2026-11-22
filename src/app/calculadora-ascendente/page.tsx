@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { alternativas } from "@/lib/i18n/rutas";
 import { getIdioma } from "@/lib/i18n/servidor";
 import { SIGNOS } from "@/lib/zodiaco";
@@ -30,6 +31,7 @@ export default async function PaginaCalculadoraAscendente() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-10">
+      <PortadaProducto clave="ascendente" />
       <header className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{tx.seccion}</p>
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{tx.titulo}</h1>

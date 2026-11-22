@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { accionWeton } from "@/lib/weton/acciones";
@@ -22,6 +23,7 @@ export default async function PaginaWeton() {
   const campos = { fecha: tw.fecha, atardecer: tw.atardecer, atardecerAyuda: tw.atardecerAyuda, neptu: tw.neptu, wuku: tw.wuku };
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      <PortadaProducto clave="weton" />
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{tw.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{tw.titulo}</h1>

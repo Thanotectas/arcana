@@ -1416,3 +1416,9 @@ body {
   0% { opacity: 0.95; transform: scale(0.98); }
   100% { opacity: 0; transform: scale(1.06); }
 }
+
+/* El espaciado entre letras rompe las ligaduras del devanagari y del árabe: en esos idiomas, sin espaciado. */
+html[lang="hi"] [class*="tracking-"],
+html[lang="ar"] [class*="tracking-"] {
+  letter-spacing: normal !important;
+}

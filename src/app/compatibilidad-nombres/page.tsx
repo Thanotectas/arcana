@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { alternativas } from "@/lib/i18n/rutas";
 import { getIdioma } from "@/lib/i18n/servidor";
 import { TEXTOS_NOMBRES } from "@/lib/herramientas/nombres-textos";
@@ -21,6 +22,7 @@ export default async function PaginaCompatibilidadNombres() {
   const { comoFunciona, cta, ...textos } = TEXTOS_NOMBRES[idioma];
   return (
     <div className="mx-auto max-w-3xl space-y-10">
+      <PortadaProducto clave="nombres" />
       <header className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{textos.seccion}</p>
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{textos.titulo}</h1>

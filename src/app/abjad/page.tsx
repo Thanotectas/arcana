@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { accionAbjad } from "@/lib/abjad/acciones";
@@ -20,6 +21,7 @@ export default async function PaginaAbjad() {
   const t = TEXTOS_ABJAD[idioma];
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      <PortadaProducto clave="abjad" />
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{t.titulo}</h1>

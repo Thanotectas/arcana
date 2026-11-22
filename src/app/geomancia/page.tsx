@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { accionGeomancia } from "@/lib/geomancia/acciones";
@@ -19,6 +20,7 @@ export default async function PaginaGeomancia() {
   const t = TEXTOS_GEOMANCIA[idioma];
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      <PortadaProducto clave="geomancia" />
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{t.titulo}</h1>

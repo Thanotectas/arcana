@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -22,6 +23,7 @@ export default async function PaginaIskambil() {
   const textos = TEXTOS_ISKAMBIL[idioma];
   return (
     <div className="mx-auto max-w-3xl space-y-8">
+      <PortadaProducto clave="iskambil" />
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{textos.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{textos.titulo}</h1>

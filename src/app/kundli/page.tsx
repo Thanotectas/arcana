@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { requerirUsuario, getPerfil, horaDePerfil, lugarDePerfil } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -20,6 +21,7 @@ export default async function PaginaKundli() {
   const k = textosVedica(idioma).kundli;
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      <PortadaProducto clave="kundli" />
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{k.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{k.titulo}</h1>

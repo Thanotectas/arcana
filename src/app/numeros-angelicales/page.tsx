@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PortadaProducto } from "@/components/PortadaProducto";
 import { redirect } from "next/navigation";
 import { alternativas, rutaIdioma } from "@/lib/i18n/rutas";
 import { getIdioma } from "@/lib/i18n/servidor";
@@ -34,6 +35,7 @@ export default async function PaginaNumerosAngelicales({ searchParams }: { searc
 
   return (
     <div className="mx-auto max-w-5xl space-y-10">
+      <PortadaProducto clave="numeros-angelicales" />
       <MigasNumeros items={[{ nombre: t.inicio, href: rutaIdioma("/", idioma) }, { nombre: t.nombreSeccion, href: base }]} />
 
       <header className="text-center">
