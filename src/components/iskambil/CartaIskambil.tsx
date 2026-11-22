@@ -63,7 +63,7 @@ function Pinta({ palo, x, y, escala, girada = false }: { palo: Palo; x: number; 
 }
 
 /** Figuras ilustradas (public/cartas/iskambil/<id>.webp): al llegar una nueva, se suma su id aquí. */
-const FIGURAS_ILUSTRADAS = new Set(["kupa-k", "kupa-q", "kupa-j", "karo-k", "karo-q", "karo-j", "sinek-k", "sinek-q"]);
+const FIGURAS_ILUSTRADAS = new Set(["kupa-k", "kupa-q", "kupa-j", "karo-k", "karo-q", "karo-j", "sinek-k", "sinek-q", "sinek-j", "maca-k"]);
 
 export function CartaIskambil({ id, alt, className = "" }: { id: string; alt: string; className?: string }) {
   const c = cartaIskambil(id);
