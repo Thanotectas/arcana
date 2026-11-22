@@ -1,3 +1,4 @@
+import { IDIOMAS_RTL } from "@/lib/i18n/idiomas";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
@@ -42,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Nunca en la app de Google Play: su ficha de seguridad de datos dice que no se usan para publicidad.
   const pixel = META_PIXEL_ID && plataforma !== "android" ? META_PIXEL_ID : "";
   return (
-    <html lang={idioma} className={`${inter.variable} ${cormorant.variable}`}>
+    <html lang={idioma} dir={IDIOMAS_RTL.includes(idioma) ? "rtl" : "ltr"} className={`${inter.variable} ${cormorant.variable}`}>
       <body className="flex min-h-dvh flex-col antialiased">
         <ProveedorIdioma idioma={idioma} t={t}>
           <div className="estrellas" aria-hidden />

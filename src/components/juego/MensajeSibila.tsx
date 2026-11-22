@@ -65,7 +65,7 @@ export function MensajeSibila({ carta }: { carta: string }) {
   const mostrarSignos = estado === "elegir" || eligiendo;
 
   return (
-    <div className="space-y-3 rounded-2xl border border-oro/40 bg-gradient-to-br from-violeta/25 via-noche to-noche p-4 text-left">
+    <div className="space-y-3 rounded-2xl border border-oro/40 bg-gradient-to-br from-violeta/25 via-noche to-noche p-4 text-start">
       <div className="flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
         <img src="/juego/sibila-gana.webp" alt="" className="h-12 w-12 shrink-0 rounded-full border-2 border-oro/70" />

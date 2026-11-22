@@ -1,4 +1,6 @@
 import { LOCALE_INTL } from "@/lib/i18n/idiomas";
+import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
 import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
 import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, precioCirculoPorDia } from "@/lib/creditos";
@@ -24,6 +26,11 @@ const VIDEOS = [
   { id: "suenos", clave: "suenos", href: "/suenos" },
   { id: "carta-astral", clave: "cartaAstral", href: "/carta-astral" },
 ] as const;
+
+/** La portada en cada idioma tiene su dirección (/fr, /tr…) para Google. */
+export async function generateMetadata(): Promise<Metadata> {
+  return { alternates: alternativas("/", await getIdioma()) };
+}
 
 export default async function Portada() {
   const [usuario, t, idioma, contador, compras, tasas] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0), comprasVisibles(), tasasDelDia()]);

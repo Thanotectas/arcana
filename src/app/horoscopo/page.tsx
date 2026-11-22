@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import { SIGNOS, imagenSigno } from "@/lib/zodiaco";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { fechaHoy } from "@/lib/horoscopo";
 import { cieloDelSigno, instanteDelDia } from "@/lib/horoscopo/cielo";
@@ -9,7 +10,7 @@ import { DiscoLuna } from "@/components/CieloSigno";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.horoscopo.titulo, description: t.meta.descripcion };
+  return { alternates: alternativas("/horoscopo", await getIdioma()), title: t.horoscopo.titulo, description: t.meta.descripcion };
 }
 
 export default async function PaginaHoroscopo() {

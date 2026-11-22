@@ -9,10 +9,10 @@ export type Palo = "oros" | "copas" | "espadas" | "bastos";
 export const PALOS: Palo[] = ["oros", "copas", "espadas", "bastos"];
 
 export const NOMBRE_PALO: Record<Palo, Texto> = {
-  oros: { es: "Oros", en: "Coins", pt: "Ouros", fr: "Deniers", tr: "Altınlar" },
-  copas: { es: "Copas", en: "Cups", pt: "Copas", fr: "Coupes", tr: "Kupalar" },
-  espadas: { es: "Espadas", en: "Swords", pt: "Espadas", fr: "Épées", tr: "Kılıçlar" },
-  bastos: { es: "Bastos", en: "Clubs", pt: "Paus", fr: "Bâtons", tr: "Sopalar" },
+  oros: { es: "Oros", en: "Coins", pt: "Ouros", fr: "Deniers", tr: "Altınlar", ar: "الدنانير", id: "Koin", hi: "सिक्के" },
+  copas: { es: "Copas", en: "Cups", pt: "Copas", fr: "Coupes", tr: "Kupalar", ar: "الكؤوس", id: "Cawan", hi: "प्याले" },
+  espadas: { es: "Espadas", en: "Swords", pt: "Espadas", fr: "Épées", tr: "Kılıçlar", ar: "السيوف", id: "Pedang", hi: "तलवारें" },
+  bastos: { es: "Bastos", en: "Clubs", pt: "Paus", fr: "Bâtons", tr: "Sopalar", ar: "العصي", id: "Tongkat", hi: "डंडे" },
 };
 
 export const TEMA_PALO: Record<Palo, string> = {
@@ -24,10 +24,10 @@ export const TEMA_PALO: Record<Palo, string> = {
 
 const NUMEROS = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12] as const;
 const FIGURA: Record<number, Texto> = {
-  1: { es: "As", en: "Ace", pt: "Ás", fr: "As", tr: "As" },
-  10: { es: "Sota", en: "Jack", pt: "Valete", fr: "Valet", tr: "Vale" },
-  11: { es: "Caballo", en: "Knight", pt: "Cavalo", fr: "Cavalier", tr: "Şövalye" },
-  12: { es: "Rey", en: "King", pt: "Rei", fr: "Roi", tr: "Kral" },
+  1: { es: "As", en: "Ace", pt: "Ás", fr: "As", tr: "As", ar: "آس", id: "As", hi: "इक्का" },
+  10: { es: "Sota", en: "Jack", pt: "Valete", fr: "Valet", tr: "Vale", ar: "غلام", id: "Pelayan", hi: "गुलाम" },
+  11: { es: "Caballo", en: "Knight", pt: "Cavalo", fr: "Cavalier", tr: "Şövalye", ar: "فارس", id: "Kesatria", hi: "घुड़सवार" },
+  12: { es: "Rey", en: "King", pt: "Rei", fr: "Roi", tr: "Kral", ar: "ملك", id: "Raja", hi: "राजा" },
 };
 
 /** Sentido tradicional de cada carta (para el modelo), por palo y número. */
@@ -98,11 +98,19 @@ export function cartaEspanola(id: string) {
 const PALO_TR: Record<Palo, string> = { oros: "Altın", copas: "Kupa", espadas: "Kılıç", bastos: "Sopa" };
 const CARTA_TR: Record<number, string> = { 1: "ası", 2: "ikilisi", 3: "üçlüsü", 4: "dörtlüsü", 5: "beşlisi", 6: "altılısı", 7: "yedilisi", 10: "valesi", 11: "şövalyesi", 12: "kralı" };
 
+/** En hindi el palo va delante, en caso oblicuo y con la posposición «का»: «प्यालों का घुड़सवार», «तलवारों का 5». */
+const PALO_HI: Record<Palo, string> = { oros: "सिक्कों", copas: "प्यालों", espadas: "तलवारों", bastos: "डंडों" };
+
 /** "As de oros", "Caballo de copas", "5 de espadas". */
 export function nombreCartaEspanola(c: CartaEspanola, idioma: keyof Texto = "es") {
   if (idioma === "tr") return `${PALO_TR[c.palo]} ${CARTA_TR[c.numero] ?? String(c.numero)}`;
+  if (idioma === "hi") return `${PALO_HI[c.palo]} का ${FIGURA[c.numero]?.hi ?? String(c.numero)}`;
   const figura = FIGURA[c.numero]?.[idioma] ?? String(c.numero);
   const palo = NOMBRE_PALO[c.palo][idioma].toLowerCase();
+  // En árabe las figuras van en idafa («فارس الكؤوس») y los números con «من» («5 من السيوف»).
+  if (idioma === "ar") return FIGURA[c.numero] ? `${figura} ${palo}` : `${figura} من ${palo}`;
+  // En indonesio el palo sigue a la carta sin preposición: «Raja pedang», «5 cawan».
+  if (idioma === "id") return `${figura} ${palo}`;
   if (idioma === "en") return `${figura} of ${palo}`;
   // En francés, «de» se apostrofa ante vocal: «Cavalier d'épées».
   if (idioma === "fr") return `${figura} ${/^[aeiouéèêh]/.test(palo) ? "d'" : "de "}${palo}`;
@@ -112,24 +120,24 @@ export function nombreCartaEspanola(c: CartaEspanola, idioma: keyof Texto = "es"
 export const TIRADAS_BARAJA: TiradaOraculo[] = [
   {
     id: "tres",
-    nombre: { es: "Tres cartas", en: "Three cards", pt: "Três cartas", fr: "Trois cartes", tr: "Üç kart" },
-    descripcion: { es: "Pasado, presente y lo que viene.", en: "Past, present and what is coming.", pt: "Passado, presente e o que vem.", fr: "Passé, présent et ce qui vient.", tr: "Geçmiş, şimdi ve gelmekte olan." },
+    nombre: { es: "Tres cartas", en: "Three cards", pt: "Três cartas", fr: "Trois cartes", tr: "Üç kart", ar: "ثلاث أوراق", id: "Tiga kartu", hi: "तीन पत्ते" },
+    descripcion: { es: "Pasado, presente y lo que viene.", en: "Past, present and what is coming.", pt: "Passado, presente e o que vem.", fr: "Passé, présent et ce qui vient.", tr: "Geçmiş, şimdi ve gelmekte olan.", ar: "الماضي والحاضر وما هو آتٍ.", id: "Masa lalu, masa kini, dan yang akan datang.", hi: "अतीत, वर्तमान और जो आने वाला है।" },
     posiciones: [
-      { nombre: { es: "Lo que pasó", en: "What happened", pt: "O que passou", fr: "Ce qui s'est passé", tr: "Yaşananlar" }, sentido: "el pasado que explica la situación" },
-      { nombre: { es: "Lo que pasa", en: "What is happening", pt: "O que acontece", fr: "Ce qui se passe", tr: "Şu an olanlar" }, sentido: "el presente" },
-      { nombre: { es: "Lo que viene", en: "What is coming", pt: "O que vem", fr: "Ce qui vient", tr: "Gelmekte olan" }, sentido: "lo que se avecina si nada cambia" },
+      { nombre: { es: "Lo que pasó", en: "What happened", pt: "O que passou", fr: "Ce qui s'est passé", tr: "Yaşananlar", ar: "ما حدث", id: "Yang telah terjadi", hi: "जो हुआ" }, sentido: "el pasado que explica la situación" },
+      { nombre: { es: "Lo que pasa", en: "What is happening", pt: "O que acontece", fr: "Ce qui se passe", tr: "Şu an olanlar", ar: "ما يحدث الآن", id: "Yang sedang terjadi", hi: "जो हो रहा है" }, sentido: "el presente" },
+      { nombre: { es: "Lo que viene", en: "What is coming", pt: "O que vem", fr: "Ce qui vient", tr: "Gelmekte olan", ar: "ما هو آتٍ", id: "Yang akan datang", hi: "जो आने वाला है" }, sentido: "lo que se avecina si nada cambia" },
     ],
   },
   {
     id: "cruz",
-    nombre: { es: "La cruz", en: "The cross", pt: "A cruz", fr: "La croix", tr: "Haç" },
-    descripcion: { es: "Cinco cartas: tu momento, lo que te ayuda, lo que te frena, el consejo y el desenlace.", en: "Five cards: your moment, what helps, what blocks, the advice and the outcome.", pt: "Cinco cartas: seu momento, o que ajuda, o que trava, o conselho e o desfecho.", fr: "Cinq cartes : ton moment, ce qui t'aide, ce qui te freine, le conseil et le dénouement.", tr: "Beş kart: senin anın, sana yardım eden, seni engelleyen, tavsiye ve sonuç." },
+    nombre: { es: "La cruz", en: "The cross", pt: "A cruz", fr: "La croix", tr: "Haç", ar: "الصليب", id: "Salib", hi: "क्रॉस" },
+    descripcion: { es: "Cinco cartas: tu momento, lo que te ayuda, lo que te frena, el consejo y el desenlace.", en: "Five cards: your moment, what helps, what blocks, the advice and the outcome.", pt: "Cinco cartas: seu momento, o que ajuda, o que trava, o conselho e o desfecho.", fr: "Cinq cartes : ton moment, ce qui t'aide, ce qui te freine, le conseil et le dénouement.", tr: "Beş kart: senin anın, sana yardım eden, seni engelleyen, tavsiye ve sonuç.", ar: "خمس أوراق: لحظتك، وما يساعدك، وما يعيقك، والنصيحة، والخاتمة.", id: "Lima kartu: momenmu, yang membantumu, yang menghambatmu, nasihat, dan hasil akhirnya.", hi: "पाँच पत्ते: आपका समय, जो आपकी मदद करता है, जो आपको रोकता है, सलाह और परिणाम।" },
     posiciones: [
-      { nombre: { es: "Tu momento", en: "Your moment", pt: "Seu momento", fr: "Ton moment", tr: "Senin anın" }, sentido: "la situación actual de la persona" },
-      { nombre: { es: "Lo que te ayuda", en: "What helps", pt: "O que ajuda", fr: "Ce qui t'aide", tr: "Sana yardım eden" }, sentido: "lo que favorece" },
-      { nombre: { es: "Lo que te frena", en: "What blocks", pt: "O que trava", fr: "Ce qui te freine", tr: "Seni engelleyen" }, sentido: "el obstáculo" },
-      { nombre: { es: "El consejo", en: "The advice", pt: "O conselho", fr: "Le conseil", tr: "Tavsiye" }, sentido: "lo que conviene hacer" },
-      { nombre: { es: "El desenlace", en: "The outcome", pt: "O desfecho", fr: "Le dénouement", tr: "Sonuç" }, sentido: "cómo se resuelve" },
+      { nombre: { es: "Tu momento", en: "Your moment", pt: "Seu momento", fr: "Ton moment", tr: "Senin anın", ar: "لحظتك", id: "Momenmu", hi: "आपका समय" }, sentido: "la situación actual de la persona" },
+      { nombre: { es: "Lo que te ayuda", en: "What helps", pt: "O que ajuda", fr: "Ce qui t'aide", tr: "Sana yardım eden", ar: "ما يساعدك", id: "Yang membantumu", hi: "जो आपकी मदद करता है" }, sentido: "lo que favorece" },
+      { nombre: { es: "Lo que te frena", en: "What blocks", pt: "O que trava", fr: "Ce qui te freine", tr: "Seni engelleyen", ar: "ما يعيقك", id: "Yang menghambatmu", hi: "जो आपको रोकता है" }, sentido: "el obstáculo" },
+      { nombre: { es: "El consejo", en: "The advice", pt: "O conselho", fr: "Le conseil", tr: "Tavsiye", ar: "النصيحة", id: "Nasihat", hi: "सलाह" }, sentido: "lo que conviene hacer" },
+      { nombre: { es: "El desenlace", en: "The outcome", pt: "O desfecho", fr: "Le dénouement", tr: "Sonuç", ar: "الخاتمة", id: "Hasil akhir", hi: "परिणाम" }, sentido: "cómo se resuelve" },
     ],
   },
 ];

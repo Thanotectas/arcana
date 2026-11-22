@@ -149,7 +149,7 @@ export function MisLigas() {
                       {l.creador ? ` · ${t("la creaste tú")}` : ""}
                     </span>
                   </span>
-                  <span className="text-oro-suave">→</span>
+                  <span className="inline-block text-oro-suave rtl:-scale-x-100">→</span>
                 </Link>
               </li>
             ))}
@@ -272,7 +272,7 @@ export function LigaDetalle({ codigo }: { codigo: string }) {
                 {f.yo && <span className="text-texto-suave"> {t("(tú)")}</span>}
               </span>
               <span className="shrink-0 text-xs text-texto-suave">{f.dias} d</span>
-              <span className="w-12 shrink-0 text-right font-semibold tabular-nums">{f.puntos}</span>
+              <span className="w-12 shrink-0 text-end font-semibold tabular-nums">{f.puntos}</span>
             </li>
           ))}
         </ol>

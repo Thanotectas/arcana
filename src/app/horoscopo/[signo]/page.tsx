@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import { Suspense } from "react";
 import { SIGNOS, imagenSigno, signoPorId } from "@/lib/zodiaco";
 import { horoscopoDelDia, fechaHoy } from "@/lib/horoscopo";
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ signo: st
   const { signo } = await params;
   const s = signoPorId(signo);
   const t = await getT();
-  return { title: s ? plantilla(t.horoscopo.tituloSigno, { signo: s.nombre }) : t.nav.horoscopo };
+  return { alternates: alternativas(`/horoscopo/${signo}`, await getIdioma()), title: s ? plantilla(t.horoscopo.tituloSigno, { signo: s.nombre }) : t.nav.horoscopo };
 }
 
 async function Contenido({ signoId, idioma, noDisponible }: { signoId: string; idioma: Idioma; noDisponible: string }) {

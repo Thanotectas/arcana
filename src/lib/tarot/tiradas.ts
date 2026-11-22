@@ -142,6 +142,66 @@ export const POSICIONES_I18N: Record<Idioma, Record<TipoTirada, { nombre: string
       { nombre: "Sonuç", descripcion: "Her şeyin yöneldiği yer." },
     ],
   },
+  ar: {
+    tarot_carta: [{ nombre: "ورقتك", descripcion: "الطاقة التي ترافقك اليوم." }],
+    tarot_tres: [
+      { nombre: "الماضي", descripcion: "الجذور والتأثيرات التي أوصلتك إلى هنا." },
+      { nombre: "الحاضر", descripcion: "قلب الوضع الحالي." },
+      { nombre: "المستقبل", descripcion: "الاتجاه المرجّح إن لم يتغير شيء." },
+    ],
+    tarot_celta: [
+      { nombre: "الوضع", descripcion: "المسألة الأساسية." },
+      { nombre: "التحدي", descripcion: "ما يعترض الوضع أو يضغط عليه." },
+      { nombre: "الجذر", descripcion: "اللاوعي، أساس المسألة." },
+      { nombre: "الماضي", descripcion: "ما بقي خلفك." },
+      { nombre: "الوعي", descripcion: "أهدافك وما يدور في ذهنك." },
+      { nombre: "المستقبل القريب", descripcion: "ما يقترب." },
+      { nombre: "أنت", descripcion: "موقفك من الوضع." },
+      { nombre: "المحيط", descripcion: "تأثير الناس والظروف." },
+      { nombre: "الآمال والمخاوف", descripcion: "ما تتمناه وما تخشاه." },
+      { nombre: "النتيجة", descripcion: "إلى أين يتجه كل شيء." },
+    ],
+  },
+  id: {
+    tarot_carta: [{ nombre: "Kartumu", descripcion: "Energi yang menemanimu hari ini." }],
+    tarot_tres: [
+      { nombre: "Masa lalu", descripcion: "Akar dan pengaruh yang membawamu sampai ke sini." },
+      { nombre: "Masa kini", descripcion: "Inti dari situasi saat ini." },
+      { nombre: "Masa depan", descripcion: "Arah yang mungkin terjadi jika tidak ada yang berubah." },
+    ],
+    tarot_celta: [
+      { nombre: "Situasinya", descripcion: "Persoalan utama." },
+      { nombre: "Tantangannya", descripcion: "Hal yang menghalangi atau menekan situasi." },
+      { nombre: "Akarnya", descripcion: "Alam bawah sadar, dasar dari persoalan." },
+      { nombre: "Masa lalu", descripcion: "Hal yang sudah tertinggal di belakang." },
+      { nombre: "Kesadaran", descripcion: "Tujuanmu dan apa yang ada di pikiranmu." },
+      { nombre: "Masa depan dekat", descripcion: "Hal yang sedang mendekat." },
+      { nombre: "Kamu", descripcion: "Sikapmu terhadap situasi ini." },
+      { nombre: "Lingkungan", descripcion: "Pengaruh orang-orang dan keadaan di sekitarmu." },
+      { nombre: "Harapan dan ketakutan", descripcion: "Apa yang kamu harapkan dan apa yang kamu takutkan." },
+      { nombre: "Hasilnya", descripcion: "Ke mana semuanya mengarah." },
+    ],
+  },
+  hi: {
+    tarot_carta: [{ nombre: "आपका पत्ता", descripcion: "वह ऊर्जा जो आज आपके साथ है।" }],
+    tarot_tres: [
+      { nombre: "अतीत", descripcion: "वे जड़ें और प्रभाव जो आपको यहाँ तक लाए।" },
+      { nombre: "वर्तमान", descripcion: "मौजूदा स्थिति का मूल।" },
+      { nombre: "भविष्य", descripcion: "अगर कुछ न बदले, तो संभावित दिशा।" },
+    ],
+    tarot_celta: [
+      { nombre: "स्थिति", descripcion: "मुख्य विषय।" },
+      { nombre: "चुनौती", descripcion: "जो स्थिति को काटता है या उसमें तनाव लाता है।" },
+      { nombre: "जड़", descripcion: "अवचेतन, मामले की नींव।" },
+      { nombre: "अतीत", descripcion: "जो पीछे छूट गया।" },
+      { nombre: "चेतन मन", descripcion: "आपके लक्ष्य और जो आपके मन में है।" },
+      { nombre: "निकट भविष्य", descripcion: "जो पास आ रहा है।" },
+      { nombre: "आप", descripcion: "इस स्थिति के प्रति आपका रवैया।" },
+      { nombre: "परिवेश", descripcion: "लोगों और परिस्थितियों का प्रभाव।" },
+      { nombre: "आशाएँ और डर", descripcion: "आप क्या चाहते हैं और किस बात से डरते हैं।" },
+      { nombre: "परिणाम", descripcion: "सब कुछ किस ओर जा रहा है।" },
+    ],
+  },
 };
 
 export interface CartaTirada {

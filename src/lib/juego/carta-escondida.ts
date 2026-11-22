@@ -99,6 +99,9 @@ const ELEMENTO_EN_CLAVE_IDIOMA: Record<Exclude<Idioma, "es">, Record<CartaTarot[
   pt: { fuego: "Arde, mesmo que você não veja.", agua: "Flui e entra pelas frestas.", aire: "Corta como o vento.", tierra: "Pesa como uma pedra na mão.", espiritu: "Não pertence a nenhum elemento." },
   fr: { fuego: "Elle brûle, même si tu ne la vois pas.", agua: "Elle coule et se glisse dans les fissures.", aire: "Elle tranche comme le vent.", tierra: "Elle pèse comme une pierre dans ta main.", espiritu: "Elle n'appartient à aucun élément." },
   tr: { fuego: "Görmesen de yanıyor.", agua: "Akıyor ve çatlaklardan sızıyor.", aire: "Rüzgâr gibi kesiyor.", tierra: "Avucundaki bir taş kadar ağır.", espiritu: "Hiçbir elemente ait değil." },
+  ar: { fuego: "تتّقد، وإن لم تُرَ.", agua: "تسيل وتتسلّل من الشقوق.", aire: "تقطع كالريح.", tierra: "ثقيلة كحجر في اليد.", espiritu: "لا تنتمي إلى أي عنصر." },
+  id: { fuego: "Ia membara, meski tak terlihat.", agua: "Ia mengalir dan menyusup lewat celah-celah.", aire: "Ia memotong seperti angin.", tierra: "Ia seberat batu di genggamanmu.", espiritu: "Ia bukan milik elemen mana pun." },
+  hi: { fuego: "यह जलता है, भले ही दिखे नहीं।", agua: "यह बहता है और दरारों से रिस जाता है।", aire: "यह हवा की तरह काटता है।", tierra: "यह हथेली पर रखे पत्थर जितना भारी है।", espiritu: "यह किसी भी तत्व का नहीं है।" },
 };
 
 export function pistasMaestras(c: CartaTarot, idioma: Idioma = "es"): string[] {
@@ -108,7 +111,10 @@ export function pistasMaestras(c: CartaTarot, idioma: Idioma = "es"): string[] {
     if (idioma === "en") return [`Sibila speaks in riddles: its shadow is called “${sombra[0]}”.`, e, `An echo of it: “${luz[2]}”. And another shadow: “${sombra[1] ?? sombra[0]}”.`, `When it turns over, it whispers: “${luz[3] ?? luz[0]}”.`];
     if (idioma === "pt") return [`Sibila fala em enigmas: sua sombra se chama “${sombra[0]}”.`, e, `Um eco dela: “${luz[2]}”. E outra sombra: “${sombra[1] ?? sombra[0]}”.`, `Quando se vira, sussurra: “${luz[3] ?? luz[0]}”.`];
     if (idioma === "fr") return [`Sibila parle en énigmes : son ombre s'appelle « ${sombra[0]} ».`, e, `Un écho d'elle : « ${luz[2]} ». Et une autre ombre : « ${sombra[1] ?? sombra[0]} ».`, `Quand elle se retourne, elle murmure : « ${luz[3] ?? luz[0]} ».`];
-    return [`Sibila bilmece gibi konuşuyor: gölgesinin adı “${sombra[0]}”.`, e, `Ondan bir yankı: “${luz[2]}”. Bir gölgesi daha: “${sombra[1] ?? sombra[0]}”.`, `Ters döndüğünde fısıldıyor: “${luz[3] ?? luz[0]}”.`];
+    if (idioma === "tr") return [`Sibila bilmece gibi konuşuyor: gölgesinin adı “${sombra[0]}”.`, e, `Ondan bir yankı: “${luz[2]}”. Bir gölgesi daha: “${sombra[1] ?? sombra[0]}”.`, `Ters döndüğünde fısıldıyor: “${luz[3] ?? luz[0]}”.`];
+    if (idioma === "ar") return [`سيبيلا تتكلّم بالألغاز: ظلّها اسمه «${sombra[0]}».`, e, `صدًى منها: «${luz[2]}». وظلّ آخر: «${sombra[1] ?? sombra[0]}».`, `حين تنقلب تهمس: «${luz[3] ?? luz[0]}».`];
+    if (idioma === "id") return [`Sibila berbicara lewat teka-teki: bayangannya bernama “${sombra[0]}”.`, e, `Gemanya: “${luz[2]}”. Dan bayangan lainnya: “${sombra[1] ?? sombra[0]}”.`, `Saat terbalik, ia berbisik: “${luz[3] ?? luz[0]}”.`];
+    return [`Sibila पहेलियों में बोलती है: इसकी छाया का नाम है “${sombra[0]}”।`, e, `इसकी एक गूँज: “${luz[2]}”। और एक और छाया: “${sombra[1] ?? sombra[0]}”।`, `उलटने पर यह फुसफुसाता है: “${luz[3] ?? luz[0]}”।`];
   }
   const [s1, s2] = c.palabrasClaveInvertida;
   const sombra = (c.significadoInvertido.match(/[^.!?]+[.!?]+/g) ?? [c.significadoInvertido])[0].trim();
@@ -191,6 +197,21 @@ const COMODINES_IDIOMA: Record<Exclude<Idioma, "es">, typeof COMODINES> = {
     { id: "paridad", titulo: "Tek mi, çift mi?", descripcion: "Numarası tek mi çift mi, söylerim." },
     { id: "rango", titulo: "Büyük mü, küçük mü?", descripcion: "Numarası 10 ve altı mı, 11 ve üstü mü, söylerim." },
   ],
+  ar: [
+    { id: "grupo", titulo: "مجموعتها", descripcion: "أخبرك إن كانت من الأركانا الكبرى أو من أي مجموعة هي." },
+    { id: "paridad", titulo: "زوجي أم فردي", descripcion: "أخبرك إن كان رقمها زوجيًا أم فرديًا." },
+    { id: "rango", titulo: "مرتفع أم منخفض؟", descripcion: "أخبرك إن كان رقمها 10 أو أقل، أو 11 أو أكثر." },
+  ],
+  id: [
+    { id: "grupo", titulo: "Kelompoknya", descripcion: "Aku beri tahu apakah ini Arkana Mayor atau dari suit apa." },
+    { id: "paridad", titulo: "Genap atau ganjil", descripcion: "Aku beri tahu apakah nomornya genap atau ganjil." },
+    { id: "rango", titulo: "Tinggi atau rendah?", descripcion: "Aku beri tahu apakah nomornya 10 ke bawah, atau 11 ke atas." },
+  ],
+  hi: [
+    { id: "grupo", titulo: "इसका समूह", descripcion: "मैं बताऊँगी कि यह मेजर आर्काना है या किस सूट का है।" },
+    { id: "paridad", titulo: "सम या विषम", descripcion: "मैं बताऊँगी कि इसका नंबर सम है या विषम।" },
+    { id: "rango", titulo: "ऊँचा या नीचा?", descripcion: "मैं बताऊँगी कि इसका नंबर 10 या उससे कम है, या 11 या उससे ज़्यादा।" },
+  ],
 };
 export function comodines(idioma: Idioma = "es") {
   return idioma === "es" ? COMODINES : COMODINES_IDIOMA[idioma];
@@ -232,6 +253,21 @@ export function textoComodin(tipo: Comodin, escondida: CartaTarot, idioma: Idiom
     if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Jokerim: bir Büyük Arkana kartı." : `🔮 Jokerim: ${nombreGrupo(escondida, "tr")} takımından.`;
     if (tipo === "paridad") return `🔮 Jokerim: numarası ${par ? "çift" : "tek"}.`;
     return escondida.numero <= 10 ? "🔮 Jokerim: numarası 10 ya da daha küçük." : "🔮 Jokerim: numarası 11 ya da daha büyük (takımlarda bu bir saray kartı demek: Prens, Şövalye, Kraliçe ya da Kral).";
+  }
+  if (idioma === "ar") {
+    if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 جوكري: إنها من الأركانا الكبرى." : `🔮 جوكري: إنها من ${nombreGrupo(escondida, "ar")}.`;
+    if (tipo === "paridad") return `🔮 جوكري: رقمها ${par ? "زوجي" : "فردي"}.`;
+    return escondida.numero <= 10 ? "🔮 جوكري: رقمها 10 أو أقل." : "🔮 جوكري: رقمها 11 أو أكثر (في المجموعات الصغرى هذه ورقة من أوراق البلاط: خادم أو فارس أو ملكة أو ملك).";
+  }
+  if (idioma === "id") {
+    if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Jokerku: ini Arkana Mayor." : `🔮 Jokerku: kartunya dari suit ${nombreGrupo(escondida, "id")}.`;
+    if (tipo === "paridad") return `🔮 Jokerku: nomornya ${par ? "genap" : "ganjil"}.`;
+    return escondida.numero <= 10 ? "🔮 Jokerku: nomornya 10 atau kurang." : "🔮 Jokerku: nomornya 11 atau lebih (di suit, itu kartu istana: Pelayan, Ksatria, Ratu, atau Raja).";
+  }
+  if (idioma === "hi") {
+    if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 मेरा जोकर: यह मेजर आर्काना है।" : `🔮 मेरा जोकर: इसका सूट ${nombreGrupo(escondida, "hi")} है।`;
+    if (tipo === "paridad") return `🔮 मेरा जोकर: इसका नंबर ${par ? "सम" : "विषम"} है।`;
+    return escondida.numero <= 10 ? "🔮 मेरा जोकर: इसका नंबर 10 या उससे कम है।" : "🔮 मेरा जोकर: इसका नंबर 11 या उससे ज़्यादा है (सूट में यह एक दरबारी कार्ड है: सेवक, शूरवीर, रानी या राजा)।";
   }
   if (tipo === "grupo") return escondida.arcano === "mayor" ? "🔮 Mi comodín: es un Arcano Mayor." : `🔮 Mi comodín: es de ${nombreGrupo(escondida)}.`;
   if (tipo === "paridad") return `🔮 Mi comodín: su número es ${escondida.numero % 2 === 0 ? "par" : "impar"}.`;
@@ -300,6 +336,9 @@ const NOMBRE_GRUPO_IDIOMA: Record<Exclude<Idioma, "es">, Record<string, string>>
   pt: { mayor: "Arcanos Maiores", bastos: "Paus", copas: "Copas", espadas: "Espadas", oros: "Ouros" },
   fr: { mayor: "Arcanes majeurs", bastos: "Bâtons", copas: "Coupes", espadas: "Épées", oros: "Deniers" },
   tr: { mayor: "Büyük Arkana", bastos: "Asalar", copas: "Kupalar", espadas: "Kılıçlar", oros: "Tılsımlar" },
+  ar: { mayor: "الأركانا الكبرى", bastos: "العصي", copas: "الكؤوس", espadas: "السيوف", oros: "العملات" },
+  id: { mayor: "Arkana Mayor", bastos: "Tongkat", copas: "Piala", espadas: "Pedang", oros: "Koin" },
+  hi: { mayor: "मेजर आर्काना", bastos: "छड़ियाँ", copas: "प्याले", espadas: "तलवारें", oros: "सिक्के" },
 };
 /** Nombre corto de cada grupo en las pestañas del selector. */
 const NOMBRE_PESTANA: Record<Idioma, Record<string, string>> = {
@@ -308,6 +347,9 @@ const NOMBRE_PESTANA: Record<Idioma, Record<string, string>> = {
   pt: { mayor: "Maiores", bastos: "Paus", copas: "Copas", espadas: "Espadas", oros: "Ouros" },
   fr: { mayor: "Majeurs", bastos: "Bâtons", copas: "Coupes", espadas: "Épées", oros: "Deniers" },
   tr: { mayor: "Büyükler", bastos: "Asalar", copas: "Kupalar", espadas: "Kılıçlar", oros: "Tılsımlar" },
+  ar: { mayor: "الكبرى", bastos: "العصي", copas: "الكؤوس", espadas: "السيوف", oros: "العملات" },
+  id: { mayor: "Mayor", bastos: "Tongkat", copas: "Piala", espadas: "Pedang", oros: "Koin" },
+  hi: { mayor: "मेजर", bastos: "छड़ियाँ", copas: "प्याले", espadas: "तलवारें", oros: "सिक्के" },
 };
 export function grupo(c: CartaTarot) {
   return c.arcano === "mayor" ? "mayor" : (c.palo ?? "");
@@ -370,6 +412,27 @@ const ELEMENTO_IDIOMA: Record<Exclude<Idioma, "es">, Record<CartaTarot["elemento
     tierra: "Elementi toprak: somut olan, beden ve para.",
     espiritu: "Dünyevi bir elementi yok: bu bir ruh kartı.",
   },
+  ar: {
+    fuego: "عنصرها النار: تدعو إلى الفعل.",
+    agua: "عنصرها الماء: تتحدّث عن المشاعر.",
+    aire: "عنصرها الهواء: تعيش في الفكر والكلمات.",
+    tierra: "عنصرها الأرض: الملموس والجسد والمال.",
+    espiritu: "ليس لها عنصر أرضي: إنها ورقة الروح.",
+  },
+  id: {
+    fuego: "Elemennya api: ia mengajak bertindak.",
+    agua: "Elemennya air: ia berbicara tentang emosi.",
+    aire: "Elemennya udara: ia hidup di pikiran dan kata-kata.",
+    tierra: "Elemennya tanah: hal yang nyata, tubuh, dan uang.",
+    espiritu: "Ia tak punya elemen duniawi: ini kartu jiwa.",
+  },
+  hi: {
+    fuego: "इसका तत्व अग्नि है: यह कर्म की ओर बुलाता है।",
+    agua: "इसका तत्व जल है: यह भावनाओं की बात करता है।",
+    aire: "इसका तत्व वायु है: यह मन और शब्दों में बसता है।",
+    tierra: "इसका तत्व पृथ्वी है: ठोस चीज़ें, शरीर और पैसा।",
+    espiritu: "इसका कोई सांसारिक तत्व नहीं: यह आत्मा का कार्ड है।",
+  },
 };
 
 const ELEMENTO: Record<CartaTarot["elemento"], string> = {
@@ -397,7 +460,10 @@ export function pistas(c: CartaTarot, idioma: Idioma = "es"): string[] {
     if (idioma === "en") return [`Sibila whispers: “${luz[0]}”.`, e, `Another word that goes with it: “${luz[1]}”.`, `One more: “${luz[2]}”.`, `And this one too: “${luz[3] ?? luz[2]}”.`, `Its shadow, when reversed: “${sombra.join(", ")}”.`];
     if (idioma === "pt") return [`Sibila sussurra: “${luz[0]}”.`, e, `Outra palavra que a acompanha: “${luz[1]}”.`, `Mais uma: “${luz[2]}”.`, `E esta também: “${luz[3] ?? luz[2]}”.`, `Sua sombra, quando sai invertida: “${sombra.join(", ")}”.`];
     if (idioma === "fr") return [`Sibila murmure : « ${luz[0]} ».`, e, `Un autre mot qui l'accompagne : « ${luz[1]} ».`, `Encore un : « ${luz[2]} ».`, `Et celui-ci aussi : « ${luz[3] ?? luz[2]} ».`, `Son ombre, quand elle sort à l'envers : « ${sombra.join(", ")} ».`];
-    return [`Sibila fısıldıyor: “${luz[0]}”.`, e, `Ona eşlik eden bir kelime daha: “${luz[1]}”.`, `Bir tane daha: “${luz[2]}”.`, `Bu da var: “${luz[3] ?? luz[2]}”.`, `Ters çıktığında gölgesi: “${sombra.join(", ")}”.`];
+    if (idioma === "tr") return [`Sibila fısıldıyor: “${luz[0]}”.`, e, `Ona eşlik eden bir kelime daha: “${luz[1]}”.`, `Bir tane daha: “${luz[2]}”.`, `Bu da var: “${luz[3] ?? luz[2]}”.`, `Ters çıktığında gölgesi: “${sombra.join(", ")}”.`];
+    if (idioma === "ar") return [`سيبيلا تهمس: «${luz[0]}».`, e, `كلمة أخرى ترافقها: «${luz[1]}».`, `وأخرى: «${luz[2]}».`, `وهذه أيضًا: «${luz[3] ?? luz[2]}».`, `ظلّها حين تظهر مقلوبة: «${sombra.join("، ")}».`];
+    if (idioma === "id") return [`Sibila berbisik: “${luz[0]}”.`, e, `Kata lain yang menyertainya: “${luz[1]}”.`, `Satu lagi: “${luz[2]}”.`, `Dan yang ini juga: “${luz[3] ?? luz[2]}”.`, `Bayangannya, saat keluar terbalik: “${sombra.join(", ")}”.`];
+    return [`Sibila फुसफुसाती है: “${luz[0]}”।`, e, `इसके साथ चलने वाला एक और शब्द: “${luz[1]}”।`, `एक और: “${luz[2]}”।`, `और यह भी: “${luz[3] ?? luz[2]}”।`, `उलटा आने पर इसकी छाया: “${sombra.join(", ")}”।`];
   }
   const [p1, p2, p3] = c.palabrasClave;
   return [
@@ -420,15 +486,36 @@ export function mensajeDelDia(c: CartaTarot) {
  * Para buscar sin tildes ni mayúsculas. La «ı» turca (sin punto) no se descompone con NFD, así que se cambia a «i»
  * a mano («Yıldız» → «yildiz»; la «İ» ya queda en «i»). Los apóstrofos curvos del teclado del celular («L’Étoile»)
  * cuentan como el recto.
+ * En árabe se quitan las vocales cortas (harakat), el tatweel y la hamza sobre o bajo la alif (NFD la separa:
+ * «الإمبراطورة» → «الامبراطورة»), y la alif maqsura y la ta marbuta cuentan como «ي» y «ه», que es como suele
+ * escribirse en el teclado. En devanagari se quita el nukta («फ़» → «फ») y el chandrabindu cuenta como anusvara.
  */
 export function normalizar(texto: string) {
-  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/ı/g, "i").replace(/[’‘ʼ´`]/g, "'").trim();
+  return texto
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/ı/g, "i")
+    .replace(/[’‘ʼ´`]/g, "'")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/\u0671/g, "\u0627")
+    .replace(/\u0649/g, "\u064A")
+    .replace(/\u0629/g, "\u0647")
+    .replace(/\u093C/g, "")
+    .replace(/\u0901/g, "\u0902")
+    .trim();
 }
 
+/**
+ * Busca por el nombre en el idioma, en español (el del mazo) y en inglés: así quien juega en árabe o en hindi puede
+ * escribir también con letras latinas («Moon», «Ace of Cups»).
+ */
 export function buscarCartas(texto: string, excluir: ReadonlySet<string>, limite = 8, idioma: Idioma = "es") {
   const q = normalizar(texto);
   if (!q) return [];
-  return MAZO.filter((c) => !excluir.has(c.id) && (normalizar(nombreCarta(c, idioma)).includes(q) || normalizar(c.nombre).includes(q))).slice(0, limite);
+  return MAZO.filter(
+    (c) => !excluir.has(c.id) && (normalizar(nombreCarta(c, idioma)).includes(q) || normalizar(c.nombre).includes(q) || normalizar(nombreCarta(c, "en")).includes(q)),
+  ).slice(0, limite);
 }
 
 // ───────────────────────── Progreso guardado en el navegador ─────────────────────────
@@ -513,12 +600,15 @@ const COMPARTIR: Record<Idioma, { juego: string; comodin: string; racha: (n: num
   pt: { juego: "O Caminho do Louco", comodin: " (com coringa)", racha: (n) => `🔥 ${n} dias seguidos`, reto: "Você adivinha a carta de hoje?" },
   fr: { juego: "Le Chemin du Fou", comodin: " (avec joker)", racha: (n) => `🔥 ${n} jours d'affilée`, reto: "Tu devines la carte du jour ?" },
   tr: { juego: "Deli'nin Yolculuğu", comodin: " (jokerle)", racha: (n) => `🔥 Seri: ${n} gün`, reto: "Bugünün kartını bulabilir misin?" },
+  ar: { juego: "رحلة الأحمق", comodin: " (مع الجوكر)", racha: (n) => `🔥 السلسلة: ${n} ${n <= 10 ? "أيام" : "يومًا"}`, reto: "من يخمّن ورقة اليوم؟" },
+  id: { juego: "Perjalanan The Fool", comodin: " (pakai joker)", racha: (n) => `🔥 Streak ${n} hari`, reto: "Bisa tebak kartu hari ini?" },
+  hi: { juego: "द फ़ूल की यात्रा", comodin: " (जोकर के साथ)", racha: (n) => `🔥 लगातार ${n} दिन`, reto: "क्या आप आज का कार्ड पहचान सकते हैं?" },
 };
 
 export function textoParaCompartir(numero: number, comparaciones: Comparacion[], gano: boolean, racha: number, sitio: string, comodin = false, idioma: Idioma = "es") {
   const t = COMPARTIR[idioma];
   return [
-    `🔮 ${t.juego} #${numero} · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}${comodin ? t.comodin : ""}`,
+    `🔮 ${t.juego} \u2066#${numero}\u2069 · ${gano ? comparaciones.length : "X"}/${MAX_INTENTOS}${comodin ? t.comodin : ""}`,
     ...comparaciones.map(emojiDe),
     racha > 1 ? t.racha(racha) : "",
     `${t.reto} ${enlaceResultado(sitio, numero, comparaciones, racha)}`,
@@ -554,10 +644,13 @@ const CORTE_IDIOMA: Record<Exclude<Idioma, "es">, Record<number, string>> = {
   pt: { 1: "Ás", 11: "Valete", 12: "Cavaleiro", 13: "Rainha", 14: "Rei" },
   fr: { 1: "As", 11: "Valet", 12: "Cavalier", 13: "Reine", 14: "Roi" },
   tr: { 1: "As", 11: "Prens", 12: "Şövalye", 13: "Kraliçe", 14: "Kral" },
+  ar: { 1: "آس", 11: "خادم", 12: "فارس", 13: "ملكة", 14: "ملك" },
+  id: { 1: "As", 11: "Pelayan", 12: "Ksatria", 13: "Ratu", 14: "Raja" },
+  hi: { 1: "इक्का", 11: "सेवक", 12: "शूरवीर", 13: "रानी", 14: "राजा" },
 };
 
 export function rotuloCasilla(c: CartaTarot, idioma: Idioma = "es") {
-  if (c.arcano === "mayor") return { numero: ROMANOS[c.numero] ?? String(c.numero), nombre: nombreCarta(c, idioma).replace(/^(?:(?:El|La|Los|Las|The|O|A|Os|As|Le|Les)\s+|L')/, "") };
+  if (c.arcano === "mayor") return { numero: ROMANOS[c.numero] ?? String(c.numero), nombre: nombreCarta(c, idioma).replace(/^(?:(?:El|La|Los|Las|The|O|A|Os|As|Le|Les|द)\s+|L')/, "") };
   return { numero: String(c.numero), nombre: (idioma === "es" ? CORTE : CORTE_IDIOMA[idioma])[c.numero] ?? "" };
 }
 
@@ -609,6 +702,21 @@ const FRASES_IDIOMA: Record<Exclude<Idioma, "es">, Record<Calor, string[]>> = {
     caliente: ["Ooo, az kaldı! 🔥 Çok yakınsın.", "Sıcak, sıcak! 🔥 Hemen yanında.", "Tüylerim diken diken oldu 🔥 Neredeyse buldun.", "İşte orada! 🔥 Bir adım daha."],
     tibio: ["Doğru yoldasın ✨", "Ilık… 🌙 Bunda bir şey var.", "Hmm, yaklaşıyorsun ✨", "O değil ama iyi gidiyorsun 🌙"],
     frio: ["Soğuk, soğuk ❄️", "O değil… çok uzakta ❄️", "Hiç yakın değil 😏 İpucumu dinle.", "Bundan daha iyi saklandı ❄️"],
+  },
+  ar: {
+    caliente: ["أوه، قريبة جدًا! 🔥 بينك وبينها خطوة.", "ساخن، ساخن! 🔥 إنها بجوارها تمامًا.", "سرت فيّ قشعريرة 🔥 اقتربت كثيرًا.", "هناك، هناك! 🔥 خطوة صغيرة أخرى."],
+    tibio: ["على الطريق الصحيح ✨", "دافئ… 🌙 هناك شيء من ذلك.", "مممم، المسافة تقصر ✨", "ليست هذه، لكن الطريق صحيح 🌙"],
+    frio: ["بارد، بارد ❄️", "ليست هذه… إنها بعيدة ❄️", "ولا حتى قريبة 😏 تلميحي سيساعدك.", "اختبأت أفضل من ذلك ❄️"],
+  },
+  id: {
+    caliente: ["Wah, nyaris! 🔥 Kamu dekat sekali.", "Panas, panas! 🔥 Kartunya tepat di sebelahnya.", "Aku sampai merinding 🔥 Sedikit lagi.", "Di situ, di situ! 🔥 Satu langkah kecil lagi."],
+    tibio: ["Kamu di jalan yang benar ✨", "Hangat… 🌙 Ada sesuatu di situ.", "Hmm, kamu makin dekat ✨", "Bukan yang itu, tapi kamu sudah bagus 🌙"],
+    frio: ["Dingin, dingin ❄️", "Bukan yang itu… masih jauh ❄️", "Jauh sekali 😏 Dengarkan petunjukku.", "Kartunya bersembunyi lebih pintar dari itu ❄️"],
+  },
+  hi: {
+    caliente: ["अरे, बस ज़रा-सा! 🔥 आप बहुत क़रीब हैं।", "गर्म, गर्म! 🔥 यह ठीक बगल में है।", "मेरे तो रोंगटे खड़े हो गए 🔥 आप लगभग पहुँच गए।", "वहीं, वहीं! 🔥 बस एक छोटा क़दम और।"],
+    tibio: ["आप सही राह पर हैं ✨", "गुनगुना… 🌙 कुछ तो बात है।", "हम्म, आप क़रीब आ रहे हैं ✨", "यह नहीं, पर आप अच्छा कर रहे हैं 🌙"],
+    frio: ["ठंडा, ठंडा ❄️", "यह नहीं… यह बहुत दूर है ❄️", "पास भी नहीं 😏 मेरा संकेत सुनिए।", "यह इससे बेहतर छिपा है ❄️"],
   },
 };
 

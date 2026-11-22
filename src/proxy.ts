@@ -6,6 +6,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { COOKIE_ORIGEN, OPCIONES_COOKIE_ORIGEN, detectarOrigen, serializarOrigen } from "@/lib/origen/comun";
+import { CABECERA_IDIOMA, separarPrefijo } from "@/lib/i18n/rutas";
+import { COOKIE_IDIOMA } from "@/lib/i18n/idiomas";
 
 const RUTAS_PRIVADAS = [
   "/tarot",
@@ -24,7 +26,15 @@ const RUTAS_PRIVADAS = [
 ];
 
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  // /fr/horoscopo, /tr/runas…: se sirve la página sin el prefijo, en ese idioma (y queda recordado en la cookie).
+  const prefijo = separarPrefijo(request.nextUrl.pathname);
+  const cabeceras = new Headers(request.headers);
+  if (prefijo) cabeceras.set(CABECERA_IDIOMA, prefijo.idioma);
+  else cabeceras.delete(CABECERA_IDIOMA);
+  const destino = request.nextUrl.clone();
+  if (prefijo) destino.pathname = prefijo.ruta;
+  const siguiente = () => (prefijo ? NextResponse.rewrite(destino, { request: { headers: cabeceras } }) : NextResponse.next({ request: { headers: cabeceras } }));
+  let response = siguiente();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,7 +48,7 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.next({ request });
+          response = siguiente();
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );
@@ -51,7 +61,10 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  const pathname = prefijo ? prefijo.ruta : request.nextUrl.pathname;
+  if (prefijo && request.cookies.get(COOKIE_IDIOMA)?.value !== prefijo.idioma) {
+    response.cookies.set(COOKIE_IDIOMA, prefijo.idioma, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  }
 
   // La app de Google Play abre con ?app=android: se recuerda en una cookie para
   // esconder las compras (la política de Play exige su propio sistema de pago).

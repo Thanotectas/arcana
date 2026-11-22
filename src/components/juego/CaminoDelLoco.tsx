@@ -12,7 +12,7 @@ import { MensajeSibila } from "./MensajeSibila";
 import { contarEvento } from "@/lib/juego/eventos";
 import { useJ } from "@/lib/juego/useJuego";
 import { nombreCarta, palabrasCarta } from "@/lib/juego/cartas-idiomas";
-import { LOCALE_INTL } from "@/lib/i18n/idiomas";
+import { IDIOMAS_RTL, LOCALE_INTL } from "@/lib/i18n/idiomas";
 import { guardarSonido, sonidoActivo, sonidoCerca, sonidoElegir, sonidoFrio, sonidoGanar, sonidoPerder, sonidoPista, sonidoTocar } from "@/lib/juego/sonido";
 import type { CartaTarot } from "@/lib/tarot/deck";
 import {
@@ -544,7 +544,7 @@ function Conversacion({
             {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
             <img src={cara(m.cara)} alt="" className="h-8 w-8 shrink-0 rounded-full border border-oro/60" />
             <p
-              className={`max-w-[85%] rounded-2xl rounded-bl-sm px-3.5 py-2 text-sm ${
+              className={`max-w-[85%] rounded-2xl rounded-es-sm px-3.5 py-2 text-sm ${
                 m.comodin ? "bg-violeta/30 ring-1 ring-violeta-suave" : m.calor === "caliente" ? "bg-oro/15 ring-1 ring-oro/50" : m.calor === "frio" ? "bg-sky-900/30" : i === ultimo && !termino ? "bg-superficie-2 ring-1 ring-oro/40" : "bg-superficie-2"
               }`}
             >
@@ -552,7 +552,7 @@ function Conversacion({
             </p>
           </div>
         ) : (
-          <div key={i} className={`burbuja-entra ml-auto flex max-w-[92%] items-center gap-2 rounded-2xl rounded-br-sm p-1.5 pr-2 ${m.r.acierto ? "bg-violeta/40 ring-1 ring-oro/70" : "bg-violeta/15"}`}>
+          <div key={i} className={`burbuja-entra ms-auto flex max-w-[92%] items-center gap-2 rounded-2xl rounded-ee-sm p-1.5 pe-2 ${m.r.acierto ? "bg-violeta/40 ring-1 ring-oro/70" : "bg-violeta/15"}`}>
             <Miniatura carta={m.carta} />
             <span className={`min-w-0 flex-1 truncate text-sm ${m.r.acierto ? "font-semibold" : ""}`}>{nombreCarta(m.carta, idioma)}</span>
             <span className={`voltear-chip shrink-0 rounded-md px-2 py-1 text-[11px] ${m.r.grupo ? "bg-violeta text-white" : "bg-noche/60 text-texto-suave"}`} style={{ animationDelay: "0.1s" }}>
@@ -645,7 +645,7 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
     setTexto("");
   }
 
-  /** Deslizar de lado sobre las cartas pasa al grupo vecino. */
+  /** Deslizar de lado sobre las cartas pasa al grupo vecino (en árabe, de derecha a izquierda, al revés). */
   function alSoltar(e: TouchEvent) {
     const ini = toque.current;
     toque.current = null;
@@ -654,7 +654,8 @@ function Selector({ intentados, quedan, sugerido, onElegir }: { intentados: Read
     const dy = e.changedTouches[0].clientY - ini.y;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
     const i = GRUPOS.findIndex((g) => g.id === pestana);
-    const otro = GRUPOS[(i + (dx < 0 ? 1 : -1) + GRUPOS.length) % GRUPOS.length];
+    const siguiente = IDIOMAS_RTL.includes(idioma) ? dx > 0 : dx < 0;
+    const otro = GRUPOS[(i + (siguiente ? 1 : -1) + GRUPOS.length) % GRUPOS.length];
     cambiarGrupo(otro.id);
   }
 
@@ -928,7 +929,7 @@ function Final({
 
       <MensajeSibila carta={nombreCarta(escondida, idioma)} />
 
-      <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-left font-sans text-sm leading-relaxed">{texto}</pre>
+      <pre className="mx-auto w-fit max-w-full whitespace-pre-wrap break-words rounded-xl bg-superficie-2 px-4 py-3 text-start font-sans text-sm leading-relaxed">{texto}</pre>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" onClick={compartir} className="boton boton-primario">
           {copiado ? t("¡Copiado! Pégalo donde quieras") : t("Compartir resultado")}
@@ -982,7 +983,7 @@ function Final({
           </>
         )}
         {premiosNuevos.map((p) => (
-          <div key={p.id} className="logro-nuevo flex items-center gap-3 rounded-xl border border-oro/60 bg-oro/10 p-3 text-left">
+          <div key={p.id} className="logro-nuevo flex items-center gap-3 rounded-xl border border-oro/60 bg-oro/10 p-3 text-start">
             {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
             <img src={emblemaPremio(p.id)} alt="" className="h-14 w-14 shrink-0 drop-shadow-[0_0_12px_rgba(241,217,154,0.7)]" />
             <p>
@@ -991,7 +992,7 @@ function Final({
           </div>
         ))}
         {proximo && (
-          <div className="flex items-center gap-3 text-left">
+          <div className="flex items-center gap-3 text-start">
             {/* eslint-disable-next-line @next/next/no-img-element -- emblema estático */}
             <img src={emblemaPremio(proximo.id)} alt="" className="h-10 w-10 shrink-0" />
             <div className="min-w-0 flex-1">
@@ -1085,7 +1086,7 @@ function BannerDorada({ carta }: { carta: CartaTarot }) {
   const d = cartaDorada(carta);
   if (!d) return null;
   return (
-    <div className="logro-nuevo flex items-center gap-4 rounded-2xl border border-oro/70 bg-gradient-to-r from-oro/20 via-oro/5 to-transparent p-3 text-left">
+    <div className="logro-nuevo flex items-center gap-4 rounded-2xl border border-oro/70 bg-gradient-to-r from-oro/20 via-oro/5 to-transparent p-3 text-start">
       {/* eslint-disable-next-line @next/next/no-img-element -- ilustración estática */}
       <img src={imagenDorada(carta)} alt={d.nombre} className="dorada-brillo voltear-carta w-16 shrink-0 rounded-lg" />
       <div className="min-w-0">
@@ -1133,7 +1134,7 @@ function ComodinSibila({ onUsar }: { onUsar: (t: Comodin) => void }) {
             sonidoTocar();
             setAbierto(true);
           }}
-          className="flex items-center gap-2 rounded-full border border-violeta-suave/50 bg-violeta/15 py-1.5 pl-1.5 pr-4 text-sm transition hover:bg-violeta/25"
+          className="flex items-center gap-2 rounded-full border border-violeta-suave/50 bg-violeta/15 py-1.5 ps-1.5 pe-4 text-sm transition hover:bg-violeta/25"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- retrato estático */}
           <img src={cara("caliente")} alt="" className="h-7 w-7 rounded-full border border-oro/60" />
@@ -1212,7 +1213,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
 
   if (!abierto) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-violeta-suave/60 bg-gradient-to-br from-violeta/30 via-noche to-noche p-5 text-left">
+      <div className="relative overflow-hidden rounded-2xl border border-violeta-suave/60 bg-gradient-to-br from-violeta/30 via-noche to-noche p-5 text-start">
         <p className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{t("Desbloqueado")}</p>
         <p className="mt-1 font-display text-2xl">{t("🌙 El reto maestro de hoy")}</p>
         <p className="mt-2 text-sm text-texto-suave">
@@ -1237,7 +1238,7 @@ function RetoMaestro({ fecha, numero, sesion, cuenta }: { fecha: string; numero:
   }
 
   return (
-    <div id="reto-maestro" className="scroll-mt-24 space-y-4 rounded-2xl border border-violeta-suave/60 bg-gradient-to-b from-violeta/20 to-noche p-4 text-left">
+    <div id="reto-maestro" className="scroll-mt-24 space-y-4 rounded-2xl border border-violeta-suave/60 bg-gradient-to-b from-violeta/20 to-noche p-4 text-start">
       <div className="flex items-center justify-between">
         <p className="font-display text-xl">{t("🌙 Reto maestro")}</p>
         <Vidas usados={intentos.length} gano={gano} max={MAX_INTENTOS_MAESTRO} />
@@ -1373,7 +1374,7 @@ function ComoLeFue({ propio }: { propio: number | null }) {
   const maximo = Math.max(1, ...resumen.distribucion);
   const masComun = resumen.distribucion.indexOf(Math.max(...resumen.distribucion)) + 1;
   return (
-    <div className="space-y-3 rounded-xl bg-superficie-2 p-4 text-left text-sm">
+    <div className="space-y-3 rounded-xl bg-superficie-2 p-4 text-start text-sm">
       <p className="text-center">
         {t("Hoy jugaron {n} personas · el {p}% la encontró", { n: resumen.jugadores, p: Math.round((resumen.ganadas / resumen.jugadores) * 100) })}
         {resumen.ganadas > 0 && t(" · la mayoría en {m}", { m: masComun })}
@@ -1381,7 +1382,7 @@ function ComoLeFue({ propio }: { propio: number | null }) {
       <div className="space-y-1.5">
         {resumen.distribucion.map((n, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="w-3 text-right text-xs text-texto-suave">{i + 1}</span>
+            <span className="w-3 text-end text-xs text-texto-suave">{i + 1}</span>
             <div className="h-5 flex-1 overflow-hidden rounded bg-noche/60">
               <div
                 className={`flex h-full items-center justify-end rounded px-1.5 text-[11px] ${propio === i + 1 ? "bg-oro text-noche" : "bg-violeta/80 text-white"}`}

@@ -78,7 +78,7 @@ export function RankingSemanal() {
   const pedirApodo = datos.sesion && (!datos.apodo || editando);
 
   return (
-    <div className="space-y-3 rounded-xl border border-oro/30 bg-superficie-2/60 p-4 text-left text-sm">
+    <div className="space-y-3 rounded-xl border border-oro/30 bg-superficie-2/60 p-4 text-start text-sm">
       <div className="flex items-baseline justify-between gap-2">
         <p className="font-display text-xl">{t("🏆 Ranking de la semana")}</p>
         <p className="shrink-0 text-xs text-texto-suave">
@@ -106,7 +106,7 @@ export function RankingSemanal() {
                 {f.yo && <span className="text-texto-suave"> {t("(tú)")}</span>}
               </span>
               <span className="shrink-0 text-xs text-texto-suave">{f.dias} d</span>
-              <span className="w-12 shrink-0 text-right font-semibold tabular-nums">{f.puntos}</span>
+              <span className="w-12 shrink-0 text-end font-semibold tabular-nums">{f.puntos}</span>
             </li>
           ))}
         </ol>
@@ -166,7 +166,7 @@ export function RankingSemanal() {
 
       <Link href="/juego/ligas" className="flex items-center justify-between rounded-lg border border-violeta-suave/40 bg-violeta/10 px-3 py-2 text-sm transition hover:border-violeta-suave">
         <span>{t("👥 Crea una liga con tu gente y compitan entre ustedes")}</span>
-        <span className="text-oro-suave">→</span>
+        <span className="inline-block text-oro-suave rtl:-scale-x-100">→</span>
       </Link>
 
       <details className="text-xs text-texto-suave">

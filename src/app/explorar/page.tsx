@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { catalogoConTextos, GRUPOS_CATALOGO, type GrupoCatalogo } from "@/lib/catalogo";
 import { IconoCatalogo } from "@/components/IconoCatalogo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.explorar.titulo, description: t.explorar.intro };
+  return { alternates: alternativas("/explorar", await getIdioma()), title: t.explorar.titulo, description: t.explorar.intro };
 }
 
 /** Todos los productos de Arcana, por grupo, con su descripción y su costo. Pública. */

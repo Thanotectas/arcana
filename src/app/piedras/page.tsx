@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
 import { Gem, FlameKindling } from "lucide-react";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { PIEDRAS, PIEDRA_DEL_SIGNO } from "@/lib/piedras";
 import { INTENCIONES } from "@/lib/velas";
 import { SIGNOS } from "@/lib/zodiaco";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.piedras.titulo, description: t.piedras.intro };
+  return { alternates: alternativas("/piedras", await getIdioma()), title: t.piedras.titulo, description: t.piedras.intro };
 }
 
 interface TextoPiedra {

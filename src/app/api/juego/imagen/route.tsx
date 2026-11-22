@@ -3,13 +3,16 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { webpComoDataUri } from "@/lib/marca/imagenes";
-import { esIdioma, type Idioma } from "@/lib/i18n/idiomas";
+import { IDIOMAS_RTL, esIdioma, type Idioma } from "@/lib/i18n/idiomas";
 import { MAX_INTENTOS, leerResultado, type Comparacion } from "@/lib/juego/carta-escondida";
+import { TextoOPintado, diasAr, numeroJuego, pintarTexto } from "@/lib/juego/video";
 
 /**
  * Imagen del resultado de El Camino del Loco, sin revelar la carta: los cuadritos de cada intento, la racha y Sibila.
  * ?n=&f=&ra= (como el enlace compartido) y ?formato=historia (1080×1920, estados e historias) u og (1200×630, la
  * vista previa del enlace en WhatsApp y Facebook).
+ * En árabe y en hindi los textos llegan ya pintados con sharp (ver pintarTexto en video.tsx): Cormorant e Inter no
+ * tienen esas letras y satori no las compone bien. En árabe, además, la tarjeta og se lee de derecha a izquierda.
  */
 async function fuentes() {
   const [cormorant, inter, simbolos] = await Promise.all([
@@ -64,6 +67,9 @@ const TEXTOS_IMAGEN: Record<Idioma, { gano: (n: number) => string; perdio: strin
   pt: { gano: (n: number) => `Encontrei em ${n}/${MAX_INTENTOS}`, perdio: "Hoje ela se escondeu", racha: (n: number) => `${n} dias seguidos`, rachaLarga: (n: number) => `${n} dias seguidos jogando`, reto: "Você adivinha a de hoje?", juego: "O CAMINHO DO LOUCO", carta: (n: number) => `Carta escondida #${n}` },
   fr: { gano: (n: number) => `Trouvée en ${n}/${MAX_INTENTOS}`, perdio: "Elle m'a échappé aujourd'hui", racha: (n: number) => `${n} jours d'affilée`, rachaLarga: (n: number) => `${n} jours d'affilée à jouer`, reto: "Tu devines celle du jour ?", juego: "LE CHEMIN DU FOU", carta: (n: number) => `Carte cachée n° ${n}` },
   tr: { gano: (n: number) => `${n}/${MAX_INTENTOS} denemede buldum`, perdio: "Bugün benden saklandı", racha: (n: number) => `Seri: ${n} gün`, rachaLarga: (n: number) => `${n} gündür üst üste oynuyorum`, reto: "Bugünün kartını bulabilir misin?", juego: "DELİ'NİN YOLCULUĞU", carta: (n: number) => `Gizli kart #${n}` },
+  ar: { gano: (n: number) => `وجدتها في ${n}/${MAX_INTENTOS}`, perdio: "اختبأت عني اليوم", racha: (n: number) => `السلسلة: ${diasAr(n)}`, rachaLarga: (n: number) => `السلسلة: ${diasAr(n)} من اللعب`, reto: "من يخمّن ورقة اليوم؟", juego: "رحلة الأحمق", carta: (n: number) => `الورقة المخبّأة رقم ${n}` },
+  id: { gano: (n: number) => `Ketemu dalam ${n}/${MAX_INTENTOS}`, perdio: "Hari ini kartunya bersembunyi dariku", racha: (n: number) => `Streak ${n} hari`, rachaLarga: (n: number) => `${n} hari berturut-turut bermain`, reto: "Bisa tebak kartu hari ini?", juego: "PERJALANAN THE FOOL", carta: (n: number) => `Kartu tersembunyi #${n}` },
+  hi: { gano: (n: number) => `${n}/${MAX_INTENTOS} में खोज लिया`, perdio: "आज यह मुझसे छिप गया", racha: (n: number) => `लगातार ${n} दिन`, rachaLarga: (n: number) => `लगातार ${n} दिन से खेल जारी`, reto: "क्या आप आज का कार्ड पहचान सकते हैं?", juego: "द फ़ूल की यात्रा", carta: (n: number) => `छिपा हुआ कार्ड #${n}` },
 };
 
 export async function GET(request: NextRequest) {
@@ -72,13 +78,23 @@ export async function GET(request: NextRequest) {
   if (!r) return new Response("Resultado no válido", { status: 400 });
   const historia = q.get("formato") === "historia";
   const pedido = q.get("idioma");
-  const T = TEXTOS_IMAGEN[esIdioma(pedido) ? pedido : "es"];
-  const [sibila, dorso, tipos] = await Promise.all([
+  const idioma: Idioma = esIdioma(pedido) ? pedido : "es";
+  const T = TEXTOS_IMAGEN[idioma];
+  const rtl = IDIOMAS_RTL.includes(idioma);
+  const titulo = r.gano ? T.gano(r.filas.length) : T.perdio;
+  const textoJuego = historia ? T.juego : `${T.juego} · ${numeroJuego(r.numero, idioma)}`;
+  const racha = historia ? T.rachaLarga(r.racha) : T.racha(r.racha);
+  // Solo en árabe e hindi hay algo que pintar (en los otros idiomas pintarTexto devuelve null al instante).
+  const [sibila, dorso, tipos, pJuego, pTitulo, pRacha, pReto, pCarta] = await Promise.all([
     webpComoDataUri(join(process.cwd(), "public/juego/sibila.webp"), { lado: 360 }),
     webpComoDataUri(join(process.cwd(), "public/cartas/arcana/dorso.webp"), { alto: 420 }),
     fuentes(),
+    pintarTexto(textoJuego, idioma, { tamano: historia ? 30 : 24, color: "#b9a6ff" }),
+    pintarTexto(titulo, idioma, historia ? { tamano: 100, color: ORO, serif: true, ancho: 936, centrado: true } : { tamano: 70, color: ORO, serif: true, ancho: 620 }),
+    r.racha > 1 ? pintarTexto(racha, idioma, { tamano: historia ? 40 : 30, color: "#ffffff" }) : null,
+    pintarTexto(T.reto, idioma, historia ? { tamano: 60, color: "#ffffff", serif: true, ancho: 936, centrado: true } : { tamano: 30, color: "#ece6f7" }),
+    historia ? pintarTexto(T.carta(r.numero), idioma, { tamano: 32, color: "#cdbfff" }) : null,
   ]);
-  const titulo = r.gano ? T.gano(r.filas.length) : T.perdio;
   const fondo =
     "radial-gradient(900px 700px at 50% 0%, rgba(139,108,246,0.42), transparent 60%), radial-gradient(700px 600px at 100% 100%, rgba(217,180,90,0.18), transparent 60%), #0b0716";
 
@@ -99,19 +115,29 @@ export async function GET(request: NextRequest) {
   if (!historia) {
     return new ImageResponse(
       (
-        <div style={{ width: "100%", height: "100%", display: "flex", background: fondo, color: "#ece6f7", padding: "56px 64px", fontFamily: "Inter" }}>
-          <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between" }}>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", fontSize: 24, letterSpacing: 6, color: "#b9a6ff" }}>{`${T.juego} · #${r.numero}`}</div>
-              <div style={{ fontFamily: "Cormorant", fontSize: 76, color: ORO, marginTop: 8 }}>{titulo}</div>
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: rtl ? "row-reverse" : "row", background: fondo, color: "#ece6f7", padding: "56px 64px", fontFamily: "Inter" }}>
+          <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between", alignItems: rtl ? "flex-end" : "flex-start" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: rtl ? "flex-end" : "flex-start" }}>
+              <div style={{ display: "flex", fontSize: 24, letterSpacing: pJuego ? 0 : 6, color: "#b9a6ff" }}>
+                <TextoOPintado texto={textoJuego} pintado={pJuego} />
+              </div>
+              <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 76, color: ORO, marginTop: 8 }}>
+                <TextoOPintado texto={titulo} pintado={pTitulo} />
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 40, alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: rtl ? "row-reverse" : "row", gap: 40, alignItems: "center" }}>
               <Cuadritos filas={r.filas} lado={r.filas.length > 4 ? 46 : 58} />
-              {r.racha > 1 && <div style={{ display: "flex", fontSize: 30, color: "#fff" }}>{T.racha(r.racha)}</div>}
+              {r.racha > 1 && (
+                <div style={{ display: "flex", fontSize: 30, color: "#fff" }}>
+                  <TextoOPintado texto={racha} pintado={pRacha} />
+                </div>
+              )}
             </div>
-            <div style={{ display: "flex", fontSize: 30 }}>
-              <span style={{ color: "#ece6f7" }}>{T.reto}</span>
-              <span style={{ color: ORO, marginLeft: 14 }}>miarcana.com/juego</span>
+            <div style={{ display: "flex", flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", gap: 14, fontSize: 30 }}>
+              <span style={{ display: "flex", color: "#ece6f7" }}>
+                <TextoOPintado texto={T.reto} pintado={pReto} />
+              </span>
+              <span style={{ color: ORO }}>miarcana.com/juego</span>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center" }}>{retrato(250)}</div>
@@ -125,15 +151,27 @@ export async function GET(request: NextRequest) {
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", background: fondo, color: "#ece6f7", padding: "190px 72px 240px", fontFamily: "Inter" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ fontSize: 30, letterSpacing: 8, color: "#b9a6ff" }}>{T.juego}</div>
-          <div style={{ fontFamily: "Cormorant", fontSize: 108, color: ORO, marginTop: 14, textAlign: "center", lineHeight: 1 }}>{titulo}</div>
-          <div style={{ fontSize: 32, color: "#cdbfff", marginTop: 16 }}>{T.carta(r.numero)}</div>
+          <div style={{ display: "flex", fontSize: 30, letterSpacing: pJuego ? 0 : 8, color: "#b9a6ff" }}>
+            <TextoOPintado texto={textoJuego} pintado={pJuego} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", fontFamily: "Cormorant", fontSize: 108, color: ORO, marginTop: 14, textAlign: "center", lineHeight: 1 }}>
+            <TextoOPintado texto={titulo} pintado={pTitulo} />
+          </div>
+          <div style={{ display: "flex", fontSize: 32, color: "#cdbfff", marginTop: 16 }}>
+            <TextoOPintado texto={T.carta(r.numero)} pintado={pCarta} />
+          </div>
         </div>
         {retrato(300)}
         <Cuadritos filas={r.filas} lado={r.filas.length > 4 ? 76 : 96} />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
-          {r.racha > 1 && <div style={{ display: "flex", fontSize: 40, color: "#fff" }}>{T.rachaLarga(r.racha)}</div>}
-          <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 64, color: "#fff" }}>{T.reto}</div>
+          {r.racha > 1 && (
+            <div style={{ display: "flex", fontSize: 40, color: "#fff" }}>
+              <TextoOPintado texto={racha} pintado={pRacha} />
+            </div>
+          )}
+          <div style={{ display: "flex", justifyContent: "center", fontFamily: "Cormorant", fontSize: 64, color: "#fff", textAlign: "center" }}>
+            <TextoOPintado texto={T.reto} pintado={pReto} />
+          </div>
           <div style={{ display: "flex", padding: "18px 46px", borderRadius: 999, background: "linear-gradient(180deg,#f6e2a8,#d6b065)", color: "#1b1230", fontSize: 46 }}>miarcana.com/juego</div>
         </div>
       </div>

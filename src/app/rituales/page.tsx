@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
 import { Coffee, Wind, Hand, Hexagon, FlameKindling, Orbit, Sparkles, Infinity as Infinito } from "lucide-react";
 import { FICHA_INTENCION, TONO_COLOR, type Intencion } from "@/lib/velas";
 import { COSTOS } from "@/lib/creditos";
-import { getT } from "@/lib/i18n/servidor";
+import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.rituales.titulo, description: t.rituales.intro };
+  return { alternates: alternativas("/rituales", await getIdioma()), title: t.rituales.titulo, description: t.rituales.intro };
 }
 
 interface Guia {

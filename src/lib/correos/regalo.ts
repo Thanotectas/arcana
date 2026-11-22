@@ -2,7 +2,7 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "crypto";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { enviarCorreo, escaparHtml, sitio, urlBaja } from "@/lib/correo";
-import { esIdioma, IDIOMA_PREDETERMINADO, LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
+import { esIdioma, IDIOMA_PREDETERMINADO, IDIOMAS_RTL, LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
 
 /**
  * Correo «tu vaso de hoy»: a quien se quedó sin créditos, Sibila le regala una lectura del vaso (3 créditos).
@@ -148,10 +148,73 @@ const TEXTOS = {
     porque: "Bu e-postayı Arcana'da bir hesabın olduğu için alıyorsun.",
     baja: "E-posta almayı bırak",
   },
+  ar: {
+    asunto: (n: string) => `${n}، كوبك يحمل لك رسالة 🥚`,
+    previa: "تركتُ لك هدية: قراءتك القادمة للكوب على حسابي.",
+    saludo: (n: string) => `مرحبًا ${n}،`,
+    titulo: "هناك أشياء لا تظهر إلا حين يسكن الماء",
+    p1: "خيط يصعد مستقيمًا، وتاج من الفقاعات حول الصفار، وغشاء ينفتح كالعباءة… كل كوب مختلف، وكوبك يحمل رسالة لم نقرأها بعد.",
+    p2: "لذلك أودّ هذا الأسبوع أن أقدّم لك هدية: قراءتك القادمة للكوب على حسابي. قراءة كاملة، مع صورتك وعليها خطوط توضّح ما ظهر وما ينتظرك. ومجانًا بالكامل.",
+    tarjeta: "هديتك",
+    lectura: "1 قراءة للكوب",
+    hasta: (f: string) => `يمكنك فتحها حتى ${f}`,
+    pasos: "الأمر بسيط:",
+    paso1: "يمكنك القيام بجلسة التنقية بهدوء، الليلة أو متى شعرت بالحاجة إليها.",
+    paso2: "يكفي التقاط صورة للكوب من الجانب، على مستوى سطح الماء وفي إضاءة جيدة.",
+    paso3: "بعد رفع الصورة، أرسم لك عليها خطوطًا تبيّن ما ظهر وما يُنبئ به.",
+    boton: "فتح هديتي 🎁",
+    prueba: "نحن أكثر من 1,300 شخص على TikTok نكتشف ما يقوله الكوب.",
+    ps: (f: string) => `ملاحظة: إن لم يكن اليوم مناسبًا لجلسة التنقية، يمكنك الاحتفاظ بهذه الرسالة. هديتك بانتظارك حتى ${f}.`,
+    firma: "بكل محبة،\nسيبيلا، من Arcana",
+    porque: "تصلك هذه الرسالة لأن لديك حسابًا على Arcana.",
+    baja: "إيقاف استلام الرسائل",
+  },
+  id: {
+    asunto: (n: string) => `${n}, gelasmu punya sesuatu untuk disampaikan 🥚`,
+    previa: "Aku meninggalkan hadiah untukmu: bacaan gelas berikutnya aku yang tanggung.",
+    saludo: (n: string) => `Hai ${n},`,
+    titulo: "Ada hal-hal yang hanya terlihat saat air sudah tenang",
+    p1: "Seutas benang yang naik lurus, mahkota gelembung di sekitar kuning telur, selubung yang terbuka seperti jubah… Setiap gelas berbeda, dan gelasmu menyimpan pesan yang belum kita baca.",
+    p2: "Karena itu, minggu ini aku ingin memberimu hadiah: bacaan gelas berikutnya aku yang tanggung. Lengkap, dengan fotomu yang ditandai garis-garis, tentang apa yang muncul dan apa yang akan datang untukmu. Tanpa bayar apa pun.",
+    tarjeta: "Hadiahmu",
+    lectura: "1 bacaan gelas",
+    hasta: (f: string) => `Kamu bisa membukanya sampai ${f}`,
+    pasos: "Caranya mudah:",
+    paso1: "Lakukan pembersihanmu dengan tenang, malam ini atau kapan pun kamu merasa membutuhkannya.",
+    paso2: "Foto gelasnya dari samping, sejajar dengan permukaan air dan dengan cahaya yang cukup.",
+    paso3: "Unggah fotonya, lalu aku tandai dengan garis apa yang muncul dan apa pertandanya.",
+    boton: "Buka hadiahku 🎁",
+    prueba: "Sudah lebih dari 1.300 orang di TikTok yang menemukan apa kata gelas mereka.",
+    ps: (f: string) => `P.S. Kalau hari ini bukan waktunya untuk pembersihanmu, simpan email ini. Hadiahmu menunggumu sampai ${f}.`,
+    firma: "Dengan sayang,\nSibila, dari Arcana",
+    porque: "Kamu menerima email ini karena kamu punya akun di Arcana.",
+    baja: "Berhenti menerima email",
+  },
+  hi: {
+    asunto: (n: string) => `${n}, आपका गिलास आपसे कुछ कहना चाहता है 🥚`,
+    previa: "मैंने आपके लिए एक तोहफ़ा छोड़ा है: गिलास की आपकी अगली रीडिंग मेरी ओर से।",
+    saludo: (n: string) => `नमस्ते ${n},`,
+    titulo: "कुछ बातें तभी दिखती हैं जब पानी ठहर जाता है",
+    p1: "सीधा ऊपर उठता एक धागा, ज़र्दी के चारों ओर बुलबुलों का एक मुकुट, चादर की तरह खुलता एक परदा… हर गिलास अलग होता है, और आपका गिलास एक ऐसा संदेश सँजोए है जिसे हमने अभी तक नहीं पढ़ा।",
+    p2: "इसलिए इस हफ़्ते मैं आपको एक तोहफ़ा देना चाहती हूँ: गिलास की आपकी अगली रीडिंग मेरी ओर से। पूरी रीडिंग, आपकी तस्वीर पर रेखाओं के निशान के साथ, कि क्या दिखा और आपके लिए आगे क्या है। बिना कुछ चुकाए।",
+    tarjeta: "आपका तोहफ़ा",
+    lectura: "गिलास की 1 रीडिंग",
+    hasta: (f: string) => `आप इसे ${f} तक खोल सकते हैं`,
+    pasos: "बहुत आसान है:",
+    paso1: "अपनी शुद्धि आराम से करें, आज रात या जब भी आपको इसकी ज़रूरत महसूस हो।",
+    paso2: "गिलास की तस्वीर बगल से, पानी की सतह की ऊँचाई पर और अच्छी रोशनी में लें।",
+    paso3: "तस्वीर अपलोड करें और मैं रेखाओं से दिखाऊँगी कि क्या उभरा और वह किस ओर इशारा करता है।",
+    boton: "मेरा तोहफ़ा खोलें 🎁",
+    prueba: "TikTok पर हम 1,300 से ज़्यादा लोग पहले से जान रहे हैं कि हमारा गिलास क्या कहता है।",
+    ps: (f: string) => `पुनश्च: अगर आज आपकी शुद्धि का दिन नहीं है, तो यह ईमेल सँभालकर रखें। आपका तोहफ़ा ${f} तक आपका इंतज़ार करेगा।`,
+    firma: "प्यार सहित,\nArcana से सिबिला",
+    porque: "आपको यह ईमेल इसलिए मिला है क्योंकि Arcana पर आपका खाता है।",
+    baja: "ईमेल पाना बंद करें",
+  },
 } as const;
 
 /** Cómo se le llama a la persona cuando no hay nombre. */
-const SIN_NOMBRE: Record<Idioma, string> = { es: "querida alma", en: "friend", pt: "querida alma", fr: "chère âme", tr: "canım" };
+const SIN_NOMBRE: Record<Idioma, string> = { es: "querida alma", en: "friend", pt: "querida alma", fr: "chère âme", tr: "canım", ar: "أيتها الروح العزيزة", id: "sahabat", hi: "प्रिय मित्र" };
 
 const ORO = "#d9b45a";
 const ORO_SUAVE = "#f1d99a";
@@ -166,22 +229,27 @@ export function correoRegaloVaso(d: { nombre: string | null; idioma: Idioma; ven
   const nombre = d.nombre?.trim().split(/\s+/)[0] || SIN_NOMBRE[d.idioma];
   const limite = fechaLimite(d.vence, d.idioma);
   const asunto = t.asunto(nombre);
-  const p = (texto: string, extra = "") => `<p style="margin:14px 0 0;font:16px/1.65 Inter,Arial,sans-serif;color:${TEXTO};${extra}">${escaparHtml(texto)}</p>`;
+  // En árabe el correo va de derecha a izquierda: dir en el documento y en las tablas, y alineación explícita
+  // (algunos clientes de correo ignoran dir).
+  const rtl = IDIOMAS_RTL.includes(d.idioma);
+  const dir = rtl ? "rtl" : "ltr";
+  const alinear = rtl ? "text-align:right;" : "";
+  const p = (texto: string, extra = "") => `<p style="margin:14px 0 0;font:16px/1.65 Inter,Arial,sans-serif;color:${TEXTO};${alinear}${extra}">${escaparHtml(texto)}</p>`;
   const paso = (n: number, texto: string) =>
-    `<tr><td valign="top" style="padding:8px 12px 0 0;"><span style="display:inline-block;width:26px;height:26px;border-radius:999px;background:${ORO};color:${NOCHE};font:700 14px/26px Inter,Arial,sans-serif;text-align:center;">${n}</span></td><td style="padding:8px 0 0;font:15px/1.55 Inter,Arial,sans-serif;color:${TEXTO};">${escaparHtml(texto)}</td></tr>`;
+    `<tr><td valign="top" style="padding:${rtl ? "8px 0 0 12px" : "8px 12px 0 0"};"><span style="display:inline-block;width:26px;height:26px;border-radius:999px;background:${ORO};color:${NOCHE};font:700 14px/26px Inter,Arial,sans-serif;text-align:center;">${n}</span></td><td style="padding:8px 0 0;font:15px/1.55 Inter,Arial,sans-serif;color:${TEXTO};${alinear}">${escaparHtml(texto)}</td></tr>`;
 
   const html = `<!doctype html>
-<html lang="${d.idioma}">
+<html lang="${d.idioma}" dir="${dir}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="dark"><title>${escaparHtml(asunto)}</title></head>
-<body style="margin:0;padding:0;background:${NOCHE};">
+<body dir="${dir}" style="margin:0;padding:0;background:${NOCHE};direction:${dir};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escaparHtml(t.previa)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${NOCHE};">
+<table role="presentation" dir="${dir}" width="100%" cellpadding="0" cellspacing="0" style="background:${NOCHE};direction:${dir};">
 <tr><td align="center" style="padding:28px 12px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${SUPERFICIE};border:1px solid rgba(217,180,90,0.35);border-radius:18px;overflow:hidden;">
+<table role="presentation" dir="${dir}" width="100%" cellpadding="0" cellspacing="0" style="direction:${dir};max-width:560px;background:${SUPERFICIE};border:1px solid rgba(217,180,90,0.35);border-radius:18px;overflow:hidden;">
 <tr><td><a href="${d.url}"><img src="${base}/marca/correo-vaso.jpg" width="560" alt="" style="display:block;width:100%;max-width:560px;height:auto;"></a></td></tr>
 <tr><td style="padding:26px 28px 0;">
-  <p style="margin:0;font:15px/1.5 Inter,Arial,sans-serif;color:${TEXTO_SUAVE};">${escaparHtml(t.saludo(nombre))}</p>
-  <h1 style="margin:8px 0 0;font:600 30px/1.15 'Cormorant Garamond',Georgia,'Times New Roman',serif;color:${ORO_SUAVE};">${escaparHtml(t.titulo)}</h1>
+  <p style="margin:0;font:15px/1.5 Inter,Arial,sans-serif;color:${TEXTO_SUAVE};${alinear}">${escaparHtml(t.saludo(nombre))}</p>
+  <h1 style="margin:8px 0 0;font:600 30px/1.15 'Cormorant Garamond',Georgia,'Times New Roman',serif;color:${ORO_SUAVE};${alinear}">${escaparHtml(t.titulo)}</h1>
   ${p(t.p1)}
   ${p(t.p2)}
 </td></tr>
@@ -195,8 +263,8 @@ export function correoRegaloVaso(d: { nombre: string | null; idioma: Idioma; ven
   </table>
 </td></tr>
 <tr><td style="padding:22px 28px 0;">
-  <p style="margin:0;font:600 15px/1.5 Inter,Arial,sans-serif;color:${ORO_SUAVE};">${escaparHtml(t.pasos)}</p>
-  <table role="presentation" cellpadding="0" cellspacing="0">${paso(1, t.paso1)}${paso(2, t.paso2)}${paso(3, t.paso3)}</table>
+  <p style="margin:0;font:600 15px/1.5 Inter,Arial,sans-serif;color:${ORO_SUAVE};${alinear}">${escaparHtml(t.pasos)}</p>
+  <table role="presentation" dir="${dir}" cellpadding="0" cellspacing="0">${paso(1, t.paso1)}${paso(2, t.paso2)}${paso(3, t.paso3)}</table>
 </td></tr>
 <tr><td align="center" style="padding:26px 28px 6px;">
   <a href="${d.url}" style="display:inline-block;background:${ORO};color:${NOCHE};font:700 16px/1 Inter,Arial,sans-serif;text-decoration:none;padding:16px 34px;border-radius:999px;">${escaparHtml(t.boton)}</a>
@@ -204,10 +272,10 @@ export function correoRegaloVaso(d: { nombre: string | null; idioma: Idioma; ven
 <tr><td style="padding:14px 28px 26px;">
   <p style="margin:0;font:italic 14px/1.6 Inter,Arial,sans-serif;color:${TEXTO_SUAVE};text-align:center;">${escaparHtml(t.prueba)}</p>
   ${p(t.ps(limite), `color:${TEXTO_SUAVE};font-size:14px;`)}
-  <p style="margin:16px 0 0;font:italic 17px/1.5 'Cormorant Garamond',Georgia,serif;color:${ORO_SUAVE};white-space:pre-line;">${escaparHtml(t.firma)}</p>
+  <p style="margin:16px 0 0;font:italic 17px/1.5 'Cormorant Garamond',Georgia,serif;color:${ORO_SUAVE};white-space:pre-line;${alinear}">${escaparHtml(t.firma)}</p>
 </td></tr>
 </table>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+<table role="presentation" dir="${dir}" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;direction:${dir};">
 <tr><td align="center" style="padding:18px 20px 0;">
   <p style="margin:0;font:12px/1.7 Inter,Arial,sans-serif;color:#6f6689;">${escaparHtml(t.porque)} <a href="${d.urlBaja}" style="color:#9a90b8;text-decoration:underline;">${escaparHtml(t.baja)}</a></p>
 </td></tr>

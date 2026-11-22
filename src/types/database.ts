@@ -576,6 +576,12 @@ export type Database = {
         Update: Partial<{ liga_id: string; usuario_id: string; unido_en: string }>;
         Relationships: [];
       };
+      lecturas_audio: {
+        Row: { lectura_id: string; tipo: "mensaje" | "completo"; estado: "generando" | "listo" | "error"; ruta: string | null; texto: string | null; caracteres: number; creditos: number; creado_en: string };
+        Insert: { lectura_id: string; tipo: "mensaje" | "completo"; estado?: "generando" | "listo" | "error"; ruta?: string | null; texto?: string | null; caracteres?: number; creditos?: number; creado_en?: string };
+        Update: Partial<{ estado: "generando" | "listo" | "error"; ruta: string | null; texto: string | null; caracteres: number; creditos: number; creado_en: string }>;
+        Relationships: [];
+      };
       app_opiniones: {
         Row: { id: number; usuario_id: string | null; plataforma: string; calificacion: number | null; texto: string; pagina: string | null; atendida: boolean; creado_en: string };
         Insert: { usuario_id?: string | null; plataforma: string; calificacion?: number | null; texto: string; pagina?: string | null; atendida?: boolean; creado_en?: string };

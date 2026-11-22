@@ -4,17 +4,27 @@ import { SIGNOS } from "@/lib/zodiaco";
 import { RESULTADOS } from "@/lib/seo/test-carta";
 import { NIVELES_ALMA } from "@/lib/seo/test-alma";
 import { slugPareja, todasLasParejas } from "@/lib/seo/compatibilidad";
+import { IDIOMAS_CON_PREFIJO, alternativas, rutaIdioma } from "@/lib/i18n/rutas";
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
 
 /** Mapa del sitio para Google: solo páginas públicas que se pueden leer sin cuenta. */
+/** Páginas cuyo contenido completo está en todos los idiomas: van también con su dirección por idioma (/fr/…). */
+const TRADUCIDAS = ["/", "/explorar", "/horoscopo", ...SIGNOS.map((s) => `/horoscopo/${s.id}`), "/luna", "/piedras", "/rituales", "/velas"];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const url = (ruta: string, prioridad: number, frecuencia: MetadataRoute.Sitemap[number]["changeFrequency"] = "monthly") => ({
     url: BASE + ruta,
     changeFrequency: frecuencia,
     priority: prioridad,
+    ...(TRADUCIDAS.includes(ruta) ? { alternates: { languages: Object.fromEntries(Object.entries(alternativas(ruta, "es").languages).map(([i, r]) => [i, BASE + r])) } } : {}),
   });
+  // Cada página traducida también en su dirección por idioma (con las mismas alternativas).
+  const porIdioma = IDIOMAS_CON_PREFIJO.flatMap((i) =>
+    TRADUCIDAS.map((ruta) => ({ ...url(ruta, ruta === "/" ? 0.9 : 0.6, ruta.startsWith("/horoscopo") ? "daily" : "weekly"), url: BASE + rutaIdioma(ruta, i) })),
+  );
   return [
+    ...porIdioma,
     url("/", 1, "daily"),
     url("/explorar", 0.8, "weekly"),
     url("/horoscopo", 0.9, "daily"),

@@ -1,12 +1,12 @@
 import "server-only";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ALTO, ANCHO, BUCKET, FPS, asegurarBucket, ejecutar, estrellas, png, rutaFfmpeg } from "@/lib/redes/reel";
 import { duracion, filtroAudio, paraLeer, sintetizar, tiemposConVoz, vozConfigurada, type Narracion } from "@/lib/redes/voz";
-import type { Idioma } from "@/lib/i18n/idiomas";
+import { IDIOMAS_RTL, type Idioma } from "@/lib/i18n/idiomas";
 import { MAX_INTENTOS, codigoResultado, type ResultadoCompartido } from "./carta-escondida";
 
 /**
@@ -65,8 +65,160 @@ const TEXTOS: Record<Idioma, { titulo: string; gano: (n: number) => string; perd
     vozGano: (n) => (n === 1 ? "İlk denemede buldum! Sen de bulabilir misin?" : `${n} denemede buldum. Sen de bulabilir misin?`),
     vozPerdio: "Bugün kart benden saklandı. Sen bulabilir misin?",
   },
+  ar: {
+    titulo: "هكذا كانت لعبتي اليوم",
+    gano: (n) => `وجدتها في ${n}/${MAX_INTENTOS}`,
+    perdio: "اختبأت عني اليوم",
+    racha: (n) => `السلسلة: ${diasAr(n)} من اللعب`,
+    reto: "والآن دورك! مجانًا على miarcana.com/juego",
+    voz1: "هكذا كانت لعبتي اليوم في رحلة الأحمق.",
+    vozGano: (n) => (n === 1 ? "وجدتها من المحاولة الأولى! والآن دورك." : `وجدتها ${n === 2 ? "في محاولتين" : `في ${n} محاولات`}. والآن دورك.`),
+    vozPerdio: "اليوم اختبأت عني الورقة. والآن دورك.",
+  },
+  id: {
+    titulo: "Permainanku hari ini",
+    gano: (n) => `Ketemu dalam ${n}/${MAX_INTENTOS}`,
+    perdio: "Hari ini kartunya bersembunyi dariku",
+    racha: (n) => `${n} hari berturut-turut bermain`,
+    reto: "Giliranmu! Main gratis di miarcana.com/juego",
+    voz1: "Begini permainanku hari ini di Perjalanan The Fool.",
+    vozGano: (n) => (n === 1 ? "Aku menemukannya di percobaan pertama! Kamu bisa menemukannya?" : `Aku menemukannya dalam ${n} kesempatan. Kamu bisa menemukannya?`),
+    vozPerdio: "Hari ini kartunya bersembunyi dariku. Kamu bisa menemukannya?",
+  },
+  hi: {
+    titulo: "आज मेरा खेल ऐसा रहा",
+    gano: (n) => `${n}/${MAX_INTENTOS} में खोज लिया`,
+    perdio: "आज यह मुझसे छिप गया",
+    racha: (n) => `लगातार ${n} दिन से खेल जारी`,
+    reto: "आपकी बारी! miarcana.com/juego पर मुफ़्त खेलें",
+    voz1: "आज द फ़ूल की यात्रा में मेरा खेल ऐसा रहा।",
+    vozGano: (n) => (n === 1 ? "पहली ही कोशिश में खोज लिया! क्या आप इसे खोज पाएँगे?" : `${n} कोशिशों में खोज लिया। क्या आप इसे खोज पाएँगे?`),
+    vozPerdio: "आज कार्ड मुझसे छिप गया। क्या आप इसे खोज पाएँगे?",
+  },
 };
-const NOMBRE_JUEGO: Record<Idioma, string> = { es: "EL CAMINO DEL LOCO", en: "THE FOOL'S JOURNEY", pt: "O CAMINHO DO LOUCO", fr: "LE CHEMIN DU FOU", tr: "DELİ'NİN YOLCULUĞU" };
+const NOMBRE_JUEGO: Record<Idioma, string> = {
+  es: "EL CAMINO DEL LOCO",
+  en: "THE FOOL'S JOURNEY",
+  pt: "O CAMINHO DO LOUCO",
+  fr: "LE CHEMIN DU FOU",
+  tr: "DELİ'NİN YOLCULUĞU",
+  ar: "رحلة الأحمق",
+  id: "PERJALANAN THE FOOL",
+  hi: "द फ़ूल की यात्रा",
+};
+
+/**
+ * «#12» dentro de un texto de derecha a izquierda: aislado como texto de izquierda a derecha (LRI…PDI), para que no
+ * salga «12#».
+ */
+export function numeroJuego(n: number, idioma: Idioma) {
+  return IDIOMAS_RTL.includes(idioma) ? `\u2066#${n}\u2069` : `#${n}`;
+}
+
+/** «يومان», «5 أيام», «12 يومًا»: en árabe el sustantivo cambia con el número. */
+export function diasAr(n: number) {
+  return n === 2 ? "يومان" : n <= 10 ? `${n} أيام` : `${n} يومًا`;
+}
+
+// ───────────────────────── Árabe y devanagari en las imágenes ─────────────────────────
+
+/**
+ * El motor de ImageResponse (satori) no sabe componer bien el árabe (desordena las palabras al partir las líneas y
+ * con la puntuación) ni el devanagari (no reordena la «ि» ni une las consonantes), y Cormorant e Inter no traen esos
+ * alfabetos. Por eso, en árabe y en hindi, cada texto se pinta aparte con sharp (Pango + HarfBuzz, que sí componen
+ * bien y escriben de derecha a izquierda solos) y entra en la imagen como un PNG transparente.
+ * Las fuentes Noto se bajan una vez de Google Fonts (TTF, como las sirve la API css2 sin navegador) y quedan en el
+ * disco temporal; si no se pueden bajar, el texto sale con satori como en los otros idiomas.
+ */
+type Escritura = "arabe" | "devanagari";
+const ESCRITURA: Partial<Record<Idioma, Escritura>> = { ar: "arabe", hi: "devanagari" };
+const FUENTES_ESCRITURA: Record<`${Escritura}-${"sans" | "serif"}`, { familia: string; css: string }> = {
+  "arabe-sans": { familia: "Noto Sans Arabic", css: "Noto+Sans+Arabic:wght@600" },
+  "arabe-serif": { familia: "Noto Naskh Arabic", css: "Noto+Naskh+Arabic:wght@600" },
+  "devanagari-sans": { familia: "Noto Sans Devanagari", css: "Noto+Sans+Devanagari:wght@600" },
+  "devanagari-serif": { familia: "Noto Serif Devanagari", css: "Noto+Serif+Devanagari:wght@600" },
+};
+const DIR_FUENTES = join(tmpdir(), "arcana-fuentes");
+const archivosFuente = new Map<string, Promise<string | null>>();
+
+/** Ruta local del TTF (lo baja la primera vez). null si no se pudo. */
+function archivoFuente(clave: keyof typeof FUENTES_ESCRITURA): Promise<string | null> {
+  let p = archivosFuente.get(clave);
+  if (!p) {
+    p = (async () => {
+      const ruta = join(DIR_FUENTES, `${clave}.ttf`);
+      try {
+        await access(ruta);
+        return ruta;
+      } catch {}
+      const css = await (await fetch(`https://fonts.googleapis.com/css2?family=${FUENTES_ESCRITURA[clave].css}`)).text();
+      const url = css.match(/url\((https:[^)]+)\)\s*format\(['"]truetype['"]\)/)?.[1];
+      if (!url) throw new Error(`sin TTF para ${clave}`);
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`${clave}: ${r.status}`);
+      await mkdir(DIR_FUENTES, { recursive: true });
+      const temporal = `${ruta}.${process.pid}.${Date.now()}`;
+      await writeFile(temporal, Buffer.from(await r.arrayBuffer()));
+      await rename(temporal, ruta);
+      return ruta;
+    })().catch((e) => {
+      console.error("[juego] fuente", clave, e instanceof Error ? e.message : e);
+      archivosFuente.delete(clave);
+      return null;
+    });
+    archivosFuente.set(clave, p);
+  }
+  return p;
+}
+
+export interface TextoPintado {
+  src: string;
+  ancho: number;
+  alto: number;
+}
+
+/** ¿Este idioma necesita los textos pintados aparte (árabe, hindi)? */
+export const necesitaTextoPintado = (idioma: Idioma) => ESCRITURA[idioma] !== undefined;
+
+const escaparMarcado = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * Un texto en árabe o hindi como PNG transparente del tamaño justo (tamano en píxeles, como fontSize). Con «ancho»
+ * parte las líneas; «centrado» centra cada línea. null en los otros idiomas o si falla (entonces se usa satori).
+ */
+export async function pintarTexto(texto: string, idioma: Idioma, o: { tamano: number; color: string; serif?: boolean; ancho?: number; centrado?: boolean }): Promise<TextoPintado | null> {
+  const escritura = ESCRITURA[idioma];
+  if (!escritura) return null;
+  const clave = `${escritura}-${o.serif ? "serif" : "sans"}` as const;
+  const archivo = await archivoFuente(clave);
+  if (!archivo) return null;
+  try {
+    const { data, info } = await sharp({
+      text: {
+        text: `<span foreground="${o.color}">${escaparMarcado(texto)}</span>`,
+        font: `${FUENTES_ESCRITURA[clave].familia} SemiBold ${Math.round(o.tamano)}`,
+        fontfile: archivo,
+        rgba: true,
+        dpi: 72,
+        width: o.ancho ? Math.round(o.ancho) : undefined,
+        align: o.centrado ? "centre" : "left",
+        wrap: "word",
+      },
+    })
+      .png()
+      .toBuffer({ resolveWithObject: true });
+    return { src: `data:image/png;base64,${data.toString("base64")}`, ancho: info.width, alto: info.height };
+  } catch (e) {
+    console.error("[juego] texto pintado", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+/** Dentro de un nodo de ImageResponse: el texto pintado si lo hay; si no, el texto tal cual. */
+export function TextoOPintado({ texto, pintado }: { texto: string; pintado: TextoPintado | null | undefined }) {
+  // eslint-disable-next-line @next/next/no-img-element -- texto ya compuesto, dentro de una imagen generada
+  return pintado ? <img src={pintado.src} width={pintado.ancho} height={pintado.alto} alt="" /> : <>{texto}</>;
+}
 
 const capa = { width: "100%", height: "100%", display: "flex", position: "relative" } as const;
 
@@ -105,6 +257,15 @@ async function generar(r: ResultadoCompartido, idioma: Idioma): Promise<Buffer> 
   const t = TEXTOS[idioma];
   const dir = await mkdtemp(join(tmpdir(), "juego-video-"));
   try {
+    const textoJuego = `${NOMBRE_JUEGO[idioma]} · ${numeroJuego(r.numero, idioma)}`;
+    const textoResultado = r.gano ? t.gano(r.filas.length) : t.perdio;
+    const [pJuego, pTitulo, pResultado, pRacha, pReto] = await Promise.all([
+      pintarTexto(textoJuego, idioma, { tamano: 34, color: "#b69cff" }),
+      pintarTexto(t.titulo, idioma, { tamano: 96, color: "#f7f1e3", serif: true, ancho: 960, centrado: true }),
+      pintarTexto(textoResultado, idioma, { tamano: 84, color: "#f1d99a", serif: true, ancho: 960, centrado: true }),
+      r.racha > 1 ? pintarTexto(t.racha(r.racha), idioma, { tamano: 38, color: "#cbbcf6" }) : null,
+      pintarTexto(t.reto, idioma, { tamano: 40, color: "#f7f1e3", ancho: 900, centrado: true }),
+    ]);
     const ALTO_CARTA = 400;
     const dorso = await sharp(await readFile(join(process.cwd(), "public", "cartas", "arcana", "dorso.webp"))).resize({ height: ALTO_CARTA }).png().toBuffer();
     const { width: ANCHO_CARTA = 230 } = await sharp(dorso).metadata();
@@ -123,8 +284,12 @@ async function generar(r: ResultadoCompartido, idioma: Idioma): Promise<Buffer> 
     );
     const cabecera = await png(
       <div style={{ ...capa, flexDirection: "column", alignItems: "center", paddingTop: 210 }}>
-        <div style={{ display: "flex", fontFamily: "Inter", fontWeight: 600, fontSize: 34, letterSpacing: 10, color: "#b69cff" }}>{`${NOMBRE_JUEGO[idioma]} · #${r.numero}`}</div>
-        <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 104, color: "#f7f1e3", marginTop: 18 }}>{t.titulo}</div>
+        <div style={{ display: "flex", fontFamily: "Inter", fontWeight: 600, fontSize: 34, letterSpacing: pJuego ? 0 : 10, color: "#b69cff" }}>
+          <TextoOPintado texto={textoJuego} pintado={pJuego} />
+        </div>
+        <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 104, color: "#f7f1e3", marginTop: 18 }}>
+          <TextoOPintado texto={t.titulo} pintado={pTitulo} />
+        </div>
       </div>,
     );
     const carta = await png(
@@ -161,10 +326,16 @@ async function generar(r: ResultadoCompartido, idioma: Idioma): Promise<Buffer> 
     );
     const final = await png(
       <div style={{ ...capa, flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 230 }}>
-        <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 92, color: "#f1d99a" }}>{r.gano ? t.gano(r.filas.length) : t.perdio}</div>
-        {r.racha > 1 && <div style={{ display: "flex", fontFamily: "Inter", fontWeight: 500, fontSize: 38, color: "#cbbcf6", marginTop: 6 }}>{t.racha(r.racha)}</div>}
+        <div style={{ display: "flex", fontFamily: "Cormorant", fontSize: 92, color: "#f1d99a" }}>
+          <TextoOPintado texto={textoResultado} pintado={pResultado} />
+        </div>
+        {r.racha > 1 && (
+          <div style={{ display: "flex", fontFamily: "Inter", fontWeight: 500, fontSize: 38, color: "#cbbcf6", marginTop: 6 }}>
+            <TextoOPintado texto={t.racha(r.racha)} pintado={pRacha} />
+          </div>
+        )}
         <div style={{ display: "flex", fontFamily: "Inter", fontWeight: 600, fontSize: 40, color: "#f7f1e3", marginTop: 26, padding: "18px 34px", borderRadius: 999, background: "rgba(139,108,246,0.35)", border: "2px solid rgba(241,217,154,0.6)" }}>
-          {t.reto}
+          <TextoOPintado texto={t.reto} pintado={pReto} />
         </div>
       </div>,
     );

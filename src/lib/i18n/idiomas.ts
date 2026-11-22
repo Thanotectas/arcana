@@ -1,5 +1,5 @@
 /** Idiomas en los que sale la aplicación. El primero es el predeterminado. */
-export const IDIOMAS = ["es", "en", "pt", "fr", "tr"] as const;
+export const IDIOMAS = ["es", "en", "pt", "fr", "tr", "ar", "id", "hi"] as const;
 export type Idioma = (typeof IDIOMAS)[number];
 
 export const IDIOMA_PREDETERMINADO: Idioma = "es";
@@ -11,6 +11,9 @@ export const NOMBRES_IDIOMA: Record<Idioma, string> = {
   pt: "Português",
   fr: "Français",
   tr: "Türkçe",
+  ar: "العربية",
+  id: "Bahasa Indonesia",
+  hi: "हिन्दी",
 };
 
 /** Nombre del idioma tal como se le indica al modelo de IA. */
@@ -20,6 +23,9 @@ export const IDIOMA_PARA_IA: Record<Idioma, string> = {
   pt: "português do Brasil",
   fr: "français (tutoiement chaleureux, comme une amie qui lit les cartes)",
   tr: "Türkçe (samimi, \"sen\" diye hitap eden sıcak bir dille)",
+  ar: "العربية الفصحى المبسطة (دافئة وقريبة، بصيغة المخاطَب)",
+  id: "Bahasa Indonesia (hangat dan akrab, menyapa dengan \"kamu\")",
+  hi: "हिन्दी (गर्मजोशी भरी, अपनापन लिए, \"आप\" से संबोधन)",
 };
 
 /** Código regional para fechas y monedas. */
@@ -29,7 +35,13 @@ export const LOCALE_INTL: Record<Idioma, string> = {
   pt: "pt-BR",
   fr: "fr-FR",
   tr: "tr-TR",
+  ar: "ar-u-nu-latn",
+  id: "id-ID",
+  hi: "hi-IN",
 };
+
+/** Idiomas que se escriben de derecha a izquierda. */
+export const IDIOMAS_RTL: readonly Idioma[] = ["ar"];
 
 export function esIdioma(valor: unknown): valor is Idioma {
   return typeof valor === "string" && (IDIOMAS as readonly string[]).includes(valor);

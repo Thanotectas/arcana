@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
 import { getT, getIdioma } from "@/lib/i18n/servidor";
 import { getPerfil } from "@/lib/dal";
@@ -11,7 +12,7 @@ import { signoPorLongitud, signoPorId, imagenSigno } from "@/lib/zodiaco";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.luna.titulo, description: t.luna.intro };
+  return { alternates: alternativas("/luna", await getIdioma()), title: t.luna.titulo, description: t.luna.intro };
 }
 
 const ICONO_FASE: Record<FaseClave, string> = { nueva: "🌑", creciente: "🌓", llena: "🌕", menguante: "🌗" };

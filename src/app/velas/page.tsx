@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { alternativas } from "@/lib/i18n/rutas";
 import { getPerfil, getUsuarioOpcional } from "@/lib/dal";
 import { COSTOS } from "@/lib/creditos";
 import { getT, getIdioma } from "@/lib/i18n/servidor";
@@ -11,7 +12,7 @@ import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t.velas.titulo, description: t.velas.intro };
+  return { alternates: alternativas("/velas", await getIdioma()), title: t.velas.titulo, description: t.velas.intro };
 }
 
 /** Guía pública de rituales de velas y, con sesión, la lectura de los restos. */

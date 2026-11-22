@@ -71,7 +71,7 @@ export function Logros({ datos }: { datos: DatosLogros }) {
   });
   const recien = LOGROS.filter((l) => nuevos.has(l.id));
   return (
-    <div className="space-y-3 text-left">
+    <div className="space-y-3 text-start">
       {recien.length > 0 && (
         <div className="logro-nuevo rounded-xl border border-oro/60 bg-oro/10 p-3 text-center text-sm">
           <div className="mb-2 flex justify-center gap-2">

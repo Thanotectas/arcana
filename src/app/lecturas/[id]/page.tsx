@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AudioSibila } from "@/components/AudioSibila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getLectura, requerirUsuario, getPreguntas, getPerfil, circuloActivo } from "@/lib/dal";
@@ -132,6 +133,7 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         </section>
       )}
 
+      {lectura.estado === "lista" && <AudioSibila id={lectura.id} compras={compras} />}
       {lectura.estado === "lista" && (
         <ConversacionLectura
           lecturaId={lectura.id}
