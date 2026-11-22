@@ -188,16 +188,30 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
       .filter((m) => m.snippet?.type === "textMessageEvent" && !m.authorDetails?.isChatOwner)
       .map((m) => ({ id: m.id, autor: (m.authorDetails?.displayName ?? "Alguien").slice(0, 60), texto: m.snippet?.displayMessage ?? "" })),
   ).catch(() => new Set<string>());
+  const mensajes = (r.datos.items ?? [])
+    .filter((m) => m.snippet?.type === "textMessageEvent" && !m.authorDetails?.isChatOwner && !intentosJuego.has(m.id))
+    .map((m) => ({ id: m.id, autor: (m.authorDetails?.displayName ?? "Alguien").slice(0, 60), texto: (m.snippet?.displayMessage ?? "").trim() }));
+  const { nuevas, sumadas } = await encolarMensajes(admin, mensajes);
+  return { conectado: true, directo: true, nuevas, ...(sumadas && !nuevas ? { detalle: `${sumadas} mensaje(s) sumados a consultas en espera` } : {}) };
+}
+
+/**
+ * Pone en la fila los mensajes del chat que son consultas (YouTube o lo que se lee en la pantalla de TikTok): una sola
+ * consulta por persona; sus mensajes se juntan («soy Sagitario» + «¿cómo me ves en el amor?») y, si ya tiene una
+ * esperando turno, se le suman. El id de cada mensaje evita encolarlo dos veces.
+ */
+export async function encolarMensajes(admin: Admin, mensajes: { id: string; autor: string; texto: string }[]): Promise<{ nuevas: number; sumadas: number }> {
+  const ahora = Date.now();
   const porAutor = new Map<string, { mensaje_id: string; autor: string; textos: string[] }>();
-  for (const m of r.datos.items ?? []) {
-    const texto = (m.snippet?.displayMessage ?? "").trim();
-    if (m.snippet?.type !== "textMessageEvent" || m.authorDetails?.isChatOwner || intentosJuego.has(m.id) || !pareceConsulta(texto)) continue;
-    const autor = (m.authorDetails?.displayName ?? "Alguien").slice(0, 60);
+  for (const m of mensajes) {
+    const texto = m.texto.trim();
+    if (!pareceConsulta(texto)) continue;
+    const autor = m.autor.slice(0, 60);
     const grupo = porAutor.get(autor);
     if (grupo) grupo.textos.push(texto);
     else porAutor.set(autor, { mensaje_id: m.id, autor, textos: [texto] });
   }
-  if (!porAutor.size) return { conectado: true, directo: true, nuevas: 0 };
+  if (!porAutor.size) return { nuevas: 0, sumadas: 0 };
 
   // Lo que cada persona ya preguntó esta noche: su consulta pendiente y el signo que dijo.
   const { data: previas } = await admin
@@ -214,6 +228,8 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
     const texto = g.textos.join(" · ").slice(0, 300);
     const signo = detectarSigno(texto)?.id ?? suyas.find((p) => p.signo)?.signo ?? null;
     const pendiente = suyas.find((p) => p.estado === "pendiente");
+    // Lo mismo que ya tiene en espera (la pantalla lo vuelve a ver) no se suma otra vez.
+    if (pendiente && pendiente.texto.toLowerCase().includes(texto.toLowerCase())) continue;
     if (pendiente) {
       const unido = `${pendiente.texto} · ${texto}`.slice(0, 300);
       const tipo = tipoDeMensaje(unido);
@@ -227,7 +243,7 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
     const tipo = tipoDeMensaje(texto);
     if (tipo) filas.push({ mensaje_id: g.mensaje_id, origen: "chat" as const, tipo, autor: g.autor, texto, signo });
   }
-  if (!filas.length) return { conectado: true, directo: true, nuevas: 0, ...(sumadas ? { detalle: `${sumadas} mensaje(s) sumados a consultas en espera` } : {}) };
+  if (!filas.length) return { nuevas: 0, sumadas };
   let { data, error } = await admin.from("en_vivo_preguntas").upsert(filas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id");
   if (error?.code === "23514") {
     // Sin la migración 0041 no existen los tipos carta y sinastría: se leen como numerología (traen fecha).
@@ -242,7 +258,7 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
     ({ data, error } = await admin.from("en_vivo_preguntas").upsert(viejas, { onConflict: "mensaje_id", ignoreDuplicates: true }).select("id"));
   }
   if (error) console.error("[en vivo] encolar:", error.message);
-  return { conectado: true, directo: true, nuevas: data?.length ?? 0 };
+  return { nuevas: data?.length ?? 0, sumadas };
 }
 
 // ───────────────────────── Lecturas ─────────────────────────

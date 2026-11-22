@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
 
 const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", huevo: "Huevo", carta: "Carta astral", sinastria: "Sinastría", pendulo: "Péndulo", iching: "I Ching", runas: "Runas", lenormand: "Lenormand", baraja: "Baraja", chino: "Chino" };
-const ORIGEN: Record<string, string> = { chat: "YouTube", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)", sistema: "Para todos" };
+const ORIGEN: Record<string, string> = { chat: "Chat (YouTube / TikTok)", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)", sistema: "Para todos" };
 
 /** Control de «Sibila en vivo»: dirección del escenario para OBS, estado, fila de consultas y lecturas. */
 export default async function PaginaAdminEnVivo() {
@@ -93,6 +93,12 @@ export default async function PaginaAdminEnVivo() {
         <p className="text-sm text-texto-suave">
           Esta ya trae la música de Arcana muy suave de fondo (7 %; baja sola durante las lecturas). Para cambiarla agrega al final{" "}
           <code>&amp;musica=4</code> (más baja), <code>&amp;musica=12</code> (más alta) o <code>&amp;musica=0</code> (sin música).
+        </p>
+        <p className="text-sm">
+          <a href="/admin/en-vivo/pantalla" className="font-semibold text-oro-suave underline">
+            👀 Leer el chat de TikTok desde tu pantalla
+          </a>{" "}
+          <span className="text-texto-suave">(Claude mira el chat de LIVE Studio y pone las consultas en la fila sola).</span>
         </p>
         <p className="text-sm text-texto-suave">
           Apuntador: <strong className="text-oro-suave">NO va en LIVE Studio</strong>. Ábrelo en el celular (o en otra pantalla) y lee desde ahí lo que escribe Sibila.

@@ -14,7 +14,7 @@ import { IDIOMA_PARA_IA, IDIOMA_PREDETERMINADO, type Idioma } from "./i18n/idiom
  */
 let cliente: Anthropic | null = null;
 
-function getCliente() {
+export function getCliente() {
   if (!cliente) {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error("[ia] Falta ANTHROPIC_API_KEY en el entorno.");
