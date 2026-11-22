@@ -106,16 +106,12 @@ export function CartaIskambil({ id, alt, className = "" }: { id: string; alt: st
 
 /** Dorso de la baraja: rombos granate y oro. */
 export function DorsoIskambil({ className = "", style }: { className?: string; style?: CSSProperties }) {
+  // Dorso propio de Arcana (tulipanes otomanos, lunas y estrella de ocho puntas en oro sobre violeta noche).
   return (
     <div
       aria-hidden
-      className={`aspect-[2/3] w-full rounded-[0.45rem] border border-[#e9dcc0] shadow-[0_8px_18px_rgba(0,0,0,0.45)] ${className}`}
-      style={{
-        background:
-          "repeating-linear-gradient(45deg, rgba(233,220,192,0.22) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(233,220,192,0.22) 0 2px, transparent 2px 9px), linear-gradient(180deg, #7a1f2b, #4a1019)",
-        boxShadow: "inset 0 0 0 3px #f4ead2, inset 0 0 0 4px rgba(122,31,43,0.9), 0 8px 18px rgba(0,0,0,0.45)",
-        ...style,
-      }}
+      className={`aspect-[2/3] w-full overflow-hidden rounded-[0.45rem] border border-oro/50 bg-noche bg-cover bg-center shadow-[0_8px_18px_rgba(0,0,0,0.45)] ${className}`}
+      style={{ backgroundImage: "url(/cartas/iskambil/dorso.webp)", ...style }}
     />
   );
 }

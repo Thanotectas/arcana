@@ -13,6 +13,10 @@ const PORTADAS: Record<string, string> = {
   marsella: "marsella",
   geomancia: "geomancia",
   abjad: "abjad",
+  nombres: "nombres",
+  ascendente: "ascendente",
+  "si-o-no": "si-o-no",
+  "numeros-angelicales": "numeros-angelicales",
 };
 
 export function PortadaProducto({ clave, prioridad = true }: { clave: string; prioridad?: boolean }) {
