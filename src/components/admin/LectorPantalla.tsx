@@ -196,7 +196,7 @@ export function LectorPantalla({ children }: { children?: ReactNode }) {
         vistos.current = [...vistos.current, ...nuevos.map((n) => n.clave)].slice(-600);
         setCuentas((c) => ({ capturas: c.capturas + 1, comentarios: c.comentarios + nuevos.length, enFila: c.enFila + (d.nuevas ?? 0) }));
         if (d.nuevas || d.sumadas) anotar(`${d.nuevas ? `${d.nuevas} a la fila` : ""}${d.nuevas && d.sumadas ? " · " : ""}${d.sumadas ? `${d.sumadas} sumada(s) a su consulta` : ""}: ${nuevos.map((n) => `${n.autor}: «${n.texto}»`).join(" · ")}`, "nueva");
-        else if (nuevos.length) anotar(`Leí ${nuevos.length} comentario(s) nuevos, ninguno era consulta.`);
+        else if (nuevos.length) anotar(`Leí ${nuevos.length} comentario(s): ninguno entra nuevo a la fila (no eran consultas o ya estaban). ${nuevos.map((n) => `${n.autor}: «${n.texto}»`).join(" · ")}`);
       } catch {
         anotar("Sin conexión con el servidor; reintento en unos segundos.", "error");
       } finally {
@@ -281,6 +281,22 @@ export function LectorPantalla({ children }: { children?: ReactNode }) {
             </button>
           </>
         )}
+        {activo && (
+          <button
+            type="button"
+            onClick={() => {
+              // En TikTok LIVE Studio el «Chat LIVE» es la columna de la derecha, de la mitad hacia abajo.
+              const r = { x: 0.77, y: 0.38, w: 0.23, h: 0.6 };
+              setRegion(r);
+              guardarRegion(r);
+              firma.current = "";
+              anotar("Recuadro puesto en la columna derecha (Chat LIVE). Si no cae justo sobre el chat, arrástralo tú en la vista previa.");
+            }}
+            className="boton boton-secundario text-sm"
+          >
+            🎯 Marcar el Chat LIVE (columna derecha)
+          </button>
+        )}
         {region && (
           <button
             type="button"
@@ -328,6 +344,7 @@ export function LectorPantalla({ children }: { children?: ReactNode }) {
         }}
       >
         <video ref={video} muted playsInline className="block w-full select-none" />
+        {activo && !marco && <p className="pointer-events-none absolute inset-x-0 top-2 text-center text-sm font-semibold text-oro drop-shadow">Arrastra el mouse sobre el «Chat LIVE» de esta imagen</p>}
         {!activo && <p className="p-10 text-center text-texto-suave">Aquí se ve la pantalla compartida.</p>}
         {activo && marco && (
           <div
