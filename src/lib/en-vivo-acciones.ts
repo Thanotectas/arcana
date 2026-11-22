@@ -8,7 +8,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requerirAdmin } from "@/lib/admin";
 import { huellaDe } from "@/lib/chat-visitas";
 import { detectarSigno } from "@/lib/redes/sibila-redes";
-import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
+import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, faltaFecha, tipoDeMensaje, type TipoLectura } from "@/lib/en-vivo";
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 import { diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 import { pedirJuego } from "@/lib/en-vivo-juego";
@@ -42,6 +42,7 @@ async function preguntaSinFoto(nombre: string, pregunta: string): Promise<Estado
   const { count } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("huella", huella).gte("creado_en", new Date(Date.now() - 3_600_000).toISOString());
   if ((count ?? 0) >= POR_HORA) return { error: "Ya enviaste tus preguntas de esta hora. ¡Gracias! Sibila las lee en orden." };
   const tipo = (tipoDeMensaje(pregunta) ?? "tarot") as TipoLectura;
+  if (faltaFecha(tipo, pregunta)) return { error: tipo === "carta" ? "Para tu carta astral escribe tu fecha de nacimiento (ej.: 14/03/1985), la hora y la ciudad." : "Para la sinastría escribe las dos fechas de nacimiento (ej.: 14/03/1985 y 22/08/1990)." };
   const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina" as const, tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, huella });
   if (error) return { error: "No se pudo enviar. Intenta de nuevo." };
   const { count: antes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
@@ -103,6 +104,7 @@ export async function accionPreguntaManual(_prev: EstadoEnVivo, formData: FormDa
   // «auto» clasifica el texto igual que el chat (carta astral, sinastría, aura…); lo que pide foto queda en tarot.
   const tipo = (elegido === "auto" ? (tipoDeMensaje(texto) ?? "tarot") : elegido) as TipoLectura;
   if (!autor || texto.length < 3 || !TIPOS.includes(tipo)) return { error: "Escribe el nombre, el tipo y la consulta." };
+  if (faltaFecha(tipo, texto)) return { error: tipo === "carta" ? "Falta la fecha de nacimiento: escríbela así 14/03/1985 (y si la sabe, la hora y la ciudad: 14/03/1985 10:30 Medellín)." : "La sinastría necesita las dos fechas: 14/03/1985 y 22/08/1990." };
   const fila = { origen: "manual" as const, tipo, autor, texto, signo: detectarSigno(texto)?.id ?? null };
   let { error } = await getSupabaseAdmin().from("en_vivo_preguntas").insert(fila);
   // Sin la migración 0044 los oráculos nuevos van como tarot con su marca y se leen igual.

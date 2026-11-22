@@ -6,7 +6,7 @@
 import { SIGNOS } from "./zodiaco";
 
 export const FECHA = /\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})\b/g;
-export const PIDE_CARTA = /carta\s+(astral|natal)|mapa\s+(astral|natal)|birth\s*chart|natal\s*chart|astral\s*chart|th[eè]me\s+(astral|natal)|geburtshoroskop|geburtsbild|radix/i;
+export const PIDE_CARTA = /carta\s*(astral|natal|astrol[oó]gica)|mapa\s*(astral|natal)|birth\s*chart|natal\s*chart|astral\s*chart|th[eè]me\s+(astral|natal)|geburtshoroskop|geburtsbild|radix/i;
 export const PIDE_SINASTRIA = /sinastr|synastr|compatib|kompatib/i;
 
 /** Meses escritos con letras (español, inglés y portugués), con sus abreviaturas. */
@@ -27,6 +27,10 @@ const MESES: [RegExp, number][] = [
 const PALABRA_MES = "(ene(?:ro)?|jan(?:uary|eiro)?|febr?(?:ero)?|february|fev(?:ereiro)?|mar(?:zo|ch|[cç]o)?|abr(?:il)?|apr(?:il)?|ma(?:yo|y|io|i)|jun(?:io|e|ho)?|jul(?:io|y|ho)?|ago(?:sto)?|aug(?:ust)?|sept?(?:iembre|ember)?|setiembre|set(?:embro)?|oct(?:ubre|ober)?|out(?:ubro)?|nov(?:iembre|ember|embro)?|dic(?:iembre)?|dec(?:ember)?|dez(?:embro)?)\\.?";
 /** «13 de febrero de 1974», «13 feb 1974», «13-feb-1974». */
 export const FECHA_DIA_MES = new RegExp(`\\b(\\d{1,2})(?:\\s*(?:de|del|of)?\\s+|[/.-])${PALABRA_MES}(?:\\s*(?:de|del|,)?\\s*|[/.-])(\\d{4}|\\d{2})\\b`, "gi");
+/** «1974-02-13» (año primero). */
+export const FECHA_ISO = /\b(\d{4})[/.-](\d{1,2})[/.-](\d{1,2})\b/g;
+/** «13 02 1974» y «13021974» (sin separadores, como escriben rápido en el chat). */
+export const FECHA_PEGADA = /\b(\d{1,2})(?:\s+|)(\d{2})(?:\s+|)((?:19|20)\d{2})\b/g;
 /** «febrero 13 de 1974», «February 13, 1974». */
 export const FECHA_MES_DIA = new RegExp(`\\b${PALABRA_MES}\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:\\s*(?:de|del|,)?\\s*)(\\d{4})\\b`, "gi");
 
@@ -44,7 +48,7 @@ function fechaValida(dia: number, mes: number, anioTexto: string): string | null
 
 /** Quita las fechas (con números o con el mes en letras) para buscar la hora o la ciudad. */
 export function sinFechas(texto: string, reemplazo = " ") {
-  return texto.replace(FECHA, reemplazo).replace(FECHA_DIA_MES, reemplazo).replace(FECHA_MES_DIA, reemplazo);
+  return texto.replace(FECHA, reemplazo).replace(FECHA_ISO, reemplazo).replace(FECHA_PEGADA, reemplazo).replace(FECHA_DIA_MES, reemplazo).replace(FECHA_MES_DIA, reemplazo);
 }
 
 /**
@@ -66,6 +70,18 @@ export function fechasEn(texto: string): string[] {
     const mes = numeroMes(m[1]);
     const f = mes ? fechaValida(Number(m[2]), mes, m[3]) : null;
     if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
+  }
+  if (!halladas.length) {
+    // Solo si no hubo una fecha escrita de la forma de siempre: «1974-02-13», «13 02 1974», «13021974».
+    for (const m of texto.matchAll(FECHA_ISO)) {
+      const f = fechaValida(Number(m[3]), Number(m[2]), m[1]);
+      if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
+    }
+    for (const m of texto.matchAll(FECHA_PEGADA)) {
+      if (halladas.some((h) => Math.abs(h.pos - (m.index ?? 0)) < 6)) continue;
+      const f = fechaValida(Number(m[1]), Number(m[2]), m[3]);
+      if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
+    }
   }
   return halladas.sort((a, b) => a.pos - b.pos).map((h) => h.fecha);
 }

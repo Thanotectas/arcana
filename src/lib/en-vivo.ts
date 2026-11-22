@@ -248,6 +248,12 @@ export async function sincronizarChat(admin: Admin): Promise<EstadoChat> {
 // ───────────────────────── Lecturas ─────────────────────────
 
 export type TipoLectura = PreguntaEnVivo["tipo"];
+
+/** La carta astral necesita una fecha y la sinastría dos: sin ellas no se puede dibujar. */
+export function faltaFecha(tipo: string, texto: string | null) {
+  const n = tipo === "carta" ? 1 : tipo === "sinastria" ? 2 : 0;
+  return n > 0 && fechasEn((texto ?? "").toLowerCase()).length < n;
+}
 /** Marca de la limpia con huevo guardada como «chocolate» cuando falta la migración 0043. */
 export const MARCA_HUEVO = "[huevo] ";
 const esOraculo = (tipo: string): tipo is OraculoVivo => (ORACULOS_VIVO as string[]).includes(tipo);
@@ -275,7 +281,8 @@ export function tipoDeMensaje(texto: string): TipoLectura | null {
   // Carta astral y sinastría se dibujan en pantalla: necesitan la fecha (o las dos fechas).
   const fechas = fechasEn(t).length;
   if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
-  if (fechas >= 1 && PIDE_CARTA.test(t)) return "carta";
+  // «Carta astral» sin fecha también es carta: espera en la fila a que la persona escriba su fecha (se le suma).
+  if (PIDE_CARTA.test(t)) return "carta";
   if (/\baura\b/.test(t)) return "aura";
   if (fechas >= 1 || /numerolog|mi n[uú]mero|my number|meu n[uú]mero/.test(t)) return "numerologia";
   if (/hor[oó]scop/.test(t)) return "horoscopo";
@@ -509,8 +516,11 @@ async function limpiarFotos(admin: Admin) {
  * null si la fila está vacía.
  */
 export async function porQueNoLee(admin: Admin): Promise<string | null> {
-  const { count: pendientes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
+  const { data: fila } = await admin.from("en_vivo_preguntas").select("autor, tipo, texto").eq("estado", "pendiente").limit(30);
+  const pendientes = fila?.length ?? 0;
   if (!pendientes) return null;
+  const esperando = (fila ?? []).filter((x) => faltaFecha(x.tipo, x.texto));
+  if (esperando.length === pendientes) return `${esperando.map((x) => x.autor).join(", ")} pidió carta astral sin la fecha: dile que la escriba así 14/03/1985.`;
   const inicioDia = new Date(new Date().toISOString().slice(0, 10) + "T05:00:00Z");
   if (inicioDia.getTime() > Date.now()) inicioDia.setUTCDate(inicioDia.getUTCDate() - 1);
   const { count: leidas } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "leida").gte("leida_en", inicioDia.toISOString());
@@ -532,8 +542,14 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
     // Orden: manual, página (fotos), chat de YouTube y comentarios de Facebook; dentro de
     // cada grupo, la más antigua. En el chat pasa primero quien aún no ha tenido lectura
     // esta noche: quien repite puede seguir preguntando, pero si hay fila espera a los nuevos.
-    const { data: lista } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("creado_en").limit(30);
-    if (!lista?.length) return null;
+    const { data: todas } = await admin.from("en_vivo_preguntas").select("*").eq("estado", "pendiente").order("creado_en").limit(30);
+    // La carta astral o la sinastría sin fecha espera a que la persona la escriba (sus mensajes se le suman);
+    // a los 10 minutos sin fecha se omite.
+    const sinFecha = (todas ?? []).filter((x) => faltaFecha(x.tipo, x.texto));
+    const vencidas = sinFecha.filter((x) => Date.now() - new Date(x.creado_en).getTime() > 600_000).map((x) => x.id);
+    if (vencidas.length) await admin.from("en_vivo_preguntas").update({ estado: "omitida", detalle: "Pidió carta astral o sinastría y no escribió la fecha de nacimiento" }).in("id", vencidas).eq("estado", "pendiente");
+    const lista = (todas ?? []).filter((x) => !faltaFecha(x.tipo, x.texto));
+    if (!lista.length) return null;
     // Los segmentos «para todos» (origen sistema) solo van cuando no hay nadie más esperando.
     const PRIORIDAD: Record<string, number> = { manual: 0, pagina: 1, chat: 2, facebook: 2, sistema: 9 };
     const candidatas = [...lista].sort((a, b) => (PRIORIDAD[a.origen] ?? 3) - (PRIORIDAD[b.origen] ?? 3));
