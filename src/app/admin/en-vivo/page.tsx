@@ -95,7 +95,10 @@ export default async function PaginaAdminEnVivo() {
           cambia el número del final: <code>&amp;musica=10</code> es más bajo, <code>&amp;musica=25</code> más alto.
         </p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador&musica=15`} />
-        <p className="text-sm text-texto-suave">Apuntador: ábrelo en el celular o en otra pantalla y lee desde ahí lo que escribe Sibila.</p>
+        <p className="text-sm text-texto-suave">
+          Apuntador: <strong className="text-oro-suave">NO va en LIVE Studio</strong>. Ábrelo en el celular (o en otra pantalla) y lee desde ahí lo que escribe Sibila.
+          En LIVE Studio va el escenario de arriba (el que dice /en-vivo/escenario).
+        </p>
         <DireccionEscenario url={url.replace("/en-vivo/escenario?", "/en-vivo/apuntador?")} />
         <p className="text-sm text-texto-suave">
           Dos plataformas a la vez (por ejemplo YouTube en OBS y TikTok en LIVE Studio): abre el escenario normal en una y esta copia
