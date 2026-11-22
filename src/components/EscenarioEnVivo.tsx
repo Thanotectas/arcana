@@ -267,6 +267,7 @@ export function EscenarioEnVivo({
   camaraGrande = false,
   camaraCompleta = false,
   espejo = false,
+  soloPreguntas = false,
 }: {
   clave: string;
   qr: string;
@@ -277,6 +278,8 @@ export function EscenarioEnVivo({
   /** Vertical con la cámara del presentador en la mitad de arriba (960×820) y la lectura de Sibila, compacta, debajo. */
   camaraCompleta?: boolean;
   espejo?: boolean;
+  /** TikTok: Sibila solo habla cuando hay una pregunta (sin frases de espera, segmentos «para todos» ni juego automático). */
+  soloPreguntas?: boolean;
 }) {
   const xl = vertical && camaraCompleta;
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
@@ -529,13 +532,13 @@ export function EscenarioEnVivo({
       const PENDIENTE = Symbol("pendiente");
       while (activo) {
         // Tras unas vueltas sin preguntas se pide un segmento «para todos» (el servidor lo hace solo si nadie espera).
-        const peticion = siguiente ?? pedir(quietos >= VUELTAS_ANTES_DE_RELLENO ? "relleno" : "lectura");
+        const peticion = siguiente ?? pedir(!soloPreguntas && quietos >= VUELTAS_ANTES_DE_RELLENO ? "relleno" : "lectura");
         siguiente = null;
         // Mientras Sibila prepara una lectura (Claude y la voz tardan unos segundos), no se queda callada.
         const pronto = await Promise.race([peticion, esperar(3500).then(() => PENDIENTE)]);
         let r: Respuesta | null;
         if (typeof pronto === "symbol") {
-          if (!despedida) await decirPuente();
+          if (!despedida && !soloPreguntas) await decirPuente();
           r = await peticion;
         } else r = pronto;
         if (!activo) break;
@@ -553,13 +556,13 @@ export function EscenarioEnVivo({
           setCierre("fin");
           emitir({ t: "cierre", estado: "fin" });
           await esperar(4000);
-          await decirCierre();
+          if (!soloPreguntas) await decirCierre();
           await esperar(6000);
           continue;
         }
         if (r?.clase === "fin") {
           setCierre("fin");
-          await decirCierre();
+          if (!soloPreguntas) await decirCierre();
           await esperar(6000);
           continue;
         }
@@ -645,6 +648,13 @@ export function EscenarioEnVivo({
           continue;
         }
         quietos++;
+        if (soloPreguntas) {
+          // TikTok: sin preguntas, Sibila espera en silencio (habla quien presenta).
+          setLectura(null);
+          setSubtitulo("");
+          await esperar(3000);
+          continue;
+        }
         // Sin preguntas: Sibila sigue hablando, con una pausa corta entre frase y frase.
         await decirPuente();
         await esperar(quietos > 24 ? 6000 : 3000);
@@ -653,7 +663,7 @@ export function EscenarioEnVivo({
     return () => {
       activo = false;
     };
-  }, [pedir, hablar, emitir, espejo]);
+  }, [pedir, hablar, emitir, espejo, soloPreguntas]);
 
   const tipo = lectura?.tipo ?? "tarot";
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
