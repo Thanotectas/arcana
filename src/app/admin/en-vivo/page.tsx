@@ -91,10 +91,9 @@ export default async function PaginaAdminEnVivo() {
         </p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador`} />
         <p className="text-sm text-texto-suave">
-          La misma, con la música de Arcana de fondo (original, sin derechos de terceros; baja sola durante las lecturas). Para más o menos volumen,
-          cambia el número del final: <code>&amp;musica=10</code> es más bajo, <code>&amp;musica=25</code> más alto.
+          Esta ya trae la música de Arcana muy suave de fondo (7 %; baja sola durante las lecturas). Para cambiarla agrega al final{" "}
+          <code>&amp;musica=4</code> (más baja), <code>&amp;musica=12</code> (más alta) o <code>&amp;musica=0</code> (sin música).
         </p>
-        <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador&musica=15`} />
         <p className="text-sm text-texto-suave">
           Apuntador: <strong className="text-oro-suave">NO va en LIVE Studio</strong>. Ábrelo en el celular (o en otra pantalla) y lee desde ahí lo que escribe Sibila.
           En LIVE Studio va el escenario de arriba (el que dice /en-vivo/escenario).

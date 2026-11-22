@@ -49,15 +49,20 @@ export default async function PaginaEscenario({ searchParams }: { searchParams: 
       espejo={espejo === "1"}
       soloPreguntas={formato === "vertical" && frases !== "1"}
       vozPresentador={voz === "presentador"}
-      musica={volumenMusica(musica)}
+      musica={volumenMusica(musica, voz === "presentador")}
     />
   );
 }
 
-/** &musica=1 → 15 %; &musica=N (1 a 100) → N %; sin el parámetro, sin música. */
-function volumenMusica(valor?: string) {
-  if (!valor) return 0;
+/**
+ * Volumen de la música de Arcana. Con &voz=presentador suena por omisión, muy suave (7 %); &musica=0 la quita y
+ * &musica=N (2 a 100) la pone al N %. En los demás escenarios solo suena con &musica.
+ */
+function volumenMusica(valor: string | undefined, presentador: boolean) {
+  const SUAVE = 0.07;
+  if (valor === undefined || valor === "") return presentador ? SUAVE : 0;
   const n = Number(valor);
-  if (!Number.isFinite(n) || n <= 1) return valor === "0" ? 0 : 0.15;
-  return Math.min(100, n) / 100;
+  if (!Number.isFinite(n) || n < 0) return SUAVE;
+  if (n === 0) return 0;
+  return n <= 1 ? SUAVE : Math.min(100, n) / 100;
 }
