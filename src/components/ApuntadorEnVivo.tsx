@@ -8,6 +8,25 @@ type Evento =
   | { t: "pausa"; on: boolean }
   | { t: "cierre"; estado: string };
 
+/** Lo que se ve en pantalla, para presentarlo en voz alta («Vamos con la carta astral de Marta…»). */
+const NOMBRE_TIPO: Record<string, string> = {
+  tarot: "🃏 Tarot",
+  carta: "🪐 Carta astral (en pantalla se dibuja su carta)",
+  sinastria: "💞 Sinastría (en pantalla, las dos cartas)",
+  horoscopo: "✨ Horóscopo (en pantalla, el cielo de hoy)",
+  numerologia: "🔢 Numerología",
+  aura: "🌈 Aura",
+  pendulo: "🔮 Péndulo",
+  iching: "☯️ I Ching",
+  runas: "ᚱ Runas",
+  lenormand: "🃏 Lenormand",
+  baraja: "🃏 Baraja española",
+  chino: "🐉 Horóscopo chino",
+  huevo: "🥚 Limpia con huevo",
+  chocolate: "☕ Taza de chocolate",
+  mano: "✋ Lectura de mano",
+};
+
 /**
  * Apuntador: sigue lo que publica el escenario principal (el mismo canal del espejo) y lo muestra grande para que
  * el presentador lo lea en voz alta. En TikTok así todo el audio del directo es su voz, en vivo.
@@ -68,7 +87,7 @@ export function Apuntador({ clave }: { clave: string }) {
         ) : evento.t === "lectura" ? (
           <div key={evento.lectura.texto} className="aparecer space-y-4">
             <p className="text-2xl text-violeta-suave">
-              Lectura para <strong className="text-oro-suave">{evento.lectura.autor}</strong> · {evento.lectura.tipo}
+              {NOMBRE_TIPO[evento.lectura.tipo] ?? evento.lectura.tipo} para <strong className="text-oro-suave">{evento.lectura.autor}</strong>
             </p>
             {evento.lectura.pregunta && <p className="font-display text-3xl text-oro-suave">«{evento.lectura.pregunta}»</p>}
             {Boolean(evento.lectura.cartas?.length) && (
