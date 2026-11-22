@@ -51,13 +51,13 @@ export function RuedaCiclo({ nombres, neptus, activo, titulo, color }: { nombres
 function RejillaWuku({ activo, t }: { activo: number; t: TextosWeton }) {
   return (
     <div>
-      <ol className="grid grid-cols-5 gap-1 sm:grid-cols-6" aria-label={t.wuku}>
+      <ol className="grid grid-cols-3 gap-1 min-[420px]:grid-cols-5 sm:grid-cols-6" aria-label={t.wuku}>
         {WUKU.map((w, i) => (
           <li
             key={w}
             title={`${i + 1}. ${w}`}
             aria-current={i === activo ? "true" : undefined}
-            className={`truncate rounded-md border px-1 py-1 text-center text-[10px] leading-tight ${i === activo ? "border-oro bg-oro/20 font-semibold text-oro" : "border-borde text-texto-suave"}`}
+            className={`break-words rounded-md border px-1 py-1 text-center text-[11px] leading-tight ${i === activo ? "border-oro bg-oro/20 font-semibold text-oro" : "border-borde text-texto-suave"}`}
           >
             {w}
           </li>

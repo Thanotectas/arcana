@@ -87,7 +87,10 @@ export function EscudoGeomantico({ r, t, idioma }: { r: ResultadoGeomancia; t: T
   ];
   const sobrinas = [3, 2, 1, 0].map((i) => ({ id: r.sobrinas[i], rol: plantilla(t.sobrina, { n: ROMANOS[i] }) }));
   return (
-    <svg viewBox="0 0 800 712" className="h-auto w-full" role="img" aria-label={t.escudo}>
+    // En el teléfono el escudo conserva un ancho legible y se desliza de lado; empieza por la derecha (las Madres),
+    // porque el escudo se lee de derecha a izquierda (dir="rtl" solo en el contenedor del desplazamiento).
+    <div dir="rtl" className="-mx-2 overflow-x-auto px-2">
+    <svg style={{ direction: "ltr" }} viewBox="0 0 800 712" className="h-auto w-full min-w-[580px] sm:min-w-0" role="img" aria-label={t.escudo}>
       <defs>
         <clipPath id="geo-escudo">
           <path d={contorno} />
@@ -124,5 +127,6 @@ export function EscudoGeomantico({ r, t, idioma }: { r: ResultadoGeomancia; t: T
       <Celda id={r.testigoDerecho} cx={570} cy={420} rol={t.testigoDerecho} idioma={idioma} ancho={300} escala={1.15} />
       <Celda id={r.juez} cx={400} cy={590} rol={t.juez} idioma={idioma} ancho={300} escala={1.35} destacada />
     </svg>
+    </div>
   );
 }

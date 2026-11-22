@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { Fragment, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { EllipsisVertical, Share, SquarePlus, Compass, MoreHorizontal } from "lucide-react";
 import { dispositivo, estaInstalada, iphoneSinSafari, navegadorDeRed, pedirInstalacion, usePuedeInstalar } from "@/lib/instalar";
+import { useT } from "@/lib/i18n/cliente";
+import { TEXTOS_INSTALAR, type Trozos } from "@/lib/instalar-textos";
 
 const sinSuscripcion = () => () => {};
 
@@ -24,7 +26,13 @@ function Paso({ n, icono, children }: { n: number; icono: React.ReactNode; child
   );
 }
 
+/** Pinta los trozos de un texto con los impares en negrita. */
+function Negritas({ trozos }: { trozos: Trozos }) {
+  return trozos.map((s, i) => <Fragment key={i}>{i % 2 ? <strong>{s}</strong> : s}</Fragment>);
+}
+
 function Guia({ qr }: { qr: string }) {
+  const tx = TEXTOS_INSTALAR[useT().idioma];
   const [instalada] = useState(estaInstalada);
   const [equipo] = useState(dispositivo);
   const [red] = useState(navegadorDeRed);
@@ -36,10 +44,10 @@ function Guia({ qr }: { qr: string }) {
     return (
       <div className="tarjeta space-y-3 p-6 text-center">
         <p className="text-4xl">🎉</p>
-        <p className="font-display text-2xl">{instalada ? "Ya tienes Arcana instalada" : "¡Listo! Arcana quedó en tu pantalla de inicio"}</p>
-        <p className="text-sm text-texto-suave">Ábrela desde su ícono y entra con tu cuenta: te espera 1 crédito de regalo.</p>
+        <p className="font-display text-2xl">{instalada ? tx.yaInstalada : tx.listo}</p>
+        <p className="text-sm text-texto-suave">{tx.abrela}</p>
         <Link href="/juego" className="boton boton-primario inline-flex">
-          Jugar la carta escondida
+          {tx.jugar}
         </Link>
       </div>
     );
@@ -48,17 +56,17 @@ function Guia({ qr }: { qr: string }) {
   if (red) {
     return (
       <div className="tarjeta space-y-3 p-6">
-        <p className="font-semibold">Estás viendo esto dentro de {red}</p>
-        <p className="text-sm text-texto-suave">Desde aquí no se puede instalar. Ábrelo en tu navegador y sigue los pasos:</p>
+        <p className="font-semibold">{tx.dentroDe(red)}</p>
+        <p className="text-sm text-texto-suave">{tx.noSePuede}</p>
         <ol className="space-y-2">
           <Paso n={1} icono={<MoreHorizontal size={20} />}>
-            Toca los <strong>tres puntos</strong> {equipo === "iphone" ? "(abajo o arriba a la derecha)" : "(arriba a la derecha)"}.
+            <Negritas trozos={tx.redPaso1(equipo === "iphone")} />
           </Paso>
           <Paso n={2} icono={<Compass size={20} />}>
-            Elige <strong>«Abrir en el navegador»</strong>{equipo === "iphone" ? " o «Abrir en Safari»" : ""}.
+            <Negritas trozos={tx.redPaso2(equipo === "iphone")} />
           </Paso>
         </ol>
-        <p className="text-xs text-texto-suave">O copia y pega en tu navegador: miarcana.com/app</p>
+        <p className="text-xs text-texto-suave">{tx.copia}</p>
       </div>
     );
   }
@@ -66,17 +74,17 @@ function Guia({ qr }: { qr: string }) {
   if (equipo === "iphone") {
     return (
       <div className="tarjeta space-y-3 p-6">
-        <p className="text-center font-semibold">En iPhone son 3 toques</p>
-        {sinSafari && <p className="rounded-lg border border-oro/40 p-3 text-sm">En iPhone se instala desde <strong>Safari</strong>. Abre miarcana.com/app en Safari y sigue estos pasos.</p>}
+        <p className="text-center font-semibold">{tx.iphoneTitulo}</p>
+        {sinSafari && <p className="rounded-lg border border-oro/40 p-3 text-sm"><Negritas trozos={tx.sinSafari} /></p>}
         <ol className="space-y-2">
           <Paso n={1} icono={<Share size={20} />}>
-            Toca <strong>Compartir</strong>, el cuadrado con la flecha hacia arriba, en la barra de Safari.
+            <Negritas trozos={tx.iphonePaso1} />
           </Paso>
           <Paso n={2} icono={<SquarePlus size={20} />}>
-            Baja y toca <strong>«Agregar a inicio»</strong>.
+            <Negritas trozos={tx.iphonePaso2} />
           </Paso>
-          <Paso n={3} icono={<span className="text-xs font-semibold">Agregar</span>}>
-            Toca <strong>«Agregar»</strong>, arriba a la derecha. ¡Listo! Arcana aparece en tu pantalla.
+          <Paso n={3} icono={<span className="text-xs font-semibold">{tx.iphoneBoton}</span>}>
+            <Negritas trozos={tx.iphonePaso3} />
           </Paso>
         </ol>
       </div>
@@ -87,25 +95,17 @@ function Guia({ qr }: { qr: string }) {
     <div className="tarjeta space-y-4 p-6">
       {puede ? (
         <button type="button" onClick={async () => setLista(await pedirInstalacion())} className="boton boton-primario flex w-full justify-center py-3 text-lg">
-          Instalar Arcana
+          {tx.instalar}
         </button>
       ) : (
         <>
-          <p className="text-center font-semibold">{equipo === "android" ? "En Android son 2 toques" : "Instálala en tu computador"}</p>
+          <p className="text-center font-semibold">{equipo === "android" ? tx.androidTitulo : tx.computadorTitulo}</p>
           <ol className="space-y-2">
             <Paso n={1} icono={<EllipsisVertical size={20} />}>
-              {equipo === "android" ? (
-                <>
-                  En Chrome, toca los <strong>tres puntos</strong> de arriba a la derecha.
-                </>
-              ) : (
-                <>
-                  En Chrome o Edge, busca el ícono de <strong>instalar</strong> en la barra de direcciones, o abre el menú (⋮).
-                </>
-              )}
+              <Negritas trozos={equipo === "android" ? tx.androidPaso1 : tx.computadorPaso1} />
             </Paso>
             <Paso n={2} icono={<SquarePlus size={20} />}>
-              Toca <strong>«Instalar app»</strong> o <strong>«Agregar a la pantalla principal»</strong>.
+              <Negritas trozos={tx.paso2} />
             </Paso>
           </ol>
         </>
@@ -113,7 +113,7 @@ function Guia({ qr }: { qr: string }) {
       {equipo === "computador" && (
         <div className="flex items-center gap-4 border-t border-borde pt-4">
           <div className="h-28 w-28 shrink-0 overflow-hidden rounded-xl" dangerouslySetInnerHTML={{ __html: qr }} />
-          <p className="text-sm text-texto-suave">¿La quieres en el celular? Escanea este código con la cámara y sigue los pasos.</p>
+          <p className="text-sm text-texto-suave">{tx.qr}</p>
         </div>
       )}
     </div>

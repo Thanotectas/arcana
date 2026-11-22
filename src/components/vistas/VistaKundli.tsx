@@ -92,7 +92,47 @@ export function VistaKundli({ entrada, resultado, idioma }: { entrada: Record<st
 
         <div className="tarjeta overflow-hidden p-5">
           <h2 className="font-display mb-3 text-2xl">{v.tablaTitulo}</h2>
-          <div className="overflow-x-auto">
+          {/* En el teléfono: una ficha por planeta (la tabla de cinco columnas no cabe). */}
+          <ul className="space-y-2 sm:hidden">
+            {r.lagna && (
+              <li className="rounded-xl border border-oro/40 bg-oro/5 p-3 text-sm">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-medium text-oro-suave">{v.lagna}</span>
+                  <span className="text-xs text-texto-suave">{v.casa} 1</span>
+                </div>
+                <p className="mt-1">
+                  {n.rashis[r.lagna.rashi]} · <span dir="ltr" className="tabular-nums">{formatoGradoVedico(r.lagna.grado)}</span>
+                </p>
+                <p className="text-xs text-texto-suave">
+                  {nak(r.lagna.nakshatra)} · {v.nakshatra} {r.lagna.pada}
+                </p>
+              </li>
+            )}
+            {r.grahas.map((g) => {
+              const notas = [g.retrogrado && !esNodo(g.id) ? v.retrogrado : null, g.dignidad ? v.dignidades[g.dignidad] : null].filter(Boolean);
+              return (
+                <li key={g.id} className="rounded-xl border border-borde p-3 text-sm">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: COLOR_GRAHA[g.id] }} aria-hidden />
+                      <span className="font-medium">{n.grahas[g.id]}</span>
+                    </span>
+                    <span className="text-xs text-texto-suave">
+                      {v.casa} {g.casa}
+                    </span>
+                  </div>
+                  <p className="mt-1">
+                    {n.rashis[g.rashi]} · <span dir="ltr" className="tabular-nums">{formatoGradoVedico(g.grado)}</span>
+                  </p>
+                  <p className="text-xs text-texto-suave">
+                    {nak(g.nakshatra)} · {g.pada}
+                    {notas.length > 0 && ` · ${notas.join(" · ")}`}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-borde text-xs uppercase tracking-wider text-texto-suave">
