@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /** Parte de la pantalla donde está el chat, en fracciones (0 a 1) del ancho y el alto. */
 interface Region {
@@ -16,6 +16,7 @@ interface Consulta {
   texto: string | null;
   estado?: string;
   lectura?: string | null;
+  esperaFecha?: boolean;
 }
 const NOMBRE_TIPO: Record<string, string> = {
   tarot: "Tarot",
@@ -68,7 +69,7 @@ const hora = () => new Intl.DateTimeFormat("es-CO", { hour: "2-digit", minute: "
  * Comparte la ventana de TikTok LIVE Studio (o el chat en el navegador): cada pocos segundos se recorta el chat, Claude
  * lee los comentarios y las consultas entran solas a la fila de Sibila.
  */
-export function LectorPantalla() {
+export function LectorPantalla({ children }: { children?: ReactNode }) {
   const video = useRef<HTMLVideoElement | null>(null);
   const flujo = useRef<MediaStream | null>(null);
   const vistos = useRef<string[]>([]);
@@ -256,11 +257,14 @@ export function LectorPantalla() {
                 <span className="text-texto-suave">{c.estado === "leyendo" ? "⏳ Sibila la prepara · " : `${i + 1}. `}</span>
                 <strong className="text-oro-suave">{c.autor}</strong> <span className="text-xs text-violeta-suave">{NOMBRE_TIPO[c.tipo] ?? c.tipo}</span>
                 {c.texto && <span className="block text-sm">«{c.texto}»</span>}
+                {c.esperaFecha && <span className="block text-xs text-red-300">Espera la fecha de nacimiento: pídesela o agrégala abajo (ej.: carta astral 18/03/1996).</span>}
               </li>
             ))}
           </ol>
         )}
       </section>
+
+      {children}
 
       <div className="flex flex-wrap gap-2">
         {!activo ? (

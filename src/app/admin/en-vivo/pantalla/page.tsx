@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requerirAdmin } from "@/lib/admin";
 import { LectorPantalla } from "@/components/admin/LectorPantalla";
+import { CierreDirecto, PreguntaManual } from "@/components/admin/ControlEnVivo";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { horaCierre } from "@/lib/en-vivo";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Leer el chat de TikTok", robots: { index: false, follow: false } };
@@ -9,6 +12,8 @@ export const metadata: Metadata = { title: "Leer el chat de TikTok", robots: { i
 /** Claude mira el chat de TikTok LIVE Studio (pantalla compartida) y pone las consultas en la fila de Sibila. */
 export default async function PaginaPantalla() {
   await requerirAdmin();
+  const { data: estado } = await getSupabaseAdmin().from("en_vivo_estado").select("*").eq("id", 1).maybeSingle();
+  const horaInput = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "America/Bogota" }).format(new Date(horaCierre(estado)));
   return (
     <main className="mx-auto max-w-4xl space-y-5 px-4 py-8">
       <Link href="/admin/en-vivo" className="text-sm text-oro-suave underline">
@@ -24,7 +29,19 @@ export default async function PaginaPantalla() {
       <p className="text-sm text-texto-suave">
         Solo se lee la imagen del chat que tú compartes; nada se guarda fuera de la fila. Si alguien escribe su consulta en varios mensajes, se le suman.
       </p>
-      <LectorPantalla />
+      <LectorPantalla>
+        <section className="space-y-2 rounded-xl border border-borde bg-superficie-2/40 p-4">
+          <h2 className="font-display text-xl">Agregar a la fila</h2>
+          <p className="text-sm text-texto-suave">Pasa primero. Para carta astral: «carta astral 18/03/1996 10:30 Cali» (la hora y la ciudad, si las sabe).</p>
+          <PreguntaManual />
+        </section>
+        <details className="rounded-xl border border-borde bg-superficie-2/40 p-4">
+          <summary className="cursor-pointer font-display text-lg">Hora de cierre (si el escenario dice «Se acabó el tiempo», ponla más tarde)</summary>
+          <div className="mt-2">
+            <CierreDirecto hora={horaInput} />
+          </div>
+        </details>
+      </LectorPantalla>
     </main>
   );
 }
