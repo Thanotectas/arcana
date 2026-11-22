@@ -91,8 +91,8 @@ export default async function PaginaAdminEnVivo() {
         </p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador`} />
         <p className="text-sm text-texto-suave">
-          Esta ya trae la música de Arcana muy suave de fondo (7 %; baja sola durante las lecturas). Para cambiarla agrega al final{" "}
-          <code>&amp;musica=4</code> (más baja), <code>&amp;musica=12</code> (más alta) o <code>&amp;musica=0</code> (sin música).
+          Va sin música y con Sibila en foto (no en video): lo que suena o se mueve solo en bucle es lo que TikTok marca como «pregrabado».
+          Si aun así quieres la música de Arcana, agrega al final <code>&amp;musica=5</code>.
         </p>
         <p className="text-sm">
           <a href="/admin/en-vivo/pantalla" className="font-semibold text-oro-suave underline">

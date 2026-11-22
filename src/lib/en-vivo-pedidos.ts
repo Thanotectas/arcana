@@ -31,6 +31,8 @@ export const FECHA_DIA_MES = new RegExp(`\\b(\\d{1,2})(?:\\s*(?:de|del|of)?\\s+|
 export const FECHA_ISO = /\b(\d{4})[/.-](\d{1,2})[/.-](\d{1,2})\b/g;
 /** «13 02 1974» y «13021974» (sin separadores, como escriben rápido en el chat). */
 export const FECHA_PEGADA = /\b(\d{1,2})(?:\s+|)(\d{2})(?:\s+|)((?:19|20)\d{2})\b/g;
+/** «18 03 96» (con espacios y el año en dos cifras). */
+export const FECHA_ESPACIOS = /\b(\d{1,2})\s+(\d{1,2})\s+(\d{2})\b(?!\s*[:h]\d)/g;
 /** «febrero 13 de 1974», «February 13, 1974». */
 export const FECHA_MES_DIA = new RegExp(`\\b${PALABRA_MES}\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:\\s*(?:de|del|,)?\\s*)(\\d{4})\\b`, "gi");
 
@@ -48,7 +50,7 @@ function fechaValida(dia: number, mes: number, anioTexto: string): string | null
 
 /** Quita las fechas (con números o con el mes en letras) para buscar la hora o la ciudad. */
 export function sinFechas(texto: string, reemplazo = " ") {
-  return texto.replace(FECHA, reemplazo).replace(FECHA_ISO, reemplazo).replace(FECHA_PEGADA, reemplazo).replace(FECHA_DIA_MES, reemplazo).replace(FECHA_MES_DIA, reemplazo);
+  return texto.replace(FECHA, reemplazo).replace(FECHA_ISO, reemplazo).replace(FECHA_PEGADA, reemplazo).replace(FECHA_ESPACIOS, reemplazo).replace(FECHA_DIA_MES, reemplazo).replace(FECHA_MES_DIA, reemplazo);
 }
 
 /**
@@ -78,6 +80,11 @@ export function fechasEn(texto: string): string[] {
       if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
     }
     for (const m of texto.matchAll(FECHA_PEGADA)) {
+      if (halladas.some((h) => Math.abs(h.pos - (m.index ?? 0)) < 6)) continue;
+      const f = fechaValida(Number(m[1]), Number(m[2]), m[3]);
+      if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
+    }
+    for (const m of texto.matchAll(FECHA_ESPACIOS)) {
       if (halladas.some((h) => Math.abs(h.pos - (m.index ?? 0)) < 6)) continue;
       const f = fechaValida(Number(m[1]), Number(m[2]), m[3]);
       if (f) halladas.push({ pos: m.index ?? 0, fecha: f });
