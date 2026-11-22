@@ -992,7 +992,7 @@ export function EscenarioEnVivo({
         ) : lectura.grafico ? (
           // Carta astral, sinastría o cielo del horóscopo: se dibuja a tamaño completo.
           <div className={`absolute ${derecha} flex justify-center ${xl ? "top-[1090px]" : vertical ? "top-[790px]" : escena ? "top-[262px]" : "top-[380px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms" }}>
-            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={xl ? 290 : vertical ? 470 : escena ? 440 : 520} />
+            <GraficoEnVivo key={lectura.id} grafico={lectura.grafico} tamano={xl ? (vozPresentador ? 400 : 290) : vertical ? 470 : escena ? 440 : 520} />
           </div>
         ) : (
           <div className={`absolute ${derecha} flex items-center justify-center ${xl ? "top-[1030px] h-[420px]" : vertical ? "top-[790px] h-[460px]" : escena ? "top-[320px] h-[460px]" : "top-[400px] h-[460px]"}`} style={{ opacity: volteadas > 0 ? 1 : 0, transition: "opacity 700ms", transform: xl ? "scale(0.62)" : compacto ? "scale(0.82)" : undefined }}>
@@ -1063,7 +1063,8 @@ export function EscenarioEnVivo({
         )}
 
         {/* Subtítulos */}
-        {!(cierre === "fin" && !subtitulo) && (
+        {/* En el modo presentador no hay subtítulos: la lectura la dice quien presenta y no debe tapar la carta. */}
+        {!vozPresentador && !(cierre === "fin" && !subtitulo) && (
         <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${xl ? "left-[230px] right-[60px] top-[1395px] bg-black/60" : vertical ? `${camaraGrande ? "left-[262px]" : "left-[100px]"} right-[100px] top-[1275px] bg-black/60` : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
           <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${xl ? "text-[30px]" : compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
