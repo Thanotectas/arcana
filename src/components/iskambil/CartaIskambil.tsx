@@ -5,8 +5,8 @@ import { DATOS_PALO, cartaIskambil, type Palo } from "@/lib/iskambil/mazo";
  * Cartas de la baraja francesa dibujadas en SVG (valor y pintas en su disposición clásica). Sin hooks ni ids:
  * sirven en componentes de servidor y de cliente. El ancho lo da el contenedor; proporción 2:3.
  */
-const ROJO = "#b3261e";
-const NEGRO = "#1d1a2b";
+const ROJO = "#e8586e";
+const NEGRO = "#e6c06a";
 const TEXTO: CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" };
 
 /** Las cuatro pintas, dibujadas en una caja de 20×20 centrada en (0, 0). */
@@ -62,9 +62,24 @@ function Pinta({ palo, x, y, escala, girada = false }: { palo: Palo; x: number; 
   return <g transform={`translate(${x} ${y}) scale(${escala})${girada ? " rotate(180)" : ""}`}>{PINTA[palo]}</g>;
 }
 
+/** Figuras ilustradas (public/cartas/iskambil/<id>.webp): al llegar una nueva, se suma su id aquí. */
+const FIGURAS_ILUSTRADAS = new Set(["kupa-k", "kupa-q"]);
+
 export function CartaIskambil({ id, alt, className = "" }: { id: string; alt: string; className?: string }) {
   const c = cartaIskambil(id);
   if (!c) return null;
+  if (FIGURAS_ILUSTRADAS.has(c.id)) {
+    // La letra va bajo la pinta de la esquina (arriba a la izquierda y, girada, abajo a la derecha), como en un naipe.
+    const letra = "absolute rounded-md border border-oro/60 bg-noche/85 px-[4%] py-[2%] font-display text-[clamp(10px,10cqw,24px)] font-bold leading-none text-oro shadow";
+    return (
+      <div role="img" aria-label={alt} className={`relative aspect-[2/3] w-full overflow-hidden rounded-[0.45rem] border border-oro/50 shadow-[0_10px_16px_rgba(0,0,0,0.45)] [container-type:inline-size] ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- carta pequeña y estática */}
+        <img src={`/cartas/iskambil/${c.id}.webp`} alt="" className="h-full w-full object-cover" loading="lazy" />
+        <span className={`${letra} left-[9%] top-[21%]`}>{c.rango}</span>
+        <span className={`${letra} bottom-[21%] right-[9%] rotate-180`}>{c.rango}</span>
+      </div>
+    );
+  }
   const color = DATOS_PALO[c.palo].rojo ? ROJO : NEGRO;
   const figura = c.rango === "K" || c.rango === "Q" || c.rango === "J" ? c.rango : null;
   const indice = (
@@ -77,7 +92,14 @@ export function CartaIskambil({ id, alt, className = "" }: { id: string; alt: st
   );
   return (
     <svg viewBox="0 0 100 150" role="img" aria-label={alt} className={`block h-auto w-full drop-shadow-[0_10px_16px_rgba(0,0,0,0.45)] ${className}`}>
-      <rect x="0.75" y="0.75" width="98.5" height="148.5" rx="7" fill="#fbf7ee" stroke="#c9b98f" strokeWidth="1.5" />
+      <defs>
+        <radialGradient id="fondo-iskambil" cx="50%" cy="45%" r="75%">
+          <stop offset="0%" stopColor="#2a1a4a" />
+          <stop offset="100%" stopColor="#120a24" />
+        </radialGradient>
+      </defs>
+      <rect x="0.75" y="0.75" width="98.5" height="148.5" rx="7" fill="url(#fondo-iskambil)" stroke="#c9a85a" strokeWidth="1.5" />
+      <rect x="4" y="4" width="92" height="142" rx="5" fill="none" stroke="#c9a85a" strokeOpacity="0.35" strokeWidth="0.6" />
       <g fill={color}>
         {indice}
         <g transform="rotate(180 50 75)">{indice}</g>
