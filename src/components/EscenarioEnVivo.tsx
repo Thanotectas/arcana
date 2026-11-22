@@ -612,6 +612,8 @@ export function EscenarioEnVivo({
           continue;
         }
         if (r?.clase === "fin") {
+          // Recargado después de la despedida: si en el panel se corre la hora de cierre, vuelve a leer (ver abajo).
+          despedida = true;
           setCierre("fin");
           if (!soloPreguntas) await decirCierre();
           await esperar(6000);
