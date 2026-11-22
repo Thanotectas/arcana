@@ -8,8 +8,11 @@ const PORTADAS: Record<string, string> = {
   kundli: "kundli",
   "kundli-milan": "kundli-milan",
   weton: "weton",
-  // Mientras llega su propia ilustración, la compatibilidad por weton usa la del weton.
-  "weton-jodoh": "weton",
+  "weton-jodoh": "weton-jodoh",
+  iskambil: "iskambil",
+  marsella: "marsella",
+  geomancia: "geomancia",
+  abjad: "abjad",
 };
 
 export function PortadaProducto({ clave, prioridad = true }: { clave: string; prioridad?: boolean }) {
