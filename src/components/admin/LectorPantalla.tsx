@@ -9,6 +9,31 @@ interface Region {
   w: number;
   h: number;
 }
+interface Consulta {
+  id: string;
+  tipo: string;
+  autor: string;
+  texto: string | null;
+  estado?: string;
+  lectura?: string | null;
+}
+const NOMBRE_TIPO: Record<string, string> = {
+  tarot: "Tarot",
+  carta: "Carta astral",
+  sinastria: "Sinastría",
+  horoscopo: "Horóscopo",
+  numerologia: "Numerología",
+  aura: "Aura",
+  pendulo: "Péndulo",
+  iching: "I Ching",
+  runas: "Runas",
+  lenormand: "Lenormand",
+  baraja: "Baraja española",
+  chino: "Horóscopo chino",
+  huevo: "Huevo",
+  chocolate: "Taza",
+  mano: "Mano",
+};
 interface Registro {
   hora: string;
   texto: string;
@@ -55,6 +80,29 @@ export function LectorPantalla() {
   const [arrastre, setArrastre] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
   const [registro, setRegistro] = useState<Registro[]>([]);
   const [cuentas, setCuentas] = useState({ capturas: 0, comentarios: 0, enFila: 0 });
+  const [fila, setFila] = useState<Consulta[]>([]);
+  const [ultima, setUltima] = useState<Consulta | null>(null);
+  const [letra, setLetra] = useState(22);
+
+  // La fila y la última lectura de Sibila, cada 3 segundos.
+  useEffect(() => {
+    let vivo = true;
+    const traer = () =>
+      fetch("/api/en-vivo/pantalla", { cache: "no-store" })
+        .then((r) => (r.ok ? (r.json() as Promise<{ fila: Consulta[]; ultima: Consulta | null }>) : null))
+        .then((d) => {
+          if (!vivo || !d) return;
+          setFila(d.fila);
+          setUltima(d.ultima);
+        })
+        .catch(() => null);
+    void traer();
+    const id = setInterval(traer, 3000);
+    return () => {
+      vivo = false;
+      clearInterval(id);
+    };
+  }, []);
 
   const anotar = (texto: string, tipo: Registro["tipo"] = "info") => setRegistro((r) => [{ hora: hora(), texto, tipo }, ...r].slice(0, 80));
 
@@ -168,6 +216,52 @@ export function LectorPantalla() {
 
   return (
     <div className="space-y-4">
+      <section className="space-y-3 rounded-xl border border-oro/40 bg-superficie-2/60 p-4">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-display text-2xl">Lo que está en pantalla</h2>
+          <div className="flex gap-1">
+            <button type="button" onClick={() => setLetra((n) => Math.max(14, n - 2))} className="boton boton-secundario px-3 py-1 text-sm">
+              A−
+            </button>
+            <button type="button" onClick={() => setLetra((n) => Math.min(44, n + 2))} className="boton boton-secundario px-3 py-1 text-sm">
+              A+
+            </button>
+          </div>
+        </div>
+        {ultima ? (
+          <div className="space-y-2">
+            <p className="text-violeta-suave">
+              {NOMBRE_TIPO[ultima.tipo] ?? ultima.tipo} para <strong className="text-oro-suave">{ultima.autor}</strong>
+              {ultima.texto && <span className="text-texto-suave"> · «{ultima.texto}»</span>}
+            </p>
+            {ultima.lectura && (
+              <p className="leading-relaxed" style={{ fontSize: letra }}>
+                {ultima.lectura}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-texto-suave">Todavía no hay lecturas esta noche.</p>
+        )}
+      </section>
+
+      <section className="space-y-2 rounded-xl border border-borde bg-superficie-2/40 p-4">
+        <h2 className="font-display text-xl">Fila de Sibila ({fila.length})</h2>
+        {fila.length === 0 ? (
+          <p className="text-sm text-texto-suave">Nadie en la fila. Invita a escribir su signo y su pregunta, o «carta astral» con su fecha.</p>
+        ) : (
+          <ol className="space-y-1">
+            {fila.map((c, i) => (
+              <li key={c.id} className={`rounded-lg px-2 py-1.5 ${c.estado === "leyendo" ? "bg-oro/15 ring-1 ring-oro/50" : i === 0 ? "bg-noche/50" : ""}`}>
+                <span className="text-texto-suave">{c.estado === "leyendo" ? "⏳ Sibila la prepara · " : `${i + 1}. `}</span>
+                <strong className="text-oro-suave">{c.autor}</strong> <span className="text-xs text-violeta-suave">{NOMBRE_TIPO[c.tipo] ?? c.tipo}</span>
+                {c.texto && <span className="block text-sm">«{c.texto}»</span>}
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
       <div className="flex flex-wrap gap-2">
         {!activo ? (
           <button type="button" onClick={() => void empezar()} className="boton boton-primario">
@@ -206,7 +300,7 @@ export function LectorPantalla() {
       </p>
 
       <div
-        className={`relative overflow-hidden rounded-xl border border-borde bg-black ${activo ? "cursor-crosshair" : ""}`}
+        className={`relative max-w-xl overflow-hidden rounded-xl border border-borde bg-black ${activo ? "cursor-crosshair" : ""}`}
         onPointerDown={(e) => {
           if (!activo) return;
           e.currentTarget.setPointerCapture(e.pointerId);
