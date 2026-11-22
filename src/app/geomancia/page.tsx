@@ -11,7 +11,7 @@ import { plantilla } from "@/lib/i18n/formato";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = TEXTOS_GEOMANCIA[await getIdioma()];
-  return { title: t.titulo, description: t.descripcionMeta };
+  return { openGraph: { images: [{ url: "/og/geomancia.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/geomancia.jpg"] },  title: t.titulo, description: t.descripcionMeta };
 }
 
 export default async function PaginaGeomancia() {

@@ -11,7 +11,7 @@ import { plantilla } from "@/lib/i18n/formato";
 
 export async function generateMetadata(): Promise<Metadata> {
   const tw = textosWeton(await getIdioma());
-  return { title: tw.tituloJodoh, description: tw.introJodoh };
+  return { openGraph: { images: [{ url: "/og/weton-jodoh.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/weton-jodoh.jpg"] },  title: tw.tituloJodoh, description: tw.introJodoh };
 }
 
 export default async function PaginaWetonJodoh() {

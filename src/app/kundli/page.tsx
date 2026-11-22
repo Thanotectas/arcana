@@ -12,7 +12,7 @@ import { CampoHora } from "@/components/CampoHoraDesconocida";
 
 export async function generateMetadata(): Promise<Metadata> {
   const k = textosVedica(await getIdioma()).kundli;
-  return { title: k.titulo, description: k.descripcion };
+  return { openGraph: { images: [{ url: "/og/kundli.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/kundli.jpg"] },  title: k.titulo, description: k.descripcion };
 }
 
 export default async function PaginaKundli() {

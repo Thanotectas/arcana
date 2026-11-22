@@ -12,7 +12,7 @@ import { CartaIskambil } from "@/components/iskambil/CartaIskambil";
 export async function generateMetadata(): Promise<Metadata> {
   const idioma = await getIdioma();
   const textos = TEXTOS_ISKAMBIL[idioma];
-  return { alternates: alternativas("/iskambil", idioma), title: textos.titulo, description: textos.intro };
+  return { openGraph: { images: [{ url: "/og/iskambil.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/iskambil.jpg"] },  alternates: alternativas("/iskambil", idioma), title: textos.titulo, description: textos.intro };
 }
 
 const MUESTRA = ["kupa-a", "karo-q", "sinek-10", "maca-7"];

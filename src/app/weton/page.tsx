@@ -11,7 +11,7 @@ import { plantilla } from "@/lib/i18n/formato";
 
 export async function generateMetadata(): Promise<Metadata> {
   const tw = textosWeton(await getIdioma());
-  return { title: tw.titulo, description: tw.intro };
+  return { openGraph: { images: [{ url: "/og/weton.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/weton.jpg"] },  title: tw.titulo, description: tw.intro };
 }
 
 export default async function PaginaWeton() {

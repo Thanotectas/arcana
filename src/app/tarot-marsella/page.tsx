@@ -11,7 +11,7 @@ import { RitualMarsella } from "@/components/marsella/RitualMarsella";
 export async function generateMetadata(): Promise<Metadata> {
   const idioma = await getIdioma();
   const textos = TEXTOS_MARSELLA[idioma];
-  return { alternates: alternativas("/tarot-marsella", idioma), title: `${textos.titulo} · ${textos.seccion}`, description: textos.intro };
+  return { openGraph: { images: [{ url: "/og/marsella.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/marsella.jpg"] },  alternates: alternativas("/tarot-marsella", idioma), title: `${textos.titulo} · ${textos.seccion}`, description: textos.intro };
 }
 
 export default async function PaginaTarotMarsella() {

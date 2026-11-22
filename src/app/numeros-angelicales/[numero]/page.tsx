@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ numero: s
     const c = (await contenidoNumeros(idioma))[numero];
     const titulo = plantilla(t.metaTituloNumero, { n: numero, lema: lemaEnTitulo(c.lema, idioma) });
     const descripcion = resumen(c.significado);
-    return { title: titulo, description: descripcion, alternates: alternativas(ruta, idioma), openGraph: { title: titulo, description: descripcion, type: "article" } };
+    return { title: titulo, description: descripcion, alternates: alternativas(ruta, idioma), openGraph: { title: titulo, description: descripcion, type: "article", images: [{ url: "/og/numeros-angelicales.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/numeros-angelicales.jpg"] } };
   }
   if (normalizarNumero(numero) !== numero) return {};
   // Las lecturas por cifras se generan al vuelo: útiles para quien las busca, pero no para el índice de Google.

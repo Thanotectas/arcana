@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.metaTituloIndice,
     description: t.metaDescripcionIndice,
     alternates: alternativas(RUTA, idioma),
-    openGraph: { title: t.metaTituloIndice, description: t.metaDescripcionIndice, type: "website" },
+    openGraph: { title: t.metaTituloIndice, description: t.metaDescripcionIndice, type: "website", images: [{ url: "/og/numeros-angelicales.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/numeros-angelicales.jpg"] },
   };
 }
 

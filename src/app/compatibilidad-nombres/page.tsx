@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: tx.meta.titulo,
     description: tx.meta.descripcion,
     alternates: alternativas("/compatibilidad-nombres", idioma),
-    openGraph: { title: tx.meta.titulo, description: tx.meta.descripcion, type: "website", siteName: "Arcana" },
+    openGraph: { title: tx.meta.titulo, description: tx.meta.descripcion, type: "website", images: [{ url: "/og/nombres.jpg", width: 1200, height: 630 }], siteName: "Arcana" },
   };
 }
 
