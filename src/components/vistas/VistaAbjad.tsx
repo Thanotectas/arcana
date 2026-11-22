@@ -85,11 +85,11 @@ export function VistaAbjad({ entrada, resultado, idioma }: { entrada: Record<str
   const t = TEXTOS_ABJAD[idioma];
   return (
     <section className="space-y-4">
-      <div className="tarjeta p-5 sm:p-6">
+      <div className="tarjeta fondo-arabesco p-5 sm:p-6">
         <Persona p={r.persona} t={t} principal />
       </div>
       {r.madre && (
-        <div className="tarjeta space-y-5 p-5 sm:p-6">
+        <div className="tarjeta fondo-arabesco space-y-5 p-5 sm:p-6">
           <Persona p={r.madre} t={t} principal={false} />
           {r.conMadre && (
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-oro/30 bg-oro/5 p-4">

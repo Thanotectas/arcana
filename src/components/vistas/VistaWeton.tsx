@@ -125,10 +125,10 @@ export function VistaWeton({ entrada, resultado, idioma }: { entrada: Record<str
   const proximo = proximoWeton(r, new Date().toISOString().slice(0, 10));
   return (
     <section className="space-y-4">
-      <div className="tarjeta p-5 sm:p-6">
+      <div className="tarjeta fondo-batik p-5 sm:p-6">
         <FichaWeton r={r} t={t} nombre={nombre} idioma={idioma} />
       </div>
-      <div className="tarjeta space-y-4 p-5 sm:p-6">
+      <div className="tarjeta fondo-batik space-y-4 p-5 sm:p-6">
         <div className="flex flex-wrap justify-center gap-6">
           <RuedaCiclo nombres={HARI} neptus={NEPTU_HARI} activo={r.hari.indice} titulo={t.ciclo7} color="oro" />
           <RuedaCiclo nombres={PASARAN} neptus={NEPTU_PASARAN} activo={r.pasaran.indice} titulo={t.ciclo5} color="violeta" />

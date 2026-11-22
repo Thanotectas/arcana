@@ -1429,3 +1429,15 @@ html[lang="ar"] [class*="tracking-"] {
     linear-gradient(180deg, rgba(20, 14, 34, 0.1), rgba(20, 14, 34, 0.4)),
     url("/fondos/arena.webp") center / cover no-repeat;
 }
+
+/* Batik kawung para el weton (Java) y arabesco geométrico para el abjad: texturas oscuras con un velo leve para que el texto se lea. */
+.fondo-batik {
+  background:
+    linear-gradient(180deg, rgba(20, 14, 34, 0.25), rgba(20, 14, 34, 0.55)),
+    url("/fondos/batik.webp") center / cover;
+}
+.fondo-arabesco {
+  background:
+    linear-gradient(180deg, rgba(20, 14, 34, 0.15), rgba(20, 14, 34, 0.5)),
+    url("/fondos/arabesco.webp") center / cover;
+}

@@ -26,7 +26,7 @@ export function VistaWetonJodoh({ entrada, resultado, idioma }: { entrada: Recor
         </div>
       </div>
 
-      <div className="tarjeta space-y-5 p-5 text-center sm:p-6">
+      <div className="tarjeta fondo-batik space-y-5 p-5 text-center sm:p-6">
         <div className="flex flex-wrap items-center justify-center gap-3 font-display text-3xl font-semibold" dir="ltr">
           <span className="rounded-xl border border-borde px-3 py-1">{j.a.neptu}</span>
           <span className="text-texto-suave">+</span>

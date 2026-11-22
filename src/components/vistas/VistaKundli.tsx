@@ -77,14 +77,17 @@ export function VistaKundli({ entrada, resultado, idioma }: { entrada: Record<st
             <h2 className="font-display text-2xl">{v.cartaTitulo}</h2>
             <p className="text-xs text-texto-suave">{v.cartaNota}</p>
           </div>
-          <CartaKundli
-            rashiCasa1={r.rashiCasa1}
-            grahas={r.grahas}
-            abreviaturas={n.abreviaturas}
-            marcaCasa1={r.lagna ? n.abreviaturas.lagna : v.chandraLagna}
-            marcaRetro={marcaRetro(idioma)}
-            titulo={v.cartaTitulo}
-          />
+          {/* La carta va dentro de un marco de lotos dorado; el hueco del marco empieza al ~10,5 % de cada borde. */}
+          <div className="relative mx-auto aspect-square w-full max-w-md bg-[url('/fondos/marco-kundli.webp')] bg-contain bg-center bg-no-repeat p-[9.5%]">
+            <CartaKundli
+              rashiCasa1={r.rashiCasa1}
+              grahas={r.grahas}
+              abreviaturas={n.abreviaturas}
+              marcaCasa1={r.lagna ? n.abreviaturas.lagna : v.chandraLagna}
+              marcaRetro={marcaRetro(idioma)}
+              titulo={v.cartaTitulo}
+            />
+          </div>
           <p className="text-center text-xs text-texto-suave">
             {v.ayanamsa}: <span dir="ltr">{formatoGradoVedico(r.ayanamsa)}</span>
           </p>
