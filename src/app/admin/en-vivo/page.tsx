@@ -86,6 +86,13 @@ export default async function PaginaAdminEnVivo() {
         <p className="text-sm text-texto-suave">Vertical con tu cámara grande (recomendada en TikTok: así no lo marca como «contenido pregrabado»):</p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=grande`} />
         <p className="text-sm text-texto-suave">
+          <strong className="text-oro-suave">TikTok (recomendada):</strong> tu cámara en grande y Sibila sin voz: ella elige las cartas y escribe la lectura, y tú la lees en
+          voz alta. TikTok restringe el LIVE cuando el audio es una voz reproducida («contenido pregrabado o copiado»), aunque salgas en cámara.
+        </p>
+        <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador`} />
+        <p className="text-sm text-texto-suave">Apuntador: ábrelo en el celular o en otra pantalla y lee desde ahí lo que escribe Sibila.</p>
+        <DireccionEscenario url={url.replace("/en-vivo/escenario?", "/en-vivo/apuntador?")} />
+        <p className="text-sm text-texto-suave">
           Dos plataformas a la vez (por ejemplo YouTube en OBS y TikTok en LIVE Studio): abre el escenario normal en una y esta copia
           espejo en la otra. El espejo no toma consultas: muestra y dice lo mismo que el principal, en vertical (necesita la migración 0051).
         </p>

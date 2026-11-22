@@ -268,6 +268,7 @@ export function EscenarioEnVivo({
   camaraCompleta = false,
   espejo = false,
   soloPreguntas = false,
+  vozPresentador = false,
 }: {
   clave: string;
   qr: string;
@@ -280,6 +281,11 @@ export function EscenarioEnVivo({
   espejo?: boolean;
   /** TikTok: Sibila solo habla cuando hay una pregunta (sin frases de espera, segmentos «para todos» ni juego automático). */
   soloPreguntas?: boolean;
+  /**
+   * Sibila escribe y no suena: el presentador lee en voz alta (desde /en-vivo/apuntador) lo que ella escribe. TikTok
+   * restringe los LIVE con audio reproducido («contenido pregrabado o copiado») aunque haya una persona en cámara.
+   */
+  vozPresentador?: boolean;
 }) {
   const xl = vertical && camaraCompleta;
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
@@ -359,8 +365,10 @@ export function EscenarioEnVivo({
       return frases[frases.length - 1];
     };
     setSubtitulo(frases[0]);
-    if (!audio) {
-      const duracion = Math.max(4000, (texto.split(/\s+/).length / 2.6) * 1000);
+    if (!audio || vozPresentador) {
+      // Sin voz: el tiempo de leerlo. Si lo lee el presentador en voz alta, más despacio y con un respiro al final.
+      const palabras = texto.split(/\s+/).length;
+      const duracion = vozPresentador ? Math.max(6000, (palabras / 2.1) * 1000 + 2500) : Math.max(4000, (palabras / 2.6) * 1000);
       const inicio = Date.now();
       while (Date.now() - inicio < duracion) {
         setSubtitulo(fraseEn((Date.now() - inicio) / duracion));
@@ -424,7 +432,7 @@ export function EscenarioEnVivo({
     });
     cancelAnimationFrame(marco);
     setNivel(0);
-  }, []);
+  }, [vozPresentador]);
 
   // Espejo: no toma consultas; repite lo que publica el escenario principal (mismo contenido, otro formato).
   useEffect(() => {
@@ -523,7 +531,7 @@ export function EscenarioEnVivo({
         }
         if (!frase || !activo) return;
         puentes.set(i, frase);
-        setSinVoz(!frase.audio);
+        setSinVoz(!frase.audio && !vozPresentador);
         setLectura(null);
         emitir({ t: "frase", texto: frase.texto, audio: frase.audio, cierre: "abierto" });
         await hablar(frase.texto, frase.audio);
@@ -623,7 +631,7 @@ export function EscenarioEnVivo({
         setMotivo(r?.clase === "espera" ? (r.motivo ?? null) : null);
         if (r?.clase === "lectura") {
           quietos = 0;
-          setSinVoz(!r.audio);
+          setSinVoz(!r.audio && !vozPresentador);
           setLectura(r);
           emitir({ t: "lectura", lectura: r });
           setVolteadas(0);
@@ -663,7 +671,7 @@ export function EscenarioEnVivo({
     return () => {
       activo = false;
     };
-  }, [pedir, hablar, emitir, espejo, soloPreguntas]);
+  }, [pedir, hablar, emitir, espejo, soloPreguntas, vozPresentador]);
 
   const tipo = lectura?.tipo ?? "tarot";
   // Sobre la pintura, todo lo que se lee va en el tercio derecho (la zona oscura).
