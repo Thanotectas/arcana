@@ -90,6 +90,11 @@ export default async function PaginaAdminEnVivo() {
           voz alta. TikTok restringe el LIVE cuando el audio es una voz reproducida («contenido pregrabado o copiado»), aunque salgas en cámara.
         </p>
         <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador`} />
+        <p className="text-sm text-texto-suave">
+          La misma, con la música de Arcana de fondo (original, sin derechos de terceros; baja sola durante las lecturas). Para más o menos volumen,
+          cambia el número del final: <code>&amp;musica=10</code> es más bajo, <code>&amp;musica=25</code> más alto.
+        </p>
+        <DireccionEscenario url={`${url}&formato=vertical&camara=completa&voz=presentador&musica=15`} />
         <p className="text-sm text-texto-suave">Apuntador: ábrelo en el celular o en otra pantalla y lee desde ahí lo que escribe Sibila.</p>
         <DireccionEscenario url={url.replace("/en-vivo/escenario?", "/en-vivo/apuntador?")} />
         <p className="text-sm text-texto-suave">

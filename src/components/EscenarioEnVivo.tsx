@@ -269,6 +269,7 @@ export function EscenarioEnVivo({
   espejo = false,
   soloPreguntas = false,
   vozPresentador = false,
+  musica = 0,
 }: {
   clave: string;
   qr: string;
@@ -286,6 +287,8 @@ export function EscenarioEnVivo({
    * restringe los LIVE con audio reproducido («contenido pregrabado o copiado») aunque haya una persona en cámara.
    */
   vozPresentador?: boolean;
+  /** Volumen (0 a 1) de la música de Arcana de fondo; 0 la apaga. Baja sola mientras hay una lectura. */
+  musica?: number;
 }) {
   const xl = vertical && camaraCompleta;
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
@@ -308,6 +311,46 @@ export function EscenarioEnVivo({
   const [juego, setJuego] = useState<{ pistas: string[]; carta: { id: string; nombre: string } | null; ganador: string | null } | null>(null);
   const contexto = useRef<AudioContext | null>(null);
   const desbloquear = useRef<(() => void) | null>(null);
+
+  // Música de Arcana (original, en bucle). Durante una lectura baja a menos de la mitad para que se entienda la voz.
+  const musicaRef = useRef<HTMLAudioElement | null>(null);
+  const bajarMusica = Boolean(lectura || subtitulo) || cierre === "fin";
+  useEffect(() => {
+    if (!musica) return;
+    const pista = new Audio("/marca/musica/arcana-escenario.mp3");
+    pista.loop = true;
+    pista.volume = 0;
+    musicaRef.current = pista;
+    // Si el navegador no deja sonar sin un clic, se reintenta con cualquier toque y cada pocos segundos.
+    const intentar = () => {
+      if (pista.paused) void pista.play().catch(() => null);
+    };
+    intentar();
+    const id = setInterval(intentar, 5000);
+    window.addEventListener("pointerdown", intentar);
+    window.addEventListener("keydown", intentar);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("pointerdown", intentar);
+      window.removeEventListener("keydown", intentar);
+      pista.pause();
+      musicaRef.current = null;
+    };
+  }, [musica]);
+  useEffect(() => {
+    const pista = musicaRef.current;
+    if (!pista || !musica) return;
+    const meta = Math.min(1, musica * (bajarMusica ? (cierre === "fin" ? 0.3 : 0.4) : 1));
+    // Cambio de volumen suave (unos 2 segundos).
+    const id = setInterval(() => {
+      const paso = (meta - pista.volume) * 0.15;
+      if (Math.abs(meta - pista.volume) < 0.005) {
+        pista.volume = meta;
+        clearInterval(id);
+      } else pista.volume = Math.min(1, Math.max(0, pista.volume + paso));
+    }, 100);
+    return () => clearInterval(id);
+  }, [musica, bajarMusica, cierre]);
 
   useEffect(() => {
     const id = setInterval(() => setInstruccion((n) => (n + 1) % INSTRUCCIONES.length), 7000);
