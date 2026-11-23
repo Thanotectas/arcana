@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionCafe, accionHuevo, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -30,9 +32,13 @@ export function FormularioFotoOraculo({ tipo }: { tipo: "cafe" | "huevo" }) {
   return (
     <form action={enviar} className="space-y-6">
       {mensajeError && (
+        estado.error === "SIN_CREDITOS" ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {mensajeError} {estado.error === "SIN_CREDITOS" && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <ol className="grid gap-3 text-sm text-texto-suave sm:grid-cols-3">

@@ -59,6 +59,8 @@ export const fr: Diccionario = {
     rituales: "Rituels",
     lecturas: "Lectures",
     explorar: "Explorer",
+    biblioteca: "Bibliothèque",
+    enVivo: "En direct",
     menu: "Menu",
     creditos: "Crédits",
     grupos: { oraculos: "Oracles", cielo: "Ton ciel", pareja: "À deux", profundo: "Plus en profondeur" },

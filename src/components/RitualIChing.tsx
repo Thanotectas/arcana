@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionIChing, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -60,9 +62,13 @@ export function RitualIChing({ nombresHexagramas }: { nombresHexagramas: Record<
   return (
     <form action={enviar} className="space-y-6">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
       <input type="hidden" name="pregunta" value={pregunta} />
       <input type="hidden" name="valores" value={JSON.stringify(tiros.map((x) => x.valor))} />

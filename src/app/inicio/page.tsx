@@ -1,3 +1,4 @@
+import { AvisoDiario } from "@/components/AvisoDiario";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean, Infinity as Infinito, LibraryBig as Archivo } from "lucide-react";
@@ -120,6 +121,8 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
           </Link>
         </div>
       </section>
+
+      <AvisoDiario clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
 
       <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} conOferta={compras} />
 

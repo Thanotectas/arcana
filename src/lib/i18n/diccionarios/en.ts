@@ -60,6 +60,8 @@ export const en: Diccionario = {
     rituales: "Rituals",
     lecturas: "Readings",
     explorar: "Explore",
+    biblioteca: "Library",
+    enVivo: "Live",
     menu: "Menu",
     creditos: "Credits",
     grupos: { oraculos: "Oracles", cielo: "Your sky", pareja: "Between two", profundo: "Deeper" },

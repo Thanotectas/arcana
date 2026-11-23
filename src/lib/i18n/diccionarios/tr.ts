@@ -59,6 +59,8 @@ export const tr: Diccionario = {
     rituales: "Ritüeller",
     lecturas: "Fallar",
     explorar: "Keşfet",
+    biblioteca: "Kütüphane",
+    enVivo: "Canlı",
     menu: "Menü",
     creditos: "Krediler",
     grupos: { oraculos: "Kehanetler", cielo: "Gökyüzün", pareja: "İki kişi", profundo: "Daha derine" },

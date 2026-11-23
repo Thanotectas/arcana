@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { getLectura, requerirUsuario, getPreguntas, getPerfil, circuloActivo } from "@/lib/dal";
 import { comprasVisibles } from "@/lib/plataforma";
 import { ConversacionLectura } from "@/components/ConversacionLectura";
+import { AvisoDiario } from "@/components/AvisoDiario";
 import { COSTO_PREGUNTA, PREGUNTAS_GRATIS_POR_LECTURA } from "@/lib/creditos";
 import { LecturaEnVivo } from "@/components/LecturaEnVivo";
 import { LecturaTaza } from "@/components/LecturaTaza";
@@ -149,6 +150,8 @@ export default async function PaginaLectura({ params }: { params: Promise<{ id: 
         />
       )}
       {lectura.estado === "lista" && <SiguientePaso tipo={lectura.tipo} />}
+      {/* Después de la lectura, invitar a recibir el aviso diario de Sibila (solo aparece si el navegador lo permite). */}
+      {lectura.estado === "lista" && <AvisoDiario clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />}
       {lectura.estado === "lista" && perfil && !perfil.ilimitado && (
         <p className="flex flex-wrap items-center gap-2 text-sm text-texto-suave">
           {plantilla(t.crecimiento.saldoLectura, { n: perfil.creditos })}

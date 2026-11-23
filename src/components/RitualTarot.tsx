@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { accionTarot, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -103,10 +105,14 @@ export function RitualTarot({
   return (
     <div className="space-y-8">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {sinCreditos ? t.comun.sinCreditos : estado.error}{" "}
           {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       {fase === "preparar" && (

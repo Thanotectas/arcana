@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { accionNumerologia, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -42,9 +44,13 @@ export function NumerologiaInteractiva({ nombreInicial, fechaInicial }: { nombre
   return (
     <form action={enviar} className="space-y-6">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <div className="grid gap-4 sm:grid-cols-[1fr_auto]">

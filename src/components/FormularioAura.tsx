@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionAura, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -23,9 +25,13 @@ export function FormularioAura({ nombreInicial = "" }: { nombreInicial?: string 
   return (
     <form action={enviar} className="space-y-8">
       {mensajeError && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {mensajeError} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <div>

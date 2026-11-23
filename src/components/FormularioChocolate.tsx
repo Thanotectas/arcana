@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionChocolate, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -29,9 +31,13 @@ export function FormularioChocolate() {
   return (
     <form action={enviar} className="space-y-6">
       {mensajeError && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {mensajeError} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <CapturaPalma variante="taza" />

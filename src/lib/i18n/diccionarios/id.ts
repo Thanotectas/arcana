@@ -57,6 +57,8 @@ export const id: Diccionario = {
     rituales: "Ritual",
     lecturas: "Bacaan",
     explorar: "Jelajahi",
+    biblioteca: "Perpustakaan",
+    enVivo: "Live",
     menu: "Menu",
     creditos: "Kredit",
     grupos: { oraculos: "Orakel", cielo: "Langitmu", pareja: "Berdua", profundo: "Lebih dalam" },

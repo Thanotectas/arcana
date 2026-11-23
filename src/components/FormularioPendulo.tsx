@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
@@ -19,9 +21,13 @@ export function FormularioPendulo() {
   return (
     <form action={enviar} className="space-y-5">
       {estado.error && (
+        estado.error === "SIN_CREDITOS" ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {estado.error === "SIN_CREDITOS" && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
       <PenduloSegunEstado />
       <div>

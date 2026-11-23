@@ -59,6 +59,8 @@ export const es = {
     rituales: "Rituales",
     lecturas: "Lecturas",
     explorar: "Explorar",
+    biblioteca: "Biblioteca",
+    enVivo: "En vivo",
     menu: "Menú",
     creditos: "Créditos",
     grupos: { oraculos: "Oráculos", cielo: "Tu cielo", pareja: "Entre dos", profundo: "Más a fondo" },

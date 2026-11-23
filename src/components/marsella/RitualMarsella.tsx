@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "../InvitacionCreditos";
+
 import { useActionState, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import type { EstadoAccion } from "@/lib/lecturas/crear";
@@ -52,9 +54,13 @@ export function RitualMarsella({ textos }: { textos: TextosMarsella }) {
   return (
     <div className="space-y-8">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       {fase === "preparar" && (

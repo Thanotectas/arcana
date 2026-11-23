@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionTabaco, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -30,9 +32,13 @@ export function FormularioTabaco() {
   return (
     <form action={enviar} className="space-y-6">
       {mensajeError && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {mensajeError} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <ol className="grid gap-3 text-sm text-texto-suave sm:grid-cols-3">

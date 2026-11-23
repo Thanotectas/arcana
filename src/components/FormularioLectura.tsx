@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState } from "react";
 import Link from "next/link";
 import { BotonEnviar } from "./BotonEnviar";
@@ -28,10 +30,14 @@ export function FormularioLectura({
   return (
     <form action={enviar} className="space-y-5">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)}{" "}
           {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
       {children}
       <BotonEnviar cargando={textoCargando ?? t.comun.unMomento}>{textoBoton}</BotonEnviar>

@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import type { EstadoAccion } from "@/lib/lecturas/acciones";
@@ -68,9 +70,13 @@ export function RitualOraculo({
   return (
     <form action={enviar} className="space-y-6">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
       <input type="hidden" name="tirada" value={tirada.id} />
       <input type="hidden" name="pregunta" value={pregunta} />

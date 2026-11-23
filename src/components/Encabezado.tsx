@@ -21,6 +21,8 @@ export async function Encabezado() {
     ...(perfil ? [{ href: "/hoy", etiqueta: t.nav.hoy }] : []),
     { href: "/horoscopo", etiqueta: t.nav.horoscopo },
     { href: "/explorar", etiqueta: t.nav.explorar },
+    { href: "/biblioteca", etiqueta: t.nav.biblioteca },
+    { href: "/en-vivo", etiqueta: t.nav.enVivo },
   ];
   const enlacesCuenta = perfil
     ? [

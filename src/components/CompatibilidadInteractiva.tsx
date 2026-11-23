@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useMemo, useState } from "react";
 import Link from "next/link";
 import { accionCompatibilidad, type EstadoAccion } from "@/lib/lecturas/acciones";
@@ -41,9 +43,13 @@ export function CompatibilidadInteractiva({ nombreInicial }: { nombreInicial: st
   return (
     <form action={enviar} className="space-y-6">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
 
       <div className="grid gap-6 md:grid-cols-2">

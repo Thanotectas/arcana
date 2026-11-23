@@ -1,5 +1,7 @@
 "use client";
 
+import { InvitacionCreditos } from "./InvitacionCreditos";
+
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Check, Lock, Sparkles } from "lucide-react";
@@ -29,9 +31,13 @@ export function CruceSelector({ disponibilidad, costo, fechas }: { disponibilida
   return (
     <form action={enviar} className="space-y-6">
       {estado.error && (
+        sinCreditos ? (
+          <InvitacionCreditos />
+        ) : (
         <Aviso>
           {textoErrorLectura(estado.error, t)} {sinCreditos && <Link href="/creditos" className="underline">{t.comun.comprarCreditos}</Link>}
         </Aviso>
+        )
       )}
       {elegidos.map((s) => (
         <input key={s} type="hidden" name="sistema" value={s} />
