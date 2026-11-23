@@ -3,11 +3,12 @@ import { generarTexto } from "@/lib/ia";
 import { IDIOMA_PARA_IA, type Idioma } from "@/lib/i18n/idiomas";
 import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { sitio } from "@/lib/correo";
 
 /**
  * Voz de Sibila en cualquier idioma para los videos: el guion se escribe una vez en español, se traduce con su tono
  * (respetando las pausas «…») y se narra con la voz de ElevenLabs configurada en Vercel. Los audios quedan en el
- * bucket «redes» (voz-sibila/<carpeta>/<idioma>.mp3) y se descargan desde /admin/voz o con /api/voz-sibila.
+ * bucket «redes» (voz-sibila/<carpeta>/<idioma>.mp3) y se sirven por miarcana.com/voz-sibila/<carpeta>/<idioma>.mp3.
  */
 
 /** Cómo se dice miarcana.com en cada idioma (la voz lee mal la dirección escrita). */
@@ -51,5 +52,6 @@ export async function narrarGuion(guion: string, idioma: Idioma, carpeta: string
   const admin = getSupabaseAdmin();
   const { error } = await admin.storage.from("redes").upload(ruta, audio, { contentType: "audio/mpeg", upsert: true, cacheControl: "3600" });
   if (error) throw new Error(`No se guardó el audio: ${error.message}`);
-  return `${admin.storage.from("redes").getPublicUrl(ruta).data.publicUrl}?v=${Date.now()}`;
+  // Se sirve por miarcana.com/voz-sibila/… (puente con caché), no por la dirección de Supabase.
+  return `${sitio()}/voz-sibila/${carpeta}/${idioma}.mp3?v=${Date.now()}`;
 }

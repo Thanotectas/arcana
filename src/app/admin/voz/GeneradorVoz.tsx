@@ -82,7 +82,7 @@ export function GeneradorVoz({ quedan }: { quedan: number | null }) {
               {f.url && (
                 <div className="flex flex-wrap items-center gap-3">
                   <audio controls src={f.url} className="w-full max-w-md" />
-                  <a href={f.url} target="_blank" rel="noopener noreferrer" className="text-sm text-oro-suave underline">Descargar MP3</a>
+                  <a href={`${f.url}${f.url.includes("?") ? "&" : "?"}descargar=1`} className="text-sm text-oro-suave underline">Descargar MP3</a>
                 </div>
               )}
             </section>
