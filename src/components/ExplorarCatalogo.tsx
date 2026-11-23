@@ -61,7 +61,7 @@ export function ExplorarCatalogo({ items, idioma, abrir }: { items: ItemExplorar
       <div className="space-y-4">
         <label className="relative block">
           <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-texto-suave" aria-hidden />
-          <input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder={t.buscar} className="campo w-full ps-12 text-base" aria-label={t.buscar} />
+          <input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder={t.buscar} className="campo w-full text-base" style={{ paddingInlineStart: "3rem" }} aria-label={t.buscar} />
         </label>
         {!q && (
           <>
