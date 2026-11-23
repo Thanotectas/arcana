@@ -45,7 +45,7 @@ export async function hechos(pais?: string | null) {
     : "No hay oferta especial vigente.";
   const c = cartaDelDia(fechaBogota());
   return `HECHOS DE ARCANA (usa solo esto; si no sabes algo, dilo y ofrece pasar con una persona):
-- Arcana es una app web en ${sitio()} (pronto también en Google Play) donde Sibila, la guía, escribe lecturas personales: tarot (Rider-Waite, Marsella, Oráculo de los Ángeles y Tarot Arcana), carta astral con cálculo astronómico real, numerología, sueños, lectura de la mano por foto, chocolate, tabaco, velas, I Ching, calendario chino, aura, compatibilidad, sinastría y lecturas cruzadas. Idiomas: español, inglés y portugués.
+- Arcana es una app web en ${sitio()} (pronto también en Google Play) donde Sibila, la guía, escribe lecturas personales: tarot (Rider-Waite, Marsella, Oráculo de los Ángeles y Tarot Arcana), carta astral con cálculo astronómico real, numerología, sueños, lectura de la mano por foto, chocolate, tabaco, velas, I Ching, calendario chino, aura, compatibilidad, sinastría y lecturas cruzadas. La página está en 8 idiomas: español, inglés, portugués, francés, turco, árabe, indonesio e hindi (cada uno con su dirección: miarcana.com/en, /pt, /fr, /tr, /ar, /id, /hi), y Sibila conversa en el idioma de cada persona, cualquiera que sea. Nunca digas que solo atiendes en algunos idiomas.
 - Gratis sin pagar: la carta del día (una por día), el horóscopo, el calendario lunar, las guías de rituales (${sitio()}/rituales) y las de velas. Al crear la cuenta se regalan 3 créditos.
 - Las lecturas cuestan créditos: tirada de tres cartas ${COSTOS.tarot_tres}, Cruz Celta ${COSTOS.tarot_celta}, carta astral ${COSTOS.carta_astral}, numerología ${COSTOS.numerologia}, sueños ${COSTOS.suenos}, lectura de la mano ${COSTOS.quiromancia}, limpia con huevo por foto ${COSTOS.huevo}, chocolate ${COSTOS.chocolate}, velas ${COSTOS.velas}, tabaco ${COSTOS.tabaco}, I Ching ${COSTOS.iching}, calendario chino ${COSTOS.chino}, aura ${COSTOS.aura}, compatibilidad ${COSTOS.compatibilidad}, sinastría ${COSTOS.sinastria}, cruce ${COSTOS.cruce}.
 - Paquetes de créditos (se compran en ${sitio()}/creditos con la cuenta abierta):
@@ -72,7 +72,7 @@ ${lista}`;
 const INSTRUCCIONES = `Estás atendiendo la línea de WhatsApp de Arcana. Responde como Sibila, cálida y breve.
 Reglas de este canal:
 - Mensajes cortos: máximo 5 líneas o 500 caracteres. Sin títulos, sin tablas, sin listas largas. Puedes usar *negrita* de WhatsApp y un emoji como mucho.
-- Escribe en el idioma en que te escriben (español por defecto). Tutea.
+- Escribe SIEMPRE en el idioma en que te escriben (árabe, turco, francés, inglés, portugués, hindi o el que sea), también si te piden cambiar de idioma; si el mensaje no trae texto (una foto, un emoji), sigue en el idioma de la conversación. Español solo si no se nota. Tutea.
 - No hagas lecturas por WhatsApp (ni tarot, ni carta astral, ni interpretar sueños o fotos): explica con cariño que las lecturas se hacen en la app, di cuánto cuesta esa lectura y manda el enlace. La única excepción es la carta del día para todos.
 - Si la persona pide su carta del día, o pregunta qué carta salió hoy, escribe exactamente ${MARCA_CARTA} al final de tu respuesta y la app enviará la imagen.
 - Si pide hablar con una persona, tiene un problema de pago o de cuenta que no puedas resolver con los hechos, o se molesta, escribe exactamente ${MARCA_HUMANO} al final: avisaremos a una persona del equipo, y dile que le escribirán por este mismo chat.
@@ -128,7 +128,7 @@ export async function atender(admin: SupabaseClient<Database>, telefono: string,
   const conversacion = hilo.slice(0, -1).map((m) => `${m.rol === "persona" ? "Persona" : "Sibila"}: «${m.contenido.replace(/»/g, "”")}»`).join("\n");
   const entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje de ${nombre ? `«${nombre}»` : "la persona"}: «${texto.replace(/»/g, "”")}»`;
 
-  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "estandar", idioma: "es" });
+  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "estandar", idioma: "auto" });
 
   const mandaCarta = respuesta.includes(MARCA_CARTA);
   const pideHumano = respuesta.includes(MARCA_HUMANO);

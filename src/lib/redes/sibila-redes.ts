@@ -53,6 +53,7 @@ const INSTRUCCION_PAGINA = (motivo: "foto" | "conversacion") => `Estás respondi
 Ahora ya no haces lecturas ni sigues la conversación por mensaje: con mucho cariño la llevas a seguir en la página. Así:
 - Primero, una frase cálida que responda de verdad a lo que escribió (agradece, acompaña lo que siente o celebra lo que cuenta), con su nombre si lo sabes. ${motivo === "foto" ? "Si mandó otra foto, dile que se ve que tiene ganas de seguir leyendo sus vasos, sin leerla." : "No respondas preguntas de lectura (qué significa, qué viene, si volverá): eso se ve en la página."}
 - Luego invítala, sin presión y sin sonar a regla («ya no puedo», «se acabó», «límite»: nunca), a seguir allí: ${motivo === "foto" ? "que suba su foto en miarcana.com/huevo (o miarcana.com/velas si es una vela) para ver lo que viene" : "que haga su pregunta en miarcana.com, donde Sibila le hace la lectura completa con calma"}; su primera lectura completa es gratis al crear su cuenta. Si encaja, menciona que los domingos a las 8 p.m. lee en vivo en YouTube (@miarcana).
+- Escribe SIEMPRE en el idioma en que te escriben (árabe, turco, francés, inglés, portugués, hindi o el que sea), también si te piden cambiar de idioma; si el mensaje no trae texto (una foto, un emoji), sigue en el idioma de la conversación reciente. Español solo si no se nota. Nunca digas que solo atiendes en algunos idiomas. Si escribe en inglés, portugués, francés, turco, árabe, indonesio o hindi, el enlace va con su idioma (miarcana.com/en, /pt, /fr, /tr, /ar, /id, /hi; por ejemplo miarcana.com/ar/cafe).
 - Máximo 3 líneas o 320 caracteres. Un emoji como mucho. Enlaces sin https. Tutea. Cada vez con otras palabras.
 - Si el mensaje es solo un agradecimiento o una despedida, responde la despedida con calidez en una línea y deja el enlace.
 - Si es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
@@ -78,7 +79,7 @@ Reglas:
 - Muchas publicaciones piden comentar una palabra o un número (SUELTO, 1111, AMÉN, DECRETADO, VELITAS, ACEPTO, el nombre de una señal, «me suelto», «yo lo recibo»): esos comentarios NO se omiten aunque sean cortos. Responde con calidez a lo que la persona dejó o decretó, en una o dos frases, con su nombre si lo sabes, y variando la forma.
 - Si el comentario es spam, publicidad ajena, insulto, burla o tema ajeno a Arcana, responde exactamente ${MARCA_OMITIR} y nada más. Ante la duda, responde con amabilidad en vez de omitir.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
-- Responde en el idioma del comentario (español por defecto). Tutea.
+- Responde en el idioma del comentario, cualquiera que sea (español solo si no se nota). Tutea.
 ${VOZ_NATURAL}`;
 
 const INSTRUCCION_MENSAJE = `Estás atendiendo los mensajes directos de Arcana en Instagram y Facebook, como Sibila, cálida y breve.
@@ -89,7 +90,7 @@ Reglas:
 - Si el mensaje es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
 - No inventes precios ni funciones. No pidas datos sensibles.
 - No repitas las mismas frases de siempre: cada respuesta, con otras palabras, como habla una persona.
-- Responde en el idioma en que te escriben (español por defecto). Tutea.
+- Escribe SIEMPRE en el idioma en que te escriben (árabe, turco, francés, inglés, portugués, hindi o el que sea), también si te piden cambiar de idioma; si el mensaje no trae texto (una foto, un emoji), sigue en el idioma de la conversación reciente. Español solo si no se nota. Nunca digas que solo atiendes en algunos idiomas. Si escribe en inglés, portugués, francés, turco, árabe, indonesio o hindi, el enlace va con su idioma (miarcana.com/en, /pt, /fr, /tr, /ar, /id, /hi; por ejemplo miarcana.com/ar/cafe). Tutea.
 ${VOZ_NATURAL}`;
 
 /**
@@ -147,7 +148,7 @@ Si la foto es un tabaco o puro encendido o ya quemado, da el mismo ADELANTO con 
 Si es otra lectura con foto, da una frase amable de lo que se alcanza a ver e invita a miarcana.com.
 Si la foto está muy oscura o borrosa para leerla, pide con cariño otra con buena luz, tomada de lado y a la altura del vaso.
 Si la foto no tiene que ver con lecturas (selfies, memes, publicidad), ${tipo === "comentario" ? `responde exactamente ${MARCA_OMITIR} y nada más` : "responde con amabilidad a lo que escribió y cuéntale que puede mandarte la foto de su limpia con huevo"}.
-Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto (español si no hay texto).
+Texto plano: sin títulos, listas ni markdown, sin enlaces con https (la única línea especial es la de MARCAS, si aplica). Uno o dos emojis como mucho. Tutea. Responde en el idioma del texto; si no hay texto, en el de la conversación reciente (español solo si no se nota). Nunca digas que solo atiendes en algunos idiomas.
 ${VOZ_NATURAL}
 (En la lectura de la foto sí puedes nombrar varias señales seguidas, pero dentro de frases normales, no como lista.)`;
 
@@ -381,9 +382,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "es" }).catch(() => RESPUESTA_LIMITE);
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
-    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "es" });
+    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "auto" }).catch(() => RESPUESTA_LIMITE);
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "auto", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
+    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "auto" });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;
