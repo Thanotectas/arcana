@@ -1,0 +1,64 @@
+VIDEO 48 — BIBLIOTECA DE SIBILA #1 · «LA LECTURA DEL CAFÉ». Serie diaria: una tradición del mundo por día.
+Google Flow (Veo), 4 clips de 8 s, vertical 9:16, ~50 s con la voz de Sibila. Lleva a miarcana.com/biblioteca/lectura-del-cafe
+(la ficha) y de ahí a la lectura con foto de la taza (miarcana.com/cafe).
+Tono: documental cálido, como una historia que se cuenta en la sobremesa. Desde adentro de la tradición: nada de «mito».
+SIN CARAS (manos, objetos, lugares): Flow cambia las caras entre clips. Prompts en inglés (Veo los sigue mejor).
+
+==================== CÓMO HACERLO EN FLOW ====================
+- «Texto a video», vertical 9:16, 8 s. Los clips 2, 3 y 4 con «Extender» desde el anterior si quieres continuidad;
+  el clip 1 y el 3 pueden ir sueltos (son lugares distintos).
+- Sonido: solo ambiente (cucharita, porcelana, murmullo, el café hirviendo). Sin música y sin voces: la voz es la de Marcela.
+- El clip 4 termina QUIETO (la taza volteada sobre el plato): ahí van el cierre y la dirección.
+
+==================== CLIP 1 · «La casa de café» (8 s) ====================
+Vertical 9:16, cinematic, warm golden light through latticed wooden windows, 16th-century Ottoman coffeehouse
+atmosphere. A low brass tray on a carved wooden table, a copper cezve (small long-handled coffee pot) bubbling gently
+on hot coals, steam rising, small white porcelain cups without handles, a brass incense burner with a thin smoke line,
+patterned kilim rugs and cushions in the background, softly out of focus. Slow dolly-in toward the cezve as the foam
+rises to the rim. Only hands visible (an older hand with a simple silver ring) lifting the cezve and pouring thick dark
+coffee with foam into a cup.
+Sound: coals crackling, coffee bubbling, distant murmur of conversation, a spoon touching porcelain. No music, no voices.
+No faces, no readable text, no logos, no modern objects.
+
+==================== CLIP 2 · «Voltear la taza» (8 s) ====================
+Vertical 9:16, cinematic close-up, warm candlelight, intimate kitchen-table atmosphere. A small porcelain coffee cup
+with a handle on its saucer, almost empty, thick coffee grounds at the bottom. A woman's hands (a thin gold bracelet)
+place the saucer on top of the cup like a lid, hold it for a moment as if making a wish, then turn the cup and saucer
+over in one smooth movement so the cup rests upside down on the saucer. One hand places a small gold coin on top of the
+upside-down cup. Slow push-in.
+Sound: porcelain clinking, a soft breath, a coin tapping porcelain. No music, no voices.
+No faces, no readable text, no logos.
+
+==================== CLIP 3 · «Las figuras» (8 s) ====================
+Vertical 9:16, cinematic macro shot, warm light. The hands lift the cup and tilt it toward the camera: inside, the dried
+coffee grounds have formed dark organic shapes on the white porcelain walls — the clear silhouette of a bird in flight
+near the rim, a winding path, and a small heart shape near the handle. Light glides slowly over the shapes; tiny golden
+particles of light shimmer briefly around the bird shape. Very slow rotation of the cup.
+Sound: porcelain, a quiet room, a soft magical shimmer when the light touches the bird. No music, no voices.
+No faces, no readable text or letters, no logos.
+
+==================== CLIP 4 · «La sobremesa» (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight, cozy table at night. Two small coffee cups turned upside down on their
+saucers, a cezve, a plate of Turkish delight, a glass of water and a lit candle on an embroidered tablecloth. Two pairs
+of hands (one older, one younger) rest close to each other on the table, as if sharing a secret, then slowly withdraw.
+For the last 3 seconds: a fixed, static shot of the table with the upside-down cups and the candle; no hands, no movement
+except the candle flame.
+Sound: candle, a soft laugh far away, porcelain. No music, no voices.
+No faces, no readable text, no logos.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración) ====================
+(~750 caracteres, ~50 s. Los «…» son pausas: déjalos.)
+Bienvenida a la Biblioteca de Sibila. Hoy: la lectura del café…
+En el siglo dieciséis, el café llegó a Estambul, y con él nacieron las primeras casas de café del Imperio otomano. Allí empezó una costumbre que hoy la UNESCO protege como patrimonio de la humanidad…
+Se bebe despacio, pensando en una pregunta. Se tapa la taza con el plato, se pide un deseo… y se voltea…
+Cuando la porcelana se enfría, la borra dibuja figuras. Un pájaro trae noticias. Un camino, un viaje. Un corazón cerca del asa… amor que se acerca a tu casa…
+De Estambul a Beirut, de Atenas a Buenos Aires, alguien sigue preguntando: ¿te leo la taza?…
+Mándame la foto de la tuya en mi arcana punto com. Yo te la leo.
+
+==================== TÍTULOS EN PANTALLA (los pongo yo al armar) ====================
+1. BIBLIOTECA DE SIBILA · #1 / La lectura del café ☕
+2. Estambul, siglo XVI / Nacen las casas de café
+3. Patrimonio de la humanidad · UNESCO
+4. Tapa · pide un deseo · voltea
+5. 🐦 noticias · 🛤️ un viaje · ❤️ amor
+6. ¿Te leo la taza? / 📸 miarcana.com/cafe
