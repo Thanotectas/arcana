@@ -97,7 +97,7 @@ const INSTRUCCIONES = [
   { titulo: "Horóscopo chino · tu animal", ejemplo: "horóscopo chino 1990" },
 ];
 /** Frases de espera de Sibila (FRASES_PUENTE en src/lib/en-vivo.ts). */
-const FRASES_PUENTE = 14;
+const FRASES_PUENTE = 15;
 /** Frases de después de la despedida (frasesCierre en src/lib/en-vivo.ts). */
 const FRASES_CIERRE = 5;
 /** Cuántas vueltas sin preguntas antes de que Sibila haga un segmento «para todos». */

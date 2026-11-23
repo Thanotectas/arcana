@@ -754,7 +754,7 @@ function codigoDicho(codigo: string) {
 }
 
 /** Cuántas frases de espera hay: el escenario las recorre en orden (EscenarioEnVivo usa el mismo número). */
-export const FRASES_PUENTE = 14;
+export const FRASES_PUENTE = 15;
 
 /**
  * Frases de Sibila entre lecturas (la página las guarda tras oírlas una vez y
@@ -775,6 +775,7 @@ export function frasesPuente(codigo: { codigo: string; creditos_extra: number } 
     "¿Vienes con alguien en el corazón? Escribe sinastría y las dos fechas de nacimiento, la tuya y la de esa persona, y dibujo sus dos cielos juntos, con los hilos que los unen.",
     `Mientras llega la siguiente pregunta: tu carta del día es gratis, todos los días, en mi arcana punto com. Y allí también te espera tu carta astral completa, explicada casa por casa. ${oferta}`.trim(),
     "No necesitas saber nada de astrología: solo tu fecha, tu hora y tu ciudad. Escribe carta astral y mira cómo aparece tu cielo en la pantalla.",
+    "¿Quieres pasar antes en la fila? Entra a mi arcana punto com, barra, en vivo. Allí me escuchas en tu idioma, eliges tu lectura y tu pregunta pasa primero. Y aquí en el chat también te leo cuando te llegue el turno.",
     `Si te gusta este espacio, sígueme y activa las notificaciones: así te aviso cada vez que vuelva a leer en vivo. Y para seguir aprendiendo durante la semana, únete a nuestro grupo de Facebook, Carta Astral y Tarot en Español: mi arcana punto com, barra, grupo.${telegram} Todas mis redes están en mi arcana punto com, barra, redes.`,
     "¿Son compatibles? La sinastría lo muestra: emoción, pasión, comunicación y estabilidad. Escribe sinastría con tu fecha y la de esa persona.",
     "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
@@ -820,6 +821,7 @@ export function frasesPuenteTikTok() {
     "Si no sabes tu hora de nacimiento, igual funciona: escribe carta astral con tu fecha y tu ciudad, y te muestro tu Sol, tu Luna y tus planetas.",
     "También puedes escoger otra cosa: tarot con tu pregunta, aura para ver tu color, horóscopo con tu signo, o mi año con tu fecha.",
     "Comparte este directo con alguien que necesite una señal hoy: entre más seamos, más preguntas leemos juntos.",
+    "¿Me ves desde otro país? Escríbeme en tu idioma: português, English, français, Türkçe… y te leo en el tuyo.",
     "¿Tu pareja, tu crush, tu mejor amiga? Escribe sinastría y las dos fechas, y vemos qué dice el cielo de los dos.",
     "Voy leyendo en orden, y primero a quien todavía no ha tenido su lectura esta noche. Escribe carta astral, sinastría o tu pregunta, que ya te llega el turno.",
     "¿Una pregunta de sí o no? Escribe péndulo y tu pregunta. Y si quieres un consejo más hondo, escribe I Ching, runas o baraja española. Escríbeme en tu idioma: yo te leo en el tuyo.",
