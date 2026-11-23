@@ -3,7 +3,7 @@ import { requerirAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sitio } from "@/lib/correo";
 import { claveEscenario, despedidaReciente, escenarioActivo, horaCierre, maximoDiario, normalizar } from "@/lib/en-vivo";
-import { vozConfigurada } from "@/lib/redes/voz";
+import { creditosVoz, vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
 import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
 
 const NOMBRE_TIPO: Record<string, string> = { tarot: "Tarot", aura: "Aura", numerologia: "Numerología", horoscopo: "Horóscopo", chocolate: "Chocolate", mano: "Mano", huevo: "Huevo", carta: "Carta astral", sinastria: "Sinastría", pendulo: "Péndulo", iching: "I Ching", runas: "Runas", lenormand: "Lenormand", baraja: "Baraja", chino: "Chino" };
-const ORIGEN: Record<string, string> = { chat: "Chat (YouTube / TikTok)", facebook: "Facebook", manual: "A mano", pagina: "Foto (/vivo)", sistema: "Para todos" };
+const ORIGEN: Record<string, string> = { chat: "Chat (YouTube / TikTok)", facebook: "Facebook", manual: "A mano", pagina: "Página (/vivo o la sala)", sistema: "Para todos" };
 
 /** Control de «Sibila en vivo»: dirección del escenario para OBS, estado, fila de consultas y lecturas. */
 export default async function PaginaAdminEnVivo() {
@@ -33,7 +33,7 @@ export default async function PaginaAdminEnVivo() {
   const fila = filaGuardada?.map(normalizar);
   const leidas = leidasGuardadas?.map(normalizar);
   const codigos = await listarCodigos(admin);
-  const aviso = await publicacionDelDirecto().catch(() => null);
+  const [aviso, creditos] = await Promise.all([publicacionDelDirecto().catch(() => null), creditosVoz()]);
   const proximoDomingo = venceSugerido();
   const fechaHora = (iso: string | null) => (iso ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(iso)) : "no vence");
   const url = `${sitio()}/en-vivo/escenario?clave=${claveEscenario()}`;
@@ -53,6 +53,8 @@ export default async function PaginaAdminEnVivo() {
           <a href="/vivo" className="text-oro-suave underline">miarcana.com/vivo</a> (el QR sale en pantalla).
         </p>
       </div>
+
+      {vozConfigurada() && <AvisoCreditos creditos={creditos} />}
 
       <section className="tarjeta space-y-3 p-5">
         <h2 className="font-display text-2xl font-semibold">Estado</h2>
@@ -215,5 +217,43 @@ export default async function PaginaAdminEnVivo() {
         )}
       </section>
     </div>
+  );
+}
+
+/** Lo que gasta, más o menos, un directo de ~50 lecturas en español (unos 700 caracteres cada una). */
+const CREDITOS_POR_DIRECTO = 35_000;
+
+/** Créditos de ElevenLabs: cuántos quedan, cuántos directos alcanzan y la voz de la sala en otros idiomas. */
+function AvisoCreditos({ creditos }: { creditos: Awaited<ReturnType<typeof creditosVoz>> }) {
+  const idiomasSala = (process.env.SALA_VOZ_IDIOMAS ?? "").trim();
+  if (!creditos) {
+    return (
+      <section className="tarjeta space-y-1 border-oro/40 p-5 text-sm">
+        <h2 className="font-display text-2xl font-semibold">Voz de Sibila (ElevenLabs)</h2>
+        <p className="text-texto-suave">No se pudieron leer los créditos: la clave de ElevenLabs necesita el permiso «User → Read». Revísalos en elevenlabs.io → Subscription.</p>
+      </section>
+    );
+  }
+  const pct = creditos.limite ? Math.round((creditos.quedan / creditos.limite) * 100) : 0;
+  const directos = Math.floor(creditos.quedan / CREDITOS_POR_DIRECTO);
+  const nivel = directos < 1 ? "peligro" : directos < 2 ? "oro" : "exito";
+  const renueva = creditos.renueva ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", timeZone: "America/Bogota" }).format(new Date(creditos.renueva)) : null;
+  return (
+    <section className={`tarjeta space-y-3 p-5 ${nivel === "peligro" ? "border-peligro/60" : nivel === "oro" ? "border-oro/60" : ""}`}>
+      <h2 className="font-display text-2xl font-semibold">Voz de Sibila (ElevenLabs)</h2>
+      <p className="text-sm">
+        Quedan <strong className={nivel === "peligro" ? "text-peligro" : nivel === "oro" ? "text-oro-suave" : "text-exito"}>{creditos.quedan.toLocaleString("es-CO")}</strong> de{" "}
+        {creditos.limite.toLocaleString("es-CO")} créditos ({pct} %){renueva ? `; se renuevan el ${renueva}` : ""}.
+      </p>
+      <div className="h-2 overflow-hidden rounded-full bg-white/10">
+        <div className={`h-full ${nivel === "peligro" ? "bg-peligro" : nivel === "oro" ? "bg-oro" : "bg-exito"}`} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="text-sm text-texto-suave">
+        {directos < 1
+          ? "No alcanza para un directo completo: Sibila puede quedarse sin voz a mitad. Recarga créditos o haz un directo corto."
+          : `Alcanza para unos ${directos} directo${directos === 1 ? "" : "s"} en español (~${CREDITOS_POR_DIRECTO.toLocaleString("es-CO")} créditos cada uno).`}{" "}
+        Voz de la sala en otros idiomas: {idiomasSala ? <strong>{idiomasSala}</strong> : "apagada (solo subtítulos)"}; cada idioma con voz suma ~17.500 créditos por directo (SALA_VOZ_IDIOMAS en Vercel).
+      </p>
+    </section>
   );
 }

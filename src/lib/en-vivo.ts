@@ -580,7 +580,12 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
     // Quien ganó «La carta escondida» pasa de primero con su pregunta.
     const ganador = await ganadorConPrioridad(admin).catch(() => null);
     const delGanador = ganador ? candidatas.find((c) => esChat(c.origen) && c.autor === ganador) : undefined;
-    const p = delGanador ?? candidatas.find((c) => !esChat(c.origen) || !repiten.has(c.autor)) ?? candidatas[0];
+    // La página (sala y /vivo) va antes que el chat, pero cada EN_VIVO_CADA_CHAT lecturas (3 por omisión) le toca a
+    // alguien del chat de YouTube, TikTok o Facebook: así esas plataformas ven que Sibila también les responde.
+    const cadaChat = Number(process.env.EN_VIVO_CADA_CHAT ?? 3);
+    const turnoChat = Number.isFinite(cadaChat) && cadaChat > 0 && (count ?? 0) % cadaChat === cadaChat - 1;
+    const delChat = turnoChat ? candidatas.find((c) => esChat(c.origen) && !repiten.has(c.autor)) : undefined;
+    const p = delGanador ?? delChat ?? candidatas.find((c) => !esChat(c.origen) || !repiten.has(c.autor)) ?? candidatas[0];
     const { data: tomada } = await admin.from("en_vivo_preguntas").update({ estado: "leyendo", leida_en: new Date().toISOString() }).eq("id", p.id).eq("estado", "pendiente").select("id").maybeSingle();
     if (!tomada) continue;
     if (delGanador && p.id === delGanador.id) await usarPrioridad(admin).catch(() => null);

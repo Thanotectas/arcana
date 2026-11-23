@@ -70,6 +70,35 @@ export async function sintetizar(texto: string, modeloPedido?: string): Promise<
   return Buffer.from(await res.arrayBuffer());
 }
 
+export interface CreditosVoz {
+  usados: number;
+  limite: number;
+  quedan: number;
+  /** Cuándo se renuevan (ISO), si ElevenLabs lo dice. */
+  renueva: string | null;
+  plan: string | null;
+}
+
+/** Créditos de ElevenLabs que quedan este mes (null si la clave no deja leerlos o no hay voz configurada). */
+export async function creditosVoz(): Promise<CreditosVoz | null> {
+  if (!clave()) return null;
+  try {
+    const res = await fetch(`${API}/user/subscription`, { headers: { "xi-api-key": clave() }, cache: "no-store" });
+    if (!res.ok) return null;
+    const d = (await res.json()) as { character_count?: number; character_limit?: number; next_character_count_reset_unix?: number; tier?: string };
+    if (typeof d.character_count !== "number" || typeof d.character_limit !== "number") return null;
+    return {
+      usados: d.character_count,
+      limite: d.character_limit,
+      quedan: Math.max(0, d.character_limit - d.character_count),
+      renueva: d.next_character_count_reset_unix ? new Date(d.next_character_count_reset_unix * 1000).toISOString() : null,
+      plan: d.tier ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Duración en segundos de un audio (ffmpeg la escribe al leerlo). */
 export async function duracion(ruta: string): Promise<number> {
   const { stderr } = await ejecutar(rutaFfmpeg(), ["-hide_banner", "-i", ruta, "-f", "null", "-"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 });
