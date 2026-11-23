@@ -2,8 +2,9 @@ import { LOCALE_INTL } from "@/lib/i18n/idiomas";
 import type { Metadata } from "next";
 import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
-import { TradicionesDelMundo } from "@/components/TradicionesDelMundo";
-import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
+import { ExplorarCatalogo } from "@/components/ExplorarCatalogo";
+import { catalogoConTextos } from "@/lib/catalogo";
+import { Sunrise } from "lucide-react";
 import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -35,33 +36,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Portada() {
   const [usuario, t, idioma, contador, compras, tasas] = await Promise.all([getUsuarioOpcional(), getT(), getIdioma(), getContadorLecturas().catch(() => 0), comprasVisibles(), tasasDelDia()]);
-  const MODULOS = [
-    { icono: Sparkles, ...t.portada.modulos.tarot, href: "/tarot" },
-    { icono: Sunrise, ...t.crecimiento.moduloHoy, href: "/hoy" },
-    { icono: Star, ...t.portada.modulos.astral, href: "/carta-astral" },
-    { icono: Hand, ...t.portada.modulos.quiromancia, href: "/quiromancia" },
-    { icono: Hash, ...t.portada.modulos.numerologia, href: "/numerologia" },
-    { icono: Hexagon, ...t.portada.modulos.iching, href: "/iching" },
-    { icono: Flame, ...t.portada.modulos.chino, href: "/calendario-chino" },
-    { icono: MoonStar, ...t.portada.modulos.suenos, href: "/suenos" },
-    { icono: Layers, ...t.portada.modulos.cruce, href: "/cruce" },
-    { icono: Heart, ...t.portada.modulos.compatibilidad, href: "/compatibilidad" },
-    { icono: HeartHandshake, ...t.portada.modulos.sinastria, href: "/sinastria" },
-    { icono: Coffee, ...t.portada.modulos.chocolate, href: "/chocolate" },
-    { icono: FlameKindling, ...t.portada.modulos.velas, href: "/velas" },
-    { icono: Wind, ...t.portada.modulos.tabaco, href: "/tabaco" },
-    { icono: Sun, ...t.portada.modulos.revolucion, href: "/revolucion-solar" },
-    { icono: Swords, ...t.portada.modulos.baraja, href: "/baraja-espanola" },
-    { icono: Clover, ...t.portada.modulos.lenormand, href: "/lenormand" },
-    { icono: Axe, ...t.portada.modulos.runas, href: "/runas" },
-    { icono: Diamond, ...t.portada.modulos.pendulo, href: "/pendulo" },
-    { icono: Bean, ...t.portada.modulos.cafe, href: "/cafe" },
-    { icono: Egg, ...t.portada.modulos.huevo, href: "/huevo" },
-    { icono: Pyramid, ...t.portada.modulos.maya, href: "/calendario-maya" },
-    { icono: Sparkle, ...t.portada.modulos.aura, href: "/aura" },
-    { icono: Moon, ...t.portada.modulos.horoscopo, href: "/horoscopo" },
-    { icono: Orbit, ...t.portada.modulos.luna, href: "/luna" },
-  ];
 
   return (
     <div className="space-y-20">
@@ -98,18 +72,21 @@ export default async function Portada() {
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {MODULOS.map((m, i) => (
-          <Link key={m.href} href={m.href} className="tarjeta tarjeta-modulo aparecer group p-6" style={{ animationDelay: `${i * 70}ms` }}>
-            <m.icono className="mb-4 h-7 w-7 text-oro transition group-hover:scale-110" aria-hidden />
-            <h2 className="font-display text-2xl font-semibold text-texto">{m.titulo}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-texto-suave">{m.texto}</p>
-            <span className="mt-4 inline-block text-sm text-violeta-suave transition group-hover:translate-x-1">{t.portada.explorar} →</span>
-          </Link>
-        ))}
-      </section>
-
-      <TradicionesDelMundo t={t} idioma={idioma} />
+      {/* Todas las lecturas: guía para elegir, buscador y vistas por lo que quieres saber, práctica o tradición. */}
+      <ExplorarCatalogo
+        idioma={idioma}
+        abrir={t.explorar.abrir}
+        items={catalogoConTextos(t, { conCuenta: Boolean(usuario), idioma }).map((i) => ({
+          clave: i.clave,
+          href: usuario || !i.requiereCuenta ? i.href : "/registro",
+          nombre: i.nombre,
+          descripcion: i.descripcion,
+          costoTexto: i.costoTexto,
+          gratis: i.costo === null || i.costo === 0,
+          destacado: Boolean(i.destacadoEn?.includes(idioma)),
+          deOtroMercado: Boolean(i.destacadoEn?.length && !i.destacadoEn.includes(idioma)),
+        }))}
+      />
 
       <section className="tarjeta p-8 text-center">
         <h2 className="font-display text-3xl font-semibold text-oro-suave">{t.portada.comoFunciona}</h2>
