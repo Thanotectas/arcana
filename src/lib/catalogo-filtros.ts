@@ -337,3 +337,14 @@ export const TEXTOS_FILTROS: Record<Idioma, TextosFiltros> = {
     },
   },
 };
+
+/**
+ * Los productos agrupados por lo que la persona quiere saber, para los menús: cada uno aparece una sola vez, en su
+ * primera necesidad (en /explorar puede salir en varias). Los que no tienen etiquetas van al final, en «Todo».
+ */
+export function gruposPorNecesidad<T extends { clave: string }>(items: T[], idioma: Idioma): { id: string; nombre: string; items: T[] }[] {
+  const t = TEXTOS_FILTROS[idioma] ?? TEXTOS_FILTROS.es;
+  const grupos = NECESIDADES.map((n) => ({ id: n as string, nombre: t.necesidades[n], items: items.filter((i) => ETIQUETAS[i.clave]?.necesidades[0] === n) })).filter((g) => g.items.length);
+  const sueltos = items.filter((i) => !ETIQUETAS[i.clave]);
+  return sueltos.length ? [...grupos, { id: "todo", nombre: t.vistas.todo, items: sueltos }] : grupos;
+}

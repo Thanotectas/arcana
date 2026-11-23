@@ -7,7 +7,7 @@ import { accionSalir } from "@/lib/auth/acciones";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { SelectorIdioma } from "./SelectorIdioma";
 import { comprasVisibles } from "@/lib/plataforma";
-import { catalogoConTextos, type GrupoCatalogo } from "@/lib/catalogo";
+import { catalogoConTextos } from "@/lib/catalogo";
 import { MenuLecturas } from "./MenuLecturas";
 import { MenuMovil } from "./MenuMovil";
 
@@ -15,8 +15,8 @@ export async function Encabezado() {
   const [perfil, t, compras, usuario] = await Promise.all([getPerfil(), getT(), comprasVisibles(), getUsuarioOpcional()]);
   // Acceso visible a /admin solo para las cuentas administradoras.
   const admin = Boolean(perfil) && esAdmin(usuario?.email);
-  const items = catalogoConTextos(t, { conCuenta: Boolean(perfil), idioma: await getIdioma() });
-  const grupos = t.nav.grupos as Record<GrupoCatalogo, string>;
+  const idioma = await getIdioma();
+  const items = catalogoConTextos(t, { conCuenta: Boolean(perfil), idioma });
   const directos = [
     ...(perfil ? [{ href: "/hoy", etiqueta: t.nav.hoy }] : []),
     { href: "/horoscopo", etiqueta: t.nav.horoscopo },
@@ -44,7 +44,7 @@ export async function Encabezado() {
             <Logotipo />
           </Link>
           <nav className="hidden items-center gap-5 whitespace-nowrap text-sm text-texto-suave lg:flex">
-            <MenuLecturas etiqueta={t.nav.lecturas} grupos={grupos} items={items} />
+            <MenuLecturas etiqueta={t.nav.lecturas} idioma={idioma} items={items} />
             {directos.map((n) => (
               <Link key={n.href} href={n.href} className="enlace-nav transition hover:text-texto">
                 {n.etiqueta}
@@ -98,7 +98,7 @@ export async function Encabezado() {
               </Link>
             </div>
           )}
-          <MenuMovil etiquetaAbrir={t.nav.menu} etiquetaCerrar={t.comun.cerrar} grupos={grupos} items={items} enlaces={[...directos, ...enlacesCuenta]} salir={perfil ? t.comun.salir : undefined} />
+          <MenuMovil etiquetaAbrir={t.nav.menu} etiquetaCerrar={t.comun.cerrar} etiquetaLecturas={t.nav.lecturas} idioma={idioma} items={items} destacados={directos} enlaces={enlacesCuenta} salir={perfil ? t.comun.salir : undefined} />
         </div>
       </div>
     </header>
