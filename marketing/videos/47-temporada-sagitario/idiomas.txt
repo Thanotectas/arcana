@@ -1,0 +1,41 @@
+VIDEO 47 EN OTROS IDIOMAS · Voz de Sibila (ElevenLabs, Marcela, la misma configuración, modelo multilingüe)
+Genera UN audio por idioma con el texto de «VOZ» y nómbralo así: en.mp3, pt.mp3, fr.mp3, tr.mp3, ar.mp3, id.mp3, hi.mp3.
+El video, la música y los títulos los armo yo: cada idioma lleva sus títulos y la dirección de la página en su idioma.
+Los «…» son pausas: déjalos, sirven para cuadrar los títulos.
+
+==================== INGLÉS (en) · miarcana.com/en ====================
+VOZ:
+Today the Sun enters Sagittarius… and faith comes back. It's time to plan that trip, to say yes to something new, and to let go of what holds you back… And pay attention: on Tuesday, the full moon arrives… Ask me what this season brings you… at miarcana.com.
+TÍTULOS: TODAY · NOVEMBER 22 / Sagittarius season begins 🏹 · Faith returns ✨ / trips, yes to the new, and letting go · And pay attention… / Tuesday 24 · Full moon 🌕 · What will this season bring you? / miarcana.com/en
+
+==================== PORTUGUÉS (pt) · miarcana.com/pt ====================
+VOZ:
+Hoje o Sol entra em Sagitário… e com ele volta a fé. É hora de planejar aquela viagem, de dizer sim ao novo e de soltar o que te prende… E atenção: na terça-feira chega a lua cheia… Me pergunte o que esta temporada te traz… em miarcana.com.
+TÍTULOS: HOJE · 22 DE NOVEMBRO / Começa a temporada de Sagitário 🏹 · A fé volta ✨ / viagens, sim ao novo e soltar o que te prende · E atenção… / Terça, 24 · Lua cheia 🌕 · O que esta temporada te traz? / miarcana.com/pt
+
+==================== FRANCÉS (fr) · miarcana.com/fr ====================
+VOZ:
+Aujourd'hui, le Soleil entre en Sagittaire… et avec lui, la foi revient. C'est le moment de préparer ce voyage, de dire oui à la nouveauté et de lâcher ce qui te retient… Et attention : mardi, c'est la pleine lune… Demande-moi ce que cette saison t'apporte… sur miarcana.com.
+TÍTULOS: AUJOURD'HUI · 22 NOVEMBRE / La saison du Sagittaire commence 🏹 · La foi revient ✨ / voyages, oui à la nouveauté, lâcher prise · Et attention… / Mardi 24 · Pleine lune 🌕 · Que t'apporte cette saison ? / miarcana.com/fr
+
+==================== TURCO (tr) · miarcana.com/tr ====================
+VOZ:
+Bugün Güneş Yay burcuna giriyor… ve onunla birlikte inanç geri dönüyor. O yolculuğu planlamanın, yeniliklere evet demenin ve seni tutan şeyleri bırakmanın zamanı… Ve dikkat: salı günü dolunay geliyor… Bu dönemin sana neler getireceğini bana sor… miarcana.com'da.
+TÍTULOS: BUGÜN · 22 KASIM / Yay burcu sezonu başlıyor 🏹 · İnanç geri dönüyor ✨ / yolculuklar, yeniye evet, bırakmak · Ve dikkat… / Salı 24 · Dolunay 🌕 · Bu sezon sana ne getirecek? / miarcana.com/tr
+
+==================== ÁRABE (ar) · miarcana.com/ar ====================
+VOZ:
+اليوم تدخل الشمس برج القوس… ومعها يعود الإيمان. حان وقت التخطيط لتلك الرحلة، وقول نعم للجديد، والتخلّي عمّا يقيّدكم… وانتبهوا: يوم الثلاثاء يأتي البدر… اسألوني ماذا يحمل لكم هذا الموسم… على miarcana.com.
+TÍTULOS: اليوم · 22 نوفمبر / يبدأ موسم برج القوس 🏹 · يعود الإيمان ✨ / سفر، نعم للجديد، وتخلٍّ عمّا يقيّدك · وانتبهوا… / الثلاثاء 24 · البدر 🌕 · ماذا يحمل لك هذا الموسم؟ / miarcana.com/ar
+
+==================== INDONESIO (id) · miarcana.com/id ====================
+VOZ:
+Hari ini Matahari memasuki Sagitarius… dan bersamanya, keyakinan kembali. Saatnya merencanakan perjalanan itu, berkata ya pada hal baru, dan melepaskan yang mengikatmu… Dan ingat: hari Selasa datang bulan purnama… Tanyakan padaku apa yang dibawa musim ini untukmu… di miarcana.com.
+TÍTULOS: HARI INI · 22 NOVEMBER / Musim Sagitarius dimulai 🏹 · Keyakinan kembali ✨ / perjalanan, ya untuk hal baru, melepaskan · Dan ingat… / Selasa 24 · Bulan purnama 🌕 · Apa yang dibawa musim ini untukmu? / miarcana.com/id
+
+==================== HINDI (hi) · miarcana.com/hi ====================
+Ojo: en la astrología védica (la que se usa en India) el Sol entra en Dhanu (Sagitario) el 16 de diciembre, no hoy.
+Por eso la voz dice «según la astrología occidental», para que nadie lo corrija en los comentarios.
+VOZ:
+पश्चिमी ज्योतिष के अनुसार, आज सूर्य धनु राशि में प्रवेश कर रहा है… और इसके साथ विश्वास लौट आता है। यह उस यात्रा की योजना बनाने, नई चीज़ों को हाँ कहने और जो तुम्हें बाँधे हुए है उसे छोड़ने का समय है… और ध्यान दो: मंगलवार को पूर्णिमा आ रही है… मुझसे पूछो कि यह मौसम तुम्हारे लिए क्या लाया है… miarcana.com पर।
+TÍTULOS: आज · 22 नवंबर / पश्चिमी ज्योतिष में धनु का मौसम शुरू 🏹 · विश्वास लौटता है ✨ / यात्राएँ, नए को हाँ, और छोड़ना · और ध्यान दो… / मंगलवार 24 · पूर्णिमा 🌕 · यह मौसम तुम्हारे लिए क्या लाया है? / miarcana.com/hi
