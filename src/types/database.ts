@@ -606,6 +606,12 @@ export type Database = {
         Update: Partial<{ id: number; seq: number; evento: Json | null; actualizado_en: string }>;
         Relationships: [];
       };
+      en_vivo_sala: {
+        Row: { seq: number; idioma: string; estado: "generando" | "listo" | "error"; evento: Json | null; creado_en: string };
+        Insert: { seq: number; idioma: string; estado?: "generando" | "listo" | "error"; evento?: Json | null; creado_en?: string };
+        Update: Partial<{ seq: number; idioma: string; estado: "generando" | "listo" | "error"; evento: Json | null; creado_en: string }>;
+        Relationships: [];
+      };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
         Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en">;

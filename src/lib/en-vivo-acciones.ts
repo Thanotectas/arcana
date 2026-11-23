@@ -229,3 +229,36 @@ export async function accionPausa(_prev: EstadoEnVivo, formData: FormData): Prom
   if (error) return { error: error.message.includes("pausa_hasta") ? "Falta aplicar la migración 0045 (pausa del presentador)." : error.message };
   return { mensaje: !segundos ? "Sibila sigue leyendo." : segundos >= 3600 ? "Sibila espera en silencio hasta que toques «Reanudar»." : `Sibila espera en silencio ${segundos} segundos, después de la frase que está diciendo.` };
 }
+
+/** Lecturas que se pueden pedir desde la Sala de Sibila (las que no necesitan foto). */
+const TIPOS_SALA: TipoLectura[] = ["tarot", "carta", "sinastria", "numerologia", "aura", "horoscopo", "pendulo", "runas", "iching", "lenormand", "baraja", "chino"];
+
+export interface EstadoSalaPregunta {
+  /** ok, nombre, pregunta, fecha_carta, fecha_sinastria, sin_directo, limite, error: la sala lo dice en el idioma de cada persona. */
+  codigo?: string;
+  antes?: number;
+}
+
+/**
+ * Pregunta enviada desde la Sala de Sibila (miarcana.com/en-vivo): la persona elige en el menú qué lectura quiere
+ * y escribe su pregunta en su idioma; entra a la fila como las del chat (Sibila le responde en ese idioma).
+ */
+export async function accionPreguntaSala(_prev: EstadoSalaPregunta, formData: FormData): Promise<EstadoSalaPregunta> {
+  const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 40);
+  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
+  const elegido = String(formData.get("tipo") ?? "tarot") as TipoLectura;
+  const tipo = TIPOS_SALA.includes(elegido) ? elegido : "tarot";
+  if (nombre.length < 2) return { codigo: "nombre" };
+  if (pregunta.length < 6) return { codigo: "pregunta" };
+  if (faltaFecha(tipo, pregunta)) return { codigo: tipo === "carta" ? "fecha_carta" : "fecha_sinastria" };
+  const admin = getSupabaseAdmin();
+  if (!(await recibeConsultas(admin))) return { codigo: "sin_directo" };
+  const h = await headers();
+  const huella = huellaDe(h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida");
+  const { count } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("huella", huella).gte("creado_en", new Date(Date.now() - 3_600_000).toISOString());
+  if ((count ?? 0) >= POR_HORA) return { codigo: "limite" };
+  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina" as const, tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, huella });
+  if (error) return { codigo: "error" };
+  const { count: pendientes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
+  return { codigo: "ok", antes: Math.max(0, (pendientes ?? 1) - 1) };
+}
