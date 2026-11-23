@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { esIdioma, type Idioma } from "@/lib/i18n/idiomas";
 import { carpetaVoz, narrarGuion, traducirGuion } from "@/lib/voz-sibila";
+import { getUsuarioOpcional } from "@/lib/dal";
+import { esAdmin } from "@/lib/admin";
 
 export const maxDuration = 300;
 
@@ -15,13 +17,25 @@ function tokenValido(recibido: string | null) {
 }
 
 /**
+ * Sesión de administrador (la misma cookie de /admin). Solo desde una página de miarcana.com: el navegador manda el
+ * origen en todo POST, y uno de otro sitio no puede usar la cookie para gastar créditos de voz.
+ */
+async function adminDeLaPagina(request: NextRequest) {
+  const origen = request.headers.get("origin");
+  if (!origen || origen !== request.nextUrl.origin) return false;
+  const usuario = await getUsuarioOpcional().catch(() => null);
+  return esAdmin(usuario?.email);
+}
+
+/**
  * Voz de Sibila para otros asistentes (el que arma los videos): POST con «Authorization: Bearer <SIBILA_VOZ_TOKEN>» y
  * { "guion": "…en español…", "idiomas": ["es", "pt"], "nombre": "49 limpia" }. Devuelve, por idioma, el guion
- * traducido y la dirección del MP3. Sin SIBILA_VOZ_TOKEN en Vercel no responde.
+ * traducido y la dirección del MP3. También acepta la sesión de administrador desde una pestaña de miarcana.com
+ * (fetch con la cookie, sin clave).
  */
 export async function POST(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null;
-  if (!tokenValido(token)) return NextResponse.json({ error: "no_autorizado" }, { status: 401 });
+  if (!tokenValido(token) && !(await adminDeLaPagina(request))) return NextResponse.json({ error: "no_autorizado" }, { status: 401 });
   const cuerpo = (await request.json().catch(() => null)) as { guion?: string; idiomas?: string[]; nombre?: string } | null;
   const guion = String(cuerpo?.guion ?? "").trim();
   const idiomas = [...new Set((cuerpo?.idiomas ?? ["es"]).filter(esIdioma))].slice(0, 8) as Idioma[];
