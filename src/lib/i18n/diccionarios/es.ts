@@ -59,7 +59,7 @@ export const es = {
     rituales: "Rituales",
     lecturas: "Lecturas",
     explorar: "Explorar",
-    biblioteca: "Biblioteca",
+    biblioteca: "El Arcano",
     enVivo: "En vivo",
     menu: "Menú",
     creditos: "Créditos",

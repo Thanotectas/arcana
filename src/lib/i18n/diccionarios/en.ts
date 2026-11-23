@@ -60,7 +60,7 @@ export const en: Diccionario = {
     rituales: "Rituals",
     lecturas: "Readings",
     explorar: "Explore",
-    biblioteca: "Library",
+    biblioteca: "The Arcanum",
     enVivo: "Live",
     menu: "Menu",
     creditos: "Credits",

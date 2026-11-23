@@ -57,7 +57,7 @@ export const hi: Diccionario = {
     rituales: "अनुष्ठान",
     lecturas: "रीडिंग",
     explorar: "खोजें",
-    biblioteca: "लाइब्रेरी",
+    biblioteca: "रहस्य",
     enVivo: "लाइव",
     menu: "मेन्यू",
     creditos: "क्रेडिट",

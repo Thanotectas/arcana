@@ -57,7 +57,7 @@ export const ar: Diccionario = {
     rituales: "الطقوس",
     lecturas: "القراءات",
     explorar: "استكشاف",
-    biblioteca: "المكتبة",
+    biblioteca: "الأسرار",
     enVivo: "مباشر",
     menu: "القائمة",
     creditos: "النقاط",

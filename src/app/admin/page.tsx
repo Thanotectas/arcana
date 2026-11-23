@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2, MessageSquareHeart } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2, MessageSquareHeart, Mic } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
@@ -14,6 +14,7 @@ const HERRAMIENTAS = [
   { href: "/admin/redes", icono: Megaphone, titulo: "Agente de redes", texto: "Borradores semanales de Sibila para Instagram y Facebook: aprobar, editar, publicar." },
   { href: "/admin/hub", icono: Share2, titulo: "Hub de redes", texto: "miarcana.com/redes: clics hacia cada canal por origen, seguidores de cada red y enlaces con QR para cada sitio." },
   { href: "/admin/embajadores", icono: HandCoins, titulo: "Embajadores", texto: "Retiros de comisiones por pagar y quién trae más ventas con su enlace." },
+  { href: "/admin/voz", icono: Mic, titulo: "Voz de Sibila", texto: "Pega el guion de un video en español, elige los idiomas y descarga la voz de Sibila en cada uno (traducida y narrada con ElevenLabs)." },
   { href: "/admin/en-vivo", icono: Radio, titulo: "Sibila en vivo", texto: "Directos de YouTube: Sibila lee tarot, aura, numerología, horóscopo, tazas y manos en voz alta." },
   { href: "/admin/telegram", icono: Send, titulo: "Telegram", texto: "El bot de Sibila: responde dudas, manda la carta del día y la envía cada mañana a quien escribió /diaria." },
   { href: "/admin/whatsapp", icono: MessageCircle, titulo: "Atención", texto: "Preguntas de visitantes en el chat de la página (y el historial de WhatsApp, desactivado por Meta)." },

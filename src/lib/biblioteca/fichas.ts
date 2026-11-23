@@ -1,7 +1,7 @@
 import type { Idioma } from "@/lib/i18n/idiomas";
 
 /**
- * «Biblioteca de Sibila: tradiciones del mundo». Una ficha por práctica: su historia, cómo se hace, sus símbolos y
+ * «El Arcano de Sibila: saberes del mundo». Una ficha por práctica: su historia, cómo se hace, sus símbolos y
  * dónde se vive hoy. Se escribe desde adentro de la tradición, con respeto y con datos reales (con fuentes); lo que
  * no está documentado se cuenta como relato de la tradición, nunca como mito. Al final, la invitación a vivirla con
  * Sibila. Cada ficha tiene su texto por idioma; si falta uno, se muestra en español.

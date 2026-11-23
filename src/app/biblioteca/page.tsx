@@ -10,22 +10,22 @@ import { BIBLIOTECA, fichaEn } from "@/lib/biblioteca/fichas";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Biblioteca de Sibila: tradiciones del mundo",
+    title: "El Arcano de Sibila: saberes del mundo",
     description: "La historia, los símbolos y la forma de practicar cada tradición: la lectura del café, el tarot, la limpia con huevo, el kundli, las runas y muchas más.",
     alternates: alternativas("/biblioteca", await getIdioma()),
   };
 }
 
-/** Portada de la Biblioteca de Sibila: una ficha por práctica, la más reciente primero. */
+/** Portada del Arcano de Sibila: una ficha por práctica, la más reciente primero. */
 export default async function PaginaBiblioteca() {
   const idioma = await getIdioma();
   const entradas = [...BIBLIOTECA].sort((a, b) => b.publicada.localeCompare(a.publicada));
   return (
     <div className="mx-auto max-w-4xl space-y-10">
-      <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "Biblioteca de Sibila", href: "/biblioteca" }]} />
+      <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "El Arcano de Sibila", href: "/biblioteca" }]} />
       <header className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Tradiciones del mundo</p>
-        <h1 className="font-display text-4xl font-semibold sm:text-5xl">Biblioteca de Sibila</h1>
+        <h1 className="font-display text-4xl font-semibold sm:text-5xl">El Arcano de Sibila</h1>
         <p className="mx-auto mt-3 max-w-2xl text-texto-suave">
           Cada práctica tiene una historia, un lenguaje y una forma de vivirse. Aquí guardamos la de cada una: de dónde viene,
           cómo se hace y qué dicen sus símbolos. Una nueva tradición cada día.

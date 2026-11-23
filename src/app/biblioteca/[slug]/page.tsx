@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: f.titulo, description: f.descripcion, alternates: alternativas(`/biblioteca/${e.slug}`, idioma), openGraph: { type: "article", title: f.titulo, description: f.descripcion } };
 }
 
-/** Una ficha de la Biblioteca de Sibila: historia, práctica, símbolos, preguntas, fuentes y la lectura con Sibila. */
+/** Una ficha del Arcano de Sibila: historia, práctica, símbolos, preguntas, fuentes y la lectura con Sibila. */
 export default async function PaginaFicha({ params }: { params: Promise<{ slug: string }> }) {
   const e = entradaPorSlug((await params).slug);
   if (!e) notFound();
@@ -29,10 +29,10 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
   return (
     <article className="mx-auto max-w-3xl space-y-10">
       <JsonLd datos={{ "@context": "https://schema.org", "@type": "Article", headline: f.titulo, description: f.descripcion, datePublished: e.publicada, inLanguage: idioma, mainEntityOfPage: url, author: { "@type": "Organization", name: "Arcana" }, publisher: { "@type": "Organization", name: "Arcana" } }} />
-      <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "Biblioteca de Sibila", href: "/biblioteca" }, { nombre: f.titulo, href: `/biblioteca/${e.slug}` }]} />
+      <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "El Arcano de Sibila", href: "/biblioteca" }, { nombre: f.titulo, href: `/biblioteca/${e.slug}` }]} />
       <header className="space-y-3 text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">
-          <Link href="/biblioteca" className="hover:text-texto">Biblioteca de Sibila</Link>
+          <Link href="/biblioteca" className="hover:text-texto">El Arcano de Sibila</Link>
         </p>
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{f.titulo}</h1>
         <p className="text-sm text-oro-suave">{f.nombres}</p>

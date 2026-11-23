@@ -57,7 +57,7 @@ export const pt: Diccionario = {
     rituales: "Rituais",
     lecturas: "Leituras",
     explorar: "Explorar",
-    biblioteca: "Biblioteca",
+    biblioteca: "O Arcano",
     enVivo: "Ao vivo",
     menu: "Menu",
     creditos: "Créditos",

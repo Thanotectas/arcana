@@ -25,7 +25,7 @@ export default async function PaginaExplorar() {
       {idioma === "es" && (
         <Link href="/biblioteca" className="tarjeta flex items-center justify-between gap-4 border-violeta/40 p-5 transition hover:border-oro">
           <span>
-            <span className="font-display block text-2xl">Biblioteca de Sibila</span>
+            <span className="font-display block text-2xl">El Arcano de Sibila</span>
             <span className="text-sm text-texto-suave">La historia, los símbolos y la forma de practicar cada tradición del mundo.</span>
           </span>
           <span className="text-oro-suave">Entrar →</span>
