@@ -1183,7 +1183,7 @@ export const fr: Diccionario = {
   explorar: {
     seccion: "Tout ce que tu peux consulter",
     titulo: "Explore Arcana",
-    intro: "Dix-huit façons de te regarder. Commence par celle qui t'appelle et laisse Sibila relier les autres : chaque lecture se souvient des précédentes.",
+    intro: "Plus de 40 façons de te regarder, issues des traditions du monde entier. Commence par celle qui t'appelle et laisse Sibila relier les autres : chaque lecture se souvient des précédentes.",
     grupos: { oraculos: "Des questions au hasard sacré : cartes, pièces, rêves et la tasse.", cielo: "Ce que dit le ciel de ta naissance et celui d'aujourd'hui.", pareja: "Deux personnes face à face, par les signes ou par les thèmes complets.", profundo: "Les lectures qui en combinent plusieurs ou qui demandent ta photo." },
     abrir: "Ouvrir",
     ctaTitulo: "Commence gratuitement",

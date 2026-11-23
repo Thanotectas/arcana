@@ -1184,7 +1184,7 @@ export const en: Diccionario = {
   explorar: {
     seccion: "Everything you can consult",
     titulo: "Explore Arcana",
-    intro: "Eighteen ways to look at yourself. Start with the one that calls you and let Sibila connect the rest: every reading remembers the previous ones.",
+    intro: "More than 40 ways to look at yourself, from traditions all over the world. Start with the one that calls you and let Sibila connect the rest: every reading remembers the previous ones.",
     grupos: { oraculos: "Questions to sacred chance: cards, coins, dreams and the cup.", cielo: "What the sky of your birth and today's sky say.", pareja: "Two people face to face, by signs or by complete charts.", profundo: "The readings that combine systems or need your photo." },
     abrir: "Open",
     ctaTitulo: "Start for free",

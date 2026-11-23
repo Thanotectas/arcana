@@ -1181,7 +1181,7 @@ export const pt: Diccionario = {
   explorar: {
     seccion: "Tudo o que você pode consultar",
     titulo: "Explore a Arcana",
-    intro: "Dezoito maneiras de se olhar. Comece pela que te chamar e deixe Sibila conectar as outras: cada leitura lembra as anteriores.",
+    intro: "Mais de 40 maneiras de se olhar, de tradições do mundo todo. Comece pela que te chamar e deixe Sibila conectar as outras: cada leitura lembra as anteriores.",
     grupos: { oraculos: "Perguntas ao acaso sagrado: cartas, moedas, sonhos e a xícara.", cielo: "O que diz o céu do seu nascimento e o de hoje.", pareja: "Duas pessoas frente a frente, por signos ou por mapas completos.", profundo: "As leituras que combinam sistemas ou precisam da sua foto." },
     abrir: "Abrir",
     ctaTitulo: "Comece grátis",

@@ -33,6 +33,7 @@ export default async function PaginaExplorar() {
           costoTexto: i.costoTexto,
           gratis: i.costo === null || i.costo === 0,
           destacado: Boolean(i.destacadoEn?.includes(idioma)),
+          deOtroMercado: Boolean(i.destacadoEn?.length && !i.destacadoEn.includes(idioma)),
         }))}
       />
       {!usuario && (

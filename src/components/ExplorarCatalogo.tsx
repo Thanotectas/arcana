@@ -18,6 +18,8 @@ export interface ItemExplorar {
   costoTexto: string;
   gratis: boolean;
   destacado: boolean;
+  /** Producto propio de otra cultura (kundli para quien está en español): la guía no lo recomienda primero. */
+  deOtroMercado: boolean;
 }
 
 type Vista = "necesidad" | "practica" | "origen" | "gratis" | "todo";
@@ -157,6 +159,7 @@ function Guia({ items, idioma }: { items: ItemExplorar[]; idioma: Idioma }) {
         if (sirve.includes(e.practica)) puntos += 2;
         if (aMano === "nada" && i.gratis) puntos += 2;
         if (i.destacado) puntos += 1;
+        if (i.deOtroMercado) puntos -= 3;
         return { i, puntos };
       })
       .filter((x) => x.puntos >= 4)

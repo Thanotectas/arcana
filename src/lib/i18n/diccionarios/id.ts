@@ -1181,7 +1181,7 @@ export const id: Diccionario = {
   explorar: {
     seccion: "Semua yang bisa kamu tanyakan",
     titulo: "Jelajahi Arcana",
-    intro: "Delapan belas cara untuk melihat dirimu. Mulailah dari yang paling memanggilmu dan biarkan Sibila menghubungkan sisanya: setiap bacaan mengingat bacaan sebelumnya.",
+    intro: "Lebih dari 40 cara untuk melihat dirimu, dari tradisi di seluruh dunia. Mulailah dari yang paling memanggilmu dan biarkan Sibila menghubungkan sisanya: setiap bacaan mengingat bacaan sebelumnya.",
     grupos: { oraculos: "Pertanyaan untuk kebetulan yang sakral: kartu, koin, mimpi, dan cangkir.", cielo: "Apa kata langit kelahiranmu dan langit hari ini.", pareja: "Dua orang berhadapan, lewat zodiak atau peta lengkap.", profundo: "Bacaan yang memadukan beberapa sistem atau membutuhkan fotomu." },
     abrir: "Buka",
     ctaTitulo: "Mulai gratis",

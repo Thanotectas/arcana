@@ -1183,7 +1183,7 @@ export const es = {
   explorar: {
     seccion: "Todo lo que puedes consultar",
     titulo: "Explora Arcana",
-    intro: "Dieciocho maneras de mirarte. Empieza por la que te llame y deja que Sibila conecte las demás: cada lectura recuerda las anteriores.",
+    intro: "Más de 40 maneras de mirarte, de todas las tradiciones del mundo. Empieza por la que te llame y deja que Sibila conecte las demás: cada lectura recuerda las anteriores.",
     grupos: { oraculos: "Preguntas al azar sagrado: cartas, monedas, sueños y la taza.", cielo: "Lo que dice el cielo de tu nacimiento y el de hoy.", pareja: "Dos personas frente a frente, por signos o por cartas completas.", profundo: "Las lecturas que combinan o que requieren tu foto." },
     abrir: "Abrir",
     ctaTitulo: "Empieza gratis",

@@ -1183,7 +1183,7 @@ export const tr: Diccionario = {
   explorar: {
     seccion: "Danışabileceğin her şey",
     titulo: "Arcana'yı keşfet",
-    intro: "Kendine bakmanın on sekiz yolu. Seni çağırandan başla, gerisini Sibila bağlasın: her fal öncekileri hatırlar.",
+    intro: "Dünyanın dört bir yanındaki geleneklerden, kendine bakmanın 40'tan fazla yolu. Seni çağırandan başla, gerisini Sibila bağlasın: her fal öncekileri hatırlar.",
     grupos: { oraculos: "Kutsal tesadüfe sorular: kartlar, paralar, rüyalar ve fincan.", cielo: "Doğduğun anın gökyüzü ve bugünün gökyüzü ne söylüyor.", pareja: "İki kişi karşı karşıya; burçlarla ya da eksiksiz haritalarla.", profundo: "Sistemleri birleştiren ya da fotoğrafını isteyen fallar." },
     abrir: "Aç",
     ctaTitulo: "Ücretsiz başla",
