@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { EVENTO_ABRIR_SIBILA } from "@/lib/eventos";
 import Link from "next/link";
 import { Send, Sparkles, X } from "lucide-react";
 import { Markdown } from "./Markdown";
@@ -57,6 +58,20 @@ export function ChatVisitante({ nombre, tope }: { nombre: string; tope: number }
       .then((d: { restantes: number } | null) => setRestantes(d ? d.restantes : tope))
       .catch(() => setRestantes(tope));
   }
+
+  // Otras partes de la página (la guía de /explorar) abren el chat con un mensaje ya escrito.
+  const abrirDesdeFuera = useRef<(texto?: string) => void>(() => {});
+  useEffect(() => {
+    abrirDesdeFuera.current = (texto) => {
+      if (!abierto) alternar();
+      if (texto) setTexto(texto);
+    };
+  });
+  useEffect(() => {
+    const abrir = (e: Event) => abrirDesdeFuera.current((e as CustomEvent<{ texto?: string }>).detail?.texto);
+    window.addEventListener(EVENTO_ABRIR_SIBILA, abrir);
+    return () => window.removeEventListener(EVENTO_ABRIR_SIBILA, abrir);
+  }, []);
 
   useEffect(() => {
     if (abierto) fin.current?.scrollIntoView({ block: "end" });

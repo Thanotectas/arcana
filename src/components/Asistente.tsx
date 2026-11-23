@@ -1,5 +1,6 @@
 "use client";
 
+import { EVENTO_ABRIR_SIBILA } from "@/lib/eventos";
 import { useEffect, useRef, useState } from "react";
 import { BotonVoz } from "./BotonVoz";
 import Link from "next/link";
@@ -34,6 +35,17 @@ export function Asistente({ nombre, gratisPorDia, circuloPorDia, costo, enCircul
   const [error, setError] = useState<string | null>(null);
   const [hoy, setHoy] = useState(usadosHoy);
   const fin = useRef<HTMLDivElement>(null);
+
+  // Otras partes de la página (la guía de /explorar) abren el chat con un mensaje ya escrito.
+  useEffect(() => {
+    const abrir = (e: Event) => {
+      setAbierto(true);
+      const texto = (e as CustomEvent<{ texto?: string }>).detail?.texto;
+      if (texto) setTexto(texto);
+    };
+    window.addEventListener(EVENTO_ABRIR_SIBILA, abrir);
+    return () => window.removeEventListener(EVENTO_ABRIR_SIBILA, abrir);
+  }, []);
 
   useEffect(() => {
     if (!abierto || cargado) return;

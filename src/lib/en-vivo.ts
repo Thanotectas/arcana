@@ -1,6 +1,6 @@
 import "server-only";
 import { manual } from "@/lib/conocimiento";
-import { esIdioma } from "@/lib/i18n/idiomas";
+import { IDIOMA_PARA_IA, esIdioma } from "@/lib/i18n/idiomas";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -271,6 +271,15 @@ export type TipoLectura = PreguntaEnVivo["tipo"];
 export function faltaFecha(tipo: string, texto: string | null) {
   const n = tipo === "carta" ? 1 : tipo === "sinastria" ? 2 : 0;
   return n > 0 && fechasEn((texto ?? "").toLowerCase()).length < n;
+}
+/**
+ * Idioma elegido en la Sala de Sibila: la pregunta llega con la marca «[idioma:fr] …» (los datos van en español para
+ * que se reconozcan las fechas). La marca manda sobre lo que se adivine por las palabras, y no se muestra.
+ */
+export function conIdioma<T extends { texto: string }>(q: T): { q: T; idioma: { codigo: string; nombre: string } | null } {
+  const m = /^\[idioma:([a-z]{2})\]\s*/.exec(q.texto ?? "");
+  if (!m || !esIdioma(m[1])) return { q, idioma: null };
+  return { q: { ...q, texto: q.texto.slice(m[0].length) }, idioma: m[1] === "es" ? null : { codigo: m[1], nombre: IDIOMA_PARA_IA[m[1]] } };
 }
 /** Marca de la limpia con huevo guardada como «chocolate» cuando falta la migración 0043. */
 export const MARCA_HUEVO = "[huevo] ";
@@ -592,7 +601,8 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
 
     const signo = p.signo ? SIGNOS.find((s) => s.id === p.signo) ?? null : null;
     try {
-      const q = normalizar(p);
+      const marcada = conIdioma(normalizar(p));
+      const q = marcada.q;
       const prep = await preparar(admin, q, signo);
       // Para que no suene automático: cómo empezaron y cerraron las últimas lecturas de la noche.
       const { data: previas } = await admin.from("en_vivo_preguntas").select("lectura").eq("estado", "leida").gte("leida_en", inicioDia.toISOString()).order("leida_en", { ascending: false }).limit(8);
@@ -617,7 +627,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
           ? `${prep.sistema}${forma}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : `${prep.sistema}${forma}`;
       // El idioma de la pregunta manda sobre el contexto en español.
-      const otroIdioma = p.origen === "sistema" ? null : idiomaDeTexto(p.texto ?? "");
+      const otroIdioma = p.origen === "sistema" ? null : (marcada.idioma ?? idiomaDeTexto(q.texto ?? ""));
       const sistemaFinal = otroIdioma
         ? `${sistema}\nIDIOMA: la persona escribió en ${otroIdioma.nombre}. Toda la lectura, de la primera a la última palabra, va en ${otroIdioma.nombre}, aunque el contexto, las cartas y las notas lleguen en español: tradúcelo todo (nombres de cartas y signos con su nombre tradicional en ese idioma). Solo la línea «COLOR:» va en español.`
         : sistema;

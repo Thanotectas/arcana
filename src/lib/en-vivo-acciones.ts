@@ -12,6 +12,8 @@ import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, faltaFecha, tipoDeMensaje, 
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 import { diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 import { pedirJuego } from "@/lib/en-vivo-juego";
+import { signoPorFecha } from "@/lib/zodiaco";
+import { esIdioma } from "@/lib/i18n/idiomas";
 
 export interface EstadoEnVivo {
   error?: string;
@@ -244,20 +246,54 @@ export interface EstadoSalaPregunta {
  * y escribe su pregunta en su idioma; entra a la fila como las del chat (Sibila le responde en ese idioma).
  */
 export async function accionPreguntaSala(_prev: EstadoSalaPregunta, formData: FormData): Promise<EstadoSalaPregunta> {
-  const nombre = String(formData.get("nombre") ?? "").trim().slice(0, 40);
-  const pregunta = String(formData.get("pregunta") ?? "").trim().slice(0, 300);
-  const elegido = String(formData.get("tipo") ?? "tarot") as TipoLectura;
+  const campo = (n: string, max = 120) => String(formData.get(n) ?? "").trim().slice(0, max);
+  const nombre = campo("nombre", 40);
+  const pregunta = campo("pregunta", 300);
+  const elegido = campo("tipo") as TipoLectura;
   const tipo = TIPOS_SALA.includes(elegido) ? elegido : "tarot";
+  const idioma = campo("idioma", 2);
   if (nombre.length < 2) return { codigo: "nombre" };
-  if (pregunta.length < 6) return { codigo: "pregunta" };
-  if (faltaFecha(tipo, pregunta)) return { codigo: tipo === "carta" ? "fecha_carta" : "fecha_sinastria" };
+  // Los datos de cada lectura llegan en campos aparte (fecha, hora, ciudad…) y se arman como los escribiría el chat.
+  const fecha = (n: string) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(campo(n, 10));
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : "";
+  };
+  let texto = pregunta;
+  if (tipo === "carta") {
+    const f = fecha("fecha");
+    if (!f) return { codigo: "fecha_carta" };
+    const hora = /^\d{2}:\d{2}$/.test(campo("hora", 5)) ? campo("hora", 5) : "sin hora";
+    texto = `carta astral ${f} ${hora} ${campo("ciudad", 80)}. ${pregunta}`;
+  } else if (tipo === "sinastria") {
+    const a = fecha("fecha");
+    const b = fecha("fecha2");
+    if (!a || !b) return { codigo: "fecha_sinastria" };
+    texto = `sinastría ${a} y ${b}${campo("pareja", 40) ? ` (con ${campo("pareja", 40)})` : ""}. ${pregunta}`;
+  } else if (tipo === "numerologia") {
+    const f = fecha("fecha");
+    if (!f) return { codigo: "fecha_carta" };
+    texto = `numerología ${campo("completo", 80) || nombre} ${f}. ${pregunta}`;
+  } else if (tipo === "chino") {
+    const f = fecha("fecha");
+    if (!f) return { codigo: "fecha_carta" };
+    texto = `horóscopo chino ${f}. ${pregunta}`;
+  } else if (tipo === "horoscopo") {
+    const f = fecha("fecha");
+    const signo = f ? signoPorFecha(Number(f.slice(3, 5)), Number(f.slice(0, 2))) : null;
+    if (!signo) return { codigo: "fecha_carta" };
+    texto = `horóscopo ${signo.nombre}. ${pregunta}`;
+  } else if (pregunta.length < 6) return { codigo: "pregunta" };
+  texto = texto.replace(/\s+/g, " ").replace(/\.\s*$/, "").trim();
+  if (faltaFecha(tipo, texto)) return { codigo: tipo === "carta" ? "fecha_carta" : "fecha_sinastria" };
+  // El idioma elegido en la sala manda: Sibila lee en ese idioma aunque los datos vayan en español.
+  if (esIdioma(idioma) && idioma !== "es") texto = `[idioma:${idioma}] ${texto}`;
   const admin = getSupabaseAdmin();
   if (!(await recibeConsultas(admin))) return { codigo: "sin_directo" };
   const h = await headers();
   const huella = huellaDe(h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocida");
   const { count } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("huella", huella).gte("creado_en", new Date(Date.now() - 3_600_000).toISOString());
   if ((count ?? 0) >= POR_HORA) return { codigo: "limite" };
-  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina" as const, tipo, autor: nombre, texto: pregunta, signo: detectarSigno(pregunta)?.id ?? null, huella });
+  const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "pagina" as const, tipo, autor: nombre, texto, signo: detectarSigno(texto)?.id ?? null, huella });
   if (error) return { codigo: "error" };
   const { count: pendientes } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).eq("estado", "pendiente");
   return { codigo: "ok", antes: Math.max(0, (pendientes ?? 1) - 1) };

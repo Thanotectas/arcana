@@ -238,7 +238,7 @@ export function SalaEnVivo({ idiomaInicial, productos, verTodo, proximo }: { idi
         </section>
       )}
 
-      <FormularioSala t={t} />
+      <FormularioSala t={t} idioma={idioma} />
 
       <section className="space-y-4">
         <div>
@@ -262,9 +262,11 @@ export function SalaEnVivo({ idiomaInicial, productos, verTodo, proximo }: { idi
   );
 }
 
-function FormularioSala({ t }: { t: TextosSala }) {
+function FormularioSala({ t, idioma }: { t: TextosSala; idioma: Idioma }) {
   const [tipo, setTipo] = useState<keyof TextosSala["tipos"]>("tarot");
   const [estado, enviar, enviando] = useActionState<EstadoSalaPregunta, FormData>(accionPreguntaSala, {});
+  // Estas lecturas se hacen con la fecha de nacimiento: la pregunta queda opcional.
+  const conFecha = ["carta", "sinastria", "numerologia", "horoscopo", "chino"].includes(tipo);
   const mensaje =
     estado.codigo === "ok"
       ? estado.antes
@@ -289,10 +291,47 @@ function FormularioSala({ t }: { t: TextosSala }) {
             ))}
           </select>
         </label>
+        <input type="hidden" name="idioma" value={idioma} />
+        <p className="rounded-xl border border-oro/30 bg-oro/5 p-3 text-sm sm:col-span-2">💡 {t.pistas[tipo]}</p>
+        {conFecha && (
+          <label className="space-y-1 text-sm">
+            <span className="text-texto-suave">{t.campos.fecha}</span>
+            <input name="fecha" type="date" required className="campo w-full" min="1900-01-01" />
+          </label>
+        )}
+        {tipo === "carta" && (
+          <>
+            <label className="space-y-1 text-sm">
+              <span className="text-texto-suave">{t.campos.hora}</span>
+              <input name="hora" type="time" className="campo w-full" />
+            </label>
+            <label className="space-y-1 text-sm sm:col-span-2">
+              <span className="text-texto-suave">{t.campos.ciudad}</span>
+              <input name="ciudad" required maxLength={80} className="campo w-full" />
+            </label>
+          </>
+        )}
+        {tipo === "sinastria" && (
+          <>
+            <label className="space-y-1 text-sm">
+              <span className="text-texto-suave">{t.campos.fecha2}</span>
+              <input name="fecha2" type="date" required className="campo w-full" min="1900-01-01" />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="text-texto-suave">{t.campos.pareja}</span>
+              <input name="pareja" maxLength={40} className="campo w-full" />
+            </label>
+          </>
+        )}
+        {tipo === "numerologia" && (
+          <label className="space-y-1 text-sm">
+            <span className="text-texto-suave">{t.campos.completo}</span>
+            <input name="completo" required maxLength={80} className="campo w-full" autoComplete="name" />
+          </label>
+        )}
         <label className="space-y-1 text-sm sm:col-span-2">
-          <span className="text-texto-suave">{t.pregunta}</span>
-          <textarea name="pregunta" required maxLength={300} rows={3} className="campo w-full" />
-          {(tipo === "carta" || tipo === "sinastria") && <span className="block text-xs text-oro-suave">{tipo === "carta" ? t.ayudaCarta : t.ayudaSinastria}</span>}
+          <span className="text-texto-suave">{conFecha ? t.campos.preguntaOpcional : t.pregunta}</span>
+          <textarea name="pregunta" required={!conFecha} minLength={conFecha ? undefined : 6} maxLength={300} rows={3} className="campo w-full" />
         </label>
         <label className="flex items-start gap-2 text-sm sm:col-span-2">
           <input type="checkbox" name="acepto" required className="mt-1" />

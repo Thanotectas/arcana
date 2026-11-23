@@ -606,6 +606,12 @@ export type Database = {
         Update: Partial<{ id: number; seq: number; evento: Json | null; actualizado_en: string }>;
         Relationships: [];
       };
+      sugerencias_practicas: {
+        Row: { id: number; texto: string; correo: string | null; idioma: string; usuario_id: string | null; huella: string | null; revisada: boolean; creado_en: string };
+        Insert: { id?: number; texto: string; correo?: string | null; idioma?: string; usuario_id?: string | null; huella?: string | null; revisada?: boolean; creado_en?: string };
+        Update: Partial<{ texto: string; correo: string | null; idioma: string; usuario_id: string | null; huella: string | null; revisada: boolean }>;
+        Relationships: [];
+      };
       en_vivo_sala: {
         Row: { seq: number; idioma: string; estado: "generando" | "listo" | "error"; evento: Json | null; creado_en: string };
         Insert: { seq: number; idioma: string; estado?: "generando" | "listo" | "error"; evento?: Json | null; creado_en?: string };
