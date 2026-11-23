@@ -84,12 +84,13 @@ async function traducir(texto: string, cartas: CartaSala[] | null, idioma: Idiom
   };
 }
 
-/** Sube el audio al bucket público y devuelve su dirección. */
+/** Sube el audio al bucket y devuelve la dirección por la que lo sirve Vercel. */
 async function subirAudio(admin: Admin, seq: number, idioma: Idioma, audio: Buffer) {
   const ruta = `en-vivo/sala/${seq}-${idioma}.mp3`;
   const { error } = await admin.storage.from(BUCKET_FOTOS).upload(ruta, audio, { contentType: "audio/mpeg", cacheControl: "86400", upsert: true });
   if (error) throw new Error(`audio: ${error.message}`);
-  return admin.storage.from(BUCKET_FOTOS).getPublicUrl(ruta).data.publicUrl;
+  // Se sirve por Vercel (con caché) y no directo desde Supabase, para no gastar su transferencia.
+  return `/api/en-vivo/sala/audio/${seq}-${idioma}.mp3`;
 }
 
 /** Texto hablado + audio en el idioma pedido. Si el original ya está en ese idioma, se usa su propio audio. */
