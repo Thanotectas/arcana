@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useCallback, useEffect, useRef, useState } from "react";
-import { IDIOMAS, NOMBRES_IDIOMA, type Idioma } from "@/lib/i18n/idiomas";
+import { IDIOMAS, LOCALE_INTL, NOMBRES_IDIOMA, type Idioma } from "@/lib/i18n/idiomas";
 import { TEXTOS_SALA, type TextosSala } from "@/lib/en-vivo-sala-textos";
 import { accionPreguntaSala, type EstadoSalaPregunta } from "@/lib/en-vivo-acciones";
 import type { EstadoSala, EventoSala } from "@/lib/en-vivo-sala";
@@ -22,7 +22,7 @@ const frasesDe = (texto: string) => texto.match(/[^.!?¿¡。]+[.!?。]+|[^.!?�
  * pide su lectura desde el menú y ve los productos de Arcana. La página pregunta cada segundo por el paso actual
  * (/api/en-vivo/sala); cada paso se reproduce una vez, en orden.
  */
-export function SalaEnVivo({ idiomaInicial, productos, verTodo }: { idiomaInicial: Idioma; productos: ProductoSala[]; verTodo: string }) {
+export function SalaEnVivo({ idiomaInicial, productos, verTodo, proximo }: { idiomaInicial: Idioma; productos: ProductoSala[]; verTodo: string; proximo: string | null }) {
   const [idioma, setIdioma] = useState<Idioma>(idiomaInicial);
   const t: TextosSala = TEXTOS_SALA[idioma];
   const [sonido, setSonido] = useState(false);
@@ -178,6 +178,11 @@ export function SalaEnVivo({ idiomaInicial, productos, verTodo }: { idiomaInicia
       {activo === false && !lectura ? (
         <section className="tarjeta p-6 text-center">
           <h2 className="font-display text-3xl">{t.noEnVivo}</h2>
+          {proximo && (
+            <p className="mt-3 text-lg">
+              {t.proximo}: <strong className="text-oro-suave" suppressHydrationWarning>{new Intl.DateTimeFormat(LOCALE_INTL[idioma], { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(new Date(proximo))}</strong>
+            </p>
+          )}
           <p className="mt-2 text-texto-suave">{t.noEnVivoTexto}</p>
         </section>
       ) : (

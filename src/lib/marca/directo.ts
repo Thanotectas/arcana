@@ -5,14 +5,14 @@
  * código de la noche (null si no hay oferta).
  */
 export const PROXIMO_DIRECTO = {
-  inicio: "2026-11-15T20:00:00-05:00",
-  fin: "2026-11-15T21:00:00-05:00",
+  inicio: "2026-11-28T20:00:00-05:00",
+  fin: "2026-11-28T22:00:00-05:00",
   // Enlace del canal en vivo: siempre lleva al directo activo, aunque haya que crear otra emisión.
   url: "https://www.youtube.com/@miarcana/live",
   // Emisión programada en YouTube Studio: antes del directo muestra la cuenta regresiva y el botón «Notificarme».
   // Emisión programada en YouTube Studio (null: el botón lleva al canal en vivo). Al programarla, pegar aquí su enlace.
-  emision: "https://youtube.com/live/4MOgSv2TN_4" as string | null,
-  codigo: { codigo: "SIBILA", creditosExtra: 2 } as { codigo: string; creditosExtra: number } | null,
+  emision: null as string | null,
+  codigo: null as { codigo: string; creditosExtra: number } | null,
   video: "directo",
 };
 

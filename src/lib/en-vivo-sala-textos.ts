@@ -7,6 +7,8 @@ export interface TextosSala {
   enVivo: string;
   noEnVivo: string;
   noEnVivoTexto: string;
+  /** «Próximo directo»: la fecha va en la hora local de quien mira. */
+  proximo: string;
   escuchar: string;
   idioma: string;
   traduciendo: string;
@@ -39,6 +41,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "EN VIVO",
     noEnVivo: "Sibila no está en vivo ahora",
     noEnVivoTexto: "Vuelve durante el próximo directo. Mientras tanto, Sibila te lee cuando quieras en la página.",
+    proximo: "Próximo directo",
     escuchar: "🔊 Escuchar a Sibila",
     idioma: "Idioma",
     traduciendo: "Sibila está preparando su voz en tu idioma…",
@@ -77,6 +80,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "LIVE",
     noEnVivo: "Sibila isn't live right now",
     noEnVivoTexto: "Come back during the next live. Meanwhile, Sibila can read for you anytime on the site.",
+    proximo: "Next live",
     escuchar: "🔊 Listen to Sibila",
     idioma: "Language",
     traduciendo: "Sibila is preparing her voice in your language…",
@@ -115,6 +119,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "AO VIVO",
     noEnVivo: "A Sibila não está ao vivo agora",
     noEnVivoTexto: "Volte durante a próxima live. Enquanto isso, a Sibila lê para você quando quiser no site.",
+    proximo: "Próxima live",
     escuchar: "🔊 Ouvir a Sibila",
     idioma: "Idioma",
     traduciendo: "A Sibila está preparando a voz no seu idioma…",
@@ -153,6 +158,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "EN DIRECT",
     noEnVivo: "Sibila n'est pas en direct pour le moment",
     noEnVivoTexto: "Reviens pendant le prochain live. En attendant, Sibila te lit quand tu veux sur le site.",
+    proximo: "Prochain live",
     escuchar: "🔊 Écouter Sibila",
     idioma: "Langue",
     traduciendo: "Sibila prépare sa voix dans ta langue…",
@@ -191,6 +197,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "CANLI",
     noEnVivo: "Sibila şu anda canlı yayında değil",
     noEnVivoTexto: "Bir sonraki yayında tekrar gel. Bu arada Sibila sitede istediğin zaman sana bakar.",
+    proximo: "Sonraki canlı yayın",
     escuchar: "🔊 Sibila'yı dinle",
     idioma: "Dil",
     traduciendo: "Sibila sesini senin dilinde hazırlıyor…",
@@ -229,6 +236,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "مباشر",
     noEnVivo: "سيبيلا ليست في بث مباشر الآن",
     noEnVivoTexto: "عُد خلال البث القادم. وفي الأثناء، تقرأ لك سيبيلا متى شئت على الموقع.",
+    proximo: "البث القادم",
     escuchar: "🔊 استمع إلى سيبيلا",
     idioma: "اللغة",
     traduciendo: "سيبيلا تجهّز صوتها بلغتك…",
@@ -267,6 +275,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "LIVE",
     noEnVivo: "Sibila sedang tidak siaran langsung",
     noEnVivoTexto: "Kembali saat siaran berikutnya. Sementara itu, Sibila bisa membacakan untukmu kapan saja di situs.",
+    proximo: "Siaran berikutnya",
     escuchar: "🔊 Dengarkan Sibila",
     idioma: "Bahasa",
     traduciendo: "Sibila sedang menyiapkan suaranya dalam bahasamu…",
@@ -305,6 +314,7 @@ export const TEXTOS_SALA: Record<Idioma, TextosSala> = {
     enVivo: "लाइव",
     noEnVivo: "सिबिला अभी लाइव नहीं हैं",
     noEnVivoTexto: "अगले लाइव में फिर आइए। तब तक सिबिला वेबसाइट पर कभी भी आपकी रीडिंग कर सकती हैं।",
+    proximo: "अगला लाइव",
     escuchar: "🔊 सिबिला को सुनें",
     idioma: "भाषा",
     traduciendo: "सिबिला आपकी भाषा में अपनी आवाज़ तैयार कर रही हैं…",

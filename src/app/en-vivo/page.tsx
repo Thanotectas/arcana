@@ -4,6 +4,7 @@ import { alternativas, rutaIdioma } from "@/lib/i18n/rutas";
 import { catalogoConTextos } from "@/lib/catalogo";
 import { TEXTOS_SALA } from "@/lib/en-vivo-sala-textos";
 import { SalaEnVivo } from "@/components/SalaEnVivo";
+import { PROXIMO_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
 
 export const dynamic = "force-dynamic";
 
@@ -20,5 +21,5 @@ export default async function PaginaSala() {
     .filter((p) => p.clave !== "hoy")
     .slice(0, 8)
     .map((p) => ({ clave: p.clave, nombre: p.nombre, descripcion: p.descripcion, href: rutaIdioma(p.href, idioma), costoTexto: p.costoTexto }));
-  return <SalaEnVivo idiomaInicial={idioma} productos={productos} verTodo={rutaIdioma("/explorar", idioma)} />;
+  return <SalaEnVivo idiomaInicial={idioma} productos={productos} verTodo={rutaIdioma("/explorar", idioma)} proximo={estadoDirecto() === "proximo" ? PROXIMO_DIRECTO.inicio : null} />;
 }
