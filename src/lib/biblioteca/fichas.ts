@@ -33,6 +33,94 @@ export interface EntradaBiblioteca {
 
 export const BIBLIOTECA: EntradaBiblioteca[] = [
   {
+    slug: "limpia-con-huevo",
+    clave: "huevo",
+    href: "/huevo",
+    publicada: "2026-11-23",
+    fuentes: [
+      { titulo: "México Desconocido: Tradición de la limpia con huevo, sabiduría ancestral", url: "https://www.mexicodesconocido.com.mx/limpia-con-huevo.html" },
+      { titulo: "UNAM, Revista Medicina y Cultura: Huevos y salud, cultura popular", url: "https://www.revistamedicinaycultura.fmposgrado.unam.mx/wp-content/uploads/2024/03/2-Vol2no1-Huevos-y-salud-cultura-popular-que-supera-el-mito.pdf" },
+      { titulo: "USC Folklore Archives: Egg Cleansings (Limpia de Huevo)", url: "https://folklore.usc.edu/egg-cleansings-limpia-de-huevo/" },
+      { titulo: "Atlas Obscura: The long history of telling the future with eggs", url: "https://www.atlasobscura.com/articles/salem-witch-trials-oomancy" },
+      { titulo: "Encyclopedia.com: Ooscopy and Oomantia", url: "https://www.encyclopedia.com/science/encyclopedias-almanacs-transcripts-and-maps/ooscopy-and-oomantia" },
+    ],
+    textos: {
+      es: {
+        titulo: "La limpia con huevo: historia, ritual y cómo se lee el vaso",
+        descripcion:
+          "La limpia con huevo une la sabiduría de los pueblos de Mesoamérica con tradiciones que cruzaron el océano. Su historia, cómo se hace paso a paso y qué dice el vaso: burbujas, hilos, figuras y manchas.",
+        nombres: "Limpia · Barrida · Pasada de huevo · Oomancia (lectura del huevo)",
+        entrada:
+          "Una abuela que pasa un huevo despacio por la cabeza, los hombros y el corazón de su nieta, mientras murmura una oración. Después, el huevo se rompe en un vaso de agua y las dos se acercan a mirar. Esa escena se repite cada día en México, Centroamérica, los Andes, el Caribe y en cualquier ciudad del mundo donde haya una familia latina. Esta es la historia de la limpia con huevo.",
+        secciones: [
+          {
+            titulo: "Raíces que se encontraron",
+            parrafos: [
+              "Mucho antes de la llegada de los europeos, los pueblos de Mesoamérica ya practicaban limpias: barrían el cuerpo con ramas de hierbas, humo de copal y flores para devolver el equilibrio a quien andaba cargado, asustado o «con el ojo puesto». Los curanderos y curanderas eran —y siguen siendo— guardianes de ese saber.",
+              "Las gallinas llegaron a América en los barcos europeos, y con ellas el huevo. En las comunidades, el huevo se sumó a las ramas de ruda, albahaca y pirul, y la limpia tomó la forma que hoy conocemos: una fusión de la medicina tradicional indígena con costumbres traídas del otro lado del mar. Por eso cada región tiene su manera: la «barrida» en el centro de México, la «pasada de huevo» en los Andes, la limpia en las botánicas del Caribe y de Estados Unidos.",
+            ],
+          },
+          {
+            titulo: "Por qué el huevo",
+            parrafos: [
+              "En casi todas las culturas el huevo es símbolo de vida, de origen y de renacimiento: de él nace todo lo nuevo. La tradición dice que, al pasarlo por el cuerpo, el huevo «recoge» la energía pesada —la envidia, el mal de ojo, el susto, el cansancio del alma— y la guarda dentro de su cáscara.",
+              "Por eso, después de la limpia, el huevo no se come: se rompe en un vaso con agua para ver qué se llevó, y luego se desecha con respeto, lejos de la casa.",
+            ],
+          },
+          {
+            titulo: "Una práctica con siglos de historia",
+            parrafos: [
+              "Mirar el interior de un huevo para saber algo del destino es muy antiguo. Los griegos le dieron nombre: oomancia, de ōón, «huevo», y manteía, «adivinación». En Europa se vertía la clara en agua caliente para leer las formas que dibujaba, y en la Nueva Inglaterra del siglo XVII las jóvenes de Salem jugaban a adivinar su futuro con una clara de huevo en un vaso, el llamado «vaso de Venus».",
+              "La limpia latinoamericana tomó ese gesto y le dio su propio sentido: aquí el huevo no solo muestra el futuro, también se lleva lo que pesa.",
+            ],
+          },
+          {
+            titulo: "Cómo se hace la limpia",
+            parrafos: [
+              "Se usa un huevo fresco, a temperatura ambiente, y si se puede, de gallina de patio. Quien hace la limpia lo pasa despacio sobre la persona, de arriba hacia abajo: la coronilla, la frente, la nuca, los hombros, los brazos, el pecho, la espalda, las piernas y las plantas de los pies, siempre en una sola dirección, como quien barre. Muchas familias rezan mientras tanto, o acompañan el huevo con un ramo de hierbas.",
+              "Al terminar, el huevo se rompe con cuidado en un vaso transparente con agua hasta la mitad, se deja reposar unos minutos y se observa a la luz. Al final, el agua y el huevo se tiran por el inodoro o en la tierra, lejos de la casa, y quien recibió la limpia se lava las manos y descansa.",
+            ],
+          },
+          {
+            titulo: "Cómo se lee el vaso",
+            parrafos: [
+              "La lectura empieza por la yema: si queda tranquila en el fondo, la limpia salió bien y no había mucho que cargar. Luego se mira la clara: si sube, si forma hilos, si se nubla. Después, las burbujas, las manchas y las figuras que se distinguen a contraluz.",
+              "Cada curandera tiene su escuela, pero hay señales que se repiten en toda Latinoamérica: los hilos que suben hacia la superficie, las burbujas alrededor de la yema, las nubes en el agua. Una sola limpia no siempre se lleva todo; cuando el vaso sale muy cargado, la tradición aconseja repetirla en los días siguientes.",
+            ],
+          },
+        ],
+        simbolos: {
+          titulo: "Lo que dice el vaso",
+          intro: "Estas son algunas de las señales más repetidas por quienes leen el huevo en Latinoamérica:",
+          lista: [
+            { s: "Yema tranquila en el fondo", d: "La limpia salió bien: tu energía está limpia y en calma." },
+            { s: "Burbujas alrededor de la yema", d: "Energía pesada que se liberó; cansancio o preocupaciones que se fueron." },
+            { s: "Hilos que suben como velas", d: "Envidias o malas intenciones que te rodeaban y la limpia recogió." },
+            { s: "Picos o agujas en la clara", d: "Celos, chismes o palabras que te han herido." },
+            { s: "Agua nublada", d: "Mucha carga emocional; conviene repetir la limpia." },
+            { s: "Un ojo en la yema", d: "Mal de ojo: alguien te ha mirado con fuerza." },
+            { s: "Puntos o manchas rojas", d: "Una carga fuerte que se fue; cuídate y descansa." },
+            { s: "Telarañas en la clara", d: "Asuntos enredados o pensamientos que no te dejan en paz." },
+            { s: "Figuras de rostros o siluetas", d: "Una persona concreta que está en tu energía." },
+            { s: "Clara que flota limpia", d: "Protección: tu camino está despejado." },
+          ],
+        },
+        preguntas: [
+          { p: "¿De dónde viene la limpia con huevo?", r: "Une las limpias de los pueblos de Mesoamérica, que barrían el cuerpo con hierbas, copal y flores, con el huevo de gallina, que llegó a América con los barcos europeos. De esa fusión nació la limpia que hoy se practica en México, Centroamérica, los Andes, el Caribe y entre las familias latinas de todo el mundo." },
+          { p: "¿Cómo se hace una limpia con huevo?", r: "Se pasa un huevo fresco por todo el cuerpo, de arriba hacia abajo y en una sola dirección, mientras se reza o se pide protección. Luego se rompe en un vaso transparente con agua, se deja reposar y se lee lo que muestra." },
+          { p: "¿Qué significan las burbujas en el vaso?", r: "La tradición lee las burbujas alrededor de la yema como energía pesada que se liberó: cansancio, preocupaciones o tensiones que la limpia se llevó." },
+          { p: "¿Qué significan los hilos que suben en el vaso?", r: "Los hilos de clara que suben hacia la superficie se leen como envidias o malas intenciones que te rodeaban y que el huevo recogió." },
+          { p: "¿Qué se hace con el huevo después de la limpia?", r: "No se come. El agua y el huevo se desechan con respeto, por el inodoro o en la tierra, lejos de la casa, y quien recibió la limpia se lava las manos." },
+        ],
+        cta: {
+          titulo: "¿Qué se llevó tu limpia?",
+          texto: "Rompe el huevo en un vaso con agua, toma una foto (si quieres, también de lado y desde arriba) y Sibila te lee lo que dice tu vaso: lo que soltaste, lo que te rodeaba y cómo cerrar la limpia.",
+          boton: "Leer mi vaso",
+        },
+      },
+    },
+  },
+  {
     slug: "lectura-del-cafe",
     clave: "cafe",
     href: "/cafe",

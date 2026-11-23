@@ -1,0 +1,66 @@
+VIDEO 49 — BIBLIOTECA DE SIBILA #2 · «LA LIMPIA CON HUEVO». Serie diaria: una tradición del mundo por día.
+Vertical 9:16, ~50 s con la voz de Sibila. Lleva a miarcana.com/biblioteca/limpia-con-huevo y a la lectura del vaso (miarcana.com/huevo).
+Tono: cálido, de familia y de abuela, con respeto. Desde adentro de la tradición. Nada de promesas de salud.
+SIN CARAS (manos, objetos, lugares). Prompts en inglés.
+
+==================== RECETA DIARIA ====================
+- 2 CLIPS DE VIDEO en Flow (tus 2 prompts del día), vertical 9:16, 8 s: el clip A (la limpia) y el clip B (el huevo en el vaso).
+- 4 IMÁGENES en Gemini («Crear imagen», vertical 9:16).
+- Sonido de los clips: solo ambiente. Sin música y sin voces: la voz es la de Marcela.
+
+==================== CLIP A · Flow · «La limpia» (8 s) ====================
+Vertical 9:16, cinematic, warm late-afternoon light through a small window, humble Latin American home with adobe
+walls, a wooden table with a bundle of fresh green herbs (rue and basil) tied with red thread, a lit white candle and a
+clay pot. An elderly woman's hands (wrinkled, a thin silver ring, a rosary wrapped around the wrist) slowly pass a white
+egg over a young woman's shoulder and down her arm in one continuous downward movement, as if sweeping gently; we only
+see the hands, the egg, the young woman's shoulder and arm in a simple cotton blouse. Soft particles of light seem to
+follow the egg. Slow push-in.
+Sound: a soft murmur of prayer far away (unintelligible), candle crackling, birds outside. No music.
+No faces, no readable text, no logos.
+
+==================== CLIP B · Flow · «El vaso» (8 s) ====================
+Vertical 9:16, cinematic macro shot, warm candlelight, dark background. Hands crack a white egg on the rim of a clear
+glass half-filled with water; the yolk drops slowly to the bottom and the egg white spreads, forming delicate threads
+that rise toward the surface like thin candles, and tiny bubbles cling around the yolk. The water glows softly with the
+candle behind it. Very slow motion, the camera slowly circles the glass.
+Sound: the crack of the shell, water, a soft magical shimmer as the threads rise. No music, no voices.
+No faces, no readable text, no logos.
+
+==================== IMAGEN 1 · Gemini · «Raíces» ====================
+Vertical 9:16 photorealistic cinematic image, a pre-Hispanic Mesoamerican altar at dusk: a carved stone bowl with
+burning copal resin and white smoke rising, marigold (cempasúchil) flowers, bundles of green herbs, a woven palm mat,
+and ancient stone carvings softly out of focus in the background. Warm golden and orange light. No people, no faces,
+no text, no logos.
+
+==================== IMAGEN 2 · Gemini · «El encuentro» ====================
+Vertical 9:16 photorealistic image, a rustic wooden table in a Latin American kitchen: a woven basket with fresh brown
+and white eggs, a bunch of rue and basil, a terracotta jug, a white candle and a small wooden cross, morning light from
+a window, warm and homely. No people, no faces, no text, no logos.
+
+==================== IMAGEN 3 · Gemini · «Las señales» ====================
+Vertical 9:16 photorealistic macro image, a clear glass of water with a broken egg inside on a dark wooden table, lit
+from behind by a candle: the yolk rests at the bottom, delicate white threads rise like thin candles, small bubbles
+around the yolk, a faint cloudy veil in the water. Mystical, serene, deep violet and warm gold tones. No people, no
+text, no logos.
+
+==================== IMAGEN 4 · Gemini · «El cierre» (con espacio para texto) ====================
+Vertical 9:16 photorealistic image, a single white egg resting on a bed of fresh rue leaves next to a lit white candle
+and a clear empty glass, soft bokeh lights behind, deep violet and warm gold tones, lots of empty dark space in the
+lower third for text. No people, no faces, no text, no logos.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración) ====================
+(~760 caracteres, ~50 s. Los «…» son pausas: déjalos.)
+Bienvenida a la Biblioteca de Sibila. Hoy: la limpia con huevo…
+Mucho antes de que llegaran los barcos, los pueblos de Mesoamérica ya limpiaban el cuerpo con hierbas, flores y humo de copal…
+Con los barcos llegaron las gallinas… y el huevo se unió a la ruda y a la albahaca. Así nació la limpia que hoy se hace en toda Latinoamérica…
+Se pasa despacio, de la cabeza a los pies, siempre en una sola dirección… como quien barre lo que pesa…
+Después, se rompe en un vaso con agua. Burbujas: cansancio que se fue. Hilos que suben: envidias que se llevó. Una yema tranquila: tu energía está en paz…
+¿Qué se llevó tu limpia?… Mándame la foto de tu vaso en mi arcana punto com. Yo te la leo.
+
+==================== TÍTULOS EN PANTALLA (los pongo yo al armar) ====================
+1. BIBLIOTECA DE SIBILA · #2 / La limpia con huevo 🥚
+2. MESOAMÉRICA / Hierbas, flores y copal
+3. Dos mundos que se encontraron
+4. De la cabeza a los pies · en una dirección
+5. 🫧 cansancio que se fue · 🕯️ envidias que se llevó · 🌕 energía en paz
+6. ¿Qué se llevó tu limpia? / 📸 miarcana.com/huevo
