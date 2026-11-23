@@ -9,6 +9,8 @@ export interface EntradaTabaco {
   foto: string; // ruta en el bucket 'palmas'
   pregunta: string;
   idioma?: string;
+  /** Hasta dos fotos más desde otros ángulos (opcionales). */
+  fotosExtra?: string[];
 }
 
 export function resumenTabaco(e: EntradaTabaco) {

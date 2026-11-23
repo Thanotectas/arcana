@@ -217,7 +217,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
 
   if (l.tipo === "chocolate") {
     const e = entrada as unknown as EntradaChocolate;
-    const imagen = await descargarPalma(e.foto);
+    const [imagen, extras] = await Promise.all([descargarPalma(e.foto), fotosExtraDe(e)]);
     return {
       usuario:
         `Lee la taza de chocolate de la foto adjunta. Mira la imagen con calma y detalle antes de escribir.\n\n${resumenChocolate(e)}\n\n` +
@@ -225,23 +225,25 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `## Figura por figura (cada figura con su sentido tradicional, por qué su posición importa y lo que puede decir para esta persona; una entrada por figura), ## Cómo se relacionan (qué historia cuentan juntas las figuras: de dónde viene, qué está pasando, hacia dónde va), ` +
         `## Lo que la taza responde (si hubo pregunta, la respuesta clara; si no, el mensaje del momento), ${anuncio("## Lo que la taza anuncia")}, ## Un consejo para los próximos días. ` +
         `Sé descriptiva y específica: la persona debe poder mirar su taza y reconocer cada cosa que nombras. Extensión: 800 a 1100 palabras.\n\n` +
-        INSTRUCCION_FIGURAS,
+        INSTRUCCION_FIGURAS +
+        notaAngulos(extras.length, "la taza"),
       sistemaExtra: TRADICION_CHOCOLATE,
-      opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("taza") },
+      opciones: { idioma, effort: "high", maxTokens: 4200, imagenes: [...(imagen ? [imagen] : []), ...extras], nivel: "premium", conocimiento: manual("taza") },
     };
   }
 
   if (l.tipo === "velas") {
     const e = entrada as unknown as EntradaVelas;
-    const imagen = await descargarPalma(e.foto);
+    const [imagen, extras] = await Promise.all([descargarPalma(e.foto), fotosExtraDe(e)]);
     return {
       usuario:
         `Interpreta los restos de esta vela ritual (foto adjunta).\n\n${resumenVelas(e)}\n\n` +
         `Estructura: ## Lo que veo en los restos (cera, hollín, mecha, figuras, con honestidad), ## Lo que dijo la llama (las señales que la persona observó, leídas una por una), ## Cómo avanza tu intención (síntesis del ritual: qué está fluyendo, qué resiste), ## Lo que la vela anuncia (si la intención se cumplirá, cuándo se empezará a notar, con plazo amplio, y qué la frena si algo la frena), ## Qué hacer ahora (un paso concreto para los próximos días y, si conviene, si repetir el ritual y con qué color o fase lunar). ` +
         `Extensión: 600 a 800 palabras.\n\n` +
-        INSTRUCCION_RESTOS,
+        INSTRUCCION_RESTOS +
+        notaAngulos(extras.length, "los restos de la vela"),
       sistemaExtra: TRADICION_VELAS,
-      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("velas") },
+      opciones: { idioma, effort: "medium", maxTokens: 3500, imagenes: [...(imagen ? [imagen] : []), ...extras], nivel: "premium", conocimiento: manual("velas") },
     };
   }
 
@@ -260,15 +262,16 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
 
   if (l.tipo === "tabaco") {
     const e = entrada as unknown as EntradaTabaco;
-    const imagen = await descargarPalma(e.foto);
+    const [imagen, extras] = await Promise.all([descargarPalma(e.foto), fotosExtraDe(e)]);
     return {
       usuario:
         `Lee el tabaco de la foto adjunta. Mira la imagen con detalle antes de escribir.\n\n${resumenTabaco(e)}\n\n` +
         `Estructura: ## Lo que veo en tu tabaco (descripción concreta: color y forma de la ceniza, cómo va la quema, marcas de la capa, la punta, el humo si se ve; dónde está cada cosa), ## Señal por señal (cada una con su sentido tradicional y lo que puede decir para esta persona), ## Lo que el tabaco responde (si hubo pregunta, la respuesta; si no, el mensaje del momento), ${anuncio("## Lo que el tabaco anuncia")}, ## Un consejo para los próximos días. ` +
         `Extensión: 600 a 850 palabras.\n\n` +
-        INSTRUCCION_TABACO,
+        INSTRUCCION_TABACO +
+        notaAngulos(extras.length, "el tabaco"),
       sistemaExtra: TRADICION_TABACO,
-      opciones: { idioma, effort: "medium", maxTokens: 3900, imagenes: imagen ? [imagen] : [], nivel: "premium", conocimiento: manual("tabaco") },
+      opciones: { idioma, effort: "medium", maxTokens: 3900, imagenes: [...(imagen ? [imagen] : []), ...extras], nivel: "premium", conocimiento: manual("tabaco") },
     };
   }
 
@@ -326,8 +329,10 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
     const imagen = await descargarPalma(e.foto);
     const esCafe = l.tipo === "cafe";
     // Café: fotos extra de los lados y del plato (tradición turca: el plato también se lee).
-    const extras = esCafe ? (await Promise.all((e.fotosExtra ?? []).slice(0, 2).map((f) => descargarPalma(f)))).filter((x): x is NonNullable<typeof x> => Boolean(x)) : [];
-    const notaExtras = extras.length
+    const extras = await fotosExtraDe(e);
+    const notaExtras = !esCafe
+      ? notaAngulos(extras.length, "el vaso")
+      : extras.length
       ? `\n\nAdemás de la foto principal (el fondo de la taza) van ${extras.length} foto(s) más: los lados de la taza${extras.length > 1 ? " y el plato" : " o el plato"}. Léelas también: en la tradición turca (kahve falı) los lados hablan de lo que se acerca y el plato de cómo se resuelve; nómbralo en «Lo que veo en tu taza».`
       : "";
     return {
@@ -340,7 +345,8 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         : `Lee el huevo de esta limpia (foto adjunta del vaso). Mira la imagen con detalle antes de escribir.\n\n${resumenHuevo(e)}\n\n` +
           `Estructura: ## Lo que veo en el vaso (la yema, la clara, burbujas, hilos, manchas y figuras, con su posición: arriba, abajo, alrededor), ## Señal por señal (su sentido tradicional y lo que dice de tu energía), ## Lo que la limpia se llevó (lo que soltaste y cómo puedes sentirte en los próximos días), ${anuncio("## Lo que el huevo anuncia")}, ## Cómo cerrar la limpia (qué hacer con el agua y el huevo, y un gesto de protección sencillo para esta semana). ` +
           `Extensión: 600 a 850 palabras.\n\n` +
-          INSTRUCCION_SENALES,
+          INSTRUCCION_SENALES +
+          notaExtras,
       sistemaExtra: esCafe ? TRADICION_CAFE : TRADICION_HUEVO,
       opciones: { idioma, effort: esCafe ? "high" : "medium", maxTokens: esCafe ? 4600 : 3900, imagenes: [...(imagen ? [imagen] : []), ...extras], nivel: "premium", conocimiento: manual(esCafe ? "taza" : "huevo") },
     };
@@ -473,6 +479,16 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
       `Estructura: ## Lo que los une, ## Dónde chocan, ## En el amor, ## En la amistad y el trabajo, ## Lo que se anuncia (si la relación tiene futuro, de qué tipo y qué etapa viene), ## Consejo para que funcione. Usa los nombres. Extensión: 600 a 750 palabras.`,
     opciones: { idioma, effort: "medium", maxTokens: 2400 },
   };
+}
+
+/** Las fotos extra (otros ángulos) de una lectura por foto, ya descargadas. */
+async function fotosExtraDe(e: { fotosExtra?: string[] }): Promise<ImagenEntrada[]> {
+  return (await Promise.all((e.fotosExtra ?? []).slice(0, 2).map((f) => descargarPalma(f)))).filter((x): x is ImagenEntrada => Boolean(x));
+}
+
+/** Nota para el modelo cuando llegan fotos de otros ángulos del mismo objeto. */
+function notaAngulos(n: number, objeto: string) {
+  return n ? `\n\nAdemás de la foto principal van ${n} foto(s) más de ${objeto} desde otros ángulos o de cerca. Míralas todas: son el mismo objeto. Úsalas para confirmar y precisar las figuras y señales (lo que en una foto se ve borroso en otra puede verse claro), y nombra lo que solo aparece en una de ellas. No describas cada foto por separado: integra lo que ves en un solo recorrido.` : "";
 }
 
 async function descargarPalma(ruta: string): Promise<ImagenEntrada | null> {

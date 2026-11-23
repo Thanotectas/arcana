@@ -10,6 +10,8 @@ export interface EntradaChocolate {
   foto: string; // ruta dentro del bucket 'palmas' (fotos de lecturas)
   pregunta: string;
   idioma?: string;
+  /** Hasta dos fotos más desde otros ángulos (opcionales). */
+  fotosExtra?: string[];
 }
 
 /** Texto para el modelo con el contexto de la taza. */

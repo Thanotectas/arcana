@@ -67,6 +67,8 @@ export interface EntradaVelas {
   senales: Senal[];
   pregunta: string;
   idioma?: string;
+  /** Hasta dos fotos más desde otros ángulos (opcionales). */
+  fotosExtra?: string[];
 }
 
 const NOMBRE_INTENCION: Record<Intencion, string> = {

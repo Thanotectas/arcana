@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionChocolate, type EstadoAccion } from "@/lib/lecturas/acciones";
 import { CapturaPalma } from "./CapturaPalma";
+import { FotosExtra } from "./FotosExtra";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { BotonVoz } from "./BotonVoz";
@@ -34,6 +35,7 @@ export function FormularioChocolate() {
       )}
 
       <CapturaPalma variante="taza" />
+      <FotosExtra tipo="chocolate" />
 
       <div>
         <label className="etiqueta" htmlFor="pregunta">{t.chocolate.pregunta}</label>

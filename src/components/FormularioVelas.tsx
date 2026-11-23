@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionVelas, type EstadoAccion } from "@/lib/lecturas/acciones";
 import { CapturaPalma } from "./CapturaPalma";
+import { FotosExtra } from "./FotosExtra";
 import { BotonEnviar } from "./BotonEnviar";
 import { Aviso } from "./Aviso";
 import { BotonVoz } from "./BotonVoz";
@@ -106,6 +107,7 @@ export function FormularioVelas() {
       </fieldset>
 
       <CapturaPalma variante="vela" />
+      <FotosExtra tipo="velas" />
 
       <div>
         <label className="etiqueta" htmlFor="pregunta">{t.velas.pregunta}</label>

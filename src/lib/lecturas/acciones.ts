@@ -460,6 +460,21 @@ export async function accionQuiromancia(_prev: EstadoAccion, formData: FormData)
 // ---------------------------------------------------------------------------
 // Lectura del chocolate: foto del interior de la taza (mismo bucket que las palmas)
 // ---------------------------------------------------------------------------
+/** Hasta dos fotos más (foto2 y foto3) desde otros ángulos, opcionales: una que no sirva se ignora. */
+async function subirFotosExtra(formData: FormData, usuario: string, prefijo: string, admin: ReturnType<typeof getSupabaseAdmin>): Promise<string[]> {
+  const extras: string[] = [];
+  for (const campo of ["foto2", "foto3"]) {
+    const f = formData.get(campo);
+    if (!(f instanceof File) || f.size === 0 || !TIPOS_FOTO.has(f.type) || f.size > TAMANO_MAX_FOTO) continue;
+    if (tipoImagenReal(new Uint8Array(await f.slice(0, 16).arrayBuffer())) !== f.type) continue;
+    const ext = f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg";
+    const r = `${usuario}/${prefijo}-${crypto.randomUUID()}.${ext}`;
+    const { error } = await admin.storage.from("palmas").upload(r, f, { contentType: f.type, upsert: false });
+    if (!error) extras.push(r);
+  }
+  return extras;
+}
+
 export async function accionChocolate(_prev: EstadoAccion, formData: FormData): Promise<EstadoAccion> {
   const { user } = await usuarioActual();
   const foto = formData.get("foto");
@@ -479,10 +494,11 @@ export async function accionChocolate(_prev: EstadoAccion, formData: FormData): 
     console.error("[chocolate] subida fallida", errorSubida);
     return { error: "FOTO_SUBIR" };
   }
+  const extras = await subirFotosExtra(formData, user.id, "taza", admin);
 
   let id: string;
   try {
-    const entrada: EntradaChocolate = { foto: ruta, pregunta };
+    const entrada: EntradaChocolate = { foto: ruta, pregunta, ...(extras.length ? { fotosExtra: extras } : {}) };
     id = await crearLectura({
       tipo: "chocolate",
       titulo: pregunta ? `Lectura del chocolate: ${pregunta}` : "Lectura del chocolate",
@@ -490,7 +506,7 @@ export async function accionChocolate(_prev: EstadoAccion, formData: FormData): 
       resultado: {},
     });
   } catch (e) {
-    await admin.storage.from("palmas").remove([ruta]);
+    await admin.storage.from("palmas").remove([ruta, ...extras]);
     return manejarError(e);
   }
   redirect(`/lecturas/${id}`);
@@ -523,10 +539,11 @@ export async function accionVelas(_prev: EstadoAccion, formData: FormData): Prom
     console.error("[velas] subida fallida", errorSubida);
     return { error: "FOTO_SUBIR" };
   }
+  const extras = await subirFotosExtra(formData, user.id, "vela", admin);
 
   let id: string;
   try {
-    const entrada: EntradaVelas = { foto: ruta, intencion, color, senales, pregunta };
+    const entrada: EntradaVelas = { foto: ruta, intencion, color, senales, pregunta, ...(extras.length ? { fotosExtra: extras } : {}) };
     id = await crearLectura({
       tipo: "velas",
       titulo: pregunta ? `Ritual de velas: ${pregunta}` : `Ritual de velas (${intencion})`,
@@ -534,7 +551,7 @@ export async function accionVelas(_prev: EstadoAccion, formData: FormData): Prom
       resultado: {},
     });
   } catch (e) {
-    await admin.storage.from("palmas").remove([ruta]);
+    await admin.storage.from("palmas").remove([ruta, ...extras]);
     return manejarError(e);
   }
   redirect(`/lecturas/${id}`);
@@ -590,12 +607,13 @@ export async function accionTabaco(_prev: EstadoAccion, formData: FormData): Pro
     console.error("[tabaco] subida fallida", errorSubida);
     return { error: "FOTO_SUBIR" };
   }
+  const extras = await subirFotosExtra(formData, user.id, "tabaco", admin);
   let id: string;
   try {
-    const entrada: EntradaTabaco = { foto: ruta, pregunta };
+    const entrada: EntradaTabaco = { foto: ruta, pregunta, ...(extras.length ? { fotosExtra: extras } : {}) };
     id = await crearLectura({ tipo: "tabaco", titulo: pregunta ? `Lectura del tabaco: ${pregunta}` : "Lectura del tabaco", entrada, resultado: {} });
   } catch (e) {
-    await admin.storage.from("palmas").remove([ruta]);
+    await admin.storage.from("palmas").remove([ruta, ...extras]);
     return manejarError(e);
   }
   redirect(`/lecturas/${id}`);
@@ -768,19 +786,8 @@ async function lecturaPorFoto(formData: FormData, tipo: "cafe" | "huevo", titulo
     console.error(`[${tipo}] subida fallida`, errorSubida);
     return { error: "FOTO_SUBIR" };
   }
-  // Café: hasta dos fotos más (los lados de la taza y el plato), opcionales; una que no sirva se ignora.
-  const extras: string[] = [];
-  if (tipo === "cafe") {
-    for (const campo of ["foto2", "foto3"]) {
-      const f = formData.get(campo);
-      if (!(f instanceof File) || f.size === 0 || !TIPOS_FOTO.has(f.type) || f.size > TAMANO_MAX_FOTO) continue;
-      if (tipoImagenReal(new Uint8Array(await f.slice(0, 16).arrayBuffer())) !== f.type) continue;
-      const ext = f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg";
-      const r = `${user.id}/${tipo}-${crypto.randomUUID()}.${ext}`;
-      const { error: e } = await admin.storage.from("palmas").upload(r, f, { contentType: f.type, upsert: false });
-      if (!e) extras.push(r);
-    }
-  }
+  // Hasta dos fotos más desde otros ángulos (café: los lados y el plato), opcionales.
+  const extras = await subirFotosExtra(formData, user.id, tipo, admin);
   let id: string;
   try {
     const entrada: EntradaFoto = { foto: ruta, pregunta, ...(extras.length ? { fotosExtra: extras } : {}) };
