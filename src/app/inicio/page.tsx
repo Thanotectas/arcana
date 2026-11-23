@@ -1,14 +1,14 @@
 import { AvisoDiario } from "@/components/AvisoDiario";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Sparkles, Star, Hash, Heart, Coins, Hand, Flame, Users, Hexagon, Sunrise, CheckCircle2, Circle, Layers, MoonStar, HeartHandshake, Coffee, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean, Infinity as Infinito, LibraryBig as Archivo } from "lucide-react";
+import { Coins, Flame, Users, Sunrise, CheckCircle2, Circle } from "lucide-react";
 import { BONO_INVITADOR } from "@/lib/invitaciones";
 import { getLecturas, getPerfil, cartaDiaDisponible, requerirUsuario, circuloActivo, getResumenInvitaciones } from "@/lib/dal";
 import { datosNacimientoDePerfil } from "@/lib/diario";
 import { cieloDeHoy } from "@/lib/astro/transitos";
 import { signoPorId } from "@/lib/zodiaco";
 import { comprasVisibles } from "@/lib/plataforma";
-import { COSTOS, OFERTA_FUNDADORES, formatoCOP } from "@/lib/creditos";
+import { OFERTA_FUNDADORES, formatoCOP } from "@/lib/creditos";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { Timer } from "lucide-react";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
@@ -16,7 +16,8 @@ import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
 import { AvisoDirecto } from "@/components/AvisoDirecto";
 import { EventoMeta } from "@/components/EventoMeta";
-import { TradicionesDelMundo } from "@/components/TradicionesDelMundo";
+import { ExplorarCatalogo } from "@/components/ExplorarCatalogo";
+import { catalogoConTextos } from "@/lib/catalogo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -69,33 +70,6 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
   ];
   const hechos = pasos.filter((p) => p.hecho).length;
 
-  const accesos = [
-    { href: "/tarot?tirada=tarot_carta", icono: Sparkles, titulo: t.inicio.accesos.cartaDia.titulo, nota: cartaDisponible ? t.inicio.accesos.cartaDia.gratisHoy : t.inicio.accesos.cartaDia.usada, costo: 0 },
-    { href: "/tarot", icono: Sparkles, ...t.inicio.accesos.tarot, costo: COSTOS.tarot_tres },
-    { href: "/carta-astral", icono: Star, ...t.inicio.accesos.astral, costo: COSTOS.carta_astral },
-    { href: "/quiromancia", icono: Hand, ...t.inicio.accesos.quiromancia, costo: COSTOS.quiromancia },
-    { href: "/numerologia", icono: Hash, ...t.inicio.accesos.numerologia, costo: COSTOS.numerologia },
-    { href: "/iching", icono: Hexagon, ...t.inicio.accesos.iching, costo: COSTOS.iching },
-    { href: "/calendario-chino", icono: Flame, ...t.inicio.accesos.chino, costo: COSTOS.chino },
-    { href: "/suenos", icono: MoonStar, ...t.inicio.accesos.suenos, costo: COSTOS.suenos },
-    { href: "/compatibilidad", icono: Heart, ...t.inicio.accesos.compatibilidad, costo: COSTOS.compatibilidad },
-    { href: "/sinastria", icono: HeartHandshake, ...t.inicio.accesos.sinastria, costo: COSTOS.sinastria },
-    { href: "/chocolate", icono: Coffee, ...t.inicio.accesos.chocolate, costo: COSTOS.chocolate },
-    { href: "/velas", icono: FlameKindling, ...t.inicio.accesos.velas, costo: COSTOS.velas },
-    { href: "/tabaco", icono: Wind, ...t.inicio.accesos.tabaco, costo: COSTOS.tabaco },
-    { href: "/cafe", icono: Bean, ...t.inicio.accesos.cafe, costo: COSTOS.cafe },
-    { href: "/huevo", icono: Egg, ...t.inicio.accesos.huevo, costo: COSTOS.huevo },
-    { href: "/baraja-espanola", icono: Swords, ...t.inicio.accesos.baraja, costo: COSTOS.baraja_espanola },
-    { href: "/lenormand", icono: Clover, ...t.inicio.accesos.lenormand, costo: COSTOS.lenormand },
-    { href: "/runas", icono: Axe, ...t.inicio.accesos.runas, costo: COSTOS.runas },
-    { href: "/pendulo", icono: Diamond, ...t.inicio.accesos.pendulo, costo: COSTOS.pendulo },
-    { href: "/revolucion-solar", icono: Sun, ...t.inicio.accesos.revolucion, costo: COSTOS.revolucion_solar },
-    { href: "/vidas-pasadas", icono: Infinito, ...t.inicio.accesos.vidas, costo: COSTOS.vidas_pasadas },
-    { href: "/registros-akashicos", icono: Archivo, ...t.inicio.accesos.akashicos, costo: COSTOS.akashicos },
-    { href: "/calendario-maya", icono: Pyramid, ...t.inicio.accesos.maya, costo: COSTOS.maya },
-    { href: "/aura", icono: Sparkle, ...t.inicio.accesos.aura, costo: COSTOS.aura },
-    { href: "/cruce", icono: Layers, ...t.inicio.accesos.cruce, costo: COSTOS.cruce },
-  ];
 
   return (
     <div className="space-y-10">
@@ -175,22 +149,21 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
         </div>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {accesos.map((a, i) => (
-          <Link key={a.href + a.titulo} href={a.href} className="tarjeta tarjeta-modulo aparecer group p-5" style={{ animationDelay: `${i * 60}ms` }}>
-            <div className="flex items-start justify-between">
-              <a.icono className="h-6 w-6 text-oro transition group-hover:scale-110" aria-hidden />
-              <span className="rounded-full bg-violeta/15 px-2 py-0.5 text-xs text-violeta-suave">
-                {a.costo === 0 ? t.comun.gratis : `${a.costo} ${a.costo > 1 ? t.comun.creditos : t.comun.credito}`}
-              </span>
-            </div>
-            <h2 className="font-display mt-3 text-2xl font-semibold">{a.titulo}</h2>
-            <p className="text-sm text-texto-suave">{a.nota}</p>
-          </Link>
-        ))}
-      </section>
-
-      <TradicionesDelMundo t={t} idioma={idioma} conCosto />
+      {/* Todas las lecturas como en /explorar: guía para elegir, buscador y vistas por lo que quieres saber, práctica o tradición. */}
+      <ExplorarCatalogo
+        idioma={idioma}
+        abrir={t.explorar.abrir}
+        items={catalogoConTextos(t, { conCuenta: true, idioma }).map((i) => ({
+          clave: i.clave,
+          href: i.href,
+          nombre: i.nombre,
+          descripcion: i.descripcion,
+          costoTexto: i.costoTexto,
+          gratis: i.costo === null || i.costo === 0,
+          destacado: Boolean(i.destacadoEn?.includes(idioma)),
+          deOtroMercado: Boolean(i.destacadoEn?.length && !i.destacadoEn.includes(idioma)),
+        }))}
+      />
 
       <Link href="/invitar" className="tarjeta tarjeta-modulo flex items-center gap-4 border-exito/30 p-5">
         <Users className="h-8 w-8 text-exito" aria-hidden />

@@ -76,13 +76,13 @@ export async function Encabezado() {
                 <Coins className="h-4 w-4" aria-hidden />
                 {perfil.ilimitado ? "∞" : perfil.creditos}
               </Link>
-              <Link href="/invitar" className="hidden text-sm text-exito hover:underline lg:block">
+              <Link href="/invitar" className="hidden whitespace-nowrap text-sm text-exito hover:underline 2xl:block">
                 {t.invitar.seccion}
               </Link>
-              <Link href="/cuenta" className="hidden text-sm text-texto-suave hover:text-texto lg:block">
-                {perfil.nombre ?? t.comun.miCuenta}
+              <Link href="/cuenta" className="hidden max-w-[10rem] truncate whitespace-nowrap text-sm text-texto-suave hover:text-texto xl:block">
+                {perfil.nombre?.split(" ")[0] ?? t.comun.miCuenta}
               </Link>
-              <form action={accionSalir} className="hidden lg:block">
+              <form action={accionSalir} className="hidden whitespace-nowrap lg:block">
                 <button type="submit" className="boton boton-fantasma px-2 py-1 text-sm">
                   {t.comun.salir}
                 </button>
