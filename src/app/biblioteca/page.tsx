@@ -36,7 +36,12 @@ export default async function PaginaBiblioteca() {
           const f = fichaEn(e, idioma);
           return (
             <Link key={e.slug} href={`/biblioteca/${e.slug}`} className="tarjeta group flex flex-col p-5 transition hover:-translate-y-1 hover:border-oro/40">
-              <span className="w-fit rounded-full bg-oro/10 p-2 text-oro"><IconoCatalogo clave={e.clave as ClaveIcono} className="h-5 w-5" /></span>
+              {e.portada ? (
+                // eslint-disable-next-line @next/next/no-img-element -- portada estática del video
+                <img src={e.portada} alt="" loading="lazy" className="mb-1 aspect-[4/5] w-full rounded-xl border border-borde object-cover" />
+              ) : (
+                <span className="w-fit rounded-full bg-oro/10 p-2 text-oro"><IconoCatalogo clave={e.clave as ClaveIcono} className="h-5 w-5" /></span>
+              )}
               <h2 className="font-display mt-3 text-2xl">{f.titulo}</h2>
               <p className="mt-1 text-xs text-violeta-suave">{f.nombres}</p>
               <p className="mt-2 flex-1 text-sm text-texto-suave">{f.descripcion}</p>

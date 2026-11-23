@@ -5,7 +5,7 @@ import { getIdioma } from "@/lib/i18n/servidor";
 import { alternativas } from "@/lib/i18n/rutas";
 import { sitio } from "@/lib/correo";
 import { CtaLectura, JsonLd, Migas, Preguntas } from "@/components/seo/BloquesSeo";
-import { BIBLIOTECA, entradaPorSlug, fichaEn } from "@/lib/biblioteca/fichas";
+import { BIBLIOTECA, entradaPorSlug, fichaEn, videoEn } from "@/lib/biblioteca/fichas";
 
 export function generateStaticParams() {
   return BIBLIOTECA.map((e) => ({ slug: e.slug }));
@@ -26,6 +26,7 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
   const idioma = await getIdioma();
   const f = fichaEn(e, idioma);
   const url = `${sitio()}/biblioteca/${e.slug}`;
+  const video = videoEn(e, idioma);
   return (
     <article className="mx-auto max-w-3xl space-y-10">
       <JsonLd datos={{ "@context": "https://schema.org", "@type": "Article", headline: f.titulo, description: f.descripcion, datePublished: e.publicada, inLanguage: idioma, mainEntityOfPage: url, author: { "@type": "Organization", name: "Arcana" }, publisher: { "@type": "Organization", name: "Arcana" } }} />
@@ -37,6 +38,16 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{f.titulo}</h1>
         <p className="text-sm text-oro-suave">{f.nombres}</p>
       </header>
+      {video && (
+        <figure className="mx-auto w-full max-w-sm">
+          <video controls playsInline preload="metadata" poster={e.portada} className="aspect-[9/16] w-full rounded-2xl border border-borde bg-black">
+            <source src={video} type="video/mp4" />
+          </video>
+          {video && (
+            <JsonLd datos={{ "@context": "https://schema.org", "@type": "VideoObject", name: f.titulo, description: f.descripcion, thumbnailUrl: `${sitio()}${e.portada ?? ""}`, uploadDate: e.publicada, contentUrl: `${sitio()}${video}`, inLanguage: idioma }} />
+          )}
+        </figure>
+      )}
       <p className="font-display text-2xl leading-snug">{f.entrada}</p>
 
       {f.secciones.map((s) => (

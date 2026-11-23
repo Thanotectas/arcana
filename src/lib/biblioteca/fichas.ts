@@ -28,6 +28,10 @@ export interface EntradaBiblioteca {
   /** Fecha de publicación (AAAA-MM-DD). */
   publicada: string;
   fuentes: { titulo: string; url: string }[];
+  /** Video de la ficha por idioma (en /public/arcano, versión liviana); si falta el del idioma, el de español. */
+  videos?: Partial<Record<Idioma, string>> & { es: string };
+  /** Imagen del video (portada y miniatura). */
+  portada?: string;
   textos: Partial<Record<Idioma, Ficha>> & { es: Ficha };
 }
 
@@ -36,6 +40,8 @@ export const BIBLIOTECA: EntradaBiblioteca[] = [
     slug: "limpia-con-huevo",
     clave: "huevo",
     href: "/huevo",
+    videos: { es: "/arcano/limpia-con-huevo-es.mp4", pt: "/arcano/limpia-con-huevo-pt.mp4" },
+    portada: "/arcano/limpia-con-huevo.jpg",
     publicada: "2026-11-23",
     fuentes: [
       { titulo: "México Desconocido: Tradición de la limpia con huevo, sabiduría ancestral", url: "https://www.mexicodesconocido.com.mx/limpia-con-huevo.html" },
@@ -124,6 +130,8 @@ export const BIBLIOTECA: EntradaBiblioteca[] = [
     slug: "lectura-del-cafe",
     clave: "cafe",
     href: "/cafe",
+    videos: { es: "/arcano/lectura-del-cafe-es.mp4", tr: "/arcano/lectura-del-cafe-tr.mp4", ar: "/arcano/lectura-del-cafe-ar.mp4", fr: "/arcano/lectura-del-cafe-fr.mp4" },
+    portada: "/arcano/lectura-del-cafe.jpg",
     publicada: "2026-11-23",
     fuentes: [
       { titulo: "UNESCO: Turkish coffee culture and tradition (Patrimonio Cultural Inmaterial, 2013)", url: "https://ich.unesco.org/en/rl/turkish-coffee-culture-and-tradition-00645" },
@@ -212,6 +220,10 @@ export const BIBLIOTECA: EntradaBiblioteca[] = [
 
 export function entradaPorSlug(slug: string) {
   return BIBLIOTECA.find((e) => e.slug === slug) ?? null;
+}
+
+export function videoEn(e: EntradaBiblioteca, idioma: Idioma) {
+  return e.videos ? (e.videos[idioma] ?? e.videos.es) : null;
 }
 
 export function fichaEn(e: EntradaBiblioteca, idioma: Idioma): Ficha {
