@@ -1,3 +1,4 @@
+import { BIBLIOTECA } from "@/lib/biblioteca/fichas";
 import type { MetadataRoute } from "next";
 import { MAZO } from "@/lib/tarot/deck";
 import { SIGNOS } from "@/lib/zodiaco";
@@ -46,6 +47,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url("/compatibilidad-signos", 0.9),
     ...todasLasParejas().map(([a, b]) => url(`/compatibilidad-signos/${slugPareja(a, b)}`, 0.6)),
     url("/reencarnacion", 0.8),
+    url("/biblioteca", 0.8),
+    ...BIBLIOTECA.map((e) => url(`/biblioteca/${e.slug}`, 0.7)),
     url("/que-son-registros-akashicos", 0.8),
     url("/alma-vieja", 0.9, "weekly"),
     ...NIVELES_ALMA.map((n) => url(`/alma-vieja/${n}`, 0.4)),

@@ -22,6 +22,15 @@ export default async function PaginaExplorar() {
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{t.explorar.titulo}</h1>
         <p className="mx-auto mt-3 max-w-2xl text-texto-suave">{t.explorar.intro}</p>
       </div>
+      {idioma === "es" && (
+        <Link href="/biblioteca" className="tarjeta flex items-center justify-between gap-4 border-violeta/40 p-5 transition hover:border-oro">
+          <span>
+            <span className="font-display block text-2xl">Biblioteca de Sibila</span>
+            <span className="text-sm text-texto-suave">La historia, los símbolos y la forma de practicar cada tradición del mundo.</span>
+          </span>
+          <span className="text-oro-suave">Entrar →</span>
+        </Link>
+      )}
       <ExplorarCatalogo
         idioma={idioma}
         abrir={t.explorar.abrir}
