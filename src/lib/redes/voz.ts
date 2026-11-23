@@ -56,8 +56,8 @@ async function pedirAudio(texto: string, modelo: string) {
 }
 
 /** Si el modelo de ELEVENLABS_MODEL no sirve (nombre mal escrito, plan que no lo incluye), se usa el clásico. */
-export async function sintetizar(texto: string): Promise<Buffer> {
-  const modelo = (process.env.ELEVENLABS_MODEL ?? "").trim() || MODELO_BASE;
+export async function sintetizar(texto: string, modeloPedido?: string): Promise<Buffer> {
+  const modelo = modeloPedido || (process.env.ELEVENLABS_MODEL ?? "").trim() || MODELO_BASE;
   let res = await pedirAudio(texto, modelo);
   if (!res.ok && modelo !== MODELO_BASE && res.status >= 400 && res.status < 500 && res.status !== 401) {
     console.warn(`[voz de Sibila] el modelo ${modelo} respondió ${res.status}; se usa ${MODELO_BASE}`);

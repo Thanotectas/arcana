@@ -64,6 +64,19 @@ type EventoOriginal = {
   };
 };
 
+/**
+ * Voz de Sibila en otros idiomas: cada lectura se narra una vez por idioma y gasta créditos de ElevenLabs. Solo los
+ * idiomas de SALA_VOZ_IDIOMAS (separados por comas, p. ej. «en,pt»; «todos» para los 8) llevan voz; los demás van
+ * con subtítulos. Por omisión, ninguno: la sala solo reutiliza el audio original cuando la lectura ya está en ese
+ * idioma (no gasta nada).
+ */
+function vozEnSala(idioma: Idioma) {
+  const lista = (process.env.SALA_VOZ_IDIOMAS ?? "").toLowerCase().split(/[\s,]+/).filter(Boolean);
+  return lista.includes("todos") || lista.includes(idioma);
+}
+/** Modelo rápido de ElevenLabs para la sala: cuesta la mitad de créditos por carácter (SALA_VOZ_MODELO lo cambia). */
+const MODELO_SALA = (process.env.SALA_VOZ_MODELO ?? "").trim() || "eleven_flash_v2_5";
+
 /** El idioma en que está escrito el texto: es, en, pt, fr o tr (lo que reconoce el directo). */
 function idiomaOrigen(texto: string): string {
   return idiomaDeTexto(texto)?.codigo ?? "es";
@@ -100,7 +113,7 @@ async function hablado(admin: Admin, seq: number, idioma: Idioma, texto: string,
   let url: string | null = null;
   try {
     if (mismo && audio) url = await subirAudio(admin, seq, idioma, Buffer.from(audio, "base64"));
-    else if (vozConfigurada()) url = await subirAudio(admin, seq, idioma, await sintetizar(traducido.texto));
+    else if (vozConfigurada() && vozEnSala(idioma)) url = await subirAudio(admin, seq, idioma, await sintetizar(traducido.texto, MODELO_SALA));
   } catch (e) {
     console.error("[sala] voz:", e instanceof Error ? e.message : e);
   }
