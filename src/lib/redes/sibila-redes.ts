@@ -20,6 +20,7 @@ import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, type In
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
 import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
+import { idiomaConversacion, respuestaFotoFija, respuestaLimite, respuestasDirecto } from "./respuestas-fijas";
 
 /**
  * Sibila responde en Instagram y Facebook: a los comentarios de las
@@ -45,10 +46,9 @@ const MARCA_FOTO = "[foto]";
 const LECTURAS_POR_PERSONA = Number(process.env.REDES_LECTURAS_POR_PERSONA) || 1;
 const RESPUESTAS_POR_PERSONA_DIA = Number(process.env.REDES_RESPUESTAS_POR_PERSONA) || 3;
 const DETALLE_LIMITE = "límite por persona: llevada a la página";
+const DETALLE_FOTO_FIJA = "respuesta fija a la foto";
 /** Por si alguien escribe sin parar (hubo días de 48 mensajes): pasado esto, Sibila ya no responde ese día. */
 const TOPE_SEGURIDAD_DIA = Number(process.env.REDES_TOPE_PERSONA_DIA) || 12;
-const RESPUESTA_LIMITE =
-  "Me encantó conversar contigo 💛 Para seguir con calma, te espero en miarcana.com: tienes tu carta del día gratis y tu primera lectura completa de regalo al crear tu cuenta 🔮";
 const INSTRUCCION_PAGINA = (motivo: "foto" | "conversacion") => `Estás respondiendo un mensaje directo de Arcana, como Sibila, a alguien con quien ya conversaste ${motivo === "foto" ? "y a quien ya le hiciste su lectura de regalo de una foto por aquí" : "bastante hoy"}.
 Ahora ya no haces lecturas ni sigues la conversación por mensaje: con mucho cariño la llevas a seguir en la página. Así:
 - Primero, una frase cálida que responda de verdad a lo que escribió (agradece, acompaña lo que siente o celebra lo que cuenta), con su nombre si lo sabes. ${motivo === "foto" ? "Si mandó otra foto, dile que se ve que tiene ganas de seguir leyendo sus vasos, sin leerla." : "No respondas preguntas de lectura (qué significa, qué viene, si volverá): eso se ve en la página."}
@@ -60,8 +60,8 @@ Ahora ya no haces lecturas ni sigues la conversación por mensaje: con mucho car
 ${VOZ_NATURAL}`;
 /** Lo que siempre se atiende aunque la persona haya llegado al límite: pagos, cuenta, pedir a una persona. */
 const PIDE_AYUDA = /\b(hablar con (una |alguien|alg[uú]n)|persona real|humano|asesor|alguien del equipo|pago|pagu[eé]|cobr|reembols|tarjeta|cr[eé]ditos? no|mi cuenta|no me deja|no puedo entrar|error|queja)/i;
-/** Respuesta sin IA cuando no se puede leer la foto (tope del día, lectura apagada, descarga fallida). */
-const RESPUESTA_FOTO_FIJA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo (o en miarcana.com/velas si es una vela): te digo lo que salió, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
+/** La respuesta fija de antes (solo español): sigue contando como «no fue lectura» en las filas viejas. Las nuevas se marcan con DETALLE_FOTO_FIJA. */
+const RESPUESTA_FOTO_FIJA_ANTIGUA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo (o en miarcana.com/velas si es una vela): te digo lo que salió, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
 /** Hosts de donde Meta sirve las fotos adjuntas; cualquier otra URL se ignora. */
 const HOSTS_FOTOS = ["fbcdn.net", "fbsbx.com", "cdninstagram.com", "facebook.com", "instagram.com"];
 /** Mensajes directos previos que entran como contexto. */
@@ -281,19 +281,16 @@ async function subirFotoMarcada(admin: SupabaseClient<Database>, idMeta: string,
 async function encolarDelAviso(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
   const nombre = (i.remitente ?? "").split(/\s+/)[0] || "";
   const texto = i.texto.trim();
-  const alAire = estadoDirecto() === "en-vivo";
-  const cuando = alAire ? "Ya estamos en vivo" : `Hoy a las ${new Intl.DateTimeFormat("es-CO", { timeZone: "America/Bogota", hour: "numeric", minute: "2-digit" }).format(new Date(PROXIMO_DIRECTO.inicio))} (Colombia)`;
-  if (i.imagen && !texto) return `${nombre ? `${nombre}, ` : ""}¡qué bueno que la compartes! 🔮 Para que Sibila la lea en el directo, súbela en miarcana punto com barra vivo. ${cuando} en YouTube: búscanos como @miarcana.`;
-  if (!pareceConsulta(texto)) return `${nombre ? `¡Gracias, ${nombre}! ` : "¡Gracias! "}${cuando} te espero en YouTube (@miarcana) 🔮 Déjame aquí tu signo y tu pregunta y te la leo en vivo.`;
+  const r = respuestasDirecto(idiomaConversacion(texto), nombre, estadoDirecto() === "en-vivo", PROXIMO_DIRECTO.inicio);
+  const firmar = (t: string) => `${t}\n\n${r.firma}`;
+  if (i.imagen && !texto) return firmar(r.foto);
+  if (!pareceConsulta(texto)) return firmar(r.saludo);
   const tipo = tipoDeMensaje(texto) ?? "tarot";
   await admin.from("en_vivo_preguntas").upsert(
     { mensaje_id: `fbp:${i.idMeta}`, origen: "facebook" as const, tipo, autor: (i.remitente ?? "Alguien en Facebook").slice(0, 60), texto: texto.slice(0, 300), signo: detectarSigno(texto)?.id ?? null },
     { onConflict: "mensaje_id", ignoreDuplicates: true },
   );
-  const variantes = alAire
-    ? [`¡Anotada${nombre ? `, ${nombre}` : ""}! 🔮 Ya estamos en vivo en YouTube: búscanos como @miarcana, que tu lectura viene en la fila.`, `${nombre ? `${nombre}, ` : ""}tu pregunta ya está en la fila ✨ Entra ahora a YouTube (@miarcana) para escucharla en vivo, con tu nombre.`]
-    : [`¡Anotada${nombre ? `, ${nombre}` : ""}! 🔮 ${cuando} te la leo en vivo en YouTube: búscanos como @miarcana y activa el recordatorio.`, `${nombre ? `${nombre}, ` : ""}tu pregunta quedó en la fila ✨ ${cuando} la escuchas en vivo, con tu nombre, en YouTube (@miarcana).`];
-  return variantes[Math.floor(Math.random() * variantes.length)];
+  return firmar(r.consulta[Math.floor(Math.random() * r.consulta.length)]);
 }
 
 export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
@@ -324,7 +321,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuestaDirecto: string | null = null;
   if (i.tipo === "comentario" && i.red === "facebook" && i.objetoId) {
     const aviso = await publicacionDelDirecto().catch(() => null);
-    if (aviso && aviso.id === i.objetoId) respuestaDirecto = `${await encolarDelAviso(admin, i)}\n\n— Sibila, de Arcana 🔮`;
+    if (aviso && aviso.id === i.objetoId) respuestaDirecto = await encolarDelAviso(admin, i);
   }
 
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
@@ -339,7 +336,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       return "limite";
     }
     if (i.imagen) {
-      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).is("detalle", null).neq("respuesta", RESPUESTA_FOTO_FIJA).gte("creado_en", desde(30 * 86_400_000));
+      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).is("detalle", null).neq("respuesta", RESPUESTA_FOTO_FIJA_ANTIGUA).gte("creado_en", desde(30 * 86_400_000));
       if ((lecturas ?? 0) >= LECTURAS_POR_PERSONA) modoPagina = "foto";
     }
     if (!modoPagina && (hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) modoPagina = "conversacion";
@@ -378,11 +375,13 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (!foto && !i.texto.trim()) respuestaFija = true;
   }
 
+  // Idioma para las respuestas fijas: el del mensaje o, si es solo una foto, el de la conversación.
+  const idiomaFijo = idiomaConversacion(i.texto, hilo.filter((m) => m.rol === "persona").map((m) => m.contenido).reverse());
   let respuesta: string;
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
-    else if (respuestaFija) respuesta = RESPUESTA_FOTO_FIJA;
-    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "auto" }).catch(() => RESPUESTA_LIMITE);
+    else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
+    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "auto" }).catch(() => respuestaLimite(idiomaFijo));
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "auto", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "auto" });
   } catch (e) {
@@ -421,7 +420,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("error", { respuesta, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
     throw e;
   }
-  await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : {}) });
+  await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : respuestaFija ? { detalle: DETALLE_FOTO_FIJA } : {}) });
   if (pideHumano) await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }, { rol: "asistente", contenido: respuesta }]).catch((e) => console.error("[redes aviso]", e));
   return pideHumano ? "humano" : "respondido";
 }

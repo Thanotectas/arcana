@@ -1,3 +1,4 @@
+import { idiomaConversacion, respuestaVacia } from "@/lib/redes/respuestas-fijas";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -133,7 +134,7 @@ export async function atender(admin: SupabaseClient<Database>, telefono: string,
   const mandaCarta = respuesta.includes(MARCA_CARTA);
   const pideHumano = respuesta.includes(MARCA_HUMANO);
   respuesta = respuesta.replace(MARCA_CARTA, "").replace(MARCA_HUMANO, "").replace(/^#+\s*/gm, "").trim();
-  if (!respuesta) respuesta = "Aquí estoy 🌙 ¿En qué te ayudo con Arcana?";
+  if (!respuesta) respuesta = respuestaVacia(idiomaConversacion(texto, hilo.filter((m) => m.rol === "persona").map((m) => m.contenido).reverse()));
 
   await enviarTexto(telefono, respuesta);
   const { error: errorRespuesta } = await admin.from("mensajes_whatsapp").insert({ telefono, nombre, rol: "asistente", contenido: respuesta, humano: pideHumano });
