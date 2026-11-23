@@ -2,6 +2,8 @@
 @font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
 @font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
 @font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+@font-face{font-family:ND;src:url(fuentes/NotoSerifDevanagari.woff2)}
 @font-face{font-family:IR;src:url(../../../src/app/fuentes/Inter-Regular.ttf)}
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
 #sombra{position:absolute;left:0;right:0;top:0;height:560px;background:linear-gradient(180deg,rgba(11,7,22,.85) 0%,rgba(11,7,22,.55) 50%,rgba(11,7,22,0) 100%)}
@@ -9,31 +11,47 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transpa
 .c{position:absolute;left:60px;right:60px;text-align:center;opacity:0}
 .brillo{font-family:C;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.6),0 0 100px rgba(240,150,80,.35),0 3px 16px #0b0716}
 .sub{font-family:CI;font-size:58px;color:#fff;margin-top:10px;text-shadow:0 3px 16px #0b0716}
+body.ar .brillo,body.ar .sub,body.ar #a1,body.ar #c1{font-family:NA,C;letter-spacing:0}
+body.hi .brillo,body.hi .sub,body.hi #a1,body.hi #c1{font-family:ND,C;letter-spacing:0}
 .marca{position:absolute;left:0;right:0;bottom:250px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716;opacity:.85}
 .marca b{color:#f1d99a}
 </style></head><body>
 <div id="sombra"></div><div id="sombra2"></div>
-<div class="c" id="a" style="top:110px"><div style="font-family:I;font-size:28px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716">HOY · 22 DE NOVIEMBRE</div>
-  <div class="brillo" style="font-size:96px;line-height:1.02;margin-top:12px">Empieza la temporada<br>de Sagitario 🏹</div></div>
-<div class="c" id="b" style="top:120px"><div class="brillo" style="font-size:84px;line-height:1.05">Vuelve la fe ✨</div>
-  <div class="sub">viajes, sí a lo nuevo<br>y soltar lo que te ata</div></div>
-<div class="c" id="c" style="top:1180px"><div style="font-family:I;font-size:30px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716">Y ATENTA…</div>
-  <div class="brillo" style="font-size:100px;line-height:1.02;margin-top:12px;color:#fff3d6">Martes 24<br>Luna llena 🌕</div></div>
-<div class="c" id="z" style="top:1190px"><div class="brillo" style="font-size:86px;line-height:1.04">¿Qué te trae<br>esta temporada?</div>
-  <div style="display:inline-block;margin-top:26px;padding:14px 44px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.7);font-family:I;font-size:44px;color:#f1d99a">🔮 miarcana.com</div></div>
+<div class="c" id="a" style="top:110px"><div style="font-family:I;font-size:28px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716" id="a1">HOY · 22 DE NOVIEMBRE</div>
+  <div class="brillo" style="font-size:96px;line-height:1.02;margin-top:12px" id="a2">Empieza la temporada<br>de Sagitario 🏹</div></div>
+<div class="c" id="b" style="top:120px"><div class="brillo" style="font-size:84px;line-height:1.05" id="b1">Vuelve la fe ✨</div>
+  <div class="sub" id="b2">viajes, sí a lo nuevo<br>y soltar lo que te ata</div></div>
+<div class="c" id="c" style="top:1180px"><div style="font-family:I;font-size:30px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716" id="c1">Y ATENTA…</div>
+  <div class="brillo" style="font-size:100px;line-height:1.02;margin-top:12px;color:#fff3d6" id="c2">Martes 24<br>Luna llena 🌕</div></div>
+<div class="c" id="z" style="top:1190px"><div class="brillo" style="font-size:86px;line-height:1.04" id="z1">¿Qué te trae<br>esta temporada?</div>
+  <div style="display:inline-block;margin-top:26px;padding:14px 44px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.7);font-family:I;font-size:44px;color:#f1d99a" id="z2">🔮 miarcana.com</div></div>
 <p class="marca"><b>ARCANA</b> · SIBILA TE LEE</p>
 <script>
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
 const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
-const [tb,tc,tz,F]=(location.hash.slice(1)||"4.75,10.4,13.8,20").split(",").map(Number);
+const TEXTOS={
+ en:["TODAY · NOVEMBER 22","Sagittarius season<br>begins 🏹","Faith returns ✨","trips, yes to the new<br>and letting go","AND PAY ATTENTION…","Tuesday 24<br>Full moon 🌕","What will this<br>season bring you?","🔮 miarcana.com/en"],
+ pt:["HOJE · 22 DE NOVEMBRO","Começa a temporada<br>de Sagitário 🏹","A fé volta ✨","viagens, sim ao novo<br>e soltar o que te prende","E ATENÇÃO…","Terça, 24<br>Lua cheia 🌕","O que esta temporada<br>te traz?","🔮 miarcana.com/pt"],
+ fr:["AUJOURD'HUI · 22 NOVEMBRE","La saison du<br>Sagittaire commence 🏹","La foi revient ✨","voyages, oui à la nouveauté<br>et lâcher prise","ET ATTENTION…","Mardi 24<br>Pleine lune 🌕","Que t'apporte<br>cette saison ?","🔮 miarcana.com/fr"],
+ tr:["BUGÜN · 22 KASIM","Yay burcu sezonu<br>başlıyor 🏹","İnanç geri dönüyor ✨","yolculuklar, yeniye evet<br>ve bırakmak","VE DİKKAT…","Salı 24<br>Dolunay 🌕","Bu sezon sana<br>ne getirecek?","🔮 miarcana.com/tr"],
+ id:["HARI INI · 22 NOVEMBER","Musim Sagitarius<br>dimulai 🏹","Keyakinan kembali ✨","perjalanan, ya untuk hal baru<br>dan melepaskan","DAN INGAT…","Selasa 24<br>Bulan purnama 🌕","Apa yang dibawa<br>musim ini untukmu?","🔮 miarcana.com/id"],
+ ar:["اليوم · 22 نوفمبر","يبدأ موسم<br>برج القوس 🏹","يعود الإيمان ✨","سفر، نعم للجديد<br>وتخلٍّ عمّا يقيّدك","وانتبهوا…","الثلاثاء 24<br>البدر 🌕","ماذا يحمل لك<br>هذا الموسم؟","🔮 miarcana.com/ar"],
+ hi:["आज · 22 नवंबर","पश्चिमी ज्योतिष में<br>धनु का मौसम शुरू 🏹","विश्वास लौटता है ✨","यात्राएँ, नए को हाँ<br>और छोड़ना","और ध्यान दो…","मंगलवार 24<br>पूर्णिमा 🌕","यह मौसम तुम्हारे लिए<br>क्या लाया है?","🔮 miarcana.com/hi"],
+};
+const [tb,tc,tz,F,LANG]=(location.hash.slice(1)||"4.75,10.4,13.8,20,es").split(",");
+if(TEXTOS[LANG]){["a1","a2","b1","b2","c1","c2","z1","z2"].forEach((id,i)=>{const e=document.getElementById(id);e.innerHTML=TEXTOS[LANG][i];if(id==="z2")e.dir="ltr";});}
+document.documentElement.lang=LANG||"es";
+if(LANG==="ar"){document.body.dir="rtl";document.body.classList.add("ar");}
+if(LANG==="hi")document.body.classList.add("hi");
+const [TB,TC,TZ]=[tb,tc,tz].map(Number);
 window.pintar=(t)=>{
   const set=(id,o,dy)=>{const e=document.getElementById(id);e.style.opacity=o.toFixed(3);e.style.transform=`translateY(${dy.toFixed(1)}px)`;};
-  set("a",ven(t,0,tb),(1-su(pr(t,0,.6)))*30);
-  set("b",ven(t,tb,tc),(1-su(pr(t,tb,tb+.6)))*30);
-  set("c",ven(t,tc,tz),(1-su(pr(t,tc,tc+.6)))*30);
-  set("z",su(pr(t,tz,tz+.5)),(1-su(pr(t,tz,tz+.6)))*34);
-  document.getElementById("sombra").style.opacity=(1-su(pr(t,tc-.3,tc+.3))).toFixed(3);
-  document.getElementById("sombra2").style.opacity=su(pr(t,tc-.3,tc+.3)).toFixed(3);
+  set("a",ven(t,0,TB),(1-su(pr(t,0,.6)))*30);
+  set("b",ven(t,TB,TC),(1-su(pr(t,TB,TB+.6)))*30);
+  set("c",ven(t,TC,TZ),(1-su(pr(t,TC,TC+.6)))*30);
+  set("z",su(pr(t,TZ,TZ+.5)),(1-su(pr(t,TZ,TZ+.6)))*34);
+  document.getElementById("sombra").style.opacity=(1-su(pr(t,TC-.3,TC+.3))).toFixed(3);
+  document.getElementById("sombra2").style.opacity=su(pr(t,TC-.3,TC+.3)).toFixed(3);
 };
 window.pintar(0);
 </script></body></html>
