@@ -15,6 +15,7 @@ import { fechaHora, plantilla } from "@/lib/i18n/formato";
 import { LunaHoy } from "@/components/LunaHoy";
 import { AvisoDirecto } from "@/components/AvisoDirecto";
 import { EventoMeta } from "@/components/EventoMeta";
+import { TradicionesDelMundo } from "@/components/TradicionesDelMundo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -185,6 +186,8 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
           </Link>
         ))}
       </section>
+
+      <TradicionesDelMundo t={t} idioma={idioma} conCosto />
 
       <Link href="/invitar" className="tarjeta tarjeta-modulo flex items-center gap-4 border-exito/30 p-5">
         <Users className="h-8 w-8 text-exito" aria-hidden />

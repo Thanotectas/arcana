@@ -2,6 +2,7 @@ import { LOCALE_INTL } from "@/lib/i18n/idiomas";
 import type { Metadata } from "next";
 import { alternativas } from "@/lib/i18n/rutas";
 import Link from "next/link";
+import { TradicionesDelMundo } from "@/components/TradicionesDelMundo";
 import { Sparkles, Star, Hash, Heart, Moon, Hand, Hexagon, Sunrise, Flame, Layers, MoonStar, HeartHandshake, Coffee, Orbit, FlameKindling, Sparkle, Wind, Sun, Swords, Clover, Axe, Diamond, Egg, Pyramid, Bean } from "lucide-react";
 import { CIRCULO, PAQUETES, PAQUETE_CIRCULO, precioCirculoPorDia } from "@/lib/creditos";
 import { getUsuarioOpcional, getContadorLecturas } from "@/lib/dal";
@@ -107,6 +108,8 @@ export default async function Portada() {
           </Link>
         ))}
       </section>
+
+      <TradicionesDelMundo t={t} idioma={idioma} />
 
       <section className="tarjeta p-8 text-center">
         <h2 className="font-display text-3xl font-semibold text-oro-suave">{t.portada.comoFunciona}</h2>
