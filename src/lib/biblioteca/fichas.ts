@@ -37,6 +37,94 @@ export interface EntradaBiblioteca {
 
 export const BIBLIOTECA: EntradaBiblioteca[] = [
   {
+    slug: "tarot",
+    clave: "tarot",
+    href: "/tarot",
+    publicada: "2026-11-24",
+    fuentes: [
+      { titulo: "The Morgan Library & Museum: Visconti-Sforza tarot cards (Milán, hacia 1450)", url: "https://www.themorgan.org/collection/tarot-cards" },
+      { titulo: "Victoria and Albert Museum: Tarot cards", url: "https://www.vam.ac.uk/articles/tarot-cards" },
+      { titulo: "National Geographic: The history of tarot cards", url: "https://www.nationalgeographic.com/history/article/tarot-cards-history-fortune-telling" },
+      { titulo: "Becker Medical Library (Washington University): exposición sobre el tarot", url: "https://beckerexhibits.wustl.edu/s/tarot/page/home" },
+      { titulo: "Michael Dummett, The Game of Tarot (1980)", url: "https://www.britannica.com/topic/tarot/additional-info" },
+    ],
+    textos: {
+      es: {
+        titulo: "El tarot: de las cortes de Italia a tu mesa, su historia y sus arcanos",
+        descripcion:
+          "El tarot nació en las cortes del norte de Italia en el siglo XV y en el siglo XVIII se volvió el oráculo más famoso del mundo. Su historia, las 78 cartas, los 22 arcanos mayores y cómo se lee una tirada.",
+        nombres: "Tarocchi (italiano) · Tarot (francés) · Arcanos mayores y menores",
+        entrada:
+          "Pocas imágenes son tan reconocibles como una carta del tarot: la Luna con sus dos torres, la Estrella derramando agua, el Loco al borde del abismo. Detrás de esas figuras hay casi seis siglos de historia: pintores del Renacimiento, sabios de París, magos de Londres y millones de personas que, cada día, barajan y preguntan. Esta es la historia del tarot.",
+        secciones: [
+          {
+            titulo: "Nace en las cortes del Renacimiento",
+            parrafos: [
+              "Las primeras cartas del tarot que se conservan se pintaron a mano hacia mediados del siglo XV en las cortes del norte de Italia, para familias como los Visconti y los Sforza de Milán. Se llamaban tarocchi y eran verdaderas obras de arte, con fondos de oro y pigmentos preciosos. Hoy algunas de esas cartas se guardan en museos como la Morgan Library de Nueva York.",
+              "A los cuatro palos de la baraja —copas, oros, espadas y bastos— se les sumó una serie de cartas con figuras alegóricas: el Mago, la Emperatriz, la Rueda de la Fortuna, la Muerte, el Sol, el Mundo. Esas son las que hoy llamamos arcanos mayores.",
+            ],
+          },
+          {
+            titulo: "De París al mundo: el tarot se vuelve oráculo",
+            parrafos: [
+              "En 1781 el erudito francés Antoine Court de Gébelin publicó en su obra Le Monde primitif que el tarot guardaba la sabiduría secreta del antiguo Egipto. Poco después, Jean-Baptiste Alliette, conocido como Etteilla, publicó el primer método para leer el futuro con estas cartas y diseñó una de las primeras barajas pensadas para la adivinación.",
+              "En el siglo XIX los ocultistas franceses e ingleses unieron el tarot con la astrología, la cábala y los cuatro elementos. Y a comienzos del siglo XX, en Londres, la artista Pamela Colman Smith dibujó, por encargo de Arthur Edward Waite y del editor William Rider, la baraja que se volvería la más usada del mundo: la Rider-Waite-Smith, la primera en ilustrar con escenas también los arcanos menores. La mayoría de los tarots que hoy se ven en redes descienden de ella.",
+            ],
+          },
+          {
+            titulo: "Las 78 cartas",
+            parrafos: [
+              "Un tarot completo tiene 78 cartas. Los 22 arcanos mayores hablan de las grandes etapas y lecciones de la vida: el viaje del Loco, que sale con su hatillo, se encuentra con el Mago y la Sacerdotisa, pasa por el Enamorado, la Torre y la Estrella, y llega al Mundo.",
+              "Los 56 arcanos menores hablan del día a día y se reparten en cuatro palos, cada uno con su elemento: copas (agua: emociones y amor), oros o pentáculos (tierra: dinero, trabajo y cuerpo), espadas (aire: la mente, las decisiones y los conflictos) y bastos (fuego: la acción, los proyectos y la pasión). Cada palo va del as al diez y tiene cuatro figuras de la corte: sota, caballo, reina y rey.",
+            ],
+          },
+          {
+            titulo: "Cómo se lee una tirada",
+            parrafos: [
+              "Se empieza con una pregunta clara. Se barajan las cartas pensando en ella, se corta y se sacan las cartas en un orden que tiene sentido: en la tirada de tres cartas, por ejemplo, la primera habla de lo que viene de atrás, la segunda del presente y la tercera de hacia dónde va la situación. La Cruz Celta, con diez cartas, mira la pregunta desde todos los ángulos.",
+              "Cada carta tiene su significado, pero la lectora no las lee sueltas: mira cómo conversan entre sí, qué palo domina, si aparecen muchos arcanos mayores —señal de un momento importante— y si alguna sale invertida, lo que matiza o retrasa su mensaje.",
+            ],
+          },
+          {
+            titulo: "Un lenguaje que se habla en todo el mundo",
+            parrafos: [
+              "En Francia se conserva el tarot de Marsella, con sus colores planos y su trazo antiguo. En Latinoamérica el tarot convive con la baraja española, que muchas abuelas leían en la mesa de la cocina. Y hoy, en cualquier idioma, alguien saca una carta del día para saber qué energía lo acompaña.",
+              "Esa es su fuerza: el tarot no pide creer en nada en particular. Pide una pregunta sincera y la disposición a mirarse en sus imágenes.",
+            ],
+          },
+        ],
+        simbolos: {
+          titulo: "Algunos arcanos mayores",
+          intro: "Estos son algunos de los arcanos mayores más conocidos y lo que la tradición lee en ellos:",
+          lista: [
+            { s: "El Loco (0)", d: "Un comienzo, un salto de fe, la libertad de empezar sin garantías." },
+            { s: "El Mago (I)", d: "Tienes las herramientas: es momento de actuar con lo que sabes." },
+            { s: "La Sacerdotisa (II)", d: "Intuición, secretos y la sabiduría que llega en silencio." },
+            { s: "Los Enamorados (VI)", d: "Una elección del corazón; un vínculo que pide decidir." },
+            { s: "La Rueda de la Fortuna (X)", d: "Un giro del destino: lo que estaba quieto empieza a moverse." },
+            { s: "La Muerte (XIII)", d: "No es una muerte física: es el fin de una etapa y el inicio de otra." },
+            { s: "La Torre (XVI)", d: "Un cambio repentino que derrumba lo que ya no sostenía." },
+            { s: "La Estrella (XVII)", d: "Esperanza, sanación y fe en lo que viene." },
+            { s: "El Sol (XIX)", d: "Alegría, éxito y claridad: el sí más luminoso del tarot." },
+            { s: "El Mundo (XXI)", d: "Un ciclo que se completa: logro, viaje o plenitud." },
+          ],
+        },
+        preguntas: [
+          { p: "¿Dónde nació el tarot?", r: "En las cortes del norte de Italia, a mediados del siglo XV. Las primeras barajas, llamadas tarocchi, se pintaron a mano para familias nobles como los Visconti y los Sforza de Milán." },
+          { p: "¿Cuándo se empezó a usar el tarot para adivinar?", r: "En Francia, a finales del siglo XVIII. En 1781 Court de Gébelin lo relacionó con la sabiduría del antiguo Egipto y poco después Etteilla publicó el primer método de lectura y una baraja pensada para la adivinación." },
+          { p: "¿Cuántas cartas tiene el tarot?", r: "78: 22 arcanos mayores, que hablan de las grandes etapas de la vida, y 56 arcanos menores, repartidos en cuatro palos (copas, oros, espadas y bastos), que hablan del día a día." },
+          { p: "¿Qué es la baraja Rider-Waite-Smith?", r: "Es el tarot que la artista Pamela Colman Smith dibujó en Londres, por encargo de Arthur Edward Waite, publicado por Rider hacia 1909-1910. Fue el primero en ilustrar con escenas todas las cartas y es la base de la mayoría de los tarots actuales." },
+          { p: "¿La carta de la Muerte es mala?", r: "No. En el tarot la Muerte habla de transformación: el final de una etapa para que empiece otra. Casi nunca se lee como una muerte física." },
+        ],
+        cta: {
+          titulo: "Pregúntale al tarot",
+          texto: "Escribe tu pregunta, baraja y saca tus cartas: Sibila te las interpreta juntas, como lo haría una lectora, según tu pregunta. Tu carta del día es gratis.",
+          boton: "Hacer mi tirada",
+        },
+      },
+    },
+  },
+  {
     slug: "limpia-con-huevo",
     clave: "huevo",
     href: "/huevo",

@@ -1,0 +1,65 @@
+VIDEO 54 — EL ARCANO DE SIBILA #3 · «EL TAROT». Serie diaria: una tradición del mundo por día.
+Vertical 9:16, ~50 s con la voz de Sibila. Lleva a miarcana.com/biblioteca/tarot y a la tirada (miarcana.com/tarot).
+Tono: documental cálido y mágico; del Renacimiento a tu mesa. Desde adentro de la tradición.
+SIN CARAS (manos, objetos, lugares). Prompts en inglés.
+(Lo numeré 54 porque las carpetas de voz 51, 52 y 53 ya las usa tu otro asistente.)
+
+==================== RECETA DIARIA ====================
+- 2 CLIPS DE VIDEO en Flow (tus 2 prompts del día), vertical 9:16, 8 s: el clip A (el pintor del Renacimiento) y el clip B (la tirada).
+- 4 IMÁGENES en Gemini («Crear imagen», vertical 9:16). Si las pegas en el chat, adjúntalas como ARCHIVO (si no, no me llegan).
+- VOZ: en miarcana.com/admin/voz pega el guion de abajo, elige los idiomas (recomiendo español, inglés, portugués y francés) y
+  descarga los MP3. Nombre del video: «54 tarot».
+- Sonido de los clips: solo ambiente. Sin música y sin voces.
+
+==================== CLIP A · Flow · «Las cartas pintadas a mano» (8 s) ====================
+Vertical 9:16, cinematic, warm candlelight in a 15th-century Italian Renaissance workshop: a wooden table with brushes,
+small pots of pigment, gold leaf and a magnifying lens. An artist's hands (only hands and sleeves of a dark velvet
+Renaissance garment) carefully paint gold leaf onto a tall hand-painted tarot card showing a crowned figure on a golden
+background; other finished cards with golden backgrounds lie beside it. Gold dust catches the light. Slow push-in.
+Sound: brush strokes, the crackle of a candle, distant church bells. No music, no voices.
+No faces, no readable text or letters, no logos.
+
+==================== CLIP B · Flow · «La tirada» (8 s) ====================
+Vertical 9:16, cinematic close-up from above, deep violet velvet tablecloth, a lit candle and a small crystal. A woman's
+hands (thin gold rings) shuffle a deck of tarot cards, cut it into three piles and then turn three cards face up in a row,
+one by one; as each card turns, a soft golden glow rises from it. The card faces show classic illustrated tarot scenes
+(a star over water, a sun, a wheel), painted style. Slow camera movement.
+Sound: cards shuffling and sliding on velvet, candle crackling, a soft shimmer as each card turns. No music, no voices.
+No faces, no readable text or letters, no logos.
+
+==================== IMAGEN 1 · Gemini · «Milán, siglo XV» ====================
+Vertical 9:16 photorealistic cinematic image, a 15th-century Italian Renaissance palace hall at golden hour: marble
+columns, frescoed walls, a carved wooden table with a fan of luxurious hand-painted tarot cards with golden backgrounds,
+a silver candelabra and a velvet cloth. No people, no faces, no readable text, no logos.
+
+==================== IMAGEN 2 · Gemini · «París, 1781» ====================
+Vertical 9:16 photorealistic image, an 18th-century Parisian scholar's study at night: tall bookshelves, an open antique
+book with engravings of Egyptian symbols and tarot cards, a quill and inkwell, a brass candlestick, a few old tarot
+cards scattered on the desk. Warm candlelight, deep shadows. No people, no faces, no readable text, no logos.
+
+==================== IMAGEN 3 · Gemini · «Los arcanos mayores» ====================
+Vertical 9:16 image, a mystical arrangement of illustrated tarot major arcana cards floating in a deep violet starry
+space in a gentle arc (the Fool, the Magician, the Star, the Moon, the Sun, the World), each glowing softly with golden
+light, painted classic tarot style. No readable text or numbers, no logos.
+
+==================== IMAGEN 4 · Gemini · «El cierre» (con espacio para texto) ====================
+Vertical 9:16 photorealistic image, a single tarot card face down on a deep violet velvet cloth next to a lit candle and a
+small crystal ball, soft bokeh lights behind, warm gold and violet tones, lots of empty dark space in the lower third for
+text. No people, no faces, no readable text, no logos.
+
+==================== GUION DE LA VOZ (pégalo en miarcana.com/admin/voz) ====================
+(~760 caracteres, ~50 s. Los «…» son pausas: déjalos.)
+Bienvenida al Arcano de Sibila. Hoy: el tarot…
+A mediados del siglo quince, en las cortes de Milán, los pintores del Renacimiento hacían a mano unas cartas con fondo de oro: los tarocchi…
+Era un juego de nobles… hasta que en París, en mil setecientos ochenta y uno, un sabio creyó ver en ellas la sabiduría secreta de Egipto. Desde entonces, el tarot es un oráculo…
+Setenta y ocho cartas. Veintidós arcanos mayores, el viaje del alma, del Loco al Mundo… y cincuenta y seis menores, la vida de cada día…
+Se baraja con una pregunta, se sacan las cartas… y ellas conversan…
+¿Qué quieres preguntarle al tarot?… Tu carta del día te espera en mi arcana punto com.
+
+==================== TÍTULOS EN PANTALLA (los pongo yo al armar) ====================
+1. EL ARCANO DE SIBILA · #3 / El tarot 🃏
+2. MILÁN · SIGLO XV / Cartas pintadas con oro
+3. PARÍS · 1781 / Nace el oráculo
+4. 78 cartas · 22 arcanos mayores · 56 menores
+5. Una pregunta · las cartas conversan
+6. ¿Qué quieres preguntarle al tarot? / 🃏 miarcana.com/tarot
