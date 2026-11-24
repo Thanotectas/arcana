@@ -2,6 +2,7 @@ import { cronAutorizado } from "@/lib/cron";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo, urlBaja } from "@/lib/correo";
 import { correoCampana, type TipoCorreo } from "@/lib/correos/plantillas";
+import { INVITACION_COMUNIDAD_HASTA, correoComunidad } from "@/lib/correos/comunidad";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
@@ -77,11 +78,28 @@ export async function GET(request: Request) {
     enviadosPor.set(c.usuario_id, lista);
   }
 
-  // 4. Segmentación.
+  // 4a. Invitación a la Comunidad (una vez por persona, hasta INVITACION_COMUNIDAD_HASTA): va primero, a quien no
+  // recibió ningún correo en las últimas 20 horas. Esa persona no recibe además el correo de campaña del día.
+  const fecha = fechaBogota();
+  const invitar: { id: string; correo: string; nombre: string | null; idioma: string }[] = [];
+  if (fecha <= INVITACION_COMUNIDAD_HASTA) {
+    const { data: yaInvitados } = await admin.from("correos").select("usuario_id").eq("tipo", "comunidad");
+    const invitados = new Set((yaInvitados ?? []).map((c) => c.usuario_id));
+    for (const p of perfiles) {
+      const u = usuarios.get(p.id);
+      if (!u || invitados.has(p.id)) continue;
+      if ((enviadosPor.get(p.id) ?? []).some((c) => ahora - c.en < 20 * 3_600_000)) continue;
+      invitar.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma });
+    }
+  }
+  const loteComunidad = invitar.slice(0, maximo);
+  const enComunidad = new Set(loteComunidad.map((c) => c.id));
+
+  // 4b. Segmentación.
   const candidatos: Candidato[] = [];
   for (const p of perfiles) {
     const u = usuarios.get(p.id);
-    if (!u) continue;
+    if (!u || enComunidad.has(p.id)) continue;
     const creada = Date.parse(p.creado_en);
     if (ahora - creada < DIAS_MINIMOS_CUENTA * DIA) continue;
     const actividad = Math.max(u.ultimoAcceso, ultimaLectura.get(p.id) ?? 0, creada);
@@ -93,10 +111,25 @@ export async function GET(request: Request) {
     candidatos.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma, tipo, dias: Math.round(dias) });
   }
   candidatos.sort((a, b) => PRIORIDAD[a.tipo] - PRIORIDAD[b.tipo] || b.dias - a.dias);
-  const lote = candidatos.slice(0, maximo);
+  const lote = candidatos.slice(0, Math.max(0, maximo - loteComunidad.length));
 
-  // 5. Envío (en serie: Resend limita a 2 peticiones por segundo).
-  const fecha = fechaBogota();
+  // 5a. Invitaciones a la Comunidad.
+  let invitados = 0;
+  for (const c of loteComunidad) {
+    const idioma = esIdioma(c.idioma) ? c.idioma : IDIOMA_PREDETERMINADO;
+    const baja = urlBaja(c.id);
+    const correo = correoComunidad({ nombre: c.nombre, idioma, fecha, urlBaja: baja });
+    const r = await enviarCorreo({ para: c.correo, asunto: correo.asunto, html: correo.html, texto: correo.texto, etiqueta: "comunidad", cabeceras: { "List-Unsubscribe": `<${baja}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
+    await admin.from("correos").insert({ usuario_id: c.id, tipo: "comunidad", asunto: correo.asunto, estado: r.ok ? "enviado" : "error", id_proveedor: r.ok ? r.id : null, detalle: r.ok ? null : r.error });
+    if (r.ok) invitados++;
+    else {
+      console.error("[cron correos] invitación a la comunidad fallida", c.id, r.error);
+      if (/^(401|403|422|429)/.test(r.error)) break;
+    }
+    await new Promise((res) => setTimeout(res, 600));
+  }
+
+  // 5b. Envío (en serie: Resend limita a 2 peticiones por segundo).
   const oferta = await estadoOfertaFundadores();
   const resumen: Record<TipoCorreo, number> = { carta_activo: 0, regreso_7: 0, regreso_30: 0 };
   let enviados = 0;
@@ -134,5 +167,5 @@ export async function GET(request: Request) {
     await new Promise((res) => setTimeout(res, 600));
   }
 
-  return Response.json({ perfiles: perfiles.length, candidatos: candidatos.length, enviados, fallidos, ...resumen });
+  return Response.json({ perfiles: perfiles.length, comunidad: invitados, candidatos: candidatos.length, enviados, fallidos, ...resumen });
 }

@@ -224,6 +224,7 @@ async function responderComoSibila(admin: Admin, m: Mensaje) {
 - Responde en 1 a 3 frases (máximo 280 caracteres), llamando a la persona por su nombre una vez, retomando lo que contó con sus palabras y conectándolo con la carta de hoy.
 - No hagas lecturas personales, predicciones con fechas ni promesas; nada de salud, embarazos, muertes, juicios ni dinero garantizado. Si cuenta un dolor, acompáñala con ternura.
 - Si pregunta algo que necesita una lectura, dile con cariño que puede hacerla en miarcana.com. No vendas en cada respuesta.
+- Si pregunta por SU carta (la suya, la personal, «mi carta de hoy»), aclárale que la de la comunidad es la carta del día para todos y que su carta personal de hoy la saca gratis en miarcana.com/tarot.
 - Sin markdown, sin hashtags, un emoji como mucho. Nunca expliques lo que vas a hacer: escribe solo la respuesta.`,
     { effort: "low", maxTokens: 500, nivel: "estandar", idioma },
   );
