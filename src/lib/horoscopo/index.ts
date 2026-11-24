@@ -59,7 +59,7 @@ export async function horoscopoDelDia(signo: Signo, idioma: Idioma = IDIOMA_PRED
         `Rasgos del signo: ${signo.rasgos.join(", ")}; elemento ${signo.elemento}; regente ${signo.regente}. ` +
         `${resumenCielo(cieloDelSigno(signo, instanteDelDia(fecha)))}\n` +
         `Apóyate en ese cielo real: nombra dónde está la Luna hoy y al menos otro planeta, en palabras sencillas (no digas "casa solar 5": di "tu zona del amor" o similar), y que lo que anuncias coincida con los aspectos de apoyo o de tensión. ` +
-        `Estructura: un párrafo general (60-80 palabras), luego ## Amor, ## Trabajo y dinero, ## Bienestar (40-60 palabras cada uno) y una línea final "Consejo del día:". Sin título general. Total: 220 a 300 palabras.`,
+        `Estructura: un párrafo general (60-80 palabras), luego ## Amor, ## Trabajo y dinero, ## Bienestar (40-60 palabras cada uno) y una línea final que empiece con "Consejo del día:" (esa etiqueta y los títulos de las secciones, traducidos al idioma de la respuesta). Sin título general ni firma. Total: 220 a 300 palabras.`,
       "",
       { effort: "low", maxTokens: 900, idioma, nivel: "economico" },
     );
