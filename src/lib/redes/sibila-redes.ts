@@ -18,6 +18,7 @@ import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
 import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion } from "./meta";
 import { esPublicacionAbjad, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
+import { esPublicacionYildizname, respuestaYildizname } from "./yildizname-comentarios";
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
 import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
@@ -83,6 +84,7 @@ Reglas:
 - Si el comentario recuerda a alguien que murió, acompaña con una frase cálida, sin lectura ni invitación. Si pide números para loterías o apuestas, no los des: responde con amabilidad que Arcana no da números de suerte para jugar.
 - Si alguien cuenta que le dijeron que tiene «trabajo», brujería o daño, o pregunta si le hicieron un amarre o un dominio, no lo confirmes: tranquilízalo, y que desconfíe de quien le cobre por «quitarlo».
 - Muchas publicaciones piden comentar una palabra o un número (SUELTO, 1111, AMÉN, DECRETADO, VELITAS, ACEPTO, el nombre de una señal, «me suelto», «yo lo recibo»): esos comentarios NO se omiten aunque sean cortos. Responde con calidez a lo que la persona dejó o decretó, en una o dos frases, con su nombre si lo sabes, y variando la forma.
+- Nunca calcules ni inventes valores de abjad, ebced o yıldızname, ni digas a alguien su signo por su nombre: si el comentario pide eso y no viene en el formato «nombre + nombre de la madre», pídele con cariño que lo escriba así.
 - Si el comentario es una crítica religiosa («haram», «حرام», «günah», «shirk», «es pecado», «brujería»), NO lo omitas: responde con respeto en UNA sola frase completa, en su idioma, sin discutir ni defender la práctica: agradece su opinión y di que compartimos estas tradiciones como cultura y reflexión, respetando todas las creencias.
 - Si el comentario es spam, publicidad ajena, insulto, burla o tema ajeno a Arcana, responde exactamente ${MARCA_OMITIR} y nada más. Ante la duda, responde con amabilidad en vez de omitir.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
@@ -334,10 +336,14 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   }
 
   // Comentario que es solo un nombre en un reel de abjad / ebced: el valor se calcula con la tabla fija, sin el modelo.
+  // En un reel del Yıldızname («tu nombre + el de tu madre») se responde con el mismo cálculo de la lectura; se revisa
+  // antes que el abjad porque su texto también habla de ebced y حساب الجمل.
   let respuestaAbjad: string | null = null;
-  if (!respuestaDirecto && i.tipo === "comentario" && i.objetoId && nombreDelComentario(i.texto)) {
-    const publicacion = await textoDePublicacion(i.red, i.objetoId).catch(() => "");
-    if (esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, i.red);
+  let publicacion = "";
+  if (!respuestaDirecto && i.tipo === "comentario" && i.objetoId) {
+    publicacion = await textoDePublicacion(i.red, i.objetoId).catch(() => "");
+    if (esPublicacionYildizname(publicacion)) respuestaAbjad = respuestaYildizname(i.texto, publicacion, i.red);
+    else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, i.red);
   }
 
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con

@@ -36,6 +36,18 @@ export function esPublicacionAbjad(texto: string) {
   return /abjad|ebced|ebcet|jummal|jumal|جمل|أبجد|ابجد/i.test(sinVocales);
 }
 
+/**
+ * Idioma del texto de una publicación: árabe si predomina la escritura árabe; si no, el de su texto latino (los
+ * hashtags como #حساب_الجمل no lo cambian).
+ */
+export function idiomaDePublicacion(texto: string): Idioma {
+  const sinEtiquetas = texto.replace(/#\S+/g, " ");
+  const arabes = (sinEtiquetas.match(/[\u0600-\u06FF]/g) ?? []).length;
+  const latinas = (sinEtiquetas.match(/[A-Za-zÀ-ÿĞğİıŞş]/g) ?? []).length;
+  if (arabes > latinas) return "ar";
+  return idiomaConversacion(sinEtiquetas.replace(/[\u0600-\u06FF]+/g, " "));
+}
+
 /** Palabras que se comentan solas y no son nombres (agradecer, reaccionar, criticar). */
 const NO_NOMBRES = /^(gracias|grac|amen|amén|ok|okay|wow|hola|si|sí|no|thanks|thank you|thx|yes|nice|love|merci|obrigad[oa]|terima kasih|teşekkürler|tesekkurler|sağol|merhaba|selam|maşallah|mashallah|masha ?allah|inshallah|haram|günah|shirk|bid'?ah|شكرا|شكراً|حرام|شرك|بدعة|نعم|لا|ماشاء الله|ما شاء الله|سبحان الله|الله أكبر|الحمد لله|آمين|امين|مرحبا|السلام عليكم)$/i;
 
@@ -85,7 +97,7 @@ export function respuestaNombreAbjad(comentario: string, textoPublicacion: strin
   const nombre = nombreDelComentario(comentario);
   if (!nombre) return null;
   const arabe = esEscrituraArabe(nombre);
-  const idioma: Idioma = arabe ? "ar" : idiomaConversacion(comentario) !== "es" ? idiomaConversacion(comentario) : idiomaConversacion(textoPublicacion);
+  const idioma: Idioma = arabe ? "ar" : idiomaConversacion(comentario) !== "es" ? idiomaConversacion(comentario) : idiomaDePublicacion(textoPublicacion);
   const grafia = arabe ? nombre : transliterar(nombre, idioma);
   const valor = valorJummal(grafia);
   if (valor <= 0) return null;
