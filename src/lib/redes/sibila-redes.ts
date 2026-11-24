@@ -16,7 +16,8 @@ import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
-import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, type Interaccion } from "./meta";
+import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion } from "./meta";
+import { esPublicacionAbjad, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
 import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
@@ -82,6 +83,7 @@ Reglas:
 - Si el comentario recuerda a alguien que murió, acompaña con una frase cálida, sin lectura ni invitación. Si pide números para loterías o apuestas, no los des: responde con amabilidad que Arcana no da números de suerte para jugar.
 - Si alguien cuenta que le dijeron que tiene «trabajo», brujería o daño, o pregunta si le hicieron un amarre o un dominio, no lo confirmes: tranquilízalo, y que desconfíe de quien le cobre por «quitarlo».
 - Muchas publicaciones piden comentar una palabra o un número (SUELTO, 1111, AMÉN, DECRETADO, VELITAS, ACEPTO, el nombre de una señal, «me suelto», «yo lo recibo»): esos comentarios NO se omiten aunque sean cortos. Responde con calidez a lo que la persona dejó o decretó, en una o dos frases, con su nombre si lo sabes, y variando la forma.
+- Si el comentario es una crítica religiosa («haram», «حرام», «günah», «shirk», «es pecado», «brujería»), NO lo omitas: responde con respeto en UNA sola frase completa, en su idioma, sin discutir ni defender la práctica: agradece su opinión y di que compartimos estas tradiciones como cultura y reflexión, respetando todas las creencias.
 - Si el comentario es spam, publicidad ajena, insulto, burla o tema ajeno a Arcana, responde exactamente ${MARCA_OMITIR} y nada más. Ante la duda, responde con amabilidad en vez de omitir.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
 - Responde en el idioma del comentario, cualquiera que sea (español solo si no se nota). Tutea.
@@ -331,6 +333,13 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (aviso && aviso.id === i.objetoId) respuestaDirecto = await encolarDelAviso(admin, i);
   }
 
+  // Comentario que es solo un nombre en un reel de abjad / ebced: el valor se calcula con la tabla fija, sin el modelo.
+  let respuestaAbjad: string | null = null;
+  if (!respuestaDirecto && i.tipo === "comentario" && i.objetoId && nombreDelComentario(i.texto)) {
+    const publicacion = await textoDePublicacion(i.red, i.objetoId).catch(() => "");
+    if (esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, i.red);
+  }
+
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
   // cariño a lo que le escriben, pero corto y llevando a la página (sin leer ni alargar la conversación).
   let modoPagina: "foto" | "conversacion" | null = null;
@@ -402,6 +411,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuesta: string;
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
+    else if (respuestaAbjad) respuesta = respuestaAbjad;
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
     else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "economico", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });

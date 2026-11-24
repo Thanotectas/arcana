@@ -66,6 +66,19 @@ async function llamar<T = Record<string, unknown>>(ruta: string, cuerpo?: Record
 
 export type RedMeta = "instagram" | "facebook";
 
+/** Texto de una publicación (caption en Instagram, mensaje en Facebook), con caché en memoria de una hora. */
+const textos = new Map<string, { texto: string; hasta: number }>();
+export async function textoDePublicacion(red: RedMeta, id: string): Promise<string> {
+  const clave = `${red}:${id}`;
+  const guardado = textos.get(clave);
+  if (guardado && guardado.hasta > Date.now()) return guardado.texto;
+  const campo = red === "instagram" ? "caption" : "message";
+  const r = await llamar<Record<string, string | undefined>>(`${id}?fields=${campo}`);
+  const texto = r[campo] ?? "";
+  textos.set(clave, { texto, hasta: Date.now() + 3_600_000 });
+  return texto;
+}
+
 /** Responde un comentario (Instagram: /replies; Facebook: /comments). Devuelve el id de la respuesta. */
 export async function responderComentario(red: RedMeta, idComentario: string, texto: string, imagenUrl?: string): Promise<string> {
   // En Facebook los enlaces en comentarios están limitados: las direcciones van en palabras.
