@@ -100,10 +100,27 @@ export function textosReelEs(fecha: string): TextosReel {
  * Texto en árabe para el reel: ImageResponse no une las letras árabes ni las ordena de derecha a izquierda, así que
  * se dibuja con Pango (sharp) y entra a la capa como imagen.
  */
+let fuentesPango: Promise<void> | null = null;
+/**
+ * En el servidor no hay fuentes del sistema: la fuente árabe no trae cifras latinas, «·» ni «.», y salían cuadros.
+ * Se le da a Pango (fontconfig) la carpeta de nuestras fuentes, así lo que falte lo dibuja Inter o Cormorant.
+ * Debe quedar fijado antes del primer texto de sharp en el proceso.
+ */
+function prepararFuentesPango() {
+  return (fuentesPango ??= (async () => {
+    if (process.env.FONTCONFIG_FILE) return;
+    const conf = join(tmpdir(), "arcana-fonts.conf");
+    const dir = join(process.cwd(), "src/app/fuentes");
+    await writeFile(conf, `<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd"><fontconfig><dir>${dir}</dir><cachedir>${join(tmpdir(), "arcana-fontcache")}</cachedir></fontconfig>`);
+    process.env.FONTCONFIG_FILE = conf;
+  })());
+}
+
 async function textoArabe(texto: string, pt: number, color: string, ancho: number): Promise<{ uri: string; ancho: number; alto: number }> {
+  await prepararFuentesPango();
   const escapado = texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const imagen = await sharp({
-    text: { text: `<span foreground="${color}">${escapado}</span>`, font: `Noto Naskh Arabic ${pt}`, fontfile: join(process.cwd(), "src/app/fuentes", "NotoNaskhArabic-SemiBold.ttf"), rgba: true, width: ancho, align: "centre", wrap: "word", spacing: Math.round(pt * 0.12) },
+    text: { text: `<span foreground="${color}">${escapado}</span>`, font: `Noto Naskh Arabic, Inter ${pt}`, fontfile: join(process.cwd(), "src/app/fuentes", "NotoNaskhArabic-SemiBold.ttf"), rgba: true, width: ancho, align: "centre", wrap: "word", spacing: Math.round(pt * 0.12) },
   })
     .png()
     .toBuffer();
