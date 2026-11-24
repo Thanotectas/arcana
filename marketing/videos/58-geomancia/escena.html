@@ -1,0 +1,141 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716;font-variant-numeric:lining-nums}
+.capa{position:absolute;inset:0;opacity:0;overflow:hidden}
+.capa img{position:absolute;top:0;height:1920px;width:auto;will-change:transform}
+#fondoTablero img{filter:blur(14px) brightness(.38) saturate(1.2)}
+.velo{position:absolute;inset:0}
+#v0{background:linear-gradient(180deg,rgba(11,7,22,.85) 0%,rgba(11,7,22,.35) 25%,rgba(11,7,22,.1) 60%,rgba(11,7,22,.85) 100%)}
+#v4{background:linear-gradient(180deg,rgba(11,7,22,.2) 0%,rgba(11,7,22,.05) 40%,rgba(11,7,22,.75) 100%)}
+.c{position:absolute;left:60px;right:60px;text-align:center;opacity:0}
+.k{font-family:I;font-size:30px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716}
+.t{font-family:C;color:#f1d99a;line-height:1.04;margin-top:10px;text-shadow:0 0 40px rgba(241,217,154,.55),0 0 100px rgba(240,150,80,.3),0 3px 16px #0b0716}
+.s{font-family:CI;font-size:58px;color:#fff;margin-top:10px;text-shadow:0 3px 16px #0b0716}
+.ar{font-family:NA}
+body.rtl .k,body.rtl .t,body.rtl .s{font-family:NA,C;letter-spacing:0}
+body.rtl .k{font-size:38px}
+.boton{display:inline-block;margin-top:34px;padding:18px 48px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.75);font-family:I;font-size:44px;color:#f1d99a}
+/* Tablero de arena (como en la página) */
+#tablero{position:absolute;left:60px;right:60px;top:520px;display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:26px;border-radius:36px;border:2px solid rgba(241,217,154,.28);
+ background:radial-gradient(120% 90% at 30% 20%,rgba(214,170,96,.30),rgba(120,80,40,.22) 60%,rgba(40,24,30,.5));box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.madre{border-radius:24px;border:1.5px solid rgba(236,230,247,.16);background:rgba(0,0,0,.22);padding:18px 18px 12px}
+.madre h3{margin:0 0 12px;text-align:center;font-family:I;font-size:22px;letter-spacing:.25em;color:#b7a5ff;font-weight:600}
+.linea{position:relative;height:84px;margin-bottom:10px;border-radius:14px;border:1.5px dashed rgba(236,230,247,.25);display:flex;align-items:center;padding:0 14px;gap:9px}
+.linea.hecha{border-style:solid;border-color:rgba(241,217,154,.45);background:rgba(241,217,154,.06)}
+.raya{width:6px;height:34px;border-radius:3px;background:#e9c98a;box-shadow:0 0 8px rgba(241,217,154,.6);transform:rotate(8deg);opacity:0}
+.res{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:12px;opacity:0}
+.pt{width:24px;height:24px;border-radius:50%;background:#f1d99a;box-shadow:0 0 16px rgba(241,217,154,.9)}
+#paridad{top:300px}
+/* Escudo */
+#escudo{position:absolute;left:40px;right:40px;top:230px;height:1150px}
+.fig{position:absolute;width:104px;text-align:center;opacity:0}
+.fig .caja{height:170px;border-radius:18px;border:1.5px solid rgba(241,217,154,.35);background:rgba(11,7,22,.55);display:flex;flex-direction:column;justify-content:center;gap:12px}
+.fila{display:flex;justify-content:center;gap:22px}
+.fila i{display:block;width:20px;height:20px;border-radius:50%;background:#f1d99a;box-shadow:0 0 12px rgba(241,217,154,.8)}
+.grupo{position:absolute;left:0;right:0;text-align:center;font-family:I;font-size:24px;letter-spacing:.28em;color:#b7a5ff;opacity:0}
+body.rtl .grupo{font-family:NA;font-size:34px;letter-spacing:0}
+#juez .caja{height:250px;width:160px;margin:0 auto;border:3px solid #f1d99a;gap:20px;box-shadow:0 0 60px rgba(241,217,154,.45)}
+#juez{width:160px}
+#juez .fila i{width:30px;height:30px}
+#nombreJuez{top:1330px}
+.marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716;opacity:.85}
+.marca b{color:#f1d99a}
+</style></head><body>
+<div class="capa" id="fondoMano"><img src="imagenes/mano.png" id="imgMano"><div class="velo" id="v0"></div></div>
+<div class="capa" id="fondoTablero"><img src="imagenes/mano-fondo.png" id="imgTablero"></div>
+<div class="capa" id="fondoDunas"><img src="imagenes/dunas.png" id="imgDunas"><div class="velo" id="v4"></div></div>
+
+<div class="c" id="titulo" style="top:170px"></div>
+<div class="c" id="paridad"></div>
+<div id="tablero" style="opacity:0"></div>
+<div id="escudo"></div>
+<div class="c" id="nombreJuez"></div>
+<div class="c" id="historia" style="top:200px"></div>
+<div class="c" id="viaje" style="top:1260px"></div>
+<div class="c" id="cierre" style="top:1150px"></div>
+<p class="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const MARCAS=[7,11,7,5,3,5,12,5,8,10,10,4,10,3,10,11];
+const F_={via:[1,1,1,1],puer:[1,1,2,1],populus:[2,2,2,2],acquisitio:[2,1,2,1],fortuna_minor:[1,1,2,2],laetitia:[1,2,2,2],albus:[2,2,1,2],tristitia:[2,2,2,1],caput_draconis:[2,1,1,1],rubeus:[2,1,2,2],fortuna_major:[2,2,1,1]};
+const ESC={madres:["via","puer","populus","acquisitio"],hijas:["fortuna_minor","puer","laetitia","puer"],sobrinas:["albus","acquisitio","tristitia","acquisitio"],td:"caput_draconis",ti:"rubeus",juez:"fortuna_major"};
+const T={
+ es:{lema:"SIBILA TE LEE",rom:["I","II","III","IV"],madre:"MADRE",filas:["Cabeza","Cuello","Cuerpo","Pies"],
+  titulo:`<div class="k">EL ARCANO DE SIBILA · #5</div><div class="t" style="font-size:150px">Geomancia</div><div class="s">la ciencia de la arena</div><div class="t ar" style="font-size:92px;margin-top:6px">علم الرمل</div>`,
+  paridad:`<div class="k">16 LÍNEAS · SIN CONTARLAS</div><div class="t" style="font-size:76px">impar = • &nbsp;·&nbsp; par = ••</div>`,
+  grupos:["MADRES","HIJAS","SOBRINAS","TESTIGOS","EL JUEZ"],
+  juez:`<div class="t" style="font-size:96px">Fortuna Mayor</div><div class="t ar" style="font-size:64px;margin-top:0">النصرة الداخلة</div><div class="s" style="font-size:50px">gran apoyo, éxito que se sostiene</div>`,
+  historia:`<div class="k">LOS SABIOS ÁRABES</div><div class="t" style="font-size:130px">ʿIlm al-raml</div><div class="s">la ciencia de la arena</div>`,
+  viaje:`<div class="t" style="font-size:66px">Mundo árabe → siglo XII: latín</div><div class="s" style="font-size:56px">Europa · África</div>`,
+  cierre:`<div class="t" style="font-size:96px">¿Qué dice la arena<br>de tu pregunta?</div><div class="boton">🔮 miarcana.com/geomancia</div>`},
+ ar:{lema:"سيبيلا تقرأ لك",rom:["١","٢","٣","٤"],madre:"الأم",filas:["الرأس","العنق","الجسد","القدمان"],
+  titulo:`<div class="k">أسرار سيبيلا · <span dir="ltr">#5</span></div><div class="t" style="font-size:150px">علم الرمل</div><div class="s" style="font-size:64px">ماذا يقول الرمل لك؟</div>`,
+  paridad:`<div class="k">16 سطرًا · دون عدّ</div><div class="t" style="font-size:74px">فردي = • &nbsp;·&nbsp; زوجي = ••</div>`,
+  grupos:["الأمهات","البنات","الحفيدات","الشاهدان","القاضي"],
+  juez:`<div class="t" style="font-size:100px">النصرة الداخلة</div><div class="s" style="font-size:60px">سند كبير ونجاح ثابت</div>`,
+  historia:`<div class="k">علم الحكماء العرب</div><div class="t" style="font-size:150px">علم الرمل</div>`,
+  viaje:`<div class="t" style="font-size:70px">القرن الثاني عشر: إلى اللاتينية</div><div class="s" style="font-size:62px">أوروبا · أفريقيا</div>`,
+  cierre:`<div class="t" style="font-size:100px">ماذا يقول الرمل<br>عن سؤالك؟</div><div class="boton" dir="ltr">🔮 miarcana.com/ar/geomancia</div>`},
+};
+// #idioma,c1,c2,c3,hijas,sobrinas,testigos,juez,c4,c5,c6,F
+const h=(location.hash.slice(1)||"es,5.24,9.08,13,16.42,17.3,18.5,19.84,22.3,26.96,31.76,37.3").split(",");
+const LANG=h[0];const [C1,C2,C3,HI,SO,TE,JU,C4,C5,C6,F]=h.slice(1).map(Number);
+const L=T[LANG];
+if(LANG==="ar"){document.body.classList.add("rtl");}
+document.getElementById("lema").textContent=L.lema;
+for(const id of ["titulo","paridad","historia","viaje","cierre"]){const e=document.getElementById(id);e.innerHTML=L[id];if(LANG==="ar")e.dir="rtl";}
+document.getElementById("nombreJuez").innerHTML=L.juez;
+// Tablero: 4 Madres × 4 líneas
+const tab=document.getElementById("tablero");tab.dir="ltr";
+for(let m=0;m<4;m++){const d=document.createElement("div");d.className="madre";d.innerHTML=`<h3 class="${LANG==="ar"?"ar":""}" style="${LANG==="ar"?"font-size:30px;letter-spacing:0":""}">${L.madre} ${L.rom[m]}</h3>`;
+ for(let f=0;f<4;f++){const i=m*4+f;const li=document.createElement("div");li.className="linea";li.id="l"+i;
+  li.innerHTML=Array.from({length:MARCAS[i]},()=>'<span class="raya"></span>').join("")+`<span class="res">${'<span class="pt"></span>'.repeat(MARCAS[i]%2?1:2)}</span>`;d.appendChild(li);}
+ tab.appendChild(d);}
+// Escudo: arriba Hijas IV..I | Madres IV..I (la Madre I a la derecha), luego Sobrinas, Testigos, Juez
+const esc=document.getElementById("escudo");
+const W=1000,FILAS_Y=[90,420,790];
+const figura=(id,x,y,cls,grande)=>{const d=document.createElement("div");d.className="fig "+cls;if(grande)d.id="juez";d.style.left=(x-(grande?80:52))+"px";d.style.top=y+"px";
+ d.innerHTML=`<div class="caja">${F_[id].map(n=>`<div class="fila">${"<i></i>".repeat(n)}</div>`).join("")}</div>`;esc.appendChild(d);};
+const xs8=[...Array(8)].map((_,i)=>62+i*125.7);
+ESC.hijas.slice().reverse().forEach((id,i)=>figura(id,xs8[i],FILAS_Y[0],"g1"));
+ESC.madres.slice().reverse().forEach((id,i)=>figura(id,xs8[4+i],FILAS_Y[0],"g0"));
+ESC.sobrinas.slice().reverse().forEach((id,i)=>figura(id,(xs8[2*i]+xs8[2*i+1])/2,FILAS_Y[1],"g2"));
+figura(ESC.ti,(xs8[1]+xs8[2])/2+60,FILAS_Y[2],"g3");figura(ESC.td,(xs8[5]+xs8[6])/2-60,FILAS_Y[2],"g3");
+figura(ESC.juez,W/2,FILAS_Y[2]-20,"g4",true);
+const g=(txt,y,x,w,cls)=>{const d=document.createElement("div");d.className="grupo "+cls;d.textContent=txt;d.style.top=y+"px";if(x!=null){d.style.left=x+"px";d.style.right="auto";d.style.width=w+"px";}esc.appendChild(d);};
+g(L.grupos[0],30,500,500,"gg0");g(L.grupos[1],30,0,500,"gg1");g(L.grupos[2],370,null,null,"gg2");
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.5)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const $=id=>document.getElementById(id);
+const rayas=[...Array(16)].map((_,i)=>[...$("l"+i).querySelectorAll(".raya")]);
+window.pintar=(t)=>{
+ // Fondos
+ const o0=1-su(pr(t,C1-.5,C1+.2));$("fondoMano").style.opacity=o0;
+ $("imgMano").style.transform=`translateX(${-1060+su(pr(t,0,C1))*260}px) scale(${1+.06*pr(t,0,C1)})`;
+ $("fondoTablero").style.opacity=Math.min(su(pr(t,C1-.5,C1+.2)),1-su(pr(t,C4-.6,C4)));
+ $("imgTablero").style.transform=`translateX(${-1500+pr(t,C1,C4)*300}px) scale(1.15)`;
+ $("fondoDunas").style.opacity=su(pr(t,C4-.6,C4));
+ $("imgDunas").style.transform=`translateX(${-1150-pr(t,C4,F)*500}px) scale(${1.05+.08*pr(t,C4,F)})`;
+ // Título
+ $("titulo").style.opacity=ven(t,.2,C1);$("titulo").style.transform=`translateY(${(1-su(pr(t,.2,.9)))*30}px)`;
+ // Tablero y marcas: cada línea se traza dentro de su ventana entre C1 y C2
+ const oT=Math.min(su(pr(t,C1,C1+.5)),1-su(pr(t,C3+.2,C3+.9)));tab.style.opacity=oT;tab.style.transform=`scale(${1-.08*su(pr(t,C3+.2,C3+.9))})`;
+ const paso=(C2-.4-(C1+.4))/16;
+ rayas.forEach((rs,i)=>{const a=C1+.4+i*paso;const k=pr(t,a,a+paso*1.6);rs.forEach((r,j)=>{r.style.opacity=cl((k*rs.length-j)*1.5)});
+  $("l"+i).classList.toggle("hecha",k>=1);
+  const res=$("l"+i).querySelector(".res");const a2=C2+.3+i*.12;const op=su(pr(t,a2,a2+.35));res.style.opacity=op;rs.forEach(r=>{if(op>0)r.style.opacity=Math.min(Number(r.style.opacity),1-.75*op)});});
+ $("paridad").style.opacity=ven(t,C2,C3+.6);
+ // Escudo
+ const ini=[C3+.6,HI,SO,TE,JU];
+ for(let gI=0;gI<5;gI++){const o=su(pr(t,ini[gI],ini[gI]+.5))*(1-su(pr(t,C4-.6,C4)));document.querySelectorAll(".g"+gI).forEach((e,j)=>{const oj=su(pr(t,ini[gI]+j*.08,ini[gI]+j*.08+.45))*(1-su(pr(t,C4-.6,C4)));e.style.opacity=oj;e.style.transform=`translateY(${(1-oj)*-24}px)`;});
+  document.querySelectorAll(".gg"+gI).forEach(e=>e.style.opacity=o);}
+ const pulso=t>JU?(.5+.5*Math.sin((t-JU)*4)):0;const j=$("juez");if(j){j.querySelector(".caja").style.boxShadow=`0 0 ${40+50*pulso}px rgba(241,217,154,${.35+.35*pulso})`;j.style.transform=`scale(${1+.12*su(pr(t,JU,JU+.6))})`;}
+ $("nombreJuez").style.opacity=ven(t,JU+.4,C4);document.querySelector('.marca').style.opacity=(.85*(1-ven(t,JU+.4,C4))).toFixed(3);
+ // Historia
+ $("historia").style.opacity=ven(t,C4,C6);$("viaje").style.opacity=ven(t,C5,C6);$("viaje").style.transform=`translateY(${(1-su(pr(t,C5,C5+.6)))*30}px)`;
+ $("cierre").style.opacity=su(pr(t,C6,C6+.6));$("cierre").style.transform=`translateY(${(1-su(pr(t,C6,C6+.6)))*30}px)`;
+};
+window.pintar(0);
+</script></body></html>
