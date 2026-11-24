@@ -35,12 +35,12 @@ export async function traducirGuion(guion: string, idioma: Idioma): Promise<stri
     `Si aparece la dirección miarcana.com o «mi arcana punto com», escríbela como se pronuncia: «${DIRECCION_DICHA[idioma]}». ` +
     `No agregues ni quites nada. Responde solo con el guion traducido, sin comillas ni comentarios.`;
   const limpiar = (t: string) => t.replace(/^```\w*\n?|```$/g, "").replace(/[#*_`]/g, "").trim();
-  let salida = limpiar(await generarTexto(limpio, sistema, { effort: "low", maxTokens: 2000, idioma }));
+  let salida = limpiar(await generarTexto(limpio, sistema, { effort: "low", maxTokens: 2000, idioma, nivel: "economico" }));
   // Una traducción mucho más larga o más corta que el guion trae algo de más (el original repetido, notas) o le falta:
   // se pide otra vez, más estricta.
   const proporcion = salida.length / limpio.length;
   if (proporcion > 1.5 || proporcion < 0.5) {
-    salida = limpiar(await generarTexto(limpio, `${sistema} IMPORTANTE: tu respuesta anterior tenía ${proporcion > 1 ? "texto de más" : "texto de menos"}. Devuelve exactamente una traducción, del mismo largo aproximado que el original.`, { effort: "low", maxTokens: 2000, idioma }));
+    salida = limpiar(await generarTexto(limpio, `${sistema} IMPORTANTE: tu respuesta anterior tenía ${proporcion > 1 ? "texto de más" : "texto de menos"}. Devuelve exactamente una traducción, del mismo largo aproximado que el original.`, { effort: "low", maxTokens: 2000, idioma, nivel: "economico" }));
   }
   return salida;
 }

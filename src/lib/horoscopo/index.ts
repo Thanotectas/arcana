@@ -45,7 +45,7 @@ export async function horoscopoDelDia(signo: Signo, idioma: Idioma = IDIOMA_PRED
         `Apóyate en ese cielo real: nombra dónde está la Luna hoy y al menos otro planeta, en palabras sencillas (no digas "casa solar 5": di "tu zona del amor" o similar), y que lo que anuncias coincida con los aspectos de apoyo o de tensión. ` +
         `Estructura: un párrafo general (60-80 palabras), luego ## Amor, ## Trabajo y dinero, ## Bienestar (40-60 palabras cada uno) y una línea final "Consejo del día:". Sin título general. Total: 220 a 300 palabras.`,
       "",
-      { effort: "low", maxTokens: 900, idioma },
+      { effort: "low", maxTokens: 900, idioma, nivel: "economico" },
     );
     await admin
       .from("horoscopos")

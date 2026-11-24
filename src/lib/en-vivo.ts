@@ -631,7 +631,7 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
       const sistemaFinal = otroIdioma
         ? `${sistema}\nIDIOMA: la persona escribió en ${otroIdioma.nombre}. Toda la lectura, de la primera a la última palabra, va en ${otroIdioma.nombre}, aunque el contexto, las cartas y las notas lleguen en español: tradúcelo todo (nombres de cartas y signos con su nombre tradicional en ese idioma). Solo la línea «COLOR:» va en español.`
         : sistema;
-      let texto = (await generarTexto(entrada, sistemaFinal, { effort: "low", maxTokens: 500, idioma: otroIdioma && esIdioma(otroIdioma.codigo) && otroIdioma.codigo !== "es" ? otroIdioma.codigo : "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
+      let texto = (await generarTexto(entrada, sistemaFinal, { effort: "low", maxTokens: 500, nivel: "economico", idioma: otroIdioma && esIdioma(otroIdioma.codigo) && otroIdioma.codigo !== "es" ? otroIdioma.codigo : "auto", imagenes: prep.imagenes, ...(q.tipo === "huevo" ? { conocimiento: manual("huevo") } : q.tipo === "chocolate" ? { conocimiento: manual("taza") } : q.tipo === "mano" ? { conocimiento: manual("mano") } : {}) })).replace(/[#*_>`]/g, "").trim();
       let color: string | null = null;
       const lineaColor = /^COLOR:\s*([^\n]+)\n?/i.exec(texto);
       if (lineaColor) {

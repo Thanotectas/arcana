@@ -86,7 +86,7 @@ function idiomaOrigen(texto: string): string {
 async function traducir(texto: string, cartas: CartaSala[] | null, idioma: Idioma): Promise<{ texto: string; cartas: CartaSala[] | null }> {
   const entrada = JSON.stringify({ texto, cartas: cartas?.map((c) => ({ nombre: c.nombre, posicion: c.posicion })) ?? [] });
   const sistema = `Eres la traductora de Sibila en un directo. Traduce al ${IDIOMA_PARA_IA[idioma]} lo que Sibila acaba de decir, con su misma voz cálida, cercana y hablada: es un texto que se va a leer en voz alta. No agregues, no quites ni expliques nada; conserva los nombres propios de las personas. Los nombres de cartas del tarot, signos y planetas van con su nombre tradicional en ese idioma. Responde SOLO con un JSON con la misma forma que recibes: {"texto": "...", "cartas": [{"nombre": "...", "posicion": "..."}]}.`;
-  const salida = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1200, idioma });
+  const salida = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1200, idioma, nivel: "economico" });
   const json = /\{[\s\S]*\}/.exec(salida)?.[0];
   if (!json) throw new Error("La traducción no llegó en JSON.");
   const r = JSON.parse(json) as { texto?: string; cartas?: { nombre?: string; posicion?: string }[] };

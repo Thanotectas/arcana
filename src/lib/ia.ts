@@ -28,11 +28,12 @@ export function getCliente() {
   return cliente;
 }
 
-/** Nivel de calidad de una generación: decide el modelo. */
-export type NivelIA = "premium" | "estandar";
+/** Nivel de calidad de una generación: decide el modelo. "economico" (Haiku): respuestas cortas y lecturas básicas en redes y WhatsApp. */
+export type NivelIA = "premium" | "estandar" | "economico";
 
 const MODELO_PREMIUM = process.env.ARCANA_IA_MODEL_PREMIUM ?? "claude-opus-5-5";
 const MODELO_ESTANDAR = process.env.ARCANA_IA_MODEL_ESTANDAR ?? "claude-sonnet-5-5";
+const MODELO_ECONOMICO = process.env.ARCANA_IA_MODEL_ECONOMICO ?? "claude-haiku-5-5";
 
 /**
  * Modelo para un nivel. ARCANA_IA_MODEL, si está definida, manda sobre los
@@ -41,7 +42,7 @@ const MODELO_ESTANDAR = process.env.ARCANA_IA_MODEL_ESTANDAR ?? "claude-sonnet-5
 export function modeloPara(nivel: NivelIA = "estandar") {
   const forzado = process.env.ARCANA_IA_MODEL;
   if (forzado) return forzado;
-  return nivel === "premium" ? MODELO_PREMIUM : MODELO_ESTANDAR;
+  return nivel === "premium" ? MODELO_PREMIUM : nivel === "economico" ? MODELO_ECONOMICO : MODELO_ESTANDAR;
 }
 
 /** Parte estable del sistema (se cachea). No incluye el idioma. */
@@ -104,11 +105,13 @@ export async function generarTexto(
     { type: "text", text: usuario },
   ];
 
+  const modelo = modeloPara(opciones.nivel);
+  // Haiku no tiene reintento en el servidor con otro modelo si declina: se le pide sin `fallbacks`.
+  const conRespaldo = !modelo.startsWith("claude-haiku");
   const stream = client.beta.messages.stream({
-    model: modeloPara(opciones.nivel),
+    model: modelo,
     max_tokens: opciones.maxTokens ?? 4000,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
+    ...(conRespaldo ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
     output_config: { effort: opciones.effort ?? "medium" },
     system: [
       {

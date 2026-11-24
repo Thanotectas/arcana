@@ -136,7 +136,7 @@ export async function atenderTelegram(admin: Admin, aviso: AvisoTelegram): Promi
   const conversacion = hilo.slice(0, -1).map((x) => `${x.rol === "persona" ? "Persona" : "Sibila"}: «${x.contenido.replace(/»/g, "”")}»`).join("\n");
   const entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje de ${nombre ? `«${nombre}»` : "la persona"}: «${texto.replace(/»/g, "”")}»`;
 
-  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "estandar", idioma: "es" });
+  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "economico", idioma: "es" });
   const mandaCarta = respuesta.includes(MARCA_CARTA);
   const pideHumano = respuesta.includes(MARCA_HUMANO);
   respuesta = respuesta.replace(MARCA_CARTA, "").replace(MARCA_HUMANO, "").replace(/^#+\s*/gm, "").replace(/\*\*/g, "").trim();

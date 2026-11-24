@@ -84,11 +84,11 @@ Formato exacto, sin nada antes ni después:
 export async function redactarKitComentarios(lunes: string) {
   const cielo = cieloDeLaSemana(lunes).map((h) => `- ${h}`).join("\n");
   const [es, fr] = await Promise.all([
-    generarTexto(`Semana del ${fechaLargaEs(lunes)}. Datos del cielo:\n${cielo}\n\nEscribe el kit en español.`, REGLAS, { effort: "low", maxTokens: 3500, idioma: "es" }),
+    generarTexto(`Semana del ${fechaLargaEs(lunes)}. Datos del cielo:\n${cielo}\n\nEscribe el kit en español.`, REGLAS, { effort: "low", maxTokens: 3500, idioma: "es", nivel: "economico" }),
     generarTexto(
       `Semaine du ${lunes}. Données du ciel (en espagnol, traduis-les) :\n${cielo}\n\nÉcris tout le kit en français : mêmes règles, titres en français (## Bélier, ## Taureau, ## Gémeaux, ## Cancer, ## Lion, ## Vierge, ## Balance, ## Scorpion, ## Sagittaire, ## Capricorne, ## Verseau, ## Poissons, ## Feu, ## Terre, ## Air, ## Eau) et signature « — Sibila, d'Arcana 🔮 ».`,
       REGLAS,
-      { effort: "low", maxTokens: 3500, idioma: "auto" },
+      { effort: "low", maxTokens: 3500, idioma: "auto", nivel: "economico" },
     ),
   ]);
   return { cielo, es: es.trim(), fr: fr.trim() };

@@ -52,7 +52,7 @@ export async function mensajeParaSigno(signoId: string, idioma: Idioma = "es"): 
   ].join("\n");
   let texto: string;
   try {
-    texto = (await generarTexto(datos, INSTRUCCION, { effort: "low", maxTokens: 400, nivel: "estandar", idioma }))
+    texto = (await generarTexto(datos, INSTRUCCION, { effort: "low", maxTokens: 400, nivel: "economico", idioma }))
       .replace(/[*_#>]/g, "")
       .replace(/\s+/g, " ")
       .trim();

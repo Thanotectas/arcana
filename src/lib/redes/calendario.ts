@@ -311,7 +311,7 @@ const INSTRUCCION = `Tarea: redactar publicaciones para Instagram y Facebook de 
 /** Pide a Sibila los textos de los encargos (una sola llamada). */
 export async function redactar(encargos: Encargo[]): Promise<Redaccion[]> {
   const entrada = encargos.map((e) => `- ${e.fecha} (${fechaLargaEs(e.fecha)}) · tipo ${e.tipo} · enlace ${e.enlace}\n  Contexto: ${e.contexto}`).join("\n");
-  const crudo = await generarTexto(`Publicaciones a redactar:\n${entrada}`, INSTRUCCION, { effort: "medium", maxTokens: 6000, nivel: "estandar", idioma: "es" });
+  const crudo = await generarTexto(`Publicaciones a redactar:\n${entrada}`, INSTRUCCION, { effort: "medium", maxTokens: 6000, nivel: "economico", idioma: "es" });
   const inicio = crudo.indexOf("[");
   const fin = crudo.lastIndexOf("]");
   const json = inicio >= 0 && fin > inicio ? crudo.slice(inicio, fin + 1) : crudo;

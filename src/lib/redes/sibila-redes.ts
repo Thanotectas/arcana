@@ -403,9 +403,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
-    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "estandar", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
-    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaIA });
+    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "economico", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
+    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: idiomaIA });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;

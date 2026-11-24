@@ -68,7 +68,7 @@ const INSTRUCCION = `Tarea: escribir el carrusel semanal "Tu signo esta semana" 
 /** Pide a Sibila los textos del carrusel de la semana que empieza en `lunes`. */
 export async function redactarCarrusel(lunes: string): Promise<ContenidoCarrusel> {
   const rasgos = SIGNOS.map((s) => `- ${s.id} (${s.nombre}, ${s.elemento}, regente ${s.regente}): ${s.rasgos.join(", ")}`).join("\n");
-  const crudo = await generarTexto(`Semana del ${rangoSemana(lunes)}.\nSignos:\n${rasgos}`, INSTRUCCION, { effort: "medium", maxTokens: 3000, nivel: "estandar", idioma: "es" });
+  const crudo = await generarTexto(`Semana del ${rangoSemana(lunes)}.\nSignos:\n${rasgos}`, INSTRUCCION, { effort: "medium", maxTokens: 3000, nivel: "economico", idioma: "es" });
   const inicio = crudo.indexOf("{");
   const fin = crudo.lastIndexOf("}");
   let datos: { titulo?: unknown; texto?: unknown; signos?: Record<string, unknown> };

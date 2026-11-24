@@ -91,7 +91,7 @@ export async function POST(request: Request) {
         .map((m) => (m.rol === "persona" ? `Persona: ${datoDeUsuario(m.contenido, 600)}` : `Tú: ${m.contenido}`))
         .join("\n\n");
       const usuario = (historial ? `Conversación reciente:\n${historial}\n\n` : "") + `Mensaje nuevo de la persona: ${datoDeUsuario(texto, 600)}\n\nResponde solo a este mensaje.`;
-      const respuesta = await generarTexto(usuario, sistema, { idioma, effort: "low", maxTokens: 600 }, enviar);
+      const respuesta = await generarTexto(usuario, sistema, { idioma, effort: "low", maxTokens: 600, nivel: "economico" }, enviar);
       await admin.rpc("finalizar_mensaje_asistente", { p_mensaje: fila.id, p_texto: respuesta });
     } catch (e) {
       const codigo = clasificarError(e);
