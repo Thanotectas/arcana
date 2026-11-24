@@ -20,6 +20,8 @@ import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, type In
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
 import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
+import { randomInt } from "node:crypto";
+import { MAZO } from "@/lib/tarot/deck";
 import { idiomaConversacion, respuestaFotoFija, respuestaLimite, respuestasDirecto } from "./respuestas-fijas";
 
 /**
@@ -33,6 +35,9 @@ import { idiomaConversacion, respuestaFotoFija, respuestaLimite, respuestasDirec
  */
 const MARCA_OMITIR = "«OMITIR»";
 const MARCA_HUMANO = "«PASAR_A_PERSONA»";
+/** Sibila la escribe cuando hizo la lectura básica gratis por mensaje: así se cuenta (una por persona en 30 días, junto con las de foto). */
+const MARCA_LECTURA = "«LECTURA_BASICA»";
+const DETALLE_LECTURA = "lectura básica por mensaje";
 
 /** Topes diarios por red y tipo: frenan el gasto si una publicación se dispara. */
 const MAXIMO_DIA = { comentario: 200, mensaje: 150 } as const;
@@ -85,7 +90,9 @@ ${VOZ_NATURAL}`;
 const INSTRUCCION_MENSAJE = `Estás atendiendo los mensajes directos de Arcana en Instagram y Facebook, como Sibila, cálida y breve.
 Reglas:
 - Máximo 4 líneas o 450 caracteres. Sin títulos ni listas largas. Un emoji como mucho. Enlaces sin https (miarcana.com/...).
-- No hagas lecturas por mensaje (ni tarot, ni carta astral, ni sueños): explica con cariño que las lecturas se hacen en la app, di cuánto cuesta y manda el enlace. Si menciona su signo, puedes darle una línea de su horóscopo de hoy.
+- LECTURA BÁSICA GRATIS: si la persona pide una lectura y en el mensaje te digo que aún tiene su lectura gratis, hazle UNA lectura básica por aquí, de verdad y con detalle, de 4 a 6 frases (máximo 650 caracteres), retomando su pregunta con sus palabras. Puede ser: (a) tarot: usa SOLO la carta que te doy como la que salió para ella (nómbrala y léela para su pregunta; no inventes otra carta); (b) su horóscopo de hoy si te da su signo; (c) un sueño: el sentido de dos o tres símbolos que cuente; (d) su número de vida si te da su fecha de nacimiento (súmala bien, dígito a dígito, hasta un número del 1 al 9, o 11, 22 o 33). Después deja una pista breve de algo bueno que se ve venir, sin decir cuándo ni cómo, y cierra invitando a la lectura completa en la página con el enlace de esa práctica en su idioma (tarot, carta-astral, suenos, numerologia, cafe, quiromancia, huevo) y que la primera completa es gratis al crear su cuenta. Al final, en una línea aparte, escribe exactamente ${MARCA_LECTURA}.
+- Si ya usó su lectura gratis, no hagas otra: con cariño, invítala a la completa en la página, di cuánto cuesta y manda el enlace. Carta astral completa, sinastría, compatibilidad y kundli no se hacen por mensaje: van en la página.
+- Nunca leas sobre salud, embarazos, muertes, juicios ni dinero garantizado; si la pregunta es por un niño o por alguien enfermo, acompaña con ternura sin lectura y sugiere un médico si hace falta.
 - Si pide hablar con una persona, tiene un problema de pago o de cuenta que no puedas resolver con los hechos, o se molesta, escribe exactamente ${MARCA_HUMANO} al final y dile que alguien del equipo le escribirá por aquí.
 - Si el mensaje es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
 - No inventes precios ni funciones. No pidas datos sensibles.
@@ -327,6 +334,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
   // cariño a lo que le escriben, pero corto y llevando a la página (sin leer ni alargar la conversación).
   let modoPagina: "foto" | "conversacion" | null = null;
+  let lecturasMes = 0;
   if (i.tipo === "mensaje" && !PIDE_AYUDA.test(i.texto)) {
     const desde = (ms: number) => new Date(Date.now() - ms).toISOString();
     const base = () => admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "respondida").neq("id_meta", i.idMeta);
@@ -335,10 +343,13 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       await marcar("omitida", { detalle: "tope de seguridad por persona en el día" });
       return "limite";
     }
-    if (i.imagen) {
-      const { count: lecturas } = await base().like("texto", `${MARCA_FOTO}%`).is("detalle", null).neq("respuesta", RESPUESTA_FOTO_FIJA_ANTIGUA).gte("creado_en", desde(30 * 86_400_000));
-      if ((lecturas ?? 0) >= LECTURAS_POR_PERSONA) modoPagina = "foto";
-    }
+    const mes = desde(30 * 86_400_000);
+    const [{ count: deFoto }, { count: deTexto }] = await Promise.all([
+      base().like("texto", `${MARCA_FOTO}%`).is("detalle", null).neq("respuesta", RESPUESTA_FOTO_FIJA_ANTIGUA).gte("creado_en", mes),
+      base().eq("detalle", DETALLE_LECTURA).gte("creado_en", mes),
+    ]);
+    lecturasMes = (deFoto ?? 0) + (deTexto ?? 0);
+    if (i.imagen && lecturasMes >= LECTURAS_POR_PERSONA) modoPagina = "foto";
     if (!modoPagina && (hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) modoPagina = "conversacion";
   }
 
@@ -358,6 +369,15 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     hilo = (previos ?? []).reverse().flatMap((m) => [{ rol: "persona", contenido: m.texto }, ...(m.respuesta ? [{ rol: "asistente", contenido: m.respuesta }] : [])]);
     const conversacion = hilo.map((m) => `${m.rol === "persona" ? "Persona" : "Sibila"}: «${m.contenido.replace(/»/g, "”")}»`).join("\n");
     entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje directo por ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»`;
+    // Lectura básica gratis: una por persona en 30 días (cuenta junto con las de foto).
+    if (!modoPagina && !i.imagen) {
+      if (lecturasMes >= LECTURAS_POR_PERSONA) entrada += "\n(Ya usó su lectura gratis de este mes: si pide otra, no la hagas por aquí; invítala con cariño a la completa en la página.)";
+      else {
+        const carta = MAZO[randomInt(MAZO.length)];
+        const invertida = randomInt(4) === 0;
+        entrada += `\n(Aún tiene su lectura básica gratis. Si pide tarot, esta es la carta que salió: ${carta.nombre}${invertida ? " invertida" : ""}. ${invertida ? carta.significadoInvertido : carta.significado} Amor: ${carta.amor} Trabajo: ${carta.trabajo} Escribe el nombre de la carta en su idioma.)`;
+      }
+    }
     // Una vez por conversación: invitar a seguir la cuenta y dejar el enlace de la página (en los mensajes directos sí van enlaces).
     if (!hilo.some((m) => m.rol === "asistente" && /segu[ií]r|s[ií]gue(nos|me)/i.test(m.contenido)))
       entrada += `\n(En esta conversación aún no invitaste a seguir la cuenta: al final de tu respuesta, en una frase corta, invita con cariño a seguir a Arcana en ${i.red === "instagram" ? "Instagram" : "Facebook"} y deja el enlace miarcana.com. Si la persona está en duelo o hay un niño o una salud de por medio, no lo hagas.)`;
@@ -377,13 +397,15 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
 
   // Idioma para las respuestas fijas: el del mensaje o, si es solo una foto, el de la conversación.
   const idiomaFijo = idiomaConversacion(i.texto, hilo.filter((m) => m.rol === "persona").map((m) => m.contenido).reverse());
+  // Si se reconoce un idioma de la página distinto del español se le pide ese (una foto sola no trae texto del que deducirlo); si no, el de la persona.
+  const idiomaIA = idiomaFijo === "es" ? ("auto" as const) : idiomaFijo;
   let respuesta: string;
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
-    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 250, nivel: "estandar", idioma: "auto" }).catch(() => respuestaLimite(idiomaFijo));
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "auto", imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
-    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 400, nivel: "estandar", idioma: "auto" });
+    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "estandar", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
+    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaIA });
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;
@@ -396,6 +418,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("omitida", { detalle: "Sibila decidió no responder" });
     return "omitido";
   }
+  const lecturaBasica = respuesta.includes(MARCA_LECTURA) || /LECTURA_BASICA/.test(respuesta);
+  respuesta = respuesta.replace(MARCA_LECTURA, "").replace(/«?LECTURA_BASICA»?/g, "");
   const pideHumano = respuesta.includes(MARCA_HUMANO);
   respuesta = respuesta.replace(MARCA_HUMANO, "").replace(/^#+\s*/gm, "").replace(/\*\*/g, "").trim();
   if (!respuesta) {
@@ -420,7 +444,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("error", { respuesta, detalle: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
     throw e;
   }
-  await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : respuestaFija ? { detalle: DETALLE_FOTO_FIJA } : {}) });
+  await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : respuestaFija ? { detalle: DETALLE_FOTO_FIJA } : lecturaBasica && i.tipo === "mensaje" ? { detalle: DETALLE_LECTURA } : {}) });
   if (pideHumano) await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }, { rol: "asistente", contenido: respuesta }]).catch((e) => console.error("[redes aviso]", e));
   return pideHumano ? "humano" : "respondido";
 }
