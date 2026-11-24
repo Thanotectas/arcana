@@ -12,7 +12,7 @@ import { idiomaDePublicacion } from "./abjad-comentarios";
  */
 
 export function esPublicacionCartaNacimiento(texto: string) {
-  return /carta (del tarot )?de nacimiento|tarot de nacimiento|birth ?card|carta de nascimento|carte de naissance|doğum kartı|doğum tarot|بطاقة (التاروت )?(الخاصة )?(ب)?ميلاد|बर्थ कार्ड|जन्म (का )?कार्ड|kartu kelahiran/i.test(texto);
+  return /carta (del tarot )?de nacimiento|tarot de nacimiento|birth ?card|carta de nascimento|carte de naissance|doğum kartı|doğum tarot|بطاقة[ _](التاروت )?(الخاصة )?(ب|ال)?ميلاد|बर्थ कार्ड|जन्म (का )?कार्ड|kartu kelahiran/i.test(texto);
 }
 
 const MESES: Record<string, number> = {};
