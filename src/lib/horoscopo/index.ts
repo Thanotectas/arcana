@@ -12,6 +12,22 @@ export function fechaHoy(zona = "America/Bogota") {
 
 const enCurso = new Map<string, Promise<string>>();
 
+/** Firma de Sibila según la escritura del idioma. */
+const FIRMA: Partial<Record<Idioma, string>> = { ar: "— سيبيلا", hi: "— सिबिला" };
+
+/**
+ * Deja una sola firma al final, igual en todos los signos: quita la que haya
+ * escrito el modelo («Sibila», «*Sibila*», «— Sibila», o ninguna) y pone la de su idioma.
+ * Se aplica también a lo ya guardado, así los días anteriores quedan iguales.
+ */
+export function conFirma(texto: string, idioma: Idioma): string {
+  const sinFirma = texto
+    .trimEnd()
+    .replace(/\n*\s*[—–-]?\s*\**\s*(Sibila|سيبيلا|सिबिला)\s*\**\.?\s*$/u, "")
+    .trimEnd();
+  return `${sinFirma}\n\n${FIRMA[idioma] ?? "— Sibila"}`;
+}
+
 /**
  * Horóscopo diario por signo, generado una sola vez por día y cacheado en la
  * tabla `horoscopos`. Es gratuito: sirve para atraer tráfico y registros.
@@ -25,7 +41,7 @@ export async function horoscopoDelDia(signo: Signo, idioma: Idioma = IDIOMA_PRED
     .eq("fecha", fecha)
     .eq("idioma", idioma)
     .maybeSingle();
-  if (data?.contenido) return data.contenido as string;
+  if (data?.contenido) return conFirma(data.contenido as string, idioma);
 
   const clave = `${signo.id}:${fecha}:${idioma}`;
   const pendiente = enCurso.get(clave);
@@ -50,7 +66,7 @@ export async function horoscopoDelDia(signo: Signo, idioma: Idioma = IDIOMA_PRED
     await admin
       .from("horoscopos")
       .upsert({ signo: signo.id, fecha, idioma, contenido: texto }, { onConflict: "signo,fecha,idioma" });
-    return texto;
+    return conFirma(texto, idioma);
   })();
 
   enCurso.set(clave, tarea);
