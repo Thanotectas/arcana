@@ -392,10 +392,12 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     ]);
     lecturasMes = (deFoto ?? 0) + (deTexto ?? 0);
     // Varias fotos seguidas (el mismo vaso en tres tomas) llegan casi a la vez y se atenderían en paralelo, antes de
-    // que la primera quede respondida: si otra foto de la misma persona entró en los últimos 10 minutos y aún se está
-    // atendiendo, esta ya no se lee.
+    // que la primera quede respondida: si otra foto de la misma persona entró antes en los últimos 10 minutos, esta ya no se
+    // lee (va a la página).
     if (i.imagen && lecturasMes < LECTURAS_POR_PERSONA) {
-      const { count: enCurso } = await admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "pendiente").like("texto", `${MARCA_FOTO}%`).neq("id_meta", i.idMeta).gte("creado_en", desde(10 * 60_000));
+      // Solo cuentan las que llegaron antes que esta (así la primera sí se lee, aunque todas estén en curso).
+      const { data: propia } = await admin.from("interacciones_redes").select("id").eq("id_meta", i.idMeta).maybeSingle();
+      const { count: enCurso } = await admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).in("estado", ["pendiente", "respondida"]).like("texto", `${MARCA_FOTO}%`).lt("id", propia?.id ?? 0).gte("creado_en", desde(10 * 60_000));
       if ((enCurso ?? 0) > 0) lecturasMes = LECTURAS_POR_PERSONA;
     }
     if (i.imagen && lecturasMes >= LECTURAS_POR_PERSONA) modoPagina = "foto";
