@@ -39,6 +39,10 @@ export default async function PaginaComunidad({ searchParams }: { searchParams: 
   const carta = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
   const anterior = diaAntes(fecha);
+  // Las cartas sin nombre traducido (oráculo de los ángeles) solo muestran el nombre en español; en los demás idiomas
+  // el nombre ya va traducido en el mensaje de Sibila.
+  const nombre = nombreCarta(carta, idioma);
+  const mostrarNombre = idioma === "es" || nombre !== carta.nombre;
 
   return (
     <section className="mx-auto max-w-2xl space-y-6">
@@ -50,10 +54,10 @@ export default async function PaginaComunidad({ searchParams }: { searchParams: 
 
       <div className="tarjeta flex items-center gap-4 p-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imagenCarta(carta, mazo)} alt={nombreCarta(carta, idioma)} className="h-28 w-auto rounded-lg border border-borde shadow-lg" />
+        <img src={imagenCarta(carta, mazo)} alt={mostrarNombre ? nombre : t.cartaDeHoy} className="h-28 w-auto rounded-lg border border-borde shadow-lg" />
         <div>
           <p className="text-xs uppercase tracking-widest text-violeta-suave">{t.cartaDeHoy}</p>
-          <p className="font-display text-2xl text-texto">{nombreCarta(carta, idioma)}</p>
+          {mostrarNombre && <p className="font-display text-2xl text-texto">{nombre}</p>}
         </div>
       </div>
 
