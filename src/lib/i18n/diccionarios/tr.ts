@@ -117,6 +117,7 @@ export const tr: Diccionario = {
       geomancia: "Geomansi (remil)",
       marsella: "Marsilya tarotu",
       iskambil: "İskambil falı",
+      yildizname: "Yıldızname",
     },
     lista: {
       titulo: "Fallarım",

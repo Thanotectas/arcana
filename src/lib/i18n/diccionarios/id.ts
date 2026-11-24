@@ -115,6 +115,7 @@ export const id: Diccionario = {
       geomancia: "Geomansi",
       marsella: "Tarot Marseille",
       iskambil: "Iskambil falı (kartu remi)",
+      yildizname: "Yıldızname",
     },
     lista: {
       titulo: "Bacaanku",

@@ -55,6 +55,7 @@ export const RUTAS: Record<TipoLectura, string> = {
   geomancia: "/geomancia",
   marsella: "/tarot-marsella",
   iskambil: "/iskambil",
+  yildizname: "/yildizname",
 };
 
 /** Sistema para el chat: quién es, qué sabe de la persona y de la app. */

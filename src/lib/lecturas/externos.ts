@@ -8,6 +8,7 @@ import { promptIskambil } from "@/lib/iskambil/prompt";
 import { promptKundli, promptKundliMilan } from "@/lib/vedica/prompt";
 import { promptMarsella } from "@/lib/marsella/prompt";
 import { promptWeton, promptWetonJodoh } from "@/lib/weton/prompt";
+import { promptYildizname } from "@/lib/yildizname/prompt";
 
 /**
  * Productos con módulo propio (src/lib/<producto>/prompt.ts): cada uno arma su propio mensaje para Sibila.
@@ -24,4 +25,5 @@ export const PROMPTS_EXTERNOS: Partial<Record<TipoLectura, ConstructorPrompt>> =
   geomancia: promptGeomancia,
   marsella: promptMarsella,
   iskambil: promptIskambil,
+  yildizname: promptYildizname,
 };

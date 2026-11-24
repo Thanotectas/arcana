@@ -9,6 +9,7 @@ import { VistaAbjad } from "./VistaAbjad";
 import { VistaGeomancia } from "./VistaGeomancia";
 import { VistaMarsella } from "./VistaMarsella";
 import { VistaIskambil } from "./VistaIskambil";
+import { VistaYildizname } from "./VistaYildizname";
 
 /** Vista del resultado de cada producto con módulo propio (la lectura escrita va debajo, como en todos). */
 export type PropsVista = { entrada: Record<string, unknown>; resultado: Record<string, unknown>; idioma: Idioma };
@@ -22,4 +23,5 @@ export const VISTAS_EXTERNAS: Partial<Record<TipoLectura, ComponentType<PropsVis
   geomancia: VistaGeomancia,
   marsella: VistaMarsella,
   iskambil: VistaIskambil,
+  yildizname: VistaYildizname,
 };

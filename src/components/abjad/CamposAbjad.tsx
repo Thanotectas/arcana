@@ -74,14 +74,15 @@ function NombreYGrafia({
   );
 }
 
-export function CamposAbjad({ nombreInicial }: { nombreInicial: string }) {
+/** También lo usa el yıldızname, donde el nombre de la madre es obligatorio y lleva su propia etiqueta. */
+export function CamposAbjad({ nombreInicial, madre }: { nombreInicial: string; madre?: { etiqueta: string; ayuda: string } }) {
   const { idioma } = useT();
   const t = TEXTOS_ABJAD[idioma];
   return (
     <div className="space-y-6">
       <NombreYGrafia etiqueta={t.nombre} ayuda={t.nombreAyuda} etiquetaGrafia={t.escritura} campo="nombre" campoGrafia="escritura" inicial={nombreInicial} requerido />
       <div className="border-t border-borde pt-5">
-        <NombreYGrafia etiqueta={t.madre} ayuda={t.madreAyuda} etiquetaGrafia={t.escrituraMadre} campo="madre" campoGrafia="escritura_madre" />
+        <NombreYGrafia etiqueta={madre?.etiqueta ?? t.madre} ayuda={madre?.ayuda ?? t.madreAyuda} etiquetaGrafia={t.escrituraMadre} campo="madre" campoGrafia="escritura_madre" requerido={Boolean(madre)} />
       </div>
     </div>
   );

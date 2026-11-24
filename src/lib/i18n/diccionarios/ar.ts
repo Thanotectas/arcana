@@ -115,6 +115,7 @@ export const ar: Diccionario = {
       geomancia: "علم الرمل",
       marsella: "تاروت مرسيليا",
       iskambil: "قراءة أوراق اللعب (إسكامبيل)",
+      yildizname: "يلدز نامه (كتاب النجوم)",
     },
     lista: {
       titulo: "قراءاتي",

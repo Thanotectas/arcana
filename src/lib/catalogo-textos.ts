@@ -1,7 +1,7 @@
 import type { Idioma } from "./i18n/idiomas";
 
 /** Productos y herramientas de los mercados nuevos: textos del menú y de Explorar en los 8 idiomas. */
-export type ClaveNueva = "kundli" | "milan" | "weton" | "jodoh" | "abjad" | "geomancia" | "marsella" | "iskambil" | "siono" | "ascendente" | "nombres" | "angeles";
+export type ClaveNueva = "kundli" | "milan" | "weton" | "jodoh" | "abjad" | "yildizname" | "geomancia" | "marsella" | "iskambil" | "siono" | "ascendente" | "nombres" | "angeles";
 
 type Texto = { titulo: string; texto: string };
 
@@ -12,6 +12,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Weton javanés", texto: "Tu día de nacimiento en el calendario de Java: tu weton, tu neptu, tu wuku y lo que dicen de tu carácter." },
     jodoh: { titulo: "Compatibilidad por weton", texto: "La tradición javanesa del primbon para la pareja: la suma de sus neptu y lo que aconseja." },
     abjad: { titulo: "Numerología abjad", texto: "El valor de las letras árabes de tu nombre (hisab al-jummal) y lo que dice de ti, como tradición y reflexión." },
+    yildizname: { titulo: "Yıldızname", texto: "El libro de las estrellas otomano: tu nombre y el de tu madre en ebced señalan tu estrella, su planeta y su día." },
     geomancia: { titulo: "Geomancia", texto: "La geomancia de las 16 figuras, de África y el mundo árabe: haz tu pregunta y lee el escudo." },
     marsella: { titulo: "Tarot de Marsella", texto: "El tarot clásico francés: la tirada en cruz con los 22 arcanos mayores de Marsella." },
     iskambil: { titulo: "Iskambil falı", texto: "La lectura turca con la baraja francesa: corazones, diamantes, tréboles y picas responden tu pregunta." },
@@ -26,6 +27,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Javanese weton", texto: "Your birth day in the Javanese calendar: your weton, neptu, wuku and what they say about your character." },
     jodoh: { titulo: "Weton compatibility", texto: "The Javanese primbon tradition for couples: the sum of your neptu and what it advises." },
     abjad: { titulo: "Abjad numerology", texto: "The value of the Arabic letters of your name (hisab al-jummal) and what it says about you, as tradition and reflection." },
+    yildizname: { titulo: "Yıldızname", texto: "The Ottoman book of the stars: your name and your mother's in ebced point to your star, its planet and its day." },
     geomancia: { titulo: "Geomancy", texto: "The 16-figure geomancy of Africa and the Arab world: ask your question and read the shield." },
     marsella: { titulo: "Tarot de Marseille", texto: "The classic French tarot: the cross spread with the 22 Marseille major arcana." },
     iskambil: { titulo: "Iskambil falı", texto: "The Turkish reading with the French deck: hearts, diamonds, clubs and spades answer your question." },
@@ -40,6 +42,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Weton javanês", texto: "Seu dia de nascimento no calendário de Java: seu weton, neptu, wuku e o que dizem do seu caráter." },
     jodoh: { titulo: "Compatibilidade por weton", texto: "A tradição javanesa do primbon para o casal: a soma dos neptu e o que ela aconselha." },
     abjad: { titulo: "Numerologia abjad", texto: "O valor das letras árabes do seu nome (hisab al-jummal) e o que diz de você, como tradição e reflexão." },
+    yildizname: { titulo: "Yıldızname", texto: "O livro das estrelas otomano: o seu nome e o da sua mãe em ebced apontam a sua estrela, o seu planeta e o seu dia." },
     geomancia: { titulo: "Geomancia", texto: "A geomancia das 16 figuras, da África e do mundo árabe: faça sua pergunta e leia o escudo." },
     marsella: { titulo: "Tarô de Marselha", texto: "O tarô clássico francês: a tiragem em cruz com os 22 arcanos maiores de Marselha." },
     iskambil: { titulo: "Iskambil falı", texto: "A leitura turca com o baralho francês: copas, ouros, paus e espadas respondem à sua pergunta." },
@@ -54,6 +57,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Weton javanais", texto: "Ton jour de naissance dans le calendrier de Java : ton weton, ton neptu, ton wuku et ce qu'ils disent de ton caractère." },
     jodoh: { titulo: "Compatibilité par weton", texto: "La tradition javanaise du primbon pour le couple : la somme des neptu et ce qu'elle conseille." },
     abjad: { titulo: "Numérologie abjad", texto: "La valeur des lettres arabes de ton prénom (hisab al-jummal) et ce qu'elle dit de toi, comme tradition et réflexion." },
+    yildizname: { titulo: "Yıldızname", texto: "Le livre des étoiles ottoman : ton prénom et celui de ta mère en ebced désignent ton étoile, sa planète et son jour." },
     geomancia: { titulo: "Géomancie", texto: "La géomancie des 16 figures, d'Afrique et du monde arabe : pose ta question et lis le bouclier." },
     marsella: { titulo: "Tarot de Marseille", texto: "Le tarot classique : le tirage en croix avec les 22 arcanes majeurs de Marseille." },
     iskambil: { titulo: "Iskambil falı", texto: "La lecture turque avec le jeu de 52 cartes : cœurs, carreaux, trèfles et piques répondent à ta question." },
@@ -68,6 +72,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Cava weton'u", texto: "Cava takvimine göre doğum günün: weton'un, neptu'n, wuku'n ve karakterin hakkında söyledikleri." },
     jodoh: { titulo: "Weton uyumu", texto: "Çiftler için Cava primbon geleneği: neptu toplamı ve önerdikleri." },
     abjad: { titulo: "Ebced hesabı", texto: "Adındaki Arap harflerinin ebced değeri ve senin hakkında söyledikleri; gelenek ve tefekkür olarak." },
+    yildizname: { titulo: "Yıldızname", texto: "Osmanlı yıldız kitabı: adın ve annenin adı ebced ile yıldızını, gezegenini ve gününü gösterir." },
     geomancia: { titulo: "Remil (geomansi)", texto: "Afrika ve Arap dünyasının 16 şekilli remil ilmi: sorunu sor ve kalkanı oku." },
     marsella: { titulo: "Marsilya tarotu", texto: "Klasik Fransız tarotu: 22 büyük arkanla haç açılımı." },
     iskambil: { titulo: "İskambil falı", texto: "52'lik desteyle fal: kupa, karo, sinek ve maça soruna cevap verir." },
@@ -82,6 +87,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "الويتون الجاوي", texto: "يوم ميلادك في التقويم الجاوي: الويتون والنبتو والووكو وما تقوله عن طبعك." },
     jodoh: { titulo: "التوافق بالويتون", texto: "تقليد البريمبون الجاوي للشريكين: مجموع النبتو وما ينصح به." },
     abjad: { titulo: "حساب الجُمَّل", texto: "قيمة حروف اسمك بحساب الجُمَّل وما تقوله عنك، بوصفه تراثًا وتأملًا." },
+    yildizname: { titulo: "يلدز نامه (كتاب النجوم)", texto: "كتاب النجوم العثماني: اسمك واسم أمك بحساب الجُمَّل يدلّان على برجك وكوكبه ويومه." },
     geomancia: { titulo: "علم الرمل", texto: "علم الرمل بأشكاله الستة عشر من أفريقيا والعالم العربي: اطرح سؤالك واقرأ الشكل." },
     marsella: { titulo: "تاروت مرسيليا", texto: "التاروت الفرنسي الكلاسيكي: فرد الصليب بالأركانا الكبرى الـ22 لمرسيليا." },
     iskambil: { titulo: "قراءة أوراق اللعب", texto: "القراءة التركية بأوراق اللعب: القلوب والديناري والسباتي والبستوني تجيب عن سؤالك." },
@@ -96,6 +102,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "Weton Jawa", texto: "Hari lahirmu dalam kalender Jawa: weton, neptu, wuku, dan apa artinya bagi wataknya." },
     jodoh: { titulo: "Kecocokan weton (jodoh)", texto: "Tradisi primbon Jawa untuk pasangan: jumlah neptu kalian dan sarannya." },
     abjad: { titulo: "Numerologi abjad", texto: "Nilai huruf Arab dari namamu (hisab al-jummal) dan maknanya, sebagai tradisi dan renungan." },
+    yildizname: { titulo: "Yıldızname", texto: "Kitab bintang Utsmaniyah: namamu dan nama ibumu dalam ebced menunjukkan bintangmu, planetnya, dan harinya." },
     geomancia: { titulo: "Geomansi", texto: "Geomansi 16 figur dari Afrika dan dunia Arab: ajukan pertanyaanmu dan baca perisainya." },
     marsella: { titulo: "Tarot Marseille", texto: "Tarot klasik Prancis: sebaran salib dengan 22 arkana mayor Marseille." },
     iskambil: { titulo: "Iskambil falı", texto: "Bacaan ala Turki dengan kartu remi: hati, wajik, keriting, dan sekop menjawab pertanyaanmu." },
@@ -110,6 +117,7 @@ export const TEXTOS_CATALOGO_NUEVO: Record<Idioma, Record<ClaveNueva, Texto>> = 
     weton: { titulo: "जावानीज़ वेटन", texto: "जावा के कैलेंडर में आपका जन्मदिन: वेटन, नेप्तू, वुकु और आपके स्वभाव के बारे में।" },
     jodoh: { titulo: "वेटन से अनुकूलता", texto: "जोड़ी के लिए जावानीज़ प्रिम्बोन परंपरा: नेप्तू का योग और उसकी सलाह।" },
     abjad: { titulo: "अबजद अंक विद्या", texto: "आपके नाम के अरबी अक्षरों का मान और वह आपके बारे में क्या कहता है, परंपरा और चिंतन के रूप में।" },
+    yildizname: { titulo: "यिल्दिज़नामे", texto: "उस्मानी सितारों की किताब: आपका और आपकी माँ का नाम एब्जद में आपका सितारा, उसका ग्रह और दिन बताता है।" },
     geomancia: { titulo: "भूमि ज्योतिष (जियोमैंसी)", texto: "अफ़्रीका और अरब जगत की 16 आकृतियों वाली विद्या: अपना सवाल पूछिए और ढाल पढ़िए।" },
     marsella: { titulo: "मार्सेय टैरो", texto: "क्लासिक फ़्रांसीसी टैरो: मार्सेय के 22 मेजर आर्काना के साथ क्रॉस स्प्रेड।" },
     iskambil: { titulo: "इस्कांबिल फ़ाल", texto: "ताश के पत्तों से तुर्की रीडिंग: पान, ईंट, चिड़ी और हुकुम आपके सवाल का जवाब देते हैं।" },

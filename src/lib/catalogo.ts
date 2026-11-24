@@ -64,6 +64,7 @@ export const CATALOGO: ItemCatalogo[] = [
   { clave: "ascendente", href: "/calculadora-ascendente", grupo: "cielo", costo: 0, destacadoEn: ["hi", "tr", "en"] },
   { clave: "weton", href: "/weton", grupo: "cielo", costo: COSTOS.weton, destacadoEn: ["id"] },
   { clave: "abjad", href: "/abjad", grupo: "cielo", costo: COSTOS.abjad, destacadoEn: ["ar", "tr"] },
+  { clave: "yildizname", href: "/yildizname", grupo: "cielo", costo: COSTOS.yildizname, destacadoEn: ["tr", "ar"] },
   { clave: "milan", href: "/kundli-milan", grupo: "pareja", costo: COSTOS.kundli_milan, destacadoEn: ["hi"] },
   { clave: "jodoh", href: "/weton-jodoh", grupo: "pareja", costo: COSTOS.weton_jodoh, destacadoEn: ["id"] },
   { clave: "nombres", href: "/compatibilidad-nombres", grupo: "pareja", costo: 0, destacadoEn: ["hi", "id", "ar", "tr"] },

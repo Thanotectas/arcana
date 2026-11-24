@@ -117,6 +117,7 @@ export const fr: Diccionario = {
       geomancia: "Géomancie",
       marsella: "Tarot de Marseille",
       iskambil: "Iskambil falı (jeu de cartes)",
+      yildizname: "Yıldızname",
     },
     lista: {
       titulo: "Mes lectures",

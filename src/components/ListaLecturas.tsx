@@ -51,6 +51,7 @@ const ICONO: Record<TipoLectura, string> = {
   geomancia: "⚏",
   marsella: "✦",
   iskambil: "🂡",
+  yildizname: "✶",
 };
 
 /** Historial con búsqueda y filtro por tipo, sin recargar. */

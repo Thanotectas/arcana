@@ -117,6 +117,7 @@ export const es = {
       geomancia: "Geomancia",
       marsella: "Tarot de Marsella",
       iskambil: "Iskambil falı (baraja francesa)",
+      yildizname: "Yıldızname",
     },
     lista: {
       titulo: "Mis lecturas",

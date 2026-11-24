@@ -43,6 +43,7 @@ export const ETIQUETAS: Record<string, Etiquetas> = {
   milan: { necesidades: ["amor"], practica: "astrologia", origenes: ["india"] },
   numerologia: { necesidades: ["destino"], practica: "numeros", origenes: ["europa"] },
   abjad: { necesidades: ["destino"], practica: "numeros", origenes: ["arabe"] },
+  yildizname: { necesidades: ["destino"], practica: "astrologia", origenes: ["turquia", "arabe"] },
   angeles: { necesidades: ["diario", "senal"], practica: "numeros", origenes: ["mundo"] },
   nombres: { necesidades: ["amor"], practica: "numeros", origenes: ["india", "arabe"] },
   maya: { necesidades: ["destino"], practica: "calendarios", origenes: ["mesoamerica"] },

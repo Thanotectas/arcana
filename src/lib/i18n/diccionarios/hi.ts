@@ -115,6 +115,7 @@ export const hi: Diccionario = {
       geomancia: "भूमि ज्योतिष (जियोमैंसी)",
       marsella: "मार्सेय टैरो",
       iskambil: "इस्कांबिल फ़ाल (ताश के पत्ते)",
+      yildizname: "यिल्दिज़नामे",
     },
     lista: {
       titulo: "मेरी रीडिंग",

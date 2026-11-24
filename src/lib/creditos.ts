@@ -38,7 +38,8 @@ export type TipoLectura =
   | "abjad" // mundo árabe: valor abjad del nombre
   | "geomancia" // África y mundo árabe: geomancia de 16 figuras
   | "marsella" // Francia: tarot de Marsella, tirada en cruz
-  | "iskambil"; // Turquía: lectura con la baraja francesa (iskambil falı)
+  | "iskambil" // Turquía: lectura con la baraja francesa (iskambil falı)
+  | "yildizname"; // Turquía: el «libro de las estrellas» (nombre + nombre de la madre en ebced)
 
 export const COSTOS: Record<TipoLectura, number> = {
   tarot_carta: 0, // gratis: 1 por día (gancho de adquisición)
@@ -75,6 +76,7 @@ export const COSTOS: Record<TipoLectura, number> = {
   geomancia: 2,
   marsella: 2,
   iskambil: 2,
+  yildizname: 2,
 };
 
 export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
@@ -112,6 +114,7 @@ export const NOMBRES_LECTURA: Record<TipoLectura, string> = {
   geomancia: "Geomancia",
   marsella: "Tarot de Marsella",
   iskambil: "Iskambil falı (baraja francesa)",
+  yildizname: "Yıldızname",
 };
 
 /** Pregunta de seguimiento sobre una lectura. */
