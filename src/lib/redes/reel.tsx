@@ -62,10 +62,68 @@ export function estrellas(semilla: number, cantidad: number, alto: number) {
   return Array.from({ length: cantidad }, () => ({ x: azar() * ANCHO, y: azar() * alto, r: 1 + azar() * 3, o: 0.25 + azar() * 0.6 }));
 }
 
-async function capas(fecha: string) {
+/** Lo que el reel dice en pantalla y en voz: en español por defecto; carta-dia-idiomas.ts arma las otras versiones. */
+export interface TextosReel {
+  idioma: string;
+  etiqueta: string;
+  fechaMazo: string;
+  nombre: string;
+  frase: string;
+  ctaPregunta: string;
+  ctaTitulo: string;
+  ctaPrecio: string;
+  ctaEnlace: string;
+  ctaPie: string;
+  voz: [string, string];
+}
+
+export function textosReelEs(fecha: string): TextosReel {
   const carta = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
   const nombreMazo = mazo === "arcana" ? "Tarot Arcana" : MAZOS[mazo].nombre;
+  return {
+    idioma: "es",
+    etiqueta: "Carta del día",
+    fechaMazo: `${fechaLargaEs(fecha)} · ${nombreMazo}`,
+    nombre: carta.nombre,
+    frase: frase(carta.significado, 150),
+    ctaPregunta: "¿Quieres tu propia tirada?",
+    ctaTitulo: "Sibila te lee tres cartas sobre tu pregunta",
+    ctaPrecio: tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos),
+    ctaEnlace: "miarcana.com",
+    ctaPie: "Tu carta del día es gratis, todos los días",
+    voz: [frases(`Hoy tu carta es ${carta.nombre}`, frase(carta.significado, 150)), "¿Quieres tu propia tirada? Te leo tres cartas en miarcana.com. Y tu carta del día es gratis, todos los días."],
+  };
+}
+
+/**
+ * Texto en árabe para el reel: ImageResponse no une las letras árabes ni las ordena de derecha a izquierda, así que
+ * se dibuja con Pango (sharp) y entra a la capa como imagen.
+ */
+async function textoArabe(texto: string, pt: number, color: string, ancho: number): Promise<{ uri: string; ancho: number; alto: number }> {
+  const escapado = texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const imagen = await sharp({
+    text: { text: `<span foreground="${color}">${escapado}</span>`, font: `Noto Naskh Arabic ${pt}`, fontfile: join(process.cwd(), "src/app/fuentes", "NotoNaskhArabic-SemiBold.ttf"), rgba: true, width: ancho, align: "centre", wrap: "word", spacing: Math.round(pt * 0.12) },
+  })
+    .png()
+    .toBuffer();
+  const { width = ancho, height = pt } = await sharp(imagen).metadata();
+  return { uri: `data:image/png;base64,${imagen.toString("base64")}`, ancho: width, alto: height };
+}
+
+async function capas(fecha: string, t: TextosReel = textosReelEs(fecha)) {
+  const carta = cartaDelDia(fecha);
+  const mazo = mazoDelDia(fecha);
+  const ar = t.idioma === "ar";
+  // Un texto del reel: <span> con las fuentes de siempre, o imagen de Pango si es árabe.
+  const bloque = async (texto: string, estilo: { size: number; color: string; display?: boolean; ancho?: number; extra?: React.CSSProperties }) => {
+    if (ar) {
+      const img = await textoArabe(texto, Math.round(estilo.size * (estilo.display ? 0.95 : 1.15)), estilo.color, estilo.ancho ?? 860);
+      // eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image
+      return <img src={img.uri} width={img.ancho} height={img.alto} alt="" style={estilo.extra} />;
+    }
+    return <span style={{ ...(estilo.display ? { fontFamily: "Cormorant" } : {}), fontSize: estilo.size, color: estilo.color, textAlign: "center", lineHeight: estilo.display ? 1.05 : 1.4, ...estilo.extra }}>{texto}</span>;
+  };
   const semilla = Number(fecha.replace(/-/g, "")) % 2147483647;
 
   // Ilustración a 900 px de alto (las de Rider-Waite son más angostas).
@@ -93,29 +151,28 @@ async function capas(fecha: string) {
         <img src={logo} width={76} height={76} alt="" />
         <span style={{ fontFamily: "Cormorant", fontSize: 60, color: "#f1d99a" }}>Arcana</span>
       </div>
-      <span style={{ marginTop: 22, fontSize: 30, letterSpacing: 8, textTransform: "uppercase", color: "#b7a5ff" }}>Carta del día</span>
-      <span style={{ marginTop: 8, fontSize: 32, color: "#ece6f7" }}>{`${fechaLargaEs(fecha)} · ${nombreMazo}`}</span>
+      {ar ? await bloque(t.etiqueta, { size: 44, color: "#b7a5ff", extra: { marginTop: 22 } }) : <span style={{ marginTop: 22, fontSize: 30, letterSpacing: 8, textTransform: "uppercase", color: "#b7a5ff" }}>{t.etiqueta}</span>}
+      {await bloque(t.fechaMazo, { size: 32, color: "#ece6f7", extra: { marginTop: 8 } })}
     </div>,
   );
 
   const texto = await png(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", paddingBottom: 170 }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: 960, padding: "34px 48px", borderRadius: 36, background: "rgba(11,7,22,0.72)", border: "1px solid rgba(241,217,154,0.3)" }}>
-        <span style={{ fontFamily: "Cormorant", fontSize: carta.nombre.length > 22 ? 70 : 86, color: "#f1d99a", textAlign: "center", lineHeight: 1.05 }}>{carta.nombre}</span>
-        <span style={{ marginTop: 16, fontSize: 34, lineHeight: 1.4, color: "#ece6f7", textAlign: "center" }}>{frase(carta.significado, 150)}</span>
+        {await bloque(t.nombre, { size: t.nombre.length > 22 ? 70 : 86, color: "#f1d99a", display: true })}
+        {await bloque(t.frase, { size: 34, color: "#ece6f7", extra: { marginTop: 16 } })}
       </div>
     </div>,
   );
 
-  const precios = tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos);
   const cta = await png(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", paddingBottom: 170 }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 940, padding: "40px 48px", borderRadius: 40, background: "rgba(11,7,22,0.82)", border: "2px solid rgba(241,217,154,0.55)" }}>
-        <span style={{ fontSize: 34, color: "#b7a5ff", letterSpacing: 2 }}>¿Quieres tu propia tirada?</span>
-        <span style={{ marginTop: 14, fontFamily: "Cormorant", fontSize: 78, color: "#f1d99a", textAlign: "center", lineHeight: 1.05 }}>Sibila te lee tres cartas sobre tu pregunta</span>
-        <span style={{ marginTop: 16, fontSize: 34, color: "#ece6f7", textAlign: "center" }}>{precios}</span>
-        <div style={{ marginTop: 28, display: "flex", padding: "20px 56px", borderRadius: 999, background: "linear-gradient(135deg, #f1d99a, #d9b45a)", color: "#0b0716", fontSize: 40, fontWeight: 600 }}>miarcana.com</div>
-        <span style={{ marginTop: 18, fontSize: 28, color: "#a89fc0" }}>Tu carta del día es gratis, todos los días</span>
+        {await bloque(t.ctaPregunta, { size: 34, color: "#b7a5ff", extra: { letterSpacing: ar ? 0 : 2 } })}
+        {await bloque(t.ctaTitulo, { size: 78, color: "#f1d99a", display: true, extra: { marginTop: 14 } })}
+        <span style={{ marginTop: 16, fontSize: 34, color: "#ece6f7", textAlign: "center" }}>{t.ctaPrecio}</span>
+        <div style={{ marginTop: 28, display: "flex", padding: "20px 56px", borderRadius: 999, background: "linear-gradient(135deg, #f1d99a, #d9b45a)", color: "#0b0716", fontSize: 40, fontWeight: 600 }}>{t.ctaEnlace}</div>
+        {await bloque(t.ctaPie, { size: 28, color: "#a89fc0", extra: { marginTop: 18 } })}
       </div>
     </div>,
   );
@@ -133,9 +190,8 @@ async function capas(fecha: string) {
 }
 
 /** Genera el MP4 del reel de esa fecha y lo devuelve como Buffer. */
-export async function generarReel(fecha: string): Promise<Buffer> {
-  const c = await capas(fecha);
-  const carta = cartaDelDia(fecha);
+export async function generarReel(fecha: string, t: TextosReel = textosReelEs(fecha)): Promise<Buffer> {
+  const c = await capas(fecha, t);
   const dir = await mkdtemp(join(tmpdir(), "reel-"));
   try {
     await Promise.all([
@@ -145,7 +201,7 @@ export async function generarReel(fecha: string): Promise<Buffer> {
       writeFile(join(dir, "cta.png"), c.cta),
       writeFile(join(dir, "estrellas.png"), c.capaEstrellas),
     ]);
-    const voz = await narrar(dir, [frases(`Hoy tu carta es ${carta.nombre}`, frase(carta.significado, 150)), "¿Quieres tu propia tirada? Te leo tres cartas en miarcana.com. Y tu carta del día es gratis, todos los días."]);
+    const voz = await narrar(dir, t.voz);
     const tiempos = tiemposConVoz(voz, { inicio: 0.8, cierreMinimo: 6.9, duracionMinima: DURACION });
     const duracion = tiempos.duracion;
     const salida = join(dir, "reel.mp4");
@@ -199,15 +255,17 @@ export async function asegurarBucket(admin: SupabaseClient<Database>) {
  * URL pública del reel de esa fecha. Si ya se generó, la reutiliza (la
  * corrida de la tarde no lo vuelve a fabricar).
  */
-export async function reelCartaDelDia(admin: SupabaseClient<Database>, fecha: string, opciones: { regenerar?: boolean } = {}): Promise<string> {
+export async function reelCartaDelDia(admin: SupabaseClient<Database>, fecha: string, opciones: { regenerar?: boolean; textos?: TextosReel } = {}): Promise<string> {
   await asegurarBucket(admin);
-  const ruta = `reels/carta-dia-${fecha}.mp4`;
+  const sufijo = opciones.textos && opciones.textos.idioma !== "es" ? `-${opciones.textos.idioma}` : "";
+  const archivo = `carta-dia-${fecha}${sufijo}.mp4`;
+  const ruta = `reels/${archivo}`;
   const { data: url } = admin.storage.from(BUCKET).getPublicUrl(ruta);
   if (!opciones.regenerar) {
-    const { data: existentes } = await admin.storage.from(BUCKET).list("reels", { search: `carta-dia-${fecha}.mp4` });
-    if (existentes?.some((f) => f.name === `carta-dia-${fecha}.mp4`)) return url.publicUrl;
+    const { data: existentes } = await admin.storage.from(BUCKET).list("reels", { search: archivo });
+    if (existentes?.some((f) => f.name === archivo)) return url.publicUrl;
   }
-  const video = await generarReel(fecha);
+  const video = await generarReel(fecha, opciones.textos);
   const { error } = await admin.storage.from(BUCKET).upload(ruta, video, { contentType: "video/mp4", upsert: true, cacheControl: "86400" });
   if (error) throw new Error(`subir reel: ${error.message}`);
   return url.publicUrl;
