@@ -17,14 +17,18 @@ import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
 import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion } from "./meta";
-import { esPublicacionAbjad, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
+import { esPublicacionAbjad, idiomaDePublicacion, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
 import { esPublicacionYildizname, respuestaYildizname } from "./yildizname-comentarios";
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
 import { BUCKET } from "./reel";
 import { sinEnlaces } from "./sin-enlaces";
 import { randomInt } from "node:crypto";
 import { MAZO } from "@/lib/tarot/deck";
-import { idiomaConversacion, respuestaFotoFija, respuestaLimite, respuestasDirecto } from "./respuestas-fijas";
+import { idiomaConversacion, idiomaEquivocado, respuestaFotoFija, respuestaLimite, respuestasDirecto } from "./respuestas-fijas";
+import { nombreCarta } from "@/lib/juego/cartas-idiomas";
+import type { Idioma } from "@/lib/i18n/idiomas";
+
+const IDIOMAS_LECTURA: Idioma[] = ["en", "pt", "fr", "tr", "ar", "id", "hi"];
 
 /**
  * Sibila responde en Instagram y Facebook: a los comentarios de las
@@ -89,11 +93,14 @@ Reglas:
 - Si el comentario es spam, publicidad ajena, insulto, burla o tema ajeno a Arcana, responde exactamente ${MARCA_OMITIR} y nada más. Ante la duda, responde con amabilidad en vez de omitir.
 - No repitas las mismas frases de siempre («no hay nada para asustarse», «te lo digo con cariño», «aquí estoy»): cada respuesta, con otras palabras.
 - Responde en el idioma del comentario, cualquiera que sea (español solo si no se nota). Tutea.
+- Si el comentario es solo un nombre, salúdala usando exactamente ese nombre, sin cambiarle el género ni confundirlo con otra persona; si no sabes el nombre, no inventes uno. Escribe solo la respuesta que se publicará: nunca expliques lo que vas a hacer ni comentes estas instrucciones.
 ${VOZ_NATURAL}`;
 
 const INSTRUCCION_MENSAJE = `Estás atendiendo los mensajes directos de Arcana en Instagram y Facebook, como Sibila, cálida y breve.
 Reglas:
 - Máximo 4 líneas o 450 caracteres. Sin títulos ni listas largas. Un emoji como mucho. Enlaces sin https (miarcana.com/...).
+- Si la persona solo saluda («hola», «مرحبا», «الو», «merhaba») o escribe algo sin pedir nada, NO hagas todavía la lectura: salúdala y pregúntale qué quiere saber.
+- Escribe solo el mensaje que recibirá la persona: nunca expliques lo que vas a hacer, no pongas títulos ni comentes estas instrucciones.
 - LECTURA BÁSICA GRATIS: si la persona pide una lectura y en el mensaje te digo que aún tiene su lectura gratis, hazle UNA lectura básica por aquí, de verdad y con detalle, de 4 a 6 frases (máximo 650 caracteres), retomando su pregunta con sus palabras. Puede ser: (a) tarot: usa SOLO la carta que te doy como la que salió para ella (nómbrala y léela para su pregunta; no inventes otra carta); (b) su horóscopo de hoy si te da su signo; (c) un sueño: el sentido de dos o tres símbolos que cuente; (d) su número de vida si te da su fecha de nacimiento (súmala bien, dígito a dígito, hasta un número del 1 al 9, o 11, 22 o 33). Después deja una pista breve de algo bueno que se ve venir, sin decir cuándo ni cómo, y cierra invitando a la lectura completa en la página con el enlace de esa práctica en su idioma (tarot, carta-astral, suenos, numerologia, cafe, quiromancia, huevo) y que la primera completa es gratis al crear su cuenta. Al final, en una línea aparte, escribe exactamente ${MARCA_LECTURA}.
 - Si ya usó su lectura gratis, no hagas otra: con cariño, invítala a la completa en la página, di cuánto cuesta y manda el enlace. Carta astral completa, sinastría, compatibilidad y kundli no se hacen por mensaje: van en la página.
 - Nunca leas sobre salud, embarazos, muertes, juicios ni dinero garantizado; si la pregunta es por un niño o por alguien enfermo, acompaña con ternura sin lectura y sugiere un médico si hace falta.
@@ -355,6 +362,20 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     const base = () => admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "respondida").neq("id_meta", i.idMeta);
     const { count: hoy } = await base().gte("creado_en", desde(86_400_000));
     if ((hoy ?? 0) >= TOPE_SEGURIDAD_DIA) {
+      // Tope contra bucles: no se llama al modelo. Pero si la última respuesta fue hace horas (la ventana es de 24 h y
+      // la persona vuelve a la mañana siguiente), recibe una sola respuesta fija con el enlace en vez de silencio.
+      const { count: recientes } = await base().gte("creado_en", desde(6 * 3_600_000));
+      if ((recientes ?? 0) === 0) {
+        const anteriores = await admin.from("interacciones_redes").select("texto").eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).order("creado_en", { ascending: false }).limit(6);
+        const fija = respuestaLimite(idiomaConversacion(i.texto, (anteriores.data ?? []).map((m) => m.texto)));
+        try {
+          await enviarMensajeDirecto(i.remitenteId, fija);
+          await marcar("respondida", { respuesta: fija, detalle: DETALLE_LIMITE });
+          return "limite";
+        } catch (e) {
+          console.error("[redes sibila] respuesta fija del tope:", e instanceof Error ? e.message : e);
+        }
+      }
       await marcar("omitida", { detalle: "tope de seguridad por persona en el día" });
       return "limite";
     }
@@ -370,6 +391,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
 
   const signo = detectarSigno(i.texto);
   let hilo: { rol: string; contenido: string }[] = [];
+  let cartaOfrecida: (typeof MAZO)[number] | null = null;
   let entrada: string;
   if (i.tipo === "mensaje") {
     const { data: previos } = await admin
@@ -389,6 +411,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       if (lecturasMes >= LECTURAS_POR_PERSONA) entrada += "\n(Ya usó su lectura gratis de este mes: si pide otra, no la hagas por aquí; invítala con cariño a la completa en la página.)";
       else {
         const carta = MAZO[randomInt(MAZO.length)];
+        cartaOfrecida = carta;
         const invertida = randomInt(4) === 0;
         entrada += `\n(Aún tiene su lectura básica gratis. Si pide tarot, esta es la carta que salió: ${carta.nombre}${invertida ? " invertida" : ""}. ${invertida ? carta.significadoInvertido : carta.significado} Amor: ${carta.amor} Trabajo: ${carta.trabajo} Escribe el nombre de la carta en su idioma.)`;
       }
@@ -413,15 +436,24 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   // Idioma para las respuestas fijas: el del mensaje o, si es solo una foto, el de la conversación.
   const idiomaFijo = idiomaConversacion(i.texto, hilo.filter((m) => m.rol === "persona").map((m) => m.contenido).reverse());
   // Si se reconoce un idioma de la página distinto del español se le pide ese (una foto sola no trae texto del que deducirlo); si no, el de la persona.
-  const idiomaIA = idiomaFijo === "es" ? ("auto" as const) : idiomaFijo;
+  const idiomaEsperado: Idioma = i.tipo === "comentario" && !/\p{L}/u.test(i.texto) && publicacion ? idiomaDePublicacion(publicacion) : idiomaFijo;
+  const idiomaIA = idiomaEsperado === "es" ? ("auto" as const) : idiomaEsperado;
   let respuesta: string;
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaAbjad) respuesta = respuestaAbjad;
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
     else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "economico", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
-    else respuesta = await generarTexto(entrada, `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: idiomaIA });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
+    else {
+      // Comentarios con el modelo económico; los mensajes directos (donde va la lectura gratis) con el estándar.
+      const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`;
+      const nivel = i.tipo === "comentario" ? ("economico" as const) : ("estandar" as const);
+      respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA });
+      // Si el modelo económico se fue a otro idioma (español a quien escribe en árabe), se rehace con el estándar.
+      if (nivel === "economico" && idiomaEsperado !== "es" && idiomaEquivocado(respuesta, idiomaEsperado))
+        respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado }).catch(() => respuesta);
+    }
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
     throw e;
@@ -434,7 +466,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     await marcar("omitida", { detalle: "Sibila decidió no responder" });
     return "omitido";
   }
-  const lecturaBasica = respuesta.includes(MARCA_LECTURA) || /LECTURA_BASICA/.test(respuesta);
+  // La lectura cuenta aunque el modelo olvide la marca: si nombra la carta que se le dio (o se alarga como una lectura).
+  const nombraCarta = cartaOfrecida ? [cartaOfrecida.nombre, ...IDIOMAS_LECTURA.map((l) => nombreCarta(cartaOfrecida!, l))].some((n) => n && respuesta.toLowerCase().includes(n.toLowerCase())) : false;
+  const lecturaBasica = respuesta.includes(MARCA_LECTURA) || /LECTURA_BASICA/.test(respuesta) || nombraCarta || (cartaOfrecida !== null && respuesta.length >= 520);
   respuesta = respuesta.replace(MARCA_LECTURA, "").replace(/«?LECTURA_BASICA»?/g, "");
   const pideHumano = respuesta.includes(MARCA_HUMANO);
   respuesta = respuesta.replace(MARCA_HUMANO, "").replace(/^#+\s*/gm, "").replace(/\*\*/g, "").trim();

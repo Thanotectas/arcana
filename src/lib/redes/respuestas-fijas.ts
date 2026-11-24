@@ -22,6 +22,22 @@ function idiomaDe(texto: string): Idioma | null {
   return d && (IDIOMAS as string[]).includes(d) ? (d as Idioma) : null;
 }
 
+/**
+ * ¿La respuesta salió en otro idioma? En árabe e hindi, si algún párrafo va casi todo en letras latinas (mezcla de
+ * idiomas incluida); en los demás, si se reconoce español o una escritura árabe o devanagari donde no va.
+ */
+export function idiomaEquivocado(respuesta: string, esperado: Idioma): boolean {
+  const limpio = respuesta.replace(/(?:https?:\/\/)?miarcana\.com\S*|@\S+|\([^)]*\)/g, " ");
+  const cuenta = (t: string, re: RegExp) => (t.match(re) ?? []).length;
+  const LATINAS = /[A-Za-zÀ-ÿĞğİıŞş]/g;
+  const propia = esperado === "ar" ? /[\u0600-\u06FF]/g : esperado === "hi" ? /[\u0900-\u097F]/g : null;
+  if (propia) return limpio.split(/\n+/).some((p) => cuenta(p, LATINAS) > 25 && cuenta(p, LATINAS) > cuenta(p, propia));
+  if (cuenta(limpio, /[\u0600-\u06FF\u0900-\u097F]/g) > cuenta(limpio, LATINAS)) return true;
+  if (esperado === "es" || idiomaDeTexto(limpio)?.codigo === esperado) return false;
+  // El detector no nombra el español: se reconoce por sus palabras más comunes.
+  return cuenta(limpio, /(?<![\p{L}])(que|qué|lo|los|las|el|una|es|está|por|con|para|muy|eso|esto|gracias|hola|tu|tus|te|y|del|pero|cómo)(?![\p{L}])/giu) >= 4;
+}
+
 /** Idioma del mensaje actual o, si no se nota, del más reciente de la conversación que lo deje ver (español por defecto). */
 export function idiomaConversacion(actual: string, anteriores: string[] = []): Idioma {
   for (const t of [actual, ...anteriores]) {
