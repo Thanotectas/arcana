@@ -391,6 +391,13 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       base().eq("detalle", DETALLE_LECTURA).gte("creado_en", mes),
     ]);
     lecturasMes = (deFoto ?? 0) + (deTexto ?? 0);
+    // Varias fotos seguidas (el mismo vaso en tres tomas) llegan casi a la vez y se atenderían en paralelo, antes de
+    // que la primera quede respondida: si otra foto de la misma persona entró en los últimos 10 minutos y aún se está
+    // atendiendo, esta ya no se lee.
+    if (i.imagen && lecturasMes < LECTURAS_POR_PERSONA) {
+      const { count: enCurso } = await admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", i.red).eq("tipo", "mensaje").eq("remitente_id", i.remitenteId).eq("estado", "pendiente").like("texto", `${MARCA_FOTO}%`).neq("id_meta", i.idMeta).gte("creado_en", desde(10 * 60_000));
+      if ((enCurso ?? 0) > 0) lecturasMes = LECTURAS_POR_PERSONA;
+    }
     if (i.imagen && lecturasMes >= LECTURAS_POR_PERSONA) modoPagina = "foto";
     if (!modoPagina && (hoy ?? 0) >= RESPUESTAS_POR_PERSONA_DIA) modoPagina = "conversacion";
   }
