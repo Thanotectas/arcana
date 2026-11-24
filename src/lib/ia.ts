@@ -112,6 +112,8 @@ export async function generarTexto(
     model: modelo,
     max_tokens: opciones.maxTokens ?? 4000,
     ...(conRespaldo ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
+    // En Haiku el razonamiento interno se come el max_tokens de textos cortos y la respuesta llegaba vacía: se apaga.
+    ...(conRespaldo ? {} : { thinking: { type: "disabled" as const } }),
     output_config: { effort: opciones.effort ?? "medium" },
     system: [
       {
@@ -140,9 +142,12 @@ export async function generarTexto(
     );
   }
 
-  return mensaje.content
+  const texto = mensaje.content
     .filter((b) => b.type === "text")
     .map((b) => b.text)
     .join("\n")
     .trim();
+  // Nunca se devuelve (ni se guarda) un texto vacío: quien llama lo trata como error y no lo cachea.
+  if (!texto) throw new Error(`[ia] respuesta vacía de ${modelo} (stop_reason: ${mensaje.stop_reason})`);
+  return texto;
 }
