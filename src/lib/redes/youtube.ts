@@ -19,7 +19,10 @@ import { videoPermitido } from "./tiktok";
  * Cupo: subir un video cuesta 1.600 de las 10.000 unidades diarias del
  * proyecto, unas 6 subidas al día.
  */
-const SCOPES = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly"];
+// youtube.force-ssl: leer y responder comentarios (Sibila). Los canales conectados antes de noviembre de 2026 no lo
+// tienen: hay que volver a conectar YouTube en /admin/redes.
+const ALCANCE_COMENTARIOS = "https://www.googleapis.com/auth/youtube.force-ssl";
+const SCOPES = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly", ALCANCE_COMENTARIOS];
 
 type Admin = SupabaseClient<Database>;
 export type PublicacionYoutube = Database["public"]["Tables"]["publicaciones_youtube"]["Row"];
@@ -60,6 +63,7 @@ interface RespuestaToken {
   access_token?: string;
   expires_in?: number;
   refresh_token?: string;
+  scope?: string;
   error?: string;
   error_description?: string;
 }
@@ -107,6 +111,7 @@ export async function conectarYoutube(admin: Admin, codigo: string) {
     expira_en: vence(t.expires_in),
     conectada_en: new Date().toISOString(),
     actualizado_en: new Date().toISOString(),
+    scopes: t.scope ?? SCOPES.join(" "),
   };
   const { error } = await admin.from("youtube_cuenta").upsert(fila, { onConflict: "id" });
   if (error) throw new Error(`guardar canal de YouTube: ${error.message}`);
@@ -115,8 +120,8 @@ export async function conectarYoutube(admin: Admin, codigo: string) {
 
 /** El canal conectado, sin los tokens (para el panel). */
 export async function cuentaYoutube(admin: Admin) {
-  const { data } = await admin.from("youtube_cuenta").select("canal_id, nombre, usuario, avatar, conectada_en").eq("id", 1).maybeSingle();
-  return data;
+  const { data } = await admin.from("youtube_cuenta").select("canal_id, nombre, usuario, avatar, conectada_en, scopes, comentarios_revisados_en").eq("id", 1).maybeSingle();
+  return data && { ...data, comentarios: Boolean(data.scopes?.includes(ALCANCE_COMENTARIOS)) };
 }
 
 /** Acceso vigente al canal (lo renueva si vence en menos de 5 minutos). */
@@ -227,4 +232,92 @@ export async function subirDesdePanel(admin: Admin, video: string, datos: DatosS
     await admin.from("publicaciones_youtube").update({ estado: "error", detalle: detalle.slice(0, 500) }).eq("id", fila.id);
     throw e;
   }
+}
+
+// ——— Comentarios (Sibila responde en YouTube) ———
+
+/** ¿El canal se conectó con el permiso de comentarios? */
+export async function permisoComentariosYoutube(admin: Admin) {
+  const { data } = await admin.from("youtube_cuenta").select("scopes").eq("id", 1).maybeSingle();
+  return Boolean(data?.scopes?.includes(ALCANCE_COMENTARIOS));
+}
+
+const textosVideo = new Map<string, { texto: string; hasta: number }>();
+
+/** Título y descripción de un video (para saber si es un reel de abjad o del Yıldızname). Una hora en memoria. */
+export async function textoDeVideo(admin: Admin, videoId: string): Promise<string> {
+  const guardado = textosVideo.get(videoId);
+  if (guardado && guardado.hasta > Date.now()) return guardado.texto;
+  const token = await tokenVigente(admin);
+  type Videos = { items?: { snippet?: { title?: string; description?: string } }[] };
+  const v = await api<Videos>(`videos?part=snippet&id=${encodeURIComponent(videoId)}`, token);
+  const s = v.items?.[0]?.snippet;
+  const texto = `${s?.title ?? ""}\n${s?.description ?? ""}`.trim();
+  textosVideo.set(videoId, { texto, hasta: Date.now() + 3_600_000 });
+  return texto;
+}
+
+export interface ComentarioYoutube {
+  id: string;
+  videoId: string;
+  autorId: string;
+  autor: string | null;
+  texto: string;
+  publicado: string;
+}
+
+/**
+ * Comentarios principales recientes en los videos del canal que el canal aún no respondió (una consulta: 1 unidad
+ * del cupo). Se dejan fuera los del propio canal y los que ya tienen una respuesta del canal en el hilo.
+ */
+export async function comentariosSinResponder(admin: Admin, horas = 72): Promise<ComentarioYoutube[]> {
+  const token = await tokenVigente(admin);
+  const { data: c } = await admin.from("youtube_cuenta").select("canal_id").eq("id", 1).maybeSingle();
+  if (!c) return [];
+  type Hilo = {
+    snippet?: {
+      videoId?: string;
+      topLevelComment?: { id: string; snippet?: { textOriginal?: string; authorDisplayName?: string; authorChannelId?: { value?: string }; publishedAt?: string } };
+    };
+    replies?: { comments?: { snippet?: { authorChannelId?: { value?: string } } }[] };
+  };
+  const r = await api<{ items?: Hilo[] }>(`commentThreads?part=snippet,replies&allThreadsRelatedToChannelId=${c.canal_id}&order=time&maxResults=50&textFormat=plainText`, token);
+  const desde = Date.now() - horas * 3_600_000;
+  const lista: ComentarioYoutube[] = [];
+  for (const h of r.items ?? []) {
+    const top = h.snippet?.topLevelComment;
+    const s = top?.snippet;
+    const autorId = s?.authorChannelId?.value ?? "";
+    if (!top || !s?.textOriginal || !h.snippet?.videoId || !autorId || autorId === c.canal_id) continue;
+    if (Date.parse(s.publishedAt ?? "") < desde) continue;
+    if ((h.replies?.comments ?? []).some((x) => x.snippet?.authorChannelId?.value === c.canal_id)) continue;
+    lista.push({ id: top.id, videoId: h.snippet.videoId, autorId, autor: s.authorDisplayName?.replace(/^@/, "") ?? null, texto: s.textOriginal, publicado: s.publishedAt ?? "" });
+  }
+  return lista.reverse();
+}
+
+/** Responde un comentario como el canal (50 unidades del cupo). Devuelve el id de la respuesta. */
+export async function responderComentarioYoutube(admin: Admin, comentarioId: string, texto: string): Promise<string> {
+  const token = await tokenVigente(admin);
+  const res = await fetch("https://www.googleapis.com/youtube/v3/comments?part=snippet", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json; charset=UTF-8" },
+    body: JSON.stringify({ snippet: { parentId: comentarioId, textOriginal: texto.slice(0, 9000) } }),
+    cache: "no-store",
+  });
+  const d = (await res.json().catch(() => ({}))) as { id?: string; error?: { message?: string } };
+  if (!res.ok || !d.id) throw new Error(`YouTube responder (${res.status}): ${d.error?.message ?? "sin id"}`);
+  return d.id;
+}
+
+/** Marca la revisión de comentarios si pasaron al menos `minutos` desde la anterior (una sola ejecución a la vez). */
+export async function turnoComentariosYoutube(admin: Admin, minutos: number): Promise<boolean> {
+  const limite = new Date(Date.now() - minutos * 60_000).toISOString();
+  const { data } = await admin
+    .from("youtube_cuenta")
+    .update({ comentarios_revisados_en: new Date().toISOString() })
+    .eq("id", 1)
+    .or(`comentarios_revisados_en.is.null,comentarios_revisados_en.lt.${limite}`)
+    .select("id");
+  return Boolean(data?.length);
 }

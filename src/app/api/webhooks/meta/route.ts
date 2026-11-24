@@ -2,6 +2,7 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { extraerInteracciones, firmaValidaMeta, metaConfigurado, tokenVerificacionMeta, type AvisoMeta } from "@/lib/redes/meta";
 import { atenderInteraccion } from "@/lib/redes/sibila-redes";
+import { revisarComentariosYoutube } from "@/lib/redes/youtube-comentarios";
 import { atenderAvisoWhatsapp } from "@/lib/whatsapp/webhook";
 import type { AvisoWhatsapp } from "@/lib/whatsapp/api";
 
@@ -58,6 +59,11 @@ export async function POST(request: Request) {
         console.error(`[meta ${i.red} ${i.tipo}]`, i.idMeta, e instanceof Error ? e.message : e);
       }
     }
+    // YouTube no tiene webhook de comentarios: los avisos de Meta, que llegan seguido, sirven de reloj (cada 20 min, pocos
+    // por vez para no pasar el tiempo de la función; los demás quedan para la siguiente revisión).
+    await revisarComentariosYoutube(admin, 20, 4)
+      .then((r) => ("atendidos" in r ? console.info("[youtube comentarios]", JSON.stringify(r).slice(0, 500)) : undefined))
+      .catch((e) => console.error("[youtube comentarios]", e instanceof Error ? e.message : e));
   })();
   after(() => trabajo);
   return NextResponse.json({ ok: true, recibidas: interacciones.length });

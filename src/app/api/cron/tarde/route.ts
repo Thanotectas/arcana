@@ -13,5 +13,5 @@ export const maxDuration = 300;
 export async function GET(request: Request) {
   const rechazo = cronAutorizado(request);
   if (rechazo) return rechazo;
-  return respuestaOrquestador(await ejecutarRutas(request, ["/api/cron/instagram", "/api/cron/metricas", "/api/cron/youtube", "/api/cron/juego"]));
+  return respuestaOrquestador(await ejecutarRutas(request, ["/api/cron/instagram", "/api/cron/metricas", "/api/cron/youtube", "/api/cron/juego", "/api/cron/youtube-comentarios"]));
 }

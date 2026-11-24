@@ -16,7 +16,8 @@ import { hechos } from "@/lib/whatsapp/sibila";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { fechaBogota } from "./carta-dia";
-import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion } from "./meta";
+import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion, type RedSibila } from "./meta";
+import { responderComentarioYoutube, textoDeVideo } from "./youtube";
 import { esPublicacionAbjad, idiomaDePublicacion, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
 import { esPublicacionYildizname, respuestaYildizname } from "./yildizname-comentarios";
 import { anotarFoto, leerMarcas, type MarcaFoto } from "./foto-anotada";
@@ -29,6 +30,10 @@ import { nombreCarta } from "@/lib/juego/cartas-idiomas";
 import type { Idioma } from "@/lib/i18n/idiomas";
 
 const IDIOMAS_LECTURA: Idioma[] = ["en", "pt", "fr", "tr", "ar", "id", "hi"];
+
+const NOMBRE_RED: Record<RedSibila, string> = { instagram: "Instagram", facebook: "Facebook", youtube: "YouTube" };
+/** Para las plantillas de abjad y Yıldızname: en YouTube, como en Facebook, «el enlace de nuestro perfil». */
+const redPlantilla = (red: RedSibila) => (red === "instagram" ? "instagram" : "facebook");
 
 /**
  * Sibila responde en Instagram y Facebook: a los comentarios de las
@@ -261,7 +266,7 @@ async function avisarHumano(i: Interaccion, hilo: { rol: string; contenido: stri
   const [para] = correosAdmin();
   if (!para) return;
   const quien = i.remitente ?? `usuario ${i.remitenteId}`;
-  const red = i.red === "instagram" ? "Instagram" : "Facebook";
+  const red = NOMBRE_RED[i.red];
   const texto = hilo.map((m) => `${m.rol === "persona" ? quien : "Sibila"}: ${m.contenido}`).join("\n");
   const html = `<div style="font-family:Georgia,serif;color:#ece6f7;background:#0b0716;padding:28px;border-radius:16px">
 <p style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#b7a5ff;margin:0 0 8px">${red} · mensaje directo</p>
@@ -348,9 +353,10 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   let respuestaAbjad: string | null = null;
   let publicacion = "";
   if (!respuestaDirecto && i.tipo === "comentario" && i.objetoId) {
-    publicacion = await textoDePublicacion(i.red, i.objetoId).catch(() => "");
-    if (esPublicacionYildizname(publicacion)) respuestaAbjad = respuestaYildizname(i.texto, publicacion, i.red);
-    else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, i.red);
+    const objeto = i.objetoId;
+    publicacion = await (i.red === "youtube" ? textoDeVideo(admin, objeto) : textoDePublicacion(i.red, objeto)).catch(() => "");
+    if (esPublicacionYildizname(publicacion)) respuestaAbjad = respuestaYildizname(i.texto, publicacion, redPlantilla(i.red));
+    else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, redPlantilla(i.red));
   }
 
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
@@ -405,7 +411,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       .limit(CONTEXTO);
     hilo = (previos ?? []).reverse().flatMap((m) => [{ rol: "persona", contenido: m.texto }, ...(m.respuesta ? [{ rol: "asistente", contenido: m.respuesta }] : [])]);
     const conversacion = hilo.map((m) => `${m.rol === "persona" ? "Persona" : "Sibila"}: «${m.contenido.replace(/»/g, "”")}»`).join("\n");
-    entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje directo por ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»`;
+    entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje directo por ${NOMBRE_RED[i.red]}: «${i.texto.replace(/»/g, "”")}»`;
     // Lectura básica gratis: una por persona en 30 días (cuenta junto con las de foto).
     if (!modoPagina && !i.imagen) {
       if (lecturasMes >= LECTURAS_POR_PERSONA) entrada += "\n(Ya usó su lectura gratis de este mes: si pide otra, no la hagas por aquí; invítala con cariño a la completa en la página.)";
@@ -418,9 +424,9 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     }
     // Una vez por conversación: invitar a seguir la cuenta y dejar el enlace de la página (en los mensajes directos sí van enlaces).
     if (!hilo.some((m) => m.rol === "asistente" && /segu[ií]r|s[ií]gue(nos|me)/i.test(m.contenido)))
-      entrada += `\n(En esta conversación aún no invitaste a seguir la cuenta: al final de tu respuesta, en una frase corta, invita con cariño a seguir a Arcana en ${i.red === "instagram" ? "Instagram" : "Facebook"} y deja el enlace miarcana.com. Si la persona está en duelo o hay un niño o una salud de por medio, no lo hagas.)`;
+      entrada += `\n(En esta conversación aún no invitaste a seguir la cuenta: al final de tu respuesta, en una frase corta, invita con cariño a seguir a Arcana en ${NOMBRE_RED[i.red]} y deja el enlace miarcana.com. Si la persona está en duelo o hay un niño o una salud de por medio, no lo hagas.)`;
   } else {
-    entrada = `Comentario de ${i.remitente ? `@${i.remitente}` : "una persona"} en ${i.red === "instagram" ? "Instagram" : "Facebook"}: «${i.texto.replace(/»/g, "”")}»${signo ? `\n(Menciona el signo ${signo.nombre}.)` : ""}`;
+    entrada = `Comentario de ${i.remitente ? `@${i.remitente}` : "una persona"} en ${NOMBRE_RED[i.red]}${i.red === "youtube" ? " (comentario en un Short del canal)" : ""}: «${i.texto.replace(/»/g, "”")}»${signo ? `\n(Menciona el signo ${signo.nombre}.)` : ""}`;
     if (i.red === "facebook") entrada += "\n(Es Facebook: no escribas direcciones web; si invitas, di «miarcana punto com» o «el enlace está en nuestro perfil».)";
   }
 
@@ -446,12 +452,13 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else {
-      // Comentarios con el modelo económico; los mensajes directos (donde va la lectura gratis) con el estándar.
+      // Comentarios y mensajes directos con el modelo estándar: son públicos o llevan la lectura gratis, y la calidad
+      // es lo que da confianza. El económico queda para las respuestas cortas que llevan a la página.
       const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`;
-      const nivel = i.tipo === "comentario" ? ("economico" as const) : ("estandar" as const);
+      const nivel = "estandar" as const;
       respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA });
-      // Si el modelo económico se fue a otro idioma (español a quien escribe en árabe), se rehace con el estándar.
-      if (nivel === "economico" && idiomaEsperado !== "es" && idiomaEquivocado(respuesta, idiomaEsperado))
+      // Si la respuesta se fue a otro idioma (español a quien escribe en árabe), se rehace una vez.
+      if (i.tipo === "comentario" && idiomaEsperado !== "es" && idiomaEquivocado(respuesta, idiomaEsperado))
         respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado }).catch(() => respuesta);
     }
   } catch (e) {
@@ -485,7 +492,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   const urlMarcada = foto && conFotoMarcada ? await subirFotoMarcada(admin, i.idMeta, Buffer.from(foto.base64, "base64"), marcas) : null;
 
   try {
-    if (i.tipo === "comentario") await responderComentario(i.red, i.idMeta, respuesta, urlMarcada ?? undefined);
+    if (i.tipo === "comentario") await (i.red === "youtube" ? responderComentarioYoutube(admin, i.idMeta, respuesta) : responderComentario(i.red, i.idMeta, respuesta, urlMarcada ?? undefined));
     else {
       if (urlMarcada) await enviarImagenDirecta(i.remitenteId, urlMarcada).catch((e) => console.error("[redes sibila] foto marcada por mensaje:", e instanceof Error ? e.message : e));
       await enviarMensajeDirecto(i.remitenteId, respuesta);

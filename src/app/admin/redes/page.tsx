@@ -254,6 +254,16 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
               </p>
               <BotonDesconectarYoutube />
             </div>
+            {youtube.comentarios ? (
+              <p className="text-sm text-texto-suave">
+                Sibila responde los comentarios del canal (revisa cada 20 minutos
+                {youtube.comentarios_revisados_en ? `; última vez ${new Date(youtube.comentarios_revisados_en).toLocaleString("es-CO", { timeZone: "America/Bogota", dateStyle: "short", timeStyle: "short" })}` : ""}). Las respuestas quedan en la lista de interacciones de abajo.
+              </p>
+            ) : (
+              <Aviso>
+                Para que Sibila responda los comentarios de YouTube, vuelve a conectar el canal: <a href="/api/youtube/conectar" className="underline">Conectar YouTube otra vez</a>. Google pedirá el permiso nuevo «ver, editar y borrar tus videos y comentarios» (si avisa que la app no está verificada, entra en «Configuración avanzada» → «Ir a Arcana»).
+              </Aviso>
+            )}
             <p className="text-sm text-texto-suave">
               Cada día a mediodía se sube solo el Short de la carta del día (privacidad: {privacidadYoutube() === "public" ? "público" : privacidadYoutube() === "unlisted" ? "no listado" : "privado"}). Mientras Google no apruebe la app, YouTube deja privado todo lo que se sube por API: después de subir, cámbialo a público en YouTube Studio.
             </p>
@@ -313,7 +323,7 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
             {ultimasInteracciones.map((i) => (
               <li key={i.id} className="rounded-xl border border-borde p-3">
                 <p className="text-xs text-texto-suave">
-                  {hora(i.creado_en)} · {i.red === "instagram" ? "Instagram" : "Facebook"} · {i.tipo}{i.remitente ? ` · ${i.remitente}` : ""} ·{" "}
+                  {hora(i.creado_en)} · {i.red === "instagram" ? "Instagram" : i.red === "youtube" ? "YouTube" : "Facebook"} · {i.tipo}{i.remitente ? ` · ${i.remitente}` : ""} ·{" "}
                   <span className={i.estado === "respondida" ? "text-exito" : i.estado === "error" ? "text-peligro" : "text-oro-suave"}>{i.estado}</span>
                   {i.humano ? " · pide persona" : ""}
                 </p>

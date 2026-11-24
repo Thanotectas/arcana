@@ -16,6 +16,6 @@ export async function GET(request: Request) {
   const rechazo = cronAutorizado(request);
   if (rechazo) return rechazo;
   const esLunes = new Date(`${fechaBogota()}T12:00:00Z`).getUTCDay() === 1;
-  const rutas = ["/api/cron/diario", "/api/cron/instagram", "/api/cron/historia", "/api/cron/kit-tiktok", "/api/cron/kit-canal", "/api/cron/correos", "/api/cron/youtube?que=publicacion", "/api/cron/telegram", "/api/cron/seguidores", "/api/cron/juego-redes", ...(esLunes ? ["/api/cron/resumen", "/api/cron/carrusel", "/api/cron/kit-comentarios", "/api/cron/juego-semana"] : [])];
+  const rutas = ["/api/cron/diario", "/api/cron/instagram", "/api/cron/historia", "/api/cron/kit-tiktok", "/api/cron/kit-canal", "/api/cron/correos", "/api/cron/youtube?que=publicacion", "/api/cron/telegram", "/api/cron/seguidores", "/api/cron/juego-redes", "/api/cron/youtube-comentarios", ...(esLunes ? ["/api/cron/resumen", "/api/cron/carrusel", "/api/cron/kit-comentarios", "/api/cron/juego-semana"] : [])];
   return respuestaOrquestador(await ejecutarRutas(request, rutas));
 }

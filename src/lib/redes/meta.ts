@@ -65,6 +65,8 @@ async function llamar<T = Record<string, unknown>>(ruta: string, cuerpo?: Record
 }
 
 export type RedMeta = "instagram" | "facebook";
+/** Redes donde responde Sibila: las de Meta (webhook) y YouTube (sus comentarios se consultan a la API). */
+export type RedSibila = RedMeta | "youtube";
 
 /** Texto de una publicación (caption en Instagram, mensaje en Facebook), con caché en memoria de una hora. */
 const textos = new Map<string, { texto: string; hasta: number }>();
@@ -154,7 +156,7 @@ export async function suscribirPagina(): Promise<{ suscritos: string[]; errores:
 
 /** Un comentario o mensaje recibido, ya normalizado. */
 export interface Interaccion {
-  red: RedMeta;
+  red: RedSibila;
   tipo: "comentario" | "mensaje";
   idMeta: string;
   remitenteId: string;

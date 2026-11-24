@@ -212,6 +212,8 @@ type YoutubeCuentaRow = {
   expira_en: string | null;
   conectada_en: string;
   actualizado_en: string;
+  comentarios_revisados_en: string | null;
+  scopes: string | null;
 };
 
 type PublicacionYoutubeRow = {
@@ -328,7 +330,7 @@ type MetricaRedesRow = {
 
 type InteraccionRedesRow = {
   id: number;
-  red: "instagram" | "facebook";
+  red: "instagram" | "facebook" | "youtube";
   tipo: "comentario" | "mensaje";
   id_meta: string;
   remitente_id: string;
@@ -632,7 +634,7 @@ export type Database = {
       };
       youtube_cuenta: {
         Row: YoutubeCuentaRow;
-        Insert: Insertable<YoutubeCuentaRow, "id" | "nombre" | "usuario" | "avatar" | "access_token" | "expira_en" | "conectada_en" | "actualizado_en">;
+        Insert: Insertable<YoutubeCuentaRow, "id" | "nombre" | "usuario" | "avatar" | "access_token" | "expira_en" | "conectada_en" | "actualizado_en" | "comentarios_revisados_en" | "scopes">;
         Update: Partial<YoutubeCuentaRow>;
         Relationships: [];
       };
