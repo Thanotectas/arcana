@@ -1,0 +1,108 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716;font-variant-numeric:lining-nums}
+#fondo{position:absolute;inset:0;overflow:hidden}
+#fondo img{position:absolute;top:0;height:1920px;width:auto}
+#velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,7,22,.55),rgba(11,7,22,.15) 45%,rgba(11,7,22,.35))}
+.c{position:absolute;left:60px;right:60px;text-align:center;opacity:0}
+.k{font-family:I;font-size:30px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716}
+.t{font-family:C;color:#f1d99a;line-height:1.05;margin-top:10px;text-shadow:0 0 40px rgba(241,217,154,.5),0 3px 16px #0b0716}
+.s{font-family:CI;font-size:58px;color:#fff;margin-top:12px;text-shadow:0 3px 16px #0b0716,0 0 30px #0b0716}
+body.rtl .k,body.rtl .t,body.rtl .s{font-family:NA,C;letter-spacing:0}
+body.rtl .k{font-size:38px}
+.boton{display:inline-block;margin-top:34px;padding:18px 48px;border-radius:999px;border:3px solid #f1d99a;background:rgba(11,7,22,.78);font-family:I;font-size:44px;color:#f1d99a}
+#carta{position:absolute;left:50%;top:700px;width:380px;margin-left:-190px;border-radius:22px;border:3px solid rgba(241,217,154,.8);box-shadow:0 0 90px rgba(241,217,154,.55),0 30px 80px rgba(0,0,0,.6);opacity:0}
+/* Teléfono */
+#tel{position:absolute;left:60px;right:60px;top:300px;height:1280px;border-radius:64px;border:3px solid rgba(236,230,247,.25);background:rgba(16,10,32,.9);box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 0 14px rgba(11,7,22,.7);opacity:0;overflow:hidden}
+#cab{display:flex;align-items:center;gap:22px;padding:56px 44px 26px;border-bottom:1.5px solid rgba(236,230,247,.12)}
+#cab img{height:120px;border-radius:10px;border:1.5px solid rgba(241,217,154,.6)}
+#cab .n{font-family:C;font-size:46px;color:#f1d99a;line-height:1.05}
+#cab .m{font-family:I;font-size:20px;letter-spacing:.22em;color:#b7a5ff}
+body.rtl #cab .n{font-family:NA}
+body.rtl #cab .m{font-family:NA;font-size:26px;letter-spacing:0}
+#lista{padding:26px 28px;display:flex;flex-direction:column;gap:20px}
+.msj{border-radius:28px;border:1.5px solid rgba(236,230,247,.14);background:rgba(255,255,255,.04);padding:22px 26px;opacity:0;position:relative}
+.msj.sib{border-color:rgba(241,217,154,.55);background:rgba(241,217,154,.07)}
+.quien{display:flex;align-items:center;gap:12px;font-family:I;font-size:31px;color:#ece6f7}
+.quien .lugar{color:#a89fc0;font-size:27px}
+.msj.sib .quien{color:#f1d99a}
+.trad{margin-inline-start:auto;font-family:I;font-size:23px;color:#b7a5ff;opacity:0;white-space:nowrap}
+.cuerpo{position:relative;margin-top:12px;min-height:90px}
+.cuerpo p{margin:0;font-family:I;font-weight:400;font-size:39px;line-height:1.36;color:#ece6f7}
+.cuerpo p.ar{font-family:NA;font-size:44px;line-height:1.45}
+.cuerpo .b{position:absolute;inset:0}
+.reac{display:flex;gap:12px;margin-top:14px}
+.reac span{font-family:I;font-size:30px;border:1.5px solid rgba(236,230,247,.18);border-radius:999px;padding:5px 14px;color:#ece6f7}
+#ejemplo{position:absolute;left:0;right:0;top:1608px;text-align:center;font-family:I;font-size:22px;color:rgba(236,230,247,.55);opacity:0}
+body.rtl #ejemplo{font-family:NA;font-size:28px}
+.marca{position:absolute;left:0;right:0;bottom:110px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716;opacity:.85}
+.marca b{color:#f1d99a}
+</style></head><body>
+<div id="fondo"><img src="imagenes/tierra.png" id="img"><div id="velo"></div></div>
+<div class="c" id="titulo" style="top:180px"></div>
+<img id="carta" src="imagenes/la-estrella.webp">
+<div id="tel"><div id="cab"><img src="imagenes/la-estrella.webp"><div><div class="m" id="cabM"></div><div class="n" id="cabN"></div></div></div><div id="lista"></div></div>
+<p id="ejemplo"></p>
+<div class="c" id="cierre" style="top:700px"></div>
+<p class="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const M={
+ L_ar:["ar","النجمة تذكّرني أن بعد كل ليلة طويلة يأتي الضوء ✨"],L_es:["es","La Estrella me recuerda que después de cada noche larga llega la luz ✨"],
+ D_tr:["tr","Bugün içimde bir umut var, sanki bir şey değişecek."],D_es:["es","Hoy siento una esperanza dentro, como si algo fuera a cambiar."],D_ar:["ar","اليوم في داخلي أمل، كأن شيئًا ما سيتغيّر."],
+ C_es:["es","Yo la vi en la sonrisa de mi mamá esta mañana 🙏"],C_ar:["ar","رأيتها في ابتسامة أمي هذا الصباح 🙏"],
+};
+const T={
+ es:{lema:"SIBILA TE LEE",
+  titulo:`<div class="k">NUEVO EN ARCANA</div><div class="t" style="font-size:132px">Comunidad<br>Arcana</div><div class="s">una carta · todos los idiomas</div>`,
+  cabM:"LA CARTA DE HOY",cabN:"La Estrella",trad:(l)=>`🌐 traducido del ${l}`,leng:{ar:"árabe",tr:"turco",es:"español"},ejemplo:"Conversación de ejemplo",
+  msjs:[["Leila","🇸🇦 Riad","L_ar","L_es"],["Deniz","🇹🇷 Estambul","D_tr","D_es"],["Tú","🇨🇴 Bogotá","C_es",null]],
+  sibila:"Tres países y una misma luz ✨ La Estrella dice que la esperanza también se cuida, como una llama pequeña.",
+  cierre:`<div class="t" style="font-size:98px">Escribe en tu idioma.<br>Todos te leen<br>en el suyo.</div><div class="s" style="font-size:54px">Gratis · Sibila responde</div><div class="boton">🔮 miarcana.com/comunidad</div>`},
+ ar:{lema:"سيبيلا تقرأ لك",
+  titulo:`<div class="k">جديد في أركانا</div><div class="t" style="font-size:150px">مجتمع<br>أركانا</div><div class="s" style="font-size:64px">بطاقة واحدة · كل اللغات</div>`,
+  cabM:"بطاقة اليوم",cabN:"النجمة",trad:(l)=>`🌐 مترجَم من ${l}`,leng:{es:"الإسبانية",tr:"التركية",ar:"العربية"},ejemplo:"محادثة على سبيل المثال",
+  msjs:[["كاميلا","🇨🇴 بوغوتا","C_es","C_ar"],["دنيز","🇹🇷 إسطنبول","D_tr","D_ar"],["أنت","🇸🇦 الرياض","L_ar",null]],
+  sibila:"ثلاث بلاد ونور واحد ✨ النجمة تقول إن الأمل يُرعى أيضًا، كشعلة صغيرة.",
+  cierre:`<div class="t" style="font-size:104px">اكتب بلغتك.<br>والجميع يقرؤونك<br>بلغتهم.</div><div class="s" style="font-size:60px">مجاني · وسيبيلا تردّ</div><div class="boton" dir="ltr">🔮 miarcana.com/ar/comunidad</div>`},
+};
+// #idioma,c1,m1,m2,m3,c2,c3,c4,F
+const h=(location.hash.slice(1)||"es,7.04,8.0,10.66,12.56,14.08,18.6,22.68,32.2").split(",");
+const LANG=h[0];const [C1,M1,M2,M3,C2,C3,C4,F]=h.slice(1).map(Number);
+const L=T[LANG];if(LANG==="ar")document.body.classList.add("rtl");
+const $=id=>document.getElementById(id);
+$("lema").textContent=L.lema;$("titulo").innerHTML=L.titulo;$("cierre").innerHTML=L.cierre;$("cabM").textContent=L.cabM;$("cabN").textContent=L.cabN;$("ejemplo").textContent=L.ejemplo;
+if(LANG==="ar"){$("tel").dir="rtl";$("titulo").dir="rtl";$("cierre").dir="rtl";}
+const p=(k)=>`<p class="${M[k][0]==="ar"?"ar":""}" dir="${M[k][0]==="ar"?"rtl":"ltr"}">${M[k][1]}</p>`;
+const lista=$("lista");
+L.msjs.forEach(([n,lugar,orig,trad],i)=>{const d=document.createElement("div");d.className="msj";d.id="m"+i;
+ d.innerHTML=`<div class="quien">${n} <span class="lugar">${lugar}</span>${trad?`<span class="trad">${L.trad(L.leng[M[orig][0]])}</span>`:""}</div><div class="cuerpo"><div class="b a">${p(orig)}</div>${trad?`<div class="b z" style="opacity:0">${p(trad)}</div>`:""}</div>`;
+ lista.appendChild(d);});
+const s=document.createElement("div");s.className="msj sib";s.id="m3";
+s.innerHTML=`<div class="quien">🔮 Sibila</div><div class="cuerpo"><p class="${LANG==="ar"?"ar":""}" dir="${LANG==="ar"?"rtl":"ltr"}">${L.sibila}</p></div><div class="reac"><span id="r0">✨ 0</span><span id="r1">🔮 0</span><span id="r2">🙏 0</span></div>`;
+lista.appendChild(s);
+// La altura del cuerpo: la del texto más alto (original o traducido), para que el cambio no salte.
+document.fonts.ready.then(()=>{document.querySelectorAll(".cuerpo").forEach(c=>{const hs=[...c.querySelectorAll("p")].map(x=>x.scrollHeight);c.style.height=Math.max(...hs)+"px";c.querySelectorAll(".b").forEach(b=>b.style.position="absolute");});});
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+window.pintar=(t)=>{
+ $("img").style.transform=`translateX(${-500-1800*su(pr(t,0,F))}px) scale(${1.04+.06*pr(t,0,F)})`;
+ // Inicio: título y la carta
+ const oI=1-su(pr(t,C1-.6,C1));$("titulo").style.opacity=su(pr(t,.2,.9))*oI;
+ $("carta").style.opacity=su(pr(t,.6,1.6))*oI;$("carta").style.transform=`translateY(${(1-su(pr(t,.6,1.8)))*60}px) rotate(${-3+3*su(pr(t,.6,2))}deg) scale(${1+.04*Math.sin(t*1.6)})`;
+ // Teléfono
+ const oT=su(pr(t,C1-.5,C1+.2))*(1-su(pr(t,C4-.6,C4)));$("tel").style.opacity=oT;$("tel").style.transform=`translateY(${(1-su(pr(t,C1-.5,C1+.4)))*80}px)`;
+ $("ejemplo").style.opacity=.9*oT;
+ [M1,M2,M3,C3].forEach((a,i)=>{const o=su(pr(t,a-.1,a+.35));const e=$("m"+i);e.style.opacity=o;e.style.transform=`translateY(${(1-o)*40}px) scale(${.96+.04*o})`;});
+ // Traducción: cada mensaje ajeno pasa a tu idioma, uno tras otro
+ [0,1,2].forEach(i=>{const e=$("m"+i);const z=e.querySelector(".z");if(!z)return;const a=C2+.3+i*.9;const k=su(pr(t,a,a+.7));
+  e.querySelector(".a").style.opacity=1-k;e.querySelector(".a").style.filter=`blur(${k*8}px)`;z.style.opacity=k;z.style.filter=`blur(${(1-k)*8}px)`;
+  e.querySelector(".trad").style.opacity=k;e.style.borderColor=`rgba(183,165,255,${.14+.5*k*(1-pr(t,a+.7,a+1.6))})`;});
+ // Reacciones que suben
+ const n=(a,b,max)=>Math.round(max*su(pr(t,a,b)));$("r0").textContent=`✨ ${n(C3+.8,C4-.5,12)}`;$("r1").textContent=`🔮 ${n(C3+1.2,C4-.5,7)}`;$("r2").textContent=`🙏 ${n(C3+1.0,C4-.5,9)}`;
+ // Cierre
+ const oC=su(pr(t,C4,C4+.6));$("cierre").style.opacity=oC;$("cierre").style.transform=`translateY(${(1-oC)*30}px)`;
+};
+window.pintar(0);
+</script></body></html>
