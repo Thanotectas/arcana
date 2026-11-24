@@ -32,7 +32,8 @@ export function raizDigital(n: number): number {
 
 /** ¿La publicación es de abjad / ebced? (por su texto: caption de Instagram o mensaje de Facebook). */
 export function esPublicacionAbjad(texto: string) {
-  return /abjad|ebced|ebcet|jummal|jumal|جمل|الجُمَّل|أبجد|ابجد/i.test(texto);
+  const sinVocales = texto.normalize("NFC").replace(/[\u064B-\u065F\u0670]/g, "");
+  return /abjad|ebced|ebcet|jummal|jumal|جمل|أبجد|ابجد/i.test(sinVocales);
 }
 
 /** Palabras que se comentan solas y no son nombres (agradecer, reaccionar, criticar). */
