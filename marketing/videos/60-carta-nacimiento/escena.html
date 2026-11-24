@@ -1,0 +1,91 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:CI;src:url(../../../src/app/fuentes/CormorantGaramond-Italic.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b0716;font-variant-numeric:lining-nums}
+#fondo{position:absolute;inset:0;overflow:hidden}
+#fondo img{position:absolute;top:0;height:1920px;width:auto;filter:brightness(.55) saturate(1.1)}
+#velo{position:absolute;inset:0;background:radial-gradient(70% 45% at 50% 45%,rgba(11,7,22,.15),rgba(11,7,22,.75))}
+.c{position:absolute;left:50px;right:50px;text-align:center;opacity:0}
+.k{font-family:I;font-size:32px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 12px #0b0716}
+.t{font-family:C;color:#f1d99a;line-height:1.05;text-shadow:0 0 40px rgba(241,217,154,.5),0 3px 18px #0b0716}
+.s{font-family:CI;font-size:60px;color:#fff;margin-top:14px;text-shadow:0 3px 16px #0b0716,0 0 30px #0b0716}
+body.rtl .k,body.rtl .t,body.rtl .s{font-family:NA,C;letter-spacing:0}
+body.rtl .k{font-size:40px}
+.num{font-family:I;color:#fff;text-shadow:0 0 30px rgba(241,217,154,.6),0 3px 14px #0b0716;letter-spacing:.02em}
+.num b{color:#f1d99a}
+#abanico{position:absolute;left:0;right:0;top:0;height:1920px}
+.carta{position:absolute;width:190px;height:327px;left:445px;top:900px;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.6);transform-origin:50% 160%;background-size:cover}
+#gira{position:absolute;left:50%;top:680px;width:440px;height:757px;margin-left:-220px;perspective:2000px;opacity:0}
+#gira .cara{position:absolute;inset:0;border-radius:26px;backface-visibility:hidden;background-size:cover;border:3px solid rgba(241,217,154,.85);box-shadow:0 0 110px rgba(241,217,154,.5),0 30px 80px rgba(0,0,0,.65)}
+#gira .dorso{transform:rotateY(180deg)}
+#flecha{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-size:110px;opacity:0}
+.marca{position:absolute;left:0;right:0;bottom:110px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#ece6f7;text-shadow:0 2px 10px #0b0716;opacity:.85}
+.marca b{color:#f1d99a}
+</style></head><body>
+<div id="fondo"><img src="imagenes/fondo.png" id="img"><div id="velo"></div></div>
+<div id="abanico"></div>
+<div id="gira"><div id="inner" style="position:absolute;inset:0;transform-style:preserve-3d"><div class="cara" id="frente"></div><div class="cara dorso" style="background-image:url(../../../public/cartas/arcana/dorso.webp)"></div></div></div>
+<div class="c" id="gancho" style="top:200px"></div>
+<div class="c" id="f0" style="top:480px"></div>
+<div class="c" id="f1" style="top:760px"></div>
+<div class="c" id="f2" style="top:960px"></div>
+<div class="c" id="f3" style="top:1160px"></div>
+<div class="c" id="resultado" style="top:600px;z-index:2"></div>
+<div class="c" id="nombre" style="top:1470px"></div>
+<div class="c" id="cta" style="top:260px"></div>
+<div id="flecha">👇</div>
+<p class="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const IDS=["el-loco","el-mago","la-sacerdotisa","la-emperatriz","el-emperador","el-sumo-sacerdote","los-enamorados","el-carro","la-fuerza","el-ermitano","la-rueda-de-la-fortuna","la-justicia","el-colgado","la-muerte","la-templanza","el-diablo","la-torre","la-estrella","la-luna","el-sol","el-juicio","el-mundo"];
+const T={
+ es:{lema:"SIBILA TE LEE",
+  gancho:`<div class="t" style="font-size:104px">Tu fecha de<br>nacimiento esconde<br>una carta del tarot</div>`,
+  ej:"EJEMPLO",resultado:`<div class="k">NACISTE CON</div>`,nombre:`<div class="t" style="font-size:110px">El Ermitaño · IX</div><div class="s">introspección · búsqueda</div>`,
+  cta:`<div class="t" style="font-size:112px">¿Cuál es<br>la tuya?</div><div class="s" style="font-size:62px;margin-top:26px">Comenta tu fecha de nacimiento<br>y Sibila te la calcula</div><div class="k" style="margin-top:30px">DÍA / MES / AÑO</div>`},
+ ar:{lema:"سيبيلا تقرأ لك",
+  gancho:`<div class="t" style="font-size:104px">تاريخ ميلادك<br>يُخفي بطاقة<br>من التاروت</div>`,
+  ej:"مثال",resultado:`<div class="k">وُلدتَ مع</div>`,nombre:`<div class="t" style="font-size:120px">الناسك · IX</div><div class="s" style="font-size:66px">تأمل ذاتي · بحث</div>`,
+  cta:`<div class="t" style="font-size:118px">ما هي<br>بطاقتك؟</div><div class="s" style="font-size:66px;margin-top:26px">اكتب تاريخ ميلادك في التعليقات<br>وستحسبها لك سيبيلا</div><div class="k" style="margin-top:30px">اليوم / الشهر / السنة</div>`},
+ tr:{lema:"SİBİLA SENİ OKUR",
+  gancho:`<div class="t" style="font-size:104px">Doğum tarihin<br>bir tarot kartı<br>saklıyor</div>`,
+  ej:"ÖRNEK",resultado:`<div class="k">DOĞUM KARTIN</div>`,nombre:`<div class="t" style="font-size:120px">Ermiş · IX</div><div class="s">içe bakış · arayış</div>`,
+  cta:`<div class="t" style="font-size:112px">Seninki<br>hangisi?</div><div class="s" style="font-size:62px;margin-top:26px">Doğum tarihini yorumlara yaz,<br>Sibila hesaplasın</div><div class="k" style="margin-top:30px">GÜN / AY / YIL</div>`},
+};
+const LANG=(location.hash.slice(1)||"es");const L=T[LANG];if(LANG==="ar")document.body.classList.add("rtl");
+const $=id=>document.getElementById(id);
+$("lema").textContent=L.lema;$("gancho").innerHTML=L.gancho;$("resultado").innerHTML=L.resultado;$("nombre").innerHTML=L.nombre;$("cta").innerHTML=L.cta;
+if(LANG==="ar")for(const id of ["gancho","resultado","nombre","cta"])$(id).dir="rtl";
+// La cuenta (siempre de izquierda a derecha)
+const F=[`<div class="k">${L.ej}</div><div class="num" style="font-size:120px;margin-top:10px" dir="ltr">13 · 02 · 1974</div>`,
+ `<div class="num" style="font-size:88px;white-space:nowrap" dir="ltr">13 + 2 + 1974 = <b>1989</b></div>`,
+ `<div class="num" style="font-size:88px;white-space:nowrap" dir="ltr">1 + 9 + 8 + 9 = <b>27</b></div>`,
+ `<div class="num" style="font-size:150px" dir="ltr">2 + 7 = <b>9</b></div>`];
+F.forEach((h,i)=>$("f"+i).innerHTML=h);
+$("frente").style.backgroundImage="url(../../../public/cartas/rider/el-ermitano.webp)";
+// Abanico de los 22 arcanos
+const ab=$("abanico");IDS.forEach((id,i)=>{const d=document.createElement("div");d.className="carta";d.style.backgroundImage=`url(../../../public/cartas/rider/${id}.webp)`;d.id="a"+i;ab.appendChild(d);});
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+// Tiempos (s): gancho 0–2.8 · cuenta 2.8–8.6 · carta 8.6–12.2 · pregunta 12.2–16
+const G=2.8,C0=2.8,C1=4.2,C2=5.6,C3=7.0,R=8.6,P=12.2,FIN=16;
+window.pintar=(t)=>{
+ $("img").style.transform=`translateX(${-1150-300*pr(t,0,FIN)}px) scale(${1.05+.05*pr(t,0,FIN)})`;
+ $("gancho").style.opacity=ven(t,.1,G);$("gancho").style.transform=`scale(${.94+.06*su(pr(t,.1,.7))})`;
+ // Abanico: se abre al inicio, se cierra durante la cuenta, vuelve al final
+ const abre=su(pr(t,.2,1.4))*(1-su(pr(t,G-.3,G+.4)))+su(pr(t,P+.2,P+1.4));
+ const opAb=Math.max(su(pr(t,.1,.6))*(1-su(pr(t,G-.2,G+.4))),su(pr(t,P+.1,P+.8)));
+ IDS.forEach((_,i)=>{const e=$("a"+i);const ang=(i-10.5)*6.4*abre;const y=(P<t?200:0);e.style.transform=`translateY(${y}px) rotate(${ang}deg)`;e.style.opacity=opAb;});
+ // Cuenta paso a paso
+ [C0,C1,C2,C3].forEach((a,i)=>{const e=$("f"+i);e.style.opacity=ven(t,a,R,.3);e.style.transform=`translateY(${(1-su(pr(t,a,a+.4)))*30}px) scale(${i===3?1+.08*Math.sin(Math.max(0,t-C3)*5)*(t<R?1:0):1})`;});
+ // La carta: entra de dorso y gira
+ const og=ven(t,R-.2,P,.35);$("gira").style.opacity=og;
+ $("inner").style.transform=`rotateY(${180-180*su(pr(t,R+.2,R+1.2))}deg) scale(${.85+.15*su(pr(t,R-.2,R+.6))})`;
+ $("resultado").style.opacity=ven(t,R+.9,P,.3);$("nombre").style.opacity=ven(t,R+1.1,P,.3);
+ // Pregunta final
+ $("cta").style.opacity=su(pr(t,P,P+.5));$("cta").style.transform=`translateY(${(1-su(pr(t,P,P+.5)))*30}px)`;
+ $("flecha").style.opacity=su(pr(t,P+.8,P+1.2));document.querySelector('.marca').style.opacity=(.85*(1-su(pr(t,P,P+.4)))).toFixed(3);$("flecha").style.transform=`translateY(${Math.sin(Math.max(0,t-P)*6)*18}px)`;
+};
+window.pintar(0);
+</script></body></html>
