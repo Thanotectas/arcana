@@ -47,7 +47,7 @@ export const ar: Diccionario = {
     hoy: "سماؤك اليوم",
     chino: "التقويم الصيني",
     cruce: "قراءات متقاطعة",
-    suenos: "الأحلام",
+    suenos: "تفسير الأحلام",
     sinastria: "التوافق الفلكي",
     chocolate: "الشوكولاتة",
     velas: "الشموع",

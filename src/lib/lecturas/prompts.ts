@@ -87,6 +87,12 @@ const TRADICION_SUENOS_IDIOMA: Partial<Record<Idioma, string>> = {
   fr: "Tradición del lector: en el mundo francófono (Francia y África occidental) se reconocen la clave de los sueños europea y la lectura simbólica; en África occidental los sueños con antepasados y con agua tienen mucho peso. Menciónalo con respeto cuando aplique, sin miedo.",
 };
 
+/** En árabe y turco la tradición clásica de interpretación tiene sección propia: es lo que esos lectores buscan. */
+const SECCION_CLASICA: Partial<Record<Idioma, string>> = {
+  ar: "## En la tradición de tafsir al-ahlam (los tres o cuatro símbolos principales del sueño con el sentido que les dan los diccionarios clásicos árabes, como el atribuido a Ibn Sirin o el de al-Nabulsi, dicho como tradición; sin versículos, sin dictámenes religiosos y sin decir de dónde viene el sueño), ",
+  tr: "## Rüya tabirine göre (los tres o cuatro símbolos principales con el sentido que les da el rüya tabiri tradicional turco, dicho como tradición; sin versículos ni dictámenes religiosos), ",
+};
+
 function idiomaDe(entrada: Objeto): Idioma {
   return esIdioma(entrada.idioma) ? entrada.idioma : IDIOMA_PREDETERMINADO;
 }
@@ -442,6 +448,7 @@ export async function construirPrompt(l: LecturaParaPrompt): Promise<Prompt> {
         `\n\nEstructura: ## Lo que tu sueño cuenta (el relato visto desde fuera, en dos o tres frases), ## Los símbolos (cada símbolo o escena relevante con su sentido tradicional y el sentido que puede tener para esta persona, como lista breve), ## La emoción del sueño (qué siente el sueño y qué parte de la vida despierta toca), ` +
         (r.previos?.length ? "## El hilo con tus sueños anteriores (solo si hay conexión real), " : "") +
         (e.recurrente ? "## Por qué vuelve (qué pide un sueño que se repite), " : "") +
+        (SECCION_CLASICA[idioma] ?? "") +
         `## Lo que puede estar anunciando (dos o tres anuncios concretos que la tradición asocia a sus símbolos, con plazo amplio), ## Lo que te está diciendo (la síntesis: un mensaje claro y una pregunta para llevar al día). Extensión: 700 a 950 palabras.`,
       sistemaExtra:
         "Interpretación de sueños: combina la lectura simbólica clásica (arquetipos junguianos, la tradición de los diccionarios de sueños, la mitología y los cuatro elementos) con el contexto de la persona. Habla de lo que la persona vive, teme o desea y, cuando la tradición le da a un símbolo sentido de anuncio (agua clara, dientes, boda, viaje, dinero, nacimiento), dilo como un anuncio probable y simbólico, nunca literal ni fatal. Nombra los símbolos concretos del relato, no generalidades. Si el sueño incluye violencia, muerte o pérdida, trátalo con calma: en los sueños suelen hablar de cambios y cierres, no de hechos. Si el relato sugiere angustia persistente, pesadillas repetidas o un trauma, sugiere con delicadeza hablar con un profesional de salud mental, sin diagnosticar. No inventes detalles que no estén en el relato." +
