@@ -139,6 +139,24 @@ type HoroscopoRow = {
 
 type Insertable<T, Opcionales extends keyof T> = Omit<T, Opcionales> & Partial<Pick<T, Opcionales>>;
 
+type ComunidadMensajeRow = {
+  id: number;
+  fecha: string;
+  usuario_id: string | null;
+  autor: string;
+  es_sibila: boolean;
+  respuesta_a: number | null;
+  idioma: string;
+  texto: string;
+  estado: "publicado" | "oculto" | "revision";
+  motivo: string | null;
+  creado_en: string;
+};
+
+type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: string };
+type ComunidadReaccionRow = { mensaje_id: number; usuario_id: string; emoji: "✨" | "🔮" | "🙏"; creado_en: string };
+type ComunidadReporteRow = { mensaje_id: number; usuario_id: string; creado_en: string };
+
 type SuscripcionPushRow = {
   id: number;
   usuario_id: string;
@@ -684,6 +702,30 @@ export type Database = {
         Row: SeguidorRedesRow;
         Insert: Insertable<SeguidorRedesRow, "id" | "seguidores" | "detalle" | "creado_en">;
         Update: Partial<SeguidorRedesRow>;
+        Relationships: [];
+      };
+      comunidad_mensajes: {
+        Row: ComunidadMensajeRow;
+        Insert: Insertable<ComunidadMensajeRow, "id" | "usuario_id" | "es_sibila" | "respuesta_a" | "estado" | "motivo" | "creado_en">;
+        Update: Partial<ComunidadMensajeRow>;
+        Relationships: [];
+      };
+      comunidad_traducciones: {
+        Row: ComunidadTraduccionRow;
+        Insert: ComunidadTraduccionRow;
+        Update: Partial<ComunidadTraduccionRow>;
+        Relationships: [];
+      };
+      comunidad_reacciones: {
+        Row: ComunidadReaccionRow;
+        Insert: Insertable<ComunidadReaccionRow, "creado_en">;
+        Update: Partial<ComunidadReaccionRow>;
+        Relationships: [];
+      };
+      comunidad_reportes: {
+        Row: ComunidadReporteRow;
+        Insert: Insertable<ComunidadReporteRow, "creado_en">;
+        Update: Partial<ComunidadReporteRow>;
         Relationships: [];
       };
       interacciones_redes: {

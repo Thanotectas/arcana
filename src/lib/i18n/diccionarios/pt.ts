@@ -59,6 +59,7 @@ export const pt: Diccionario = {
     explorar: "Explorar",
     biblioteca: "O Arcano",
     enVivo: "Ao vivo",
+    comunidad: "Comunidade",
     menu: "Menu",
     creditos: "Créditos",
     grupos: { oraculos: "Oráculos", cielo: "Seu céu", pareja: "Entre dois", profundo: "Mais a fundo" },

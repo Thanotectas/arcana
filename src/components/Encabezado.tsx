@@ -23,6 +23,7 @@ export async function Encabezado() {
     { href: "/explorar", etiqueta: t.nav.explorar },
     { href: "/biblioteca", etiqueta: t.nav.biblioteca },
     { href: "/en-vivo", etiqueta: t.nav.enVivo },
+    { href: "/comunidad", etiqueta: t.nav.comunidad },
   ];
   const enlacesCuenta = perfil
     ? [

@@ -61,6 +61,7 @@ export const fr: Diccionario = {
     explorar: "Explorer",
     biblioteca: "L'Arcane",
     enVivo: "En direct",
+    comunidad: "Communauté",
     menu: "Menu",
     creditos: "Crédits",
     grupos: { oraculos: "Oracles", cielo: "Ton ciel", pareja: "À deux", profundo: "Plus en profondeur" },

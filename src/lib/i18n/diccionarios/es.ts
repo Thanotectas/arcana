@@ -61,6 +61,7 @@ export const es = {
     explorar: "Explorar",
     biblioteca: "El Arcano",
     enVivo: "En vivo",
+    comunidad: "Comunidad",
     menu: "Menú",
     creditos: "Créditos",
     grupos: { oraculos: "Oráculos", cielo: "Tu cielo", pareja: "Entre dos", profundo: "Más a fondo" },

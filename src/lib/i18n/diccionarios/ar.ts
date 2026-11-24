@@ -59,6 +59,7 @@ export const ar: Diccionario = {
     explorar: "استكشاف",
     biblioteca: "الأسرار",
     enVivo: "مباشر",
+    comunidad: "المجتمع",
     menu: "القائمة",
     creditos: "النقاط",
     grupos: { oraculos: "العرّافات", cielo: "سماؤك", pareja: "بين اثنين", profundo: "أعمق" },

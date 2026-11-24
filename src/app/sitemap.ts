@@ -32,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...SIGNOS.map((s) => url(`/horoscopo/${s.id}`, 0.8, "daily")),
     url("/luna", 0.8, "weekly"),
     url("/juego", 0.9, "daily"),
+    url("/comunidad", 0.8, "daily"),
     url("/si-o-no", 0.8, "weekly"),
     url("/calculadora-ascendente", 0.8),
     url("/compatibilidad-nombres", 0.7),

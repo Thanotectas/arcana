@@ -59,6 +59,7 @@ export const id: Diccionario = {
     explorar: "Jelajahi",
     biblioteca: "Rahasia",
     enVivo: "Live",
+    comunidad: "Komunitas",
     menu: "Menu",
     creditos: "Kredit",
     grupos: { oraculos: "Orakel", cielo: "Langitmu", pareja: "Berdua", profundo: "Lebih dalam" },

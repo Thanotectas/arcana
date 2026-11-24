@@ -62,6 +62,7 @@ export const en: Diccionario = {
     explorar: "Explore",
     biblioteca: "The Arcanum",
     enVivo: "Live",
+    comunidad: "Community",
     menu: "Menu",
     creditos: "Credits",
     grupos: { oraculos: "Oracles", cielo: "Your sky", pareja: "Between two", profundo: "Deeper" },
