@@ -74,6 +74,9 @@ function FormularioTiktok({ video, texto, creador, directo }: { video: string; t
   const [divulgar, setDivulgar] = useState(false);
   const [tuMarca, setTuMarca] = useState(false);
   const [deMarca, setDeMarca] = useState(false);
+  // Pauta de TikTok: no dejar publicar un video más largo de lo que admite la cuenta.
+  const [duracion, setDuracion] = useState(0);
+  const muyLargo = Boolean(creador.max_video_post_duration_sec && duracion > creador.max_video_post_duration_sec);
   const faltaMarca = divulgar && !tuMarca && !deMarca;
   const interacciones = [
     { nombre: "comentarios", texto: "Permitir comentarios", apagado: creador.comment_disabled },
@@ -96,7 +99,7 @@ function FormularioTiktok({ video, texto, creador, directo }: { video: string; t
       </div>
 
       <div className="grid gap-4 sm:grid-cols-[220px_1fr]">
-        <video src={video} controls playsInline className="w-full max-w-[220px] rounded-xl border border-borde" />
+        <video src={video} controls playsInline onLoadedMetadata={(e) => setDuracion(e.currentTarget.duration || 0)} className="w-full max-w-[220px] rounded-xl border border-borde" />
         <div className="space-y-4">
           {directo && (
             <>
@@ -185,12 +188,13 @@ function FormularioTiktok({ video, texto, creador, directo }: { video: string; t
             </>
           )}
 
+          {directo && muyLargo && <Aviso>{`Este video dura ${Math.round(duracion)} s y la cuenta admite hasta ${creador.max_video_post_duration_sec} s: recórtalo para publicarlo.`}</Aviso>}
           {estado.error && <Aviso>{estado.error}</Aviso>}
           {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
 
           <div className="flex flex-wrap gap-2">
             {directo && (
-              <button type="submit" name="modo" value="directo" disabled={faltaMarca || !privacidad} className="boton boton-primario disabled:opacity-40">
+              <button type="submit" name="modo" value="directo" disabled={faltaMarca || !privacidad || muyLargo} className="boton boton-primario disabled:opacity-40">
                 <Send className="h-4 w-4" aria-hidden /> Publicar en TikTok
               </button>
             )}
