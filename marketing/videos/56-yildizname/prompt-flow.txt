@@ -1,0 +1,84 @@
+VIDEO 56 · EL ARCANO DE SIBILA #4 · «YILDIZNAME, EL LIBRO DE LAS ESTRELLAS». Para lanzar la lectura nueva (miarcana.com/yildizname).
+Vertical 9:16, ~50 s, voz de Sibila. Versiones: ESPAÑOL, TURCO y ÁRABE (los dos públicos que más crecieron).
+Tono: cálido, misterioso y elegante; el Estambul otomano de noche. Desde adentro de la tradición.
+CUIDADO CULTURAL: nada religioso. Ni mezquitas, ni libros sagrados, ni caligrafía legible, ni personas rezando.
+Hito urbano permitido: la Torre de Gálata y el Bósforo.
+
+==================== RECETA ====================
+- 2 CLIPS en Flow (tus 2 prompts del día), vertical 9:16, 8 s. El clip B lleva la cara de Sibila: en «Ingredientes a video» adjunta la
+  imagen de referencia public/marca/sibila/base.jpg. Si le cambia la cara, repítelo agregando: «keep exactly the same face, hair and dress
+  as the reference image».
+- 4 IMÁGENES en Gemini (vertical 9:16). Mándalas como ARCHIVO.
+- VOZ: en miarcana.com/admin/voz pega el guion de abajo, ponle de nombre «56 yildizname» y elige ESPAÑOL, TURCO y ÁRABE.
+- Sonido de los clips: solo ambiente. Sin música y sin voces.
+
+==================== CLIP A · Flow · «El calígrafo de las estrellas» (8 s, sin caras) ====================
+Vertical 9:16, cinematic, night, warm candlelight in a 19th-century Ottoman scholar's room in Istanbul: a low wooden desk with an oil lamp,
+a brass astrolabe, an inkwell and a reed pen. Close-up of a man's hands (dark sleeves of an Ottoman robe, a ring) slowly drawing golden
+circles and small star symbols on old cream paper; as the pen moves, the golden ink lifts off the page as tiny glowing sparks that rise
+toward an open window where the Galata Tower and the Bosphorus shine under a starry sky. Slow push-in.
+Sound: pen scratching on paper, oil lamp flickering, distant sea and a soft night breeze. No music, no voices.
+No faces, no readable text or letters, no calligraphy, no religious symbols, no logos.
+
+==================== CLIP B · Flow · «Sibila abre el libro de las estrellas» (8 s, con Sibila) ====================
+Vertical 9:16, cinematic, deep violet night with warm golden light. The woman from the reference image (exactly the same face, long dark
+wavy hair, golden forehead jewel, deep violet dress with golden embroidery) sits at a carved wooden table and slowly opens a large antique
+book with gilded Ottoman floral ornaments on its pages (no writing). From the open pages a luminous golden ring of the twelve zodiac
+symbols rises and turns slowly above the book; one symbol, the lion of Leo, glows brighter like a small sun. She looks at it with a soft,
+knowing smile (mouth closed), then raises her eyes to the camera. Slow camera push-in.
+Sound: pages turning, a soft magical shimmer as the ring rises, candle crackling. No music, no voices.
+No readable text or letters, no calligraphy, no religious symbols, no logos. Keep her face identical to the reference image.
+
+==================== IMAGEN 1 · Gemini · «Estambul, 1858» ====================
+Vertical 9:16 photorealistic cinematic image of 19th-century Istanbul at night seen from an old wooden window: the Galata Tower and the
+Bosphorus under a sky full of bright stars, warm lamplight on the windowsill where an antique leather-bound book and a brass astrolabe rest.
+Deep violet and gold tones. No people, no mosques, no readable text, no logos.
+
+==================== IMAGEN 2 · Gemini · «Cada letra tiene un número» ====================
+Vertical 9:16 image, macro view of old cream paper with delicate gilded Ottoman floral borders (tezhip); above the paper float glowing golden
+numbers (1, 5, 10, 30, 80, 100) and tiny stars, like dust in candlelight, deep violet background. No letters, no words, no calligraphy, no logos.
+
+==================== IMAGEN 3 · Gemini · «Tu nombre y el de tu madre» ====================
+Vertical 9:16 image, magical and tender: the hands of a mother and her daughter (no faces), wearing simple gold rings, hold together a small
+glowing brass lantern under a deep violet starry sky; from the lantern two golden threads of light rise and intertwine into one bright star.
+Soft gold and violet tones. No faces, no readable text, no logos.
+
+==================== IMAGEN 4 · Gemini · «El cierre: tu estrella» (con espacio para texto) ====================
+Vertical 9:16 image, a luminous golden zodiac wheel floating in a deep violet night sky with stars, the Leo symbol glowing like a small sun,
+seven small glowing planets around it; lots of empty dark space in the lower third for text. No readable text, no people, no logos.
+
+==================== GUION DE LA VOZ (español; pégalo en miarcana.com/admin/voz) ====================
+(~760 caracteres, ~50 s. Los «…» son pausas: déjalos. La herramienta lo traduce al turco y al árabe.)
+Bienvenida al Arcano de Sibila. Hoy: el Yıldızname, el libro de las estrellas…
+En el Estambul otomano, los libros de las estrellas guardaban un secreto: cada letra de tu nombre tiene un número…
+Se suma tu nombre… y el nombre de tu madre… porque en esta tradición nadie llega solo: venimos de ella…
+Ese número se divide entre doce… y lo que queda señala tu estrella, su planeta… y el día de la semana que te favorece…
+Leyla, hija de Deniz: ochenta más ochenta y uno… ciento sesenta y uno. Su estrella es Leo: el Sol… y el domingo…
+¿Cuál es la tuya?… Descúbrela en mi arcana punto com.
+
+==================== TÍTULOS EN PANTALLA (los pongo yo al armar) ====================
+ES
+1. EL ARCANO DE SIBILA · #4 / Yıldızname: el libro de las estrellas ✨
+2. ESTAMBUL OTOMANO / Cada letra tiene un número
+3. Tu nombre + el de tu madre
+4. ÷ 12 → tu estrella · tu planeta · tu día
+5. Leyla + Deniz · 80 + 81 = 161 / Leo ☀️ el Sol · domingo
+6. ¿Cuál es tu estrella? / 🔮 miarcana.com/yildizname
+TR
+1. SİBİLA'NIN SIRLARI · #4 / Yıldızname: yıldızların kitabı ✨
+2. OSMANLI İSTANBUL'U / Her harfin bir sayısı var
+3. Senin adın + annenin adı
+4. ÷ 12 → yıldızın · gezegenin · günün
+5. Leyla + Deniz · 80 + 81 = 161 / Aslan ☀️ Güneş · Pazar
+6. Senin yıldızın hangisi? / 🔮 miarcana.com/tr/yildizname
+AR
+1. أسرار سيبيلا · #4 / يلدز نامه: كتاب النجوم ✨
+2. إسطنبول العثمانية / لكل حرف رقم
+3. اسمك + اسم أمك
+4. ÷ 12 ← برجك · كوكبك · يومك
+5. ليلى + دنيز · 80 + 81 = 161 / الأسد ☀️ الشمس · الأحد
+6. ما هو نجمك؟ / 🔮 miarcana.com/ar/yildizname
+
+Dato verificado: la versión popular suma el ebced del nombre y del nombre de la madre y divide entre 12 (resto = signo desde Aries).
+Los yıldızname otomanos circularon impresos, p. ej. la Risâle-i Yıldıznâme (Estambul, 1858). Fuente: TDV İslâm Ansiklopedisi, «Yıldıznâme».
+Ejemplo: ليلى = 30+10+30+10 = 80 · Deniz (دينيز) = 81 · 161 = 12×13 + 5 → 5.º signo: Leo.
