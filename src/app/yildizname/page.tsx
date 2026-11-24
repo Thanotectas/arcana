@@ -13,7 +13,7 @@ import { plantilla } from "@/lib/i18n/formato";
 export async function generateMetadata(): Promise<Metadata> {
   const idioma = await getIdioma();
   const t = TEXTOS_YILDIZNAME[idioma];
-  return { title: t.titulo, description: t.descripcionMeta, alternates: alternativas("/yildizname", idioma) };
+  return { title: t.titulo, description: t.descripcionMeta, alternates: alternativas("/yildizname", idioma), openGraph: { images: [{ url: "/og/yildizname.jpg", width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: ["/og/yildizname.jpg"] } };
 }
 
 export default async function PaginaYildizname() {

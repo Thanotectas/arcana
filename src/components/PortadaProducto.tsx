@@ -13,6 +13,7 @@ const PORTADAS: Record<string, string> = {
   marsella: "marsella",
   geomancia: "geomancia",
   abjad: "abjad",
+  yildizname: "yildizname",
   nombres: "nombres",
   ascendente: "ascendente",
   "si-o-no": "si-o-no",
