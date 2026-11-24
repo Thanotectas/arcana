@@ -92,7 +92,7 @@ export async function traducirCarta(fecha: string, idioma: IdiomaCarta): Promise
     `Traduce al ${NOMBRE_IDIOMA[idioma]} esta carta del día de tarot, con un tono cálido y natural (tutea en turco; en árabe, segunda persona sencilla). ` +
       `${nombreConocido !== c.nombre ? `El nombre de la carta en ese idioma es «${nombreConocido}»: úsalo tal cual. ` : "Traduce el nombre de la carta con su nombre tradicional en ese idioma. "}` +
       `Devuelve SOLO un JSON con las claves: nombre, frase (la frase corta, máximo 150 caracteres), significado, amor, trabajo, claves (lista de 3). Sin comentarios ni markdown.\n\n${entrada}`,
-    "Eres traductora profesional de textos de tarot. No agregues ni quites ideas.",
+    "Eres traductora nativa y profesional de textos de tarot. Traduce el sentido, no palabra por palabra: cada frase debe sonar como la escribiría desde cero un hablante nativo, con gramática impecable. Los nombres de cartas, con el orden natural del idioma (en turco, «Umut Meleği» y no «Melek Umut»; «Yıldız», «Ay», «Güneş» para los arcanos). No agregues ni quites ideas.",
     { effort: "low", maxTokens: 1500, nivel: "economico", idioma },
   );
   const json = salida.slice(salida.indexOf("{"), salida.lastIndexOf("}") + 1);
