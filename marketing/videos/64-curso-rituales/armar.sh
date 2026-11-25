@@ -4,9 +4,9 @@
 set -euo pipefail
 SALIDA="$1"; IDIOMA="$2"; DIR="$(cd "$(dirname "$0")" && pwd)"; T="$(mktemp -d)"
 case "$IDIOMA" in   # «siete días», «¿te aviso?», cierre, final (s, medidos con faster-whisper)
- es) M="4.3,9.6,11.4,16.6";;
- tr) M="3.9,7.95,10.55,14.6";;
- ar) M="3.85,9.05,11.9,16";;
+ es) M="4.3,9.6,11.6,18.9";;
+ tr) M="3.8,7.95,10.7,16.0";;
+ ar) M="3.85,9.0,11.8,18.1";;
 esac
 F="${M##*,}"
 NODE_PATH="$(npm root -g)" node "$DIR/cuadros.cjs" "$DIR/capas.html#$IDIOMA,$M" "$T/c" "$F"

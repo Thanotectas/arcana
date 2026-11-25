@@ -20,7 +20,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   es: {
     antetitulo: "Muy pronto",
     titulo: "Curso de rituales con Sibila",
-    texto: "Siete días, una lección por día: un video corto y un ritual guiado, desde la tradición (velas, Luna, limpias y cierres de ciclo). ¿Te aviso cuando abra?",
+    texto: "Siete días, una lección por día: un video corto y un ritual guiado, desde la tradición (velas, Luna, limpias y cierres de ciclo). ¿Te aviso cuando abra? Quienes se anoten tendrán precio especial de fundadores.",
     correo: "Tu correo",
     boton: "Avísame",
     listo: "¡Listo! Te escribo cuando abra el curso 🕯️",
@@ -30,7 +30,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   en: {
     antetitulo: "Coming soon",
     titulo: "Rituals course with Sibila",
-    texto: "Seven days, one lesson a day: a short video and a guided ritual, from tradition (candles, the Moon, cleansings and closing cycles). Shall I let you know when it opens?",
+    texto: "Seven days, one lesson a day: a short video and a guided ritual, from tradition (candles, the Moon, cleansings and closing cycles). Shall I let you know when it opens? Everyone on the list gets a special founders' price.",
     correo: "Your email",
     boton: "Notify me",
     listo: "Done! I'll write to you when the course opens 🕯️",
@@ -40,7 +40,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   pt: {
     antetitulo: "Em breve",
     titulo: "Curso de rituais com a Sibila",
-    texto: "Sete dias, uma lição por dia: um vídeo curto e um ritual guiado, a partir da tradição (velas, Lua, limpezas e fechamento de ciclos). Quer que eu te avise quando abrir?",
+    texto: "Sete dias, uma lição por dia: um vídeo curto e um ritual guiado, a partir da tradição (velas, Lua, limpezas e fechamento de ciclos). Quer que eu te avise quando abrir? Quem estiver na lista terá preço especial de fundador.",
     correo: "Seu e-mail",
     boton: "Me avise",
     listo: "Pronto! Te escrevo quando o curso abrir 🕯️",
@@ -50,7 +50,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   fr: {
     antetitulo: "Bientôt",
     titulo: "Cours de rituels avec Sibila",
-    texto: "Sept jours, une leçon par jour : une courte vidéo et un rituel guidé, selon la tradition (bougies, Lune, nettoyages et fins de cycle). Je te préviens à l'ouverture ?",
+    texto: "Sept jours, une leçon par jour : une courte vidéo et un rituel guidé, selon la tradition (bougies, Lune, nettoyages et fins de cycle). Je te préviens à l'ouverture ? Les inscrits auront un prix spécial de fondateur.",
     correo: "Ton e-mail",
     boton: "Préviens-moi",
     listo: "C'est noté ! Je t'écris à l'ouverture du cours 🕯️",
@@ -60,7 +60,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   tr: {
     antetitulo: "Çok yakında",
     titulo: "Sibila ile ritüel kursu",
-    texto: "Yedi gün, her gün bir ders: kısa bir video ve gelenekten rehberli bir ritüel (mumlar, Ay, arınmalar ve döngü kapatma). Açıldığında sana haber vereyim mi?",
+    texto: "Yedi gün, her gün bir ders: kısa bir video ve gelenekten rehberli bir ritüel (mumlar, Ay, arınmalar ve döngü kapatma). Açıldığında sana haber vereyim mi? Listedekilere kurucu üye fiyatı.",
     correo: "E-postan",
     boton: "Bana haber ver",
     listo: "Tamam! Kurs açıldığında sana yazacağım 🕯️",
@@ -70,7 +70,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   ar: {
     antetitulo: "قريبًا",
     titulo: "دورة الطقوس مع سيبيلا",
-    texto: "سبعة أيام، ودرس كل يوم: فيديو قصير وطقس مُرشَد من التقاليد (الشموع، والقمر، والتنقية، وإغلاق الدورات). هل أُخبرك حين تُفتح؟",
+    texto: "سبعة أيام، ودرس كل يوم: فيديو قصير وطقس مُرشَد من التقاليد (الشموع، والقمر، والتنقية، وإغلاق الدورات). هل أُخبرك حين تُفتح؟ لمن في القائمة سعر خاص للمؤسّسين.",
     correo: "بريدك الإلكتروني",
     boton: "أخبرني",
     listo: "تمّ! سأكتب لك حين تُفتح الدورة 🕯️",
@@ -80,7 +80,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   id: {
     antetitulo: "Segera hadir",
     titulo: "Kursus ritual bersama Sibila",
-    texto: "Tujuh hari, satu pelajaran setiap hari: video singkat dan ritual terpandu, dari tradisi (lilin, Bulan, pembersihan, dan menutup siklus). Mau kukabari saat dibuka?",
+    texto: "Tujuh hari, satu pelajaran setiap hari: video singkat dan ritual terpandu, dari tradisi (lilin, Bulan, pembersihan, dan menutup siklus). Mau kukabari saat dibuka? Yang ada di daftar dapat harga khusus pendiri.",
     correo: "Email-mu",
     boton: "Kabari aku",
     listo: "Siap! Aku akan menulis saat kursusnya dibuka 🕯️",
@@ -90,7 +90,7 @@ export const TEXTOS_LISTA_ESPERA: Record<Idioma, TextosListaEspera> = {
   hi: {
     antetitulo: "जल्द ही",
     titulo: "सिबिला के साथ अनुष्ठान कोर्स",
-    texto: "सात दिन, हर दिन एक पाठ: एक छोटा वीडियो और परंपरा से एक निर्देशित अनुष्ठान (मोमबत्तियाँ, चंद्रमा, शुद्धि और चक्र पूरे करना)। खुलने पर आपको बताऊँ?",
+    texto: "सात दिन, हर दिन एक पाठ: एक छोटा वीडियो और परंपरा से एक निर्देशित अनुष्ठान (मोमबत्तियाँ, चंद्रमा, शुद्धि और चक्र पूरे करना)। खुलने पर आपको बताऊँ? सूची में शामिल लोगों को संस्थापक कीमत मिलेगी।",
     correo: "आपका ईमेल",
     boton: "मुझे बताएँ",
     listo: "हो गया! कोर्स खुलने पर मैं आपको लिखूँगी 🕯️",
