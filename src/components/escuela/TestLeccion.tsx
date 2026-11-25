@@ -108,6 +108,9 @@ export function TestLeccion({
         <div className="tarjeta border-oro/50 p-6">
           <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Tu carta de cierre de ciclo</p>
           {cartaAudio && <audio controls autoPlay src={cartaAudio} className="mt-3 w-full" />}
+          <p className="mt-4 text-sm">
+            <Link href={`/escuela/${curso}/grimorio`} className="text-oro-suave underline">Abrir mi grimorio y compartir mi sello de cierre ✦</Link>
+          </p>
           {carta.split(/\n{2,}/).map((x, k) => (
             <p key={k} className="font-display mt-3 text-xl leading-relaxed">{x}</p>
           ))}

@@ -25,6 +25,8 @@ export const CURSO_RITUALES: Curso = {
   lecciones: [
     {
       numero: 1,
+      luna: "🌑",
+      saludo: "{nombre}, hoy empieza tu cierre de año. Antes de encender nada, vamos a preparar el lugar donde va a pasar todo.",
       titulo: "Qué es un ritual: intención, espacio y momento",
       resumen: "Antes de encender nada: qué hace que un gesto se vuelva ritual, y tu altar para estos siete días.",
       minutos: 15,
@@ -46,8 +48,8 @@ export const CURSO_RITUALES: Curso = {
           pasos: [
             "Elige un lugar tranquilo donde el altar pueda quedarse los siete días.",
             "Extiende el paño y pon encima la vela, el vaso de agua y lo que trajiste de la naturaleza.",
-            "Siéntate frente a él y respira hondo tres veces.",
-            "Escribe en el papel, en presente y con tus palabras, lo que quieres cerrar este año. Por ejemplo: «Cierro este año con gratitud y dejo atrás el miedo a empezar».",
+            { texto: "Siéntate frente a tu altar y respira conmigo, despacio.", accion: "respirar", segundos: 42 },
+            { texto: "Escribe, en presente y con tus palabras, lo que quieres cerrar este año.", accion: "escribir", ayuda: "Por ejemplo: «Cierro este año con gratitud y dejo atrás el miedo a empezar». Escríbelo también en tu papel; aquí queda guardado en tu grimorio." },
             "Dobla el papel y déjalo bajo la vela. Lo usaremos el último día.",
           ],
           herramienta: { href: "/luna", texto: "Mira en qué Luna estás hoy" },
@@ -64,6 +66,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 2,
+      luna: "🌒",
+      saludo: "{nombre}, tu altar ya está listo. Hoy le abrimos las ventanas a la casa y dejamos que el humo se lleve lo viejo.",
       titulo: "Limpiar antes de pedir: el humo y las hierbas",
       resumen: "Copal, romero, ruda, bakhoor y üzerlik: cómo se limpia una casa con humo en distintas tradiciones.",
       minutos: 20,
@@ -84,7 +88,7 @@ export const CURSO_RITUALES: Curso = {
           materiales: ["Hierbas secas (romero, laurel o ruda) o un incienso que te guste", "Un plato o cuenco de barro o metal", "Fósforos", "Las ventanas abiertas"],
           pasos: [
             "Abre las ventanas: el humo necesita por dónde salir.",
-            "Enciende las hierbas o el incienso en el plato y apaga la llama para que solo quede el humo.",
+            { texto: "Enciende las hierbas o el incienso en el plato y apaga la llama para que solo quede el humo.", accion: "encender" },
             "Empieza por el rincón más alejado de la puerta y recorre cada habitación en el sentido de las agujas del reloj, pasando el humo por las esquinas, detrás de las puertas y bajo las camas.",
             "Mientras caminas, di en voz baja lo que sale de tu casa: «Sale el cansancio, sale la tristeza, sale lo que ya no es mío».",
             "Termina en la puerta de entrada y deja que el humo salga hacia afuera.",
@@ -104,6 +108,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 3,
+      luna: "🌓",
+      saludo: "{nombre}, hoy hacemos la limpia de las abuelas. Ten a mano un huevo, un vaso de agua y un rato de calma.",
       titulo: "La limpia con huevo",
       resumen: "La limpia de las abuelas latinoamericanas: cómo se hace, por qué el huevo y cómo se lee el vaso.",
       minutos: 20,
@@ -122,16 +128,16 @@ export const CURSO_RITUALES: Curso = {
           titulo: "Tu limpia de cierre de año",
           materiales: ["Un huevo fresco a temperatura ambiente", "Un vaso transparente con agua hasta la mitad", "Una ramita de romero o ruda (si tienes)"],
           pasos: [
-            "Sostén el huevo entre las manos un momento y piensa en lo que quieres soltar de este año.",
+            { texto: "Sostén el huevo entre las manos, respira y piensa en lo que quieres soltar de este año.", accion: "respirar", segundos: 30 },
             "Pásalo despacio por tu cuerpo de arriba hacia abajo, siempre en la misma dirección: la coronilla, la frente, la nuca, los hombros, los brazos, el pecho, la espalda, las piernas y las plantas de los pies.",
-            "Rompe el huevo con cuidado en el vaso y déjalo reposar cinco minutos.",
+            { texto: "Rompe el huevo con cuidado en el vaso y déjalo reposar.", accion: "esperar", segundos: 300, ayuda: "Cinco minutos. Mientras tanto, quédate en silencio cerca del vaso." },
             "Míralo a contraluz: la yema, la clara, los hilos, las burbujas.",
             "Toma la foto (de frente y, si puedes, también de lado y desde arriba) y súbela para que Sibila la lea.",
             "Al final, tira el agua y el huevo lejos de la casa y lávate las manos.",
           ],
           herramienta: { href: "/biblioteca/limpia-con-huevo", texto: "Lee la historia completa en El Arcano" },
         },
-        { tipo: "entrega", titulo: "Sibila lee tu vaso", texto: "Sube la foto de tu vaso y Sibila te dice lo que se llevó tu limpia. Esta lectura está incluida en el curso.", href: "/huevo", boton: "Que Sibila lea mi vaso" },
+        { tipo: "entrega", titulo: "Sibila lee tu vaso", texto: "Sube la foto de tu vaso y Sibila te dice lo que se llevó tu limpia. Esta lectura está incluida en el curso.", href: "/huevo", boton: "Que Sibila lea mi vaso", lectura: "huevo" },
         {
           tipo: "test",
           preguntas: [
@@ -144,6 +150,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 4,
+      luna: "🌔",
+      saludo: "{nombre}, hoy tu intención se vuelve fuego. Vamos a elegir tu vela, tu día y tu Luna.",
       titulo: "El lenguaje de las velas: color, día y Luna",
       resumen: "Qué vela encender para lo que buscas, qué día y con qué Luna. Y la vela de tu intención para el año.",
       minutos: 20,
@@ -166,14 +174,14 @@ export const CURSO_RITUALES: Curso = {
             "Elige tu intención para el año que viene y, con la herramienta de velas, mira el color, el día y la Luna que le corresponden.",
             "Con la aguja, marca en la vela una palabra que resuma tu intención.",
             "«Viste» la vela: úntala con un poco de aceite de la base hacia la mecha (para atraer).",
-            "Ponla en el plato, enciéndela con un fósforo y di tu intención en voz alta.",
-            "Quédate con ella unos minutos. Déjala arder mientras estés en casa y apágala con los dedos humedecidos o un apagavelas, sin soplarla.",
+            { texto: "Ponla en el plato, enciéndela con un fósforo y di tu intención en voz alta.", accion: "encender" },
+            { texto: "Quédate con ella, mirando la llama.", accion: "esperar", segundos: 120, ayuda: "Después, déjala arder mientras estés en casa y apágala con los dedos humedecidos o un apagavelas, sin soplarla." },
             "Cuando termine de arder (puede tomar más de un día), toma la foto de los restos.",
           ],
           cuidado: "Nunca dejes una vela encendida sin nadie que la cuide, ni cerca de cortinas, niños o mascotas.",
           herramienta: { href: "/velas", texto: "Elige tu vela, tu día y tu Luna" },
         },
-        { tipo: "entrega", titulo: "Sibila lee tu vela", texto: "Cuando tu vela termine de arder, fotografía los restos y Sibila te dice lo que la cera y la llama dejaron dicho. Incluida en el curso.", href: "/velas", boton: "Que Sibila lea mi vela" },
+        { tipo: "entrega", titulo: "Sibila lee tu vela", texto: "Cuando tu vela termine de arder, fotografía los restos y Sibila te dice lo que la cera y la llama dejaron dicho. Incluida en el curso.", href: "/velas", boton: "Que Sibila lea mi vela", lectura: "velas" },
         {
           tipo: "test",
           preguntas: [
@@ -186,6 +194,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 5,
+      luna: "🌕",
+      saludo: "{nombre}, hoy toca soltar. Lo que escribas hoy no viene contigo al año nuevo.",
       titulo: "Soltar: la Luna menguante y el papel que se quema",
       resumen: "Escribir lo que ya no quieres cargar y dejarlo ir, como se hace en tantas casas a fin de año.",
       minutos: 15,
@@ -204,9 +214,9 @@ export const CURSO_RITUALES: Curso = {
           titulo: "El papel que se quema",
           materiales: ["Papel y lápiz", "Un cuenco de metal o el fregadero", "Fósforos", "Un vaso de agua a mano"],
           pasos: [
-            "Escribe en el papel, sin pensarlo mucho, todo lo que no quieres llevar al año nuevo: miedos, hábitos, rencores, cansancios.",
+            { texto: "Escribe, sin pensarlo mucho, todo lo que no quieres llevar al año nuevo.", accion: "escribir", ayuda: "Miedos, hábitos, rencores, cansancios. Escríbelo también en tu papel: ese es el que vas a quemar." },
             "Léelo una vez en voz alta y di: «Te agradezco lo que me enseñaste. Ahora te dejo ir».",
-            "Quema el papel en el cuenco de metal o en el fregadero, con el agua a mano.",
+            { texto: "Quema el papel en el cuenco de metal o en el fregadero, con el agua a mano.", accion: "encender" },
             "Cuando se enfríen, lleva las cenizas a la tierra (una maceta o el jardín) o déjalas ir con el agua.",
             "Si no puedes quemar, rompe el papel en pedazos muy pequeños y entiérralos.",
           ],
@@ -223,6 +233,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 6,
+      luna: "🌖",
+      saludo: "{nombre}, después de soltar, agradecer. Hoy ponemos la mesa como para alguien querido.",
       titulo: "Agradecer: la mesa, las uvas y el café",
       resumen: "La gratitud en distintas culturas: las doce uvas, la sobremesa y la taza de café que se voltea.",
       minutos: 20,
@@ -242,14 +254,14 @@ export const CURSO_RITUALES: Curso = {
           materiales: ["Tu mesa, con algo que te guste: una flor, una vela, una fruta", "Papel y lápiz", "Café molido muy fino (al estilo turco, si puedes) y una taza pequeña con plato"],
           pasos: [
             "Prepara la mesa como si esperaras a alguien querido.",
-            "Escribe doce cosas que agradeces de este año, una por cada mes si puedes.",
+            { texto: "Escribe doce cosas que agradeces de este año, una por cada mes si puedes.", accion: "escribir" },
             "Prepara tu café sin colar, tómalo despacio pensando en lo que escribiste y deja un poco en el fondo.",
-            "Pide un deseo, tapa la taza con el plato, voltéala hacia ti y espera a que se enfríe.",
+            { texto: "Pide un deseo, tapa la taza con el plato, voltéala hacia ti y espera a que se enfríe.", accion: "esperar", segundos: 180 },
             "Levanta la taza y toma la foto del interior para que Sibila te la lea.",
           ],
           herramienta: { href: "/biblioteca/lectura-del-cafe", texto: "La historia de la lectura del café" },
         },
-        { tipo: "entrega", titulo: "Sibila lee tu taza", texto: "Sube la foto de tu taza y Sibila te lee los símbolos de la borra y lo que dicen de tu año nuevo. Incluida en el curso.", href: "/cafe", boton: "Que Sibila lea mi taza" },
+        { tipo: "entrega", titulo: "Sibila lee tu taza", texto: "Sube la foto de tu taza y Sibila te lee los símbolos de la borra y lo que dicen de tu año nuevo. Incluida en el curso.", href: "/cafe", boton: "Que Sibila lea mi taza", lectura: "cafe" },
         {
           tipo: "test",
           preguntas: [
@@ -261,6 +273,8 @@ export const CURSO_RITUALES: Curso = {
     },
     {
       numero: 7,
+      luna: "🌗",
+      saludo: "{nombre}, último día. Hoy sembramos lo que viene… y al final te espera mi carta.",
       titulo: "Sembrar el año nuevo",
       resumen: "Tu carta al año que viene, tres cartas del tarot y la carta de cierre que Sibila escribe para ti.",
       minutos: 20,
@@ -279,15 +293,15 @@ export const CURSO_RITUALES: Curso = {
           titulo: "Carta al año que viene",
           materiales: ["El papel que dejaste bajo la vela el primer día", "Papel nuevo y un sobre", "Tu vela blanca del altar"],
           pasos: [
-            "Enciende la vela blanca del altar y relee el papel del primer día.",
-            "Escribe una carta a ti mismo o a ti misma para leer dentro de un año: lo que deseas, cómo quieres sentirte, qué quieres aprender.",
+            { texto: "Enciende la vela blanca del altar y relee el papel del primer día.", accion: "encender" },
+            { texto: "Escribe una carta para leer dentro de un año: lo que deseas, cómo quieres sentirte, qué quieres aprender.", accion: "escribir", ayuda: "Escríbela también en papel para el sobre. Aquí queda en tu grimorio." },
             "Guárdala en el sobre, escribe la fecha de hoy y ciérralo.",
             "Saca tu tirada de tres cartas con Sibila: lo que dejas, lo que llevas y lo que llega.",
             "Guarda el sobre en un lugar especial. Lo abrirás el próximo diciembre.",
           ],
           herramienta: { href: "/tarot", texto: "Saca tus tres cartas" },
         },
-        { tipo: "entrega", titulo: "Tu tirada de cierre", texto: "Haz tu tirada de tres cartas con Sibila: lo que dejas, lo que llevas y lo que llega. Incluida en el curso.", href: "/tarot", boton: "Sacar mis tres cartas" },
+        { tipo: "entrega", titulo: "Tu tirada de cierre", texto: "Haz tu tirada de tres cartas con Sibila: lo que dejas, lo que llevas y lo que llega. Incluida en el curso.", href: "/tarot", boton: "Sacar mis tres cartas", lectura: "tarot_tres" },
         {
           tipo: "test",
           preguntas: [

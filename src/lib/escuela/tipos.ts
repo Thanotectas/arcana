@@ -8,19 +8,31 @@ export type PreguntaTest =
   | { tipo: "opcion"; p: string; opciones: string[]; correcta: number; porque: string }
   | { tipo: "abierta"; p: string; ayuda?: string };
 
+/**
+ * Un paso del ritual guiado. Puede ser un texto simple o llevar una acción: respirar (guía de respiración), encender
+ * (tocar para encender la vela), escribir (lo que escribe queda en su grimorio) o esperar unos segundos.
+ */
+export type PasoRitual =
+  | string
+  | { texto: string; accion?: "respirar" | "encender" | "escribir" | "esperar"; segundos?: number; ayuda?: string };
+
 export type Bloque =
   /** Video de Sibila; sin `src`, se muestra que se está grabando. */
   | { tipo: "video"; titulo: string; src?: string; poster?: string }
   | { tipo: "texto"; titulo?: string; parrafos: string[] }
   /** Ritual para hacer en casa, con materiales, pasos y (si aplica) la herramienta de Arcana que lo personaliza. */
-  | { tipo: "ritual"; titulo: string; materiales: string[]; pasos: string[]; cuidado?: string; herramienta?: { href: string; texto: string } }
+  | { tipo: "ritual"; titulo: string; materiales: string[]; pasos: PasoRitual[]; cuidado?: string; herramienta?: { href: string; texto: string } }
   | { tipo: "test"; titulo?: string; preguntas: PreguntaTest[] }
   /** La foto del ritual, que Sibila lee en la lectura de Arcana correspondiente (incluida en el curso). */
-  | { tipo: "entrega"; titulo: string; texto: string; href: string; boton: string };
+  | { tipo: "entrega"; titulo: string; texto: string; href: string; boton: string; lectura: string };
 
 export interface Leccion {
   numero: number;
   titulo: string;
+  /** Lo que Sibila le dice a la persona al abrir la lección (con su nombre). */
+  saludo: string;
+  /** Fase de la Luna que acompaña la lección en el camino (solo simbólica). */
+  luna: "🌑" | "🌒" | "🌓" | "🌔" | "🌕" | "🌖" | "🌗" | "🌘";
   resumen: string;
   minutos: number;
   bloques: Bloque[];
@@ -45,4 +57,9 @@ export interface Curso {
   abierto: boolean;
   /** Horas que deben pasar desde que se completa una lección para que se abra la siguiente. */
   horasEntreLecciones: number;
+}
+
+/** Texto de un paso, sea simple o con acción. */
+export function textoPaso(p: PasoRitual) {
+  return typeof p === "string" ? p : p.texto;
 }

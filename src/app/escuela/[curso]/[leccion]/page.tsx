@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AlertTriangle, Clapperboard, Sparkles } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Clapperboard, ExternalLink, Flame, Moon, Sparkles } from "lucide-react";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { avanceDe } from "@/lib/escuela/servidor";
+import { avanceDe, lecturasDelCurso } from "@/lib/escuela/servidor";
+import { conNombre, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
+import { textoPaso } from "@/lib/escuela/tipos";
+import { Altar } from "@/components/escuela/Altar";
+import { ModoRitual } from "@/components/escuela/ModoRitual";
 import { TestLeccion } from "@/components/escuela/TestLeccion";
 
 export async function generateMetadata({ params }: { params: Promise<{ curso: string; leccion: string }> }): Promise<Metadata> {
@@ -13,7 +17,15 @@ export async function generateMetadata({ params }: { params: Promise<{ curso: st
   return l ? { title: `Día ${l.numero} · ${l.titulo}`, robots: { index: false } } : {};
 }
 
-/** Una lección: sus bloques en orden (video, texto, ritual, entrega y test). Solo con inscripción y si ya se abrió. */
+function Separador() {
+  return (
+    <div className="flex items-center justify-center gap-4 text-oro/70" aria-hidden>
+      <span className="h-px w-16 bg-gradient-to-r from-transparent to-oro/60" />✦<span className="h-px w-16 bg-gradient-to-l from-transparent to-oro/60" />
+    </div>
+  );
+}
+
+/** Una lección: saludo personal, video, la tradición, el ritual guiado, la foto para Sibila y las preguntas. */
 export default async function PaginaLeccion({ params }: { params: Promise<{ curso: string; leccion: string }> }) {
   const { curso: slug, leccion: num } = await params;
   const curso = cursoPorSlug(slug);
@@ -23,30 +35,53 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
   const avance = await avanceDe(curso, usuario);
   const i = curso.lecciones.indexOf(leccion);
   const estado = avance.estados[i];
-  if (!(avance.inscrito || avance.vistaPrevia) || (estado !== "abierta" && estado !== "hecha")) redirect(`/escuela/${curso.slug}`);
+  if (!usuario || !(avance.inscrito || avance.vistaPrevia) || (estado !== "abierta" && estado !== "hecha")) redirect(`/escuela/${curso.slug}`);
+  if (avance.inscrito && !avance.perfil) redirect(`/escuela/${curso.slug}`);
   const previo = avance.progreso.get(leccion.numero);
+  const ant = curso.lecciones[i - 1];
   const sig = curso.lecciones[i + 1];
   const siguiente = sig && (avance.estados[i + 1] === "abierta" || avance.estados[i + 1] === "hecha") ? `/escuela/${curso.slug}/${sig.numero}` : null;
+  const perfil = avance.perfil;
+  const zona = perfil?.zona ?? "America/Bogota";
+  const luna = lunaHoy();
+  const tiposEntrega = leccion.bloques.flatMap((b) => (b.tipo === "entrega" ? [b.lectura] : []));
+  const lecturas = await lecturasDelCurso(usuario.id, avance.inscritoEn, tiposEntrega);
+  const hayVela = leccion.bloques.some((b) => b.tipo === "ritual" && b.herramienta?.href === "/velas");
+  const vela = hayVela && perfil?.intencionVela ? tuVela(perfil.intencionVela, zona) : null;
+  const primerTexto = leccion.bloques.findIndex((b) => b.tipo === "texto");
 
   return (
-    <article className="mx-auto max-w-2xl space-y-8" lang="es">
-      <p className="text-sm text-texto-suave">
-        <Link href={`/escuela/${curso.slug}`} className="hover:text-texto">{curso.titulo}</Link> › Día {leccion.numero}
-      </p>
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">Día {leccion.numero} de {curso.lecciones.length} · {leccion.minutos} min</p>
-        <h1 className="font-display text-4xl font-semibold">{leccion.titulo}</h1>
-        <p className="text-texto-suave">{leccion.resumen}</p>
+    <article className="mx-auto max-w-2xl space-y-12" lang="es">
+      {/* Encabezado: la Luna del día, el título y Sibila que te saluda */}
+      <header className="relative -mx-4 overflow-hidden px-6 pb-8 pt-12 text-center sm:mx-0 sm:rounded-3xl sm:border sm:border-borde">
+        <div className="escuela-cielo absolute inset-0" aria-hidden />
+        <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_0%,rgba(139,108,246,.25),transparent_70%)]" aria-hidden />
+        <div className="relative space-y-3">
+          <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">
+            <Link href={`/escuela/${curso.slug}`} className="hover:text-texto">{curso.titulo}</Link>
+          </p>
+          <p className="text-6xl" aria-hidden>{leccion.luna}</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">Día {leccion.numero} de {curso.lecciones.length} · {leccion.minutos} min</p>
+          <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">{leccion.titulo}</h1>
+          <div className="mx-auto flex max-w-lg items-start gap-3 pt-3 text-start">
+            {/* eslint-disable-next-line @next/next/no-img-element -- retrato pequeño estático */}
+            <img src="/cartas/arcana/la-sibila.webp" alt="" className="h-12 w-12 shrink-0 rounded-full border border-oro/50 object-cover object-top" />
+            <p className="font-display text-xl italic leading-snug text-texto/90">«{conNombre(leccion.saludo, perfil?.nombre)}»</p>
+          </div>
+          <div className="pt-4 opacity-80">
+            <Altar estados={avance.estados} tamano="chico" />
+          </div>
+        </div>
       </header>
 
       {leccion.bloques.map((b, k) => {
         if (b.tipo === "video")
           return b.src ? (
             <figure key={k} className="mx-auto w-full max-w-sm">
-              <video controls playsInline preload="metadata" poster={b.poster} className="aspect-[9/16] w-full rounded-2xl border border-borde bg-black">
+              <video controls playsInline preload="metadata" poster={b.poster} className="aspect-[9/16] w-full rounded-3xl border border-oro/30 bg-black shadow-[0_0_60px_rgba(139,108,246,.25)]">
                 <source src={b.src} type="video/mp4" />
               </video>
-              <figcaption className="mt-2 text-center text-sm text-texto-suave">{b.titulo}</figcaption>
+              <figcaption className="mt-3 text-center font-display text-lg italic text-texto-suave">{b.titulo}</figcaption>
             </figure>
           ) : (
             <div key={k} className="tarjeta flex items-center gap-4 p-5 text-sm text-texto-suave">
@@ -54,45 +89,124 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
               <span><span className="font-display block text-lg text-texto">{b.titulo}</span>El video de Sibila de esta lección se está grabando.</span>
             </div>
           );
-        if (b.tipo === "texto")
+        if (b.tipo === "texto") {
+          const capital = k === primerTexto;
           return (
-            <section key={k} className="space-y-3">
-              {b.titulo && <h2 className="font-display text-3xl">{b.titulo}</h2>}
-              {b.parrafos.map((p, j) => <p key={j} className="leading-relaxed text-texto/90">{p}</p>)}
+            <section key={k} className="space-y-5">
+              <Separador />
+              {b.titulo && <h2 className="text-center font-display text-4xl">{b.titulo}</h2>}
+              {b.parrafos.map((p, j) => (
+                <p key={j} className={`text-lg leading-relaxed text-texto/90 ${capital && j === 0 ? "escuela-capital" : ""}`}>{p}</p>
+              ))}
             </section>
           );
+        }
         if (b.tipo === "ritual")
           return (
-            <section key={k} className="tarjeta space-y-4 p-6">
-              <h2 className="font-display text-3xl">{b.titulo}</h2>
-              <div>
-                <h3 className="text-sm uppercase tracking-[0.2em] text-violeta-suave">Necesitas</h3>
-                <ul className="mt-2 list-disc space-y-1 ps-5 text-sm">{b.materiales.map((m) => <li key={m}>{m}</li>)}</ul>
+            <section key={k} className="space-y-6">
+              <Separador />
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Tu ritual de hoy</p>
+                <h2 className="font-display text-4xl">{b.titulo}</h2>
               </div>
-              <div>
-                <h3 className="text-sm uppercase tracking-[0.2em] text-violeta-suave">Paso a paso</h3>
-                <ol className="mt-2 list-decimal space-y-2 ps-5">{b.pasos.map((p) => <li key={p} className="leading-relaxed">{p}</li>)}</ol>
+              {/* Lo personal: la Luna de hoy y, el día de las velas, su vela */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="tarjeta flex items-center gap-4 p-4">
+                  <span className="text-4xl" aria-hidden>{luna.emoji}</span>
+                  <span>
+                    <span className="flex items-center gap-1 text-xs uppercase tracking-[0.2em] text-violeta-suave"><Moon className="h-3 w-3" aria-hidden />Tu Luna hoy</span>
+                    <span className="font-display block text-xl">{luna.nombre}</span>
+                    <span className="text-xs text-texto-suave">{luna.sentido}</span>
+                  </span>
+                </div>
+                {vela && perfil?.intencionVela ? (
+                  <div className="tarjeta flex items-center gap-4 border-oro/40 p-4">
+                    <span className="h-12 w-4 shrink-0 rounded-sm" style={{ background: vela.tono, boxShadow: `0 -6px 18px ${vela.tono}` }} aria-hidden />
+                    <span>
+                      <span className="flex items-center gap-1 text-xs uppercase tracking-[0.2em] text-violeta-suave"><Flame className="h-3 w-3" aria-hidden />Tu vela · {NOMBRE_INTENCION[perfil.intencionVela]}</span>
+                      <span className="font-display block text-xl">{vela.color} <span className="text-base text-texto-suave">({vela.alterno})</span></span>
+                      <span className="text-xs text-texto-suave">Un {vela.dia}, día de {vela.astro}, con {vela.fase.toLowerCase()}{vela.cuando ? `: el próximo es el ${vela.cuando}.` : "."}</span>
+                    </span>
+                  </div>
+                ) : (
+                  perfil?.intencionCierre && (
+                    <div className="tarjeta p-4">
+                      <span className="text-xs uppercase tracking-[0.2em] text-violeta-suave">Lo que quieres cerrar</span>
+                      <span className="font-display mt-1 block text-lg italic leading-snug">«{perfil.intencionCierre}»</span>
+                    </div>
+                  )
+                )}
               </div>
-              {b.cuidado && <p className="flex gap-2 rounded-xl border border-oro/30 p-3 text-sm text-texto-suave"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden />{b.cuidado}</p>}
-              {b.herramienta && <Link href={b.herramienta.href} className="boton boton-secundario">{b.herramienta.texto}</Link>}
+              <ModoRitual curso={curso.slug} leccion={leccion.numero} titulo={b.titulo} materiales={b.materiales} pasos={b.pasos} cuidado={b.cuidado} notasIniciales={previo?.notas ?? {}} nombre={perfil?.nombre ?? null} />
+              <details className="tarjeta p-5">
+                <summary className="cursor-pointer font-display text-xl">Ver el ritual por escrito</summary>
+                <div className="mt-4 space-y-4">
+                  <ul className="flex flex-wrap gap-2">
+                    {b.materiales.map((m) => <li key={m} className="rounded-full border border-borde px-3 py-1 text-sm">{m}</li>)}
+                  </ul>
+                  <ol className="space-y-3">
+                    {b.pasos.map((p, j) => (
+                      <li key={j} className="flex gap-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-oro/50 font-display text-oro-suave">{j + 1}</span>
+                        <span className="leading-relaxed">{textoPaso(p)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {b.cuidado && <p className="flex gap-2 rounded-xl border border-oro/30 p-3 text-sm text-texto-suave"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden />{b.cuidado}</p>}
+                  {b.herramienta && <Link href={b.herramienta.href} className="inline-flex items-center gap-1 text-sm text-oro-suave underline">{b.herramienta.texto}<ExternalLink className="h-3 w-3" aria-hidden /></Link>}
+                </div>
+              </details>
             </section>
           );
-        if (b.tipo === "entrega")
+        if (b.tipo === "entrega") {
+          const hecha = lecturas.get(b.lectura);
           return (
-            <section key={k} className="tarjeta border-oro/40 bg-oro/5 p-6 text-center">
-              <Sparkles className="mx-auto h-6 w-6 text-oro" aria-hidden />
-              <h2 className="font-display mt-2 text-2xl">{b.titulo}</h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-texto-suave">{b.texto}</p>
-              <Link href={b.href} className="boton boton-primario mt-4">{b.boton}</Link>
+            <section key={k} className="tarjeta relative overflow-hidden border-oro/40 p-6 text-center">
+              <div className="escuela-cielo pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+              <Sparkles className="relative mx-auto h-6 w-6 text-oro" aria-hidden />
+              <h2 className="relative mt-2 font-display text-3xl">{b.titulo}</h2>
+              {hecha ? (
+                <div className="relative mt-4 space-y-3 text-start">
+                  {hecha.foto && (
+                    // eslint-disable-next-line @next/next/no-img-element -- foto privada con dirección firmada
+                    <img src={hecha.foto} alt="" className="mx-auto max-h-64 rounded-xl border border-borde object-cover" />
+                  )}
+                  {hecha.resumen && <p className="font-display text-lg italic leading-relaxed">{hecha.resumen}</p>}
+                  <p className="text-center"><Link href={`/lecturas/${hecha.id}`} className="boton boton-secundario">Ver la lectura completa</Link></p>
+                </div>
+              ) : (
+                <>
+                  <p className="relative mx-auto mt-1 max-w-md text-sm text-texto-suave">{b.texto}</p>
+                  <Link href={b.href} className="boton boton-primario relative mt-4">{b.boton}</Link>
+                  <p className="relative mt-2 text-xs text-texto-suave">Cuando la hagas, aparecerá aquí y en tu grimorio.</p>
+                </>
+              )}
             </section>
           );
+        }
         return (
-          <section key={k} className="tarjeta space-y-4 p-6">
-            <h2 className="font-display text-3xl">{b.titulo ?? "Para ti"}</h2>
-            <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} />
+          <section key={k} className="space-y-5">
+            <Separador />
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Para ti</p>
+              <h2 className="font-display text-4xl">{b.titulo ?? "Tus preguntas de hoy"}</h2>
+            </div>
+            <div className="tarjeta p-6">
+              <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} />
+            </div>
           </section>
         );
       })}
+
+      <nav className="flex items-center justify-between gap-3 border-t border-borde pt-6 text-sm">
+        {ant ? (
+          <Link href={`/escuela/${curso.slug}/${ant.numero}`} className="inline-flex items-center gap-1 text-texto-suave hover:text-texto"><ChevronLeft className="h-4 w-4" aria-hidden />Día {ant.numero}</Link>
+        ) : <span />}
+        <Link href={`/escuela/${curso.slug}`} className="text-oro-suave hover:text-texto">El camino</Link>
+        {siguiente && sig ? (
+          <Link href={siguiente} className="inline-flex items-center gap-1 text-texto-suave hover:text-texto">Día {sig.numero}<ChevronRight className="h-4 w-4" aria-hidden /></Link>
+        ) : <span />}
+      </nav>
     </article>
   );
 }
