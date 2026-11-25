@@ -58,7 +58,8 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
           <h1 className="font-display text-5xl font-semibold leading-none drop-shadow-[0_4px_24px_rgba(0,0,0,.8)] sm:text-7xl">{curso.titulo}</h1>
           <p className="font-display text-2xl italic text-violeta-suave">{avance.perfil ? `${avance.perfil.nombre}, tu camino de siete noches` : curso.subtitulo}</p>
           <div className="pt-4">
-            <Altar estados={avance.estados.map((e) => (dentro ? e : "cerrada"))} />
+            {/* A quien aún no entra, el altar encendido: lo que va a vivir. */}
+            <Altar estados={dentro ? avance.estados : avance.estados.map(() => "hecha")} />
           </div>
           {dentro && (
             <p className="text-sm text-texto-suave">

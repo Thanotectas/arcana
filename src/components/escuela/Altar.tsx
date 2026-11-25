@@ -13,7 +13,7 @@ export function Altar({ estados, tamano = "grande" }: { estados: ("hecha" | "abi
         const encendida = e === "hecha";
         const hoy = e === "abierta";
         return (
-          <svg key={i} viewBox="0 0 40 120" style={{ height: h, width: h / 3 }} className="overflow-visible" aria-hidden>
+          <svg key={i} viewBox="0 0 40 120" style={{ height: `min(${h}px, ${((h / alto) * (tamano === "grande" ? 34 : 22)).toFixed(1)}vw)`, width: "auto" }} className="overflow-visible" aria-hidden>
             <defs>
               <linearGradient id={`cera-${i}`} x1="0" x2="1">
                 <stop offset="0" stopColor={encendida ? "#efe3c8" : "#5a5170"} />
