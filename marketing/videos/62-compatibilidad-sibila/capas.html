@@ -1,0 +1,72 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+/* Bandas de Gemini: arriba 0–256 px y abajo 1560–1920 px (desenfocadas): ahí va el texto, sin tapar a Sibila */
+.banda{position:absolute;left:0;right:0;opacity:0}
+#bArr{top:0;height:300px;background:linear-gradient(180deg,rgba(18,8,38,.78),rgba(18,8,38,.55) 70%,rgba(18,8,38,0))}
+#bAba{bottom:0;height:420px;background:linear-gradient(0deg,rgba(18,8,38,.85),rgba(18,8,38,.6) 70%,rgba(18,8,38,0))}
+.c{position:absolute;left:30px;right:30px;text-align:center;opacity:0}
+.oro{color:#f1d99a;text-shadow:0 0 34px rgba(241,217,154,.6),0 4px 16px rgba(0,0,0,.7)}
+.blanco{color:#fff;text-shadow:0 4px 16px rgba(0,0,0,.75),0 0 30px rgba(18,8,38,.9)}
+.fila{position:absolute;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:14px;direction:rtl;opacity:0}
+.caja{width:118px;height:150px;border-radius:20px;border:3px solid rgba(241,217,154,.85);background:rgba(18,8,38,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;opacity:0;box-shadow:0 0 24px rgba(241,217,154,.25)}
+.caja .l{font-family:NA;font-size:72px;line-height:1.05;color:#f1d99a}
+.lat .caja{width:108px;height:146px}.lat .caja .v{font-size:36px}.lat .caja .l{font-family:C;font-size:78px}.lat{gap:10px}
+.caja .v{font-family:I;font-size:32px;color:#fff}
+.igual{font-family:I;font-size:66px;color:#fff;margin-inline-start:16px;opacity:0;direction:ltr;text-shadow:0 4px 14px rgba(0,0,0,.7)}
+.igual b{color:#f1d99a}
+#siete{top:850px;font-family:I;font-size:300px;line-height:1}
+#marca{position:absolute;left:0;right:0;bottom:44px;text-align:center;font-family:I;font-size:22px;letter-spacing:.3em;color:#e9dcff;opacity:.85;text-shadow:0 2px 10px #000}
+#marca b{color:#f1d99a}
+</style></head><body>
+<div class="banda" id="bArr"></div><div class="banda" id="bAba"></div>
+<div class="c oro" id="pareja" style="top:70px"></div>
+<div class="fila" id="f1" style="top:60px"></div>
+<div class="fila" id="f2" style="top:1650px"></div>
+<div class="c blanco" id="suma" style="top:96px;font-family:I;font-size:92px" dir="ltr">80 + 170 = <b style="color:#f1d99a">250</b></div>
+<div class="c oro" id="siete">7</div>
+<div class="c oro" id="sentido" style="top:1660px"></div>
+<div class="c oro" id="resumen" style="top:80px"></div>
+<div class="c blanco" id="cta" style="top:1620px"></div>
+<p id="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const T={
+ ar:{pareja:`<span style="font-family:NA;font-size:132px">ليلى <span style="font-size:96px">💞</span> قيس</span>`,sentido:`<span style="font-family:NA;font-size:104px">روحان متصلتان</span>`,
+  resumen:`<span style="font-family:NA;font-size:96px">ليلى 💞 قيس = 7</span>`,cta:`<div style="font-family:NA;font-size:84px;line-height:1.25">اكتب اسمك واسم من تحب 👇</div>`,lema:"سيبيلا تقرأ لك",rtl:true},
+ es:{pareja:`<span style="font-family:C;font-size:124px">Romeo <span style="font-size:88px">💞</span> Julieta</span>`,sentido:`<span style="font-family:C;font-size:84px;line-height:1">Un gran amor<br>que pide paciencia</span>`,
+  resumen:`<span style="font-family:C;font-size:104px">Romeo 💞 Julieta = 9</span>`,cta:`<div style="font-family:C;font-size:80px;line-height:1.1">Escribe tu nombre<br>y el de quien amas 👇</div>`,lema:"SIBILA TE LEE",rtl:false,
+  filas:[[["R",9],["O",6],["M",4],["E",5],["O",6],30],[["J",1],["U",3],["L",3],["I",9],["E",5],["T",2],["A",1],24]],suma:"30 + 24 = <b style='color:#f1d99a'>54</b>",n:"9"},
+ tr:{pareja:`<span style="font-family:C;font-size:122px">Leyla <span style="font-size:88px">💞</span> Mecnun</span><div style="font-family:NA;font-size:48px;color:#e9dcff">ليلى + قيس</div>`,sentido:`<span style="font-family:C;font-size:118px">Ruh bağı</span>`,
+  resumen:`<span style="font-family:C;font-size:104px">Leyla 💞 Mecnun = 7</span>`,cta:`<div style="font-family:C;font-size:84px;line-height:1.1">Senin ve sevdiğinin<br>ismini yaz 👇</div>`,lema:"SİBİLA SENİ OKUR",rtl:false},
+};
+const h=(location.hash.slice(1)||"ar,1.8,4.4,5.2,7.2,10").split(",");
+const LANG=h[0];const [A,B,R,D,F]=h.slice(1).map(Number);const L=T[LANG];
+const $=id=>document.getElementById(id);
+if(L.suma){$("suma").innerHTML=L.suma;$("siete").textContent=L.n;}
+$("pareja").innerHTML=L.pareja;$("sentido").innerHTML=L.sentido;$("resumen").innerHTML=L.resumen;$("cta").innerHTML=L.cta;$("lema").textContent=L.lema;
+if(L.rtl)for(const id of ["pareja","sentido","resumen","cta"])$(id).dir="rtl";
+(L.filas||[[["ل",30],["ي",10],["ل",30],["ى",10],80],[["ق",100],["ي",10],["س",60],170]]).forEach((f,i)=>{const el=$("f"+(i+1));if(L.filas){el.style.direction="ltr";el.classList.add("lat");}const total=f.pop();
+ f.forEach(([l,v])=>{const d=document.createElement("div");d.className="caja";d.innerHTML=`<div class="l">${l}</div><div class="v">${v}</div>`;el.appendChild(d);});
+ const ig=document.createElement("div");ig.className="igual";ig.innerHTML=`= <b>${total}</b>`;el.appendChild(ig);});
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.3)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const pop=(t,a)=>{const k=pr(t,a,a+.35);return k<1?1+.22*Math.sin(k*Math.PI)*(1-k):1;};
+window.pintar=(t)=>{
+ $("bArr").style.opacity=1;$("bAba").style.opacity=su(pr(t,A-.3,A));
+ // 0–A: la pareja, gigante arriba
+ $("pareja").style.opacity=ven(t,0,A+.1,.25);$("pareja").style.transform=`scale(${t<.4?.8+.2*su(pr(t,0,.4)):1})`;
+ // A–B: casillas (ليلى arriba, قيس abajo), una a una, mientras giran las llamas
+ ["f1","f2"].forEach((id,i)=>{const e=$(id);e.style.opacity=ven(t,A+i*.35,B,.25);[...e.children].forEach((c,j)=>{const a=A+.1+i*.35+j*.16;const o=su(pr(t,a,a+.2));c.style.opacity=o;c.style.transform=`translateY(${(1-o)*20}px) scale(${pop(t,a)})`;});});
+ // B–R: la suma, cuando se forma el corazón
+ $("suma").style.opacity=ven(t,B,D,.25);$("suma").style.transform=`scale(${pop(t,B)})`;
+ // R: el 7 sobre el estallido, y su sentido abajo
+ const o7=ven(t,R,D,.25);$("siete").style.opacity=o7;$("siete").style.transform=`scale(${(.5+.5*su(pr(t,R,R+.3)))*pop(t,R+.05)})`;
+ $("sentido").style.opacity=ven(t,R+.25,D,.3);
+ // D–F: Sibila señala hacia abajo: la invitación, y arriba el resultado para que el video se pueda volver a ver
+ $("resumen").style.opacity=su(pr(t,D,D+.35));$("cta").style.opacity=su(pr(t,D+.15,D+.5));$("cta").style.transform=`translateY(${(1-su(pr(t,D+.15,D+.5)))*20}px)`;
+ $("marca").style.opacity=(.85*(1-su(pr(t,R,R+.3)))).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
