@@ -4,6 +4,7 @@ import { esAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/types/database";
 import type { Curso, Leccion, PreguntaTest } from "./tipos";
+import { narrarEscuela } from "./voz";
 
 export type EstadoLeccion = "hecha" | "abierta" | "manana" | "cerrada";
 
@@ -15,18 +16,19 @@ export interface Avance {
   /** Cuándo se abre la próxima lección, si espera. */
   proxima: string | null;
   carta: string | null;
-  progreso: Map<number, { respuestas: Record<string, unknown>; comentario: string | null }>;
+  cartaAudio: string | null;
+  progreso: Map<number, { respuestas: Record<string, unknown>; comentario: string | null; comentarioAudio: string | null }>;
 }
 
 /** Inscripción, lecciones hechas y cuáles están abiertas (una por día: la siguiente se abre horas después). */
 export async function avanceDe(curso: Curso, usuario: { id: string; email?: string | null } | null): Promise<Avance> {
   const vistaPrevia = Boolean(usuario && esAdmin(usuario.email));
-  const vacio: Avance = { inscrito: false, vistaPrevia, estados: curso.lecciones.map(() => "cerrada"), proxima: null, carta: null, progreso: new Map() };
+  const vacio: Avance = { inscrito: false, vistaPrevia, estados: curso.lecciones.map(() => "cerrada"), proxima: null, carta: null, cartaAudio: null, progreso: new Map() };
   if (!usuario) return vacio;
   const admin = getSupabaseAdmin();
   const [{ data: insc }, { data: filas }] = await Promise.all([
-    admin.from("escuela_inscripciones").select("carta").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
-    admin.from("escuela_progreso").select("leccion, respuestas, comentario, completada_en").eq("usuario_id", usuario.id).eq("curso", curso.slug),
+    admin.from("escuela_inscripciones").select("carta, carta_audio").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
+    admin.from("escuela_progreso").select("leccion, respuestas, comentario, comentario_audio, completada_en").eq("usuario_id", usuario.id).eq("curso", curso.slug),
   ]);
   if (!insc && !vistaPrevia) return vacio;
   const hechas = new Map((filas ?? []).map((f) => [f.leccion, f]));
@@ -47,7 +49,8 @@ export async function avanceDe(curso: Curso, usuario: { id: string; email?: stri
     estados,
     proxima,
     carta: insc?.carta ?? null,
-    progreso: new Map([...hechas].map(([k, f]) => [k, { respuestas: (f.respuestas ?? {}) as Record<string, unknown>, comentario: f.comentario }])),
+    cartaAudio: insc?.carta_audio ?? null,
+    progreso: new Map([...hechas].map(([k, f]) => [k, { respuestas: (f.respuestas ?? {}) as Record<string, unknown>, comentario: f.comentario, comentarioAudio: f.comentario_audio }])),
   };
 }
 
@@ -118,7 +121,17 @@ export async function completarLeccion(curso: Curso, leccion: Leccion, usuario: 
 
   const ahora = new Date().toISOString();
   await admin.from("escuela_progreso").upsert(
-    { usuario_id: usuario.id, curso: curso.slug, leccion: leccion.numero, respuestas: limpias as Json, comentario, intentos: (previa?.intentos ?? 0) + 1, actualizado_en: ahora },
+    {
+      usuario_id: usuario.id,
+      curso: curso.slug,
+      leccion: leccion.numero,
+      respuestas: limpias as Json,
+      comentario,
+      intentos: (previa?.intentos ?? 0) + 1,
+      actualizado_en: ahora,
+      // Si Sibila escribió otro comentario, el audio anterior ya no corresponde.
+      ...(comentario !== (previa?.comentario ?? null) ? { comentario_audio: null } : {}),
+    },
     { onConflict: "usuario_id,curso,leccion" },
   );
   return { correctas, total: opciones, detalle, comentario };
@@ -144,6 +157,28 @@ export async function cartaDeCierre(curso: Curso, usuario: { id: string }) {
     "Eres Sibila. Escribe la carta de cierre de ciclo para esta persona que terminó el curso de rituales: 3 o 4 párrafos cálidos, en segunda persona, que recojan lo que quiso cerrar, lo que soltó, lo que agradece y lo que quiere sembrar, con imágenes de la tradición (la vela, el agua, el humo, la semilla). Termina con una bendición sencilla para el año nuevo y firma «Sibila». Nada de promesas de resultados, salud ni dinero; no inventes datos que no estén en sus respuestas ni uses su nombre.",
     { effort: "low", maxTokens: 1500, nivel: "estandar", idioma: "es" },
   );
-  await admin.from("escuela_inscripciones").update({ carta }).eq("usuario_id", usuario.id).eq("curso", curso.slug).is("carta", null);
+  // La carta de cierre siempre va con la voz de Sibila (si la voz falla, queda el texto).
+  const audio = await narrarEscuela(carta).catch((e) => {
+    console.error("[escuela] voz de la carta:", e instanceof Error ? e.message : e);
+    return null;
+  });
+  await admin.from("escuela_inscripciones").update({ carta, carta_audio: audio }).eq("usuario_id", usuario.id).eq("curso", curso.slug).is("carta", null);
   return carta;
+}
+
+/** El comentario de una lección en la voz de Sibila: se narra la primera vez que la persona lo pide y queda guardado. */
+export async function audioComentario(curso: Curso, leccion: number, usuario: { id: string }) {
+  const admin = getSupabaseAdmin();
+  const { data: fila } = await admin.from("escuela_progreso").select("comentario, comentario_audio").eq("usuario_id", usuario.id).eq("curso", curso.slug).eq("leccion", leccion).maybeSingle();
+  if (!fila?.comentario) return null;
+  if (fila.comentario_audio) return fila.comentario_audio;
+  const audio = await narrarEscuela(fila.comentario);
+  if (audio) await admin.from("escuela_progreso").update({ comentario_audio: audio }).eq("usuario_id", usuario.id).eq("curso", curso.slug).eq("leccion", leccion).eq("comentario", fila.comentario);
+  return audio;
+}
+
+/** La dirección del audio de la carta (después de cartaDeCierre). */
+export async function audioCarta(curso: Curso, usuario: { id: string }) {
+  const { data } = await getSupabaseAdmin().from("escuela_inscripciones").select("carta_audio").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle();
+  return data?.carta_audio ?? null;
 }

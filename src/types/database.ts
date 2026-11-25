@@ -154,8 +154,8 @@ type ComunidadMensajeRow = {
 };
 
 type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: string };
-type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; creado_en: string };
-type EscuelaProgresoRow = { usuario_id: string; curso: string; leccion: number; respuestas: Json; comentario: string | null; intentos: number; completada_en: string; actualizado_en: string };
+type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; carta_audio: string | null; creado_en: string };
+type EscuelaProgresoRow = { usuario_id: string; curso: string; leccion: number; respuestas: Json; comentario: string | null; comentario_audio: string | null; intentos: number; completada_en: string; actualizado_en: string };
 type ListaEsperaRow = { id: number; curso: string; correo: string; usuario_id: string | null; idioma: string; origen: string | null; creado_en: string };
 type BibliotecaTraduccionRow = { slug: string; idioma: string; version: string; ficha: Json | null; creado_en: string };
 type ComunidadReaccionRow = { mensaje_id: number; usuario_id: string; emoji: "✨" | "🔮" | "🙏"; creado_en: string };
@@ -723,13 +723,13 @@ export type Database = {
       };
       escuela_inscripciones: {
         Row: EscuelaInscripcionRow;
-        Insert: Insertable<EscuelaInscripcionRow, "creditos" | "carta" | "creado_en">;
+        Insert: Insertable<EscuelaInscripcionRow, "creditos" | "carta" | "carta_audio" | "creado_en">;
         Update: Partial<EscuelaInscripcionRow>;
         Relationships: [];
       };
       escuela_progreso: {
         Row: EscuelaProgresoRow;
-        Insert: Insertable<EscuelaProgresoRow, "respuestas" | "comentario" | "intentos" | "completada_en" | "actualizado_en">;
+        Insert: Insertable<EscuelaProgresoRow, "respuestas" | "comentario" | "comentario_audio" | "intentos" | "completada_en" | "actualizado_en">;
         Update: Partial<EscuelaProgresoRow>;
         Relationships: [];
       };

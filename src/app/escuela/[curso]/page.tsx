@@ -102,6 +102,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
       {avance.carta && (
         <section className="tarjeta border-oro/50 p-6">
           <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Tu carta de cierre de ciclo</p>
+          {avance.cartaAudio && <audio controls src={avance.cartaAudio} className="mt-3 w-full" />}
           {avance.carta.split(/\n{2,}/).map((x, k) => (
             <p key={k} className="font-display mt-3 text-xl leading-relaxed">{x}</p>
           ))}

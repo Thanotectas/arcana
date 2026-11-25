@@ -89,7 +89,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
         return (
           <section key={k} className="tarjeta space-y-4 p-6">
             <h2 className="font-display text-3xl">{b.titulo ?? "Para ti"}</h2>
-            <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} siguiente={siguiente} ultima={!sig} />
+            <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} />
           </section>
         );
       })}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
 import type { PreguntaTest } from "@/lib/escuela/tipos";
+import { EscucharSibila } from "./EscucharSibila";
 
 interface Resultado {
   correctas: number;
@@ -20,6 +21,7 @@ export function TestLeccion({
   preguntas,
   previas,
   comentarioPrevio,
+  audioPrevio,
   siguiente,
   ultima,
 }: {
@@ -28,6 +30,7 @@ export function TestLeccion({
   preguntas: PreguntaTest[];
   previas: Record<string, unknown>;
   comentarioPrevio: string | null;
+  audioPrevio: string | null;
   siguiente: string | null;
   ultima: boolean;
 }) {
@@ -36,6 +39,7 @@ export function TestLeccion({
   const [estado, setEstado] = useState<"" | "enviando" | "error">("");
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [carta, setCarta] = useState<string | null>(null);
+  const [cartaAudio, setCartaAudio] = useState<string | null>(null);
   const comentario = resultado?.comentario ?? comentarioPrevio;
   const completo = preguntas.every((p, i) => p.tipo !== "opcion" || typeof respuestas[String(i)] === "number");
 
@@ -43,10 +47,11 @@ export function TestLeccion({
     e.preventDefault();
     setEstado("enviando");
     const r = await fetch("/api/escuela", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "leccion", curso, leccion, respuestas }) }).catch(() => null);
-    const datos = (await r?.json().catch(() => null)) as { ok?: boolean; resultado?: Resultado; carta?: string | null } | null;
+    const datos = (await r?.json().catch(() => null)) as { ok?: boolean; resultado?: Resultado; carta?: string | null; cartaAudio?: string | null } | null;
     if (!datos?.ok || !datos.resultado) return setEstado("error");
     setResultado(datos.resultado);
     setCarta(datos.carta ?? null);
+    setCartaAudio(datos.cartaAudio ?? null);
     setEstado("");
     router.refresh();
   };
@@ -95,11 +100,14 @@ export function TestLeccion({
           {comentario.split(/\n{2,}/).map((x, k) => (
             <p key={k} className="mt-2 leading-relaxed">{x}</p>
           ))}
+          {/* Un comentario nuevo necesita su propio audio: la clave reinicia el botón. */}
+          <EscucharSibila key={comentario} curso={curso} leccion={leccion} audioInicial={resultado ? null : audioPrevio} />
         </div>
       )}
       {carta && (
         <div className="tarjeta border-oro/50 p-6">
           <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Tu carta de cierre de ciclo</p>
+          {cartaAudio && <audio controls autoPlay src={cartaAudio} className="mt-3 w-full" />}
           {carta.split(/\n{2,}/).map((x, k) => (
             <p key={k} className="font-display mt-3 text-xl leading-relaxed">{x}</p>
           ))}
