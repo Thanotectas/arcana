@@ -1,0 +1,62 @@
+VIDEO 63 — BIBLIOTECA DE SIBILA #3 · «EL MAL DE OJO: NAZAR, HAMSA Y LA LIMPIA». Serie: una tradición del mundo por día.
+Vertical 9:16, ~50 s con la voz de Sibila. Lleva a miarcana.com/biblioteca/limpia-con-huevo y a la lectura del vaso
+(miarcana.com/huevo). Une a los tres públicos: Turquía (nazar boncuğu), mundo árabe (khamsa, «العين») y Latinoamérica
+(mal de ojo, limpia con huevo, azabache).
+Tono: documental cálido, desde adentro de la tradición, con respeto. Como cultura y costumbre: nada de promesas de
+protección, salud ni resultados. SIN CARAS (manos, objetos, lugares). Prompts en inglés (Veo e Imagen los siguen mejor).
+
+==================== RECETA DIARIA ====================
+- 2 CLIPS DE VIDEO en Flow, vertical 9:16, 8 s: clip A (el ojo azul) y clip B (el huevo en el vaso).
+- 4 IMÁGENES en Gemini («Crear imagen», vertical 9:16). Yo las animo con zoom lento y les pongo los títulos.
+- Sonido de los clips: solo ambiente. Sin música y sin voces: la voz es la de Marcela (desde el viernes, con créditos).
+
+==================== CLIP A · Flow · «El ojo azul» (8 s) ====================
+Vertical 9:16, cinematic macro shot, warm afternoon light through an old window in Istanbul. A woman's hand with a thin
+gold ring gently hangs a handmade cobalt-blue glass evil-eye bead (nazar boncuğu: concentric circles of dark blue,
+white, light blue and a black center) on a small nail beside a wooden doorframe; the bead swings slowly and catches
+the light, casting a soft blue reflection on the wall. Dust particles float in the sunbeam. Very slow push-in.
+Sound: a quiet street far away, a soft glass clink, a gentle breeze. No music, no voices.
+No faces, no readable text, no logos.
+
+==================== CLIP B · Flow · «El vaso» (8 s) ====================
+Vertical 9:16, cinematic macro shot, warm candlelight, dark background. An elderly woman's wrinkled hands crack a white
+egg on the rim of a clear glass half-filled with water; the yolk sinks slowly and the egg white spreads into delicate
+threads that rise toward the surface, with tiny bubbles around the yolk. Beside the glass, out of focus, a sprig of rue
+and a lit white candle. Very slow motion, the camera slowly circles the glass.
+Sound: the crack of the shell, water, a soft shimmer as the threads rise. No music, no voices.
+No faces, no readable text, no logos.
+
+==================== IMAGEN 1 · Gemini · «Una creencia muy antigua» ====================
+Vertical 9:16 photorealistic cinematic image, an archaeological museum display at night: ancient Mediterranean pottery
+and small blue glass eye amulets and beads from antiquity on a dark stone pedestal, soft museum spotlights, deep blue
+and warm gold tones, calm and mysterious. No people, no faces, no readable text or labels, no logos.
+
+==================== IMAGEN 2 · Gemini · «El bazar de los ojos azules» ====================
+Vertical 9:16 photorealistic image, a stall in an old Istanbul bazaar covered with hundreds of handmade blue glass
+evil-eye beads of all sizes hanging on strings and set on a tray, glowing in warm lamp light, rich cobalt blue and
+amber tones, shallow depth of field. No people, no faces, no readable text, no logos.
+
+==================== IMAGEN 3 · Gemini · «La mano» ====================
+Vertical 9:16 photorealistic image, a carved wooden door in a North African medina (Morocco) at golden hour, with an
+ornate brass hamsa (khamsa) hand-shaped door knocker and a small blue glass eye bead hanging beside it, warm terracotta
+and turquoise tiles around, soft light. No people, no faces, no readable text or calligraphy, no logos.
+
+==================== IMAGEN 4 · Gemini · «El cuidado de la abuela» (cierre) ====================
+Vertical 9:16 photorealistic image, a cozy Latin American home at night: a baby's small wrist resting on a soft
+blanket wearing a thin red thread bracelet with a tiny black jet (azabache) charm, next to it a glass of water, a
+white egg, a sprig of rue and a lit candle on a wooden table, warm golden light, deep violet shadows, lots of empty
+dark space in the lower third (for text). Only the baby's wrist and a grandmother's hand, no faces, no text, no logos.
+
+==================== VOZ DE SIBILA (ElevenLabs, Marcela, misma configuración) ====================
+(~780 caracteres, ~50 s. Los «…» son pausas: déjalos.)
+Bienvenida a la Biblioteca de Sibila. Hoy: el mal de ojo…
+Es una de las creencias más antiguas del mundo. Ya los griegos y los romanos hablaban de la mirada que pesa, de la envidia que se siente aunque nadie diga nada…
+En Turquía, el ojo azul cuelga en las puertas, en los autos, en la cuna de los bebés: el nazar, que devuelve la mirada…
+En el norte de África y en Oriente Medio, la mano abierta, la khamsa, cuida la entrada de la casa…
+Y en nuestra tierra, la abuela pasa un huevo, lo rompe en un vaso de agua… y lee lo que quedó…
+Tres caminos, una misma idea: cuidar a los que queremos…
+Si hiciste tu limpia, mándame la foto de tu vaso en mi arcana punto com. Yo te la leo.
+
+==================== TÍTULOS EN PANTALLA (los pongo yo) ====================
+BIBLIOTECA DE SIBILA · #3 / El mal de ojo / Grecia y Roma: la mirada que pesa / Turquía: el nazar / Norte de África y
+Oriente Medio: la khamsa / Latinoamérica: la limpia con huevo / Tres caminos, una misma idea / 🔮 miarcana.com/huevo
