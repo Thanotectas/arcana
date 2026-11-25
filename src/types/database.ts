@@ -154,6 +154,8 @@ type ComunidadMensajeRow = {
 };
 
 type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: string };
+type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; creado_en: string };
+type EscuelaProgresoRow = { usuario_id: string; curso: string; leccion: number; respuestas: Json; comentario: string | null; intentos: number; completada_en: string; actualizado_en: string };
 type ListaEsperaRow = { id: number; curso: string; correo: string; usuario_id: string | null; idioma: string; origen: string | null; creado_en: string };
 type BibliotecaTraduccionRow = { slug: string; idioma: string; version: string; ficha: Json | null; creado_en: string };
 type ComunidadReaccionRow = { mensaje_id: number; usuario_id: string; emoji: "✨" | "🔮" | "🙏"; creado_en: string };
@@ -719,6 +721,18 @@ export type Database = {
         Update: Partial<ComunidadTraduccionRow>;
         Relationships: [];
       };
+      escuela_inscripciones: {
+        Row: EscuelaInscripcionRow;
+        Insert: Insertable<EscuelaInscripcionRow, "creditos" | "carta" | "creado_en">;
+        Update: Partial<EscuelaInscripcionRow>;
+        Relationships: [];
+      };
+      escuela_progreso: {
+        Row: EscuelaProgresoRow;
+        Insert: Insertable<EscuelaProgresoRow, "respuestas" | "comentario" | "intentos" | "completada_en" | "actualizado_en">;
+        Update: Partial<EscuelaProgresoRow>;
+        Relationships: [];
+      };
       lista_espera: {
         Row: ListaEsperaRow;
         Insert: Insertable<ListaEsperaRow, "id" | "usuario_id" | "idioma" | "origen" | "creado_en">;
@@ -856,6 +870,10 @@ export type Database = {
       reintentar_lectura: {
         Args: { p_lectura: string; p_costo: number };
         Returns: boolean;
+      };
+      inscribir_curso: {
+        Args: { p_usuario: string; p_curso: string; p_costo: number; p_incluidos: number };
+        Returns: string;
       };
       devolver_creditos: {
         Args: { p_usuario: string; p_cantidad: number; p_motivo: string; p_referencia?: string | null };
