@@ -8,7 +8,7 @@ import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { CuentaRegresiva } from "@/components/CuentaRegresiva";
 import { Coffee, Timer } from "lucide-react";
 import { accionComprar, accionComprarInternacional } from "@/lib/pagos/acciones";
-import { pagosInternacionalesConfigurados } from "@/lib/pagos/lemon";
+import { pagoInternacionalDisponible } from "@/lib/pagos/internacional";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { pagosConfigurados } from "@/lib/pagos/bold";
@@ -35,10 +35,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // Código de oferta: de la URL (?codigo=) o de la cookie del enlace corto /c/CODIGO.
   const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || "";
   const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
-  // Fuera de Colombia (país según Vercel) se cobra en dólares con Lemon Squeezy; la persona puede cambiar con el enlace.
+  // Fuera de Colombia (país según Vercel) se cobra en dólares con PayPal (o Lemon Squeezy si se reactiva); la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
-  const internacionalDisponible = pagosInternacionalesConfigurados();
-  // Sin pago en dólares activo (Lemon rechazó la tienda), todos ven pesos, aunque llegue ?moneda=usd.
+  const internacionalDisponible = pagoInternacionalDisponible();
+  // Sin pago en dólares activo (sin claves de PayPal), todos ven pesos, aunque llegue ?moneda=usd.
   const internacional = internacionalDisponible && (moneda === "usd" || (moneda !== "cop" && pais !== "CO"));
   const accion = internacional ? accionComprarInternacional : accionComprar;
   // Fuera de Colombia se paga en pesos con Bold (acepta Visa y Mastercard extranjeras): se muestra el aproximado en dólares.

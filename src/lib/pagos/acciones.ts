@@ -5,7 +5,10 @@ import { createClient } from "../supabase/server";
 import { paquetePorId, OFERTA_FUNDADORES } from "../creditos";
 import { estadoOfertaFundadores } from "./fundadores";
 import { nuevaReferencia, pagosConfigurados } from "./bold";
-import { crearCheckout, pagosInternacionalesConfigurados } from "./lemon";
+import { crearCheckout } from "./lemon";
+import { crearOrdenPaypal } from "./paypal";
+import { proveedorInternacional } from "./internacional";
+import { getIdioma } from "../i18n/servidor";
 import { getSupabaseAdmin } from "../supabase/admin";
 import { comprasVisibles } from "../plataforma";
 import { cookies, headers } from "next/headers";
@@ -68,14 +71,16 @@ export async function accionComprar(formData: FormData) {
 
 /**
  * Compra internacional (fuera de Colombia): orden en USD creada por el
- * servidor y checkout alojado de Lemon Squeezy. El webhook acredita.
+ * servidor y pago en PayPal (o el checkout de Lemon Squeezy si se reactiva).
+ * Con PayPal acredita la ruta de retorno al capturar; el webhook es el respaldo.
  */
 export async function accionComprarInternacional(formData: FormData) {
   if (!(await comprasVisibles())) redirect("/creditos");
   const idPaquete = String(formData.get("paquete") ?? "");
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?moneda=usd&error=paquete");
-  if (!pagosInternacionalesConfigurados()) redirect("/creditos?moneda=usd&error=config");
+  const proveedor = proveedorInternacional();
+  if (!proveedor) redirect("/creditos?moneda=usd&error=config");
   if (idPaquete === OFERTA_FUNDADORES.id && !(await estadoOfertaFundadores()).activa) redirect("/creditos?moneda=usd&error=oferta");
 
   const supabase = await createClient();
@@ -106,8 +111,28 @@ export async function accionComprarInternacional(formData: FormData) {
     redirect("/creditos?moneda=usd&error=orden");
   }
 
-  const { data: perfil } = await supabase.from("perfiles").select("nombre").eq("id", user.id).maybeSingle();
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://miarcana.com").replace(/\/$/, "");
+
+  if (proveedor === "paypal") {
+    const creditos = paquete.creditos + extra;
+    const orden = await crearOrdenPaypal({
+      referencia,
+      montoCentavos: monto,
+      descripcion: `Arcana · ${paquete.id === "circulo" || paquete.id === OFERTA_FUNDADORES.id ? "Círculo Arcana (30 días)" : `${creditos} créditos`}`,
+      urlRetorno: `${base}/api/pagos/paypal/retorno?ref=${encodeURIComponent(referencia)}`,
+      urlCancelar: `${base}/creditos?moneda=usd&error=cancelado`,
+      idioma: await getIdioma(),
+    });
+    if (!orden) {
+      await admin.from("ordenes").update({ estado: "error" }).eq("referencia", referencia);
+      redirect("/creditos?moneda=usd&error=checkout");
+    }
+    // El id de PayPal queda en transaccion_id hasta la captura (que lo reemplaza por el id del cobro).
+    await admin.from("ordenes").update({ transaccion_id: orden.id }).eq("referencia", referencia);
+    redirect(orden.urlAprobar);
+  }
+
+  const { data: perfil } = await supabase.from("perfiles").select("nombre").eq("id", user.id).maybeSingle();
   const url = await crearCheckout({ paquete: idPaquete, referencia, email: user.email, nombre: perfil?.nombre, urlRetorno: `${base}/creditos/retorno?ref=${encodeURIComponent(referencia)}`, precioCentavos: monto !== paquete.precioUSDCentavos ? monto : undefined });
   if (!url) {
     await admin.from("ordenes").update({ estado: "error" }).eq("referencia", referencia);

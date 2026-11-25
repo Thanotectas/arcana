@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { requerirUsuario, getOrdenPorReferencia } from "@/lib/dal";
 import { consultarVenta, estadoOrden } from "@/lib/pagos/bold";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { confirmarOrdenPaypal } from "@/lib/pagos/paypal";
 import { Aviso } from "@/components/Aviso";
 import { EventoMeta } from "@/components/EventoMeta";
 import { getT } from "@/lib/i18n/servidor";
@@ -44,6 +45,11 @@ export default async function PaginaRetorno({
         orden = { ...orden, estado };
       }
     }
+  }
+
+  // Pago en dólares con PayPal: si el retorno o el webhook aún no acreditaron, se confirma aquí.
+  if (orden && orden.estado === "pendiente" && orden.moneda === "USD") {
+    if ((await confirmarOrdenPaypal(orden.referencia)) !== "ignorada") orden = await getOrdenPorReferencia(orden.referencia);
   }
 
   const estados = t.cuenta.estados as Record<string, string>;

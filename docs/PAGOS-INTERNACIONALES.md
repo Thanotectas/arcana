@@ -1,3 +1,30 @@
+# Pagos internacionales con PayPal (25 nov 2026)
+
+Quien paga desde fuera de Colombia ve los precios en dólares en `/creditos` y paga con PayPal (con su cuenta PayPal o con tarjeta). En Colombia sigue Bold en pesos. La cuenta que recibe es la cuenta Empresas **"Mi Arcana"** (tipo Particular); los retiros a Colombia se hacen por Nequi.
+
+## Cómo funciona
+
+1. `accionComprarInternacional` crea la orden `pendiente` en USD (`ARC-…`) y pide a PayPal una orden (Orders v2, `intent: CAPTURE`, `custom_id` = referencia). El id de PayPal queda en `ordenes.transaccion_id`.
+2. La persona aprueba en PayPal y vuelve a `/api/pagos/paypal/retorno?ref=…`, que captura y acredita con `acreditar_orden(..., 'paypal')`, y redirige a `/creditos/retorno`.
+3. Respaldo: el webhook `/api/webhooks/paypal` hace lo mismo si la persona cerró la ventana antes de volver, y anula la orden en reembolsos y contracargos. No se fía del cuerpo del aviso: siempre vuelve a consultar la orden en la API (referencia, monto y moneda deben coincidir).
+4. Si cancela, vuelve a `/creditos?moneda=usd&error=cancelado` y no se cobra nada.
+
+Código: `src/lib/pagos/paypal.ts`, `src/lib/pagos/internacional.ts` (elige PayPal o Lemon), `src/app/api/pagos/paypal/retorno`, `src/app/api/webhooks/paypal`. No requiere migración (`metodo_pago` es texto libre).
+
+## Configurar (una vez)
+
+1. Entra a https://developer.paypal.com con la cuenta de PayPal de Mi Arcana → **Apps & Credentials**.
+2. Primero en **Sandbox**: crea una app ("Arcana"), copia el **Client ID** y el **Secret**. Ponlos en Vercel (entorno **Preview**) como `PAYPAL_CLIENT_ID` y `PAYPAL_CLIENT_SECRET`, sin `PAYPAL_ENV`. Prueba una compra en la vista previa con una cuenta personal de sandbox (Sandbox → Accounts).
+3. Luego en **Live**: crea la app, copia Client ID y Secret y ponlos en Vercel (entorno **Production**) con `PAYPAL_ENV=live`.
+4. En la app Live → **Webhooks → Add Webhook**: URL `https://miarcana.com/api/webhooks/paypal`, eventos `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED`, `PAYMENT.CAPTURE.REFUNDED`, `PAYMENT.CAPTURE.REVERSED`.
+5. Redespliega. Las claves nunca van al repositorio ni al chat.
+
+`PAYPAL_ACTIVO=0` apaga el pago en dólares sin borrar las claves. Sin claves de PayPal, todos pagan en pesos con Bold como hasta ahora.
+
+Precios: los mismos `precioUSDCentavos` de `src/lib/creditos.ts`, ajustados por país con `precioUSDPara` (paridad). PayPal cobra cerca de 5,4 % + cargo fijo por venta internacional.
+
+---
+
 > **Estado (22 oct 2026): Lemon Squeezy rechazó la tienda de Arcana** (también rechazó Thanotectas en marzo). El código lo deja apagado salvo `LEMON_ACTIVO=1`, aunque las demás variables sigan en Vercel. Lo de abajo queda como referencia por si algún día se reactiva.
 
 # Pagos internacionales con Lemon Squeezy
