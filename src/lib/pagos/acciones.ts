@@ -79,8 +79,6 @@ export async function accionComprarInternacional(formData: FormData) {
   const idPaquete = String(formData.get("paquete") ?? "");
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?moneda=usd&error=paquete");
-  const proveedor = proveedorInternacional();
-  if (!proveedor) redirect("/creditos?moneda=usd&error=config");
   if (idPaquete === OFERTA_FUNDADORES.id && !(await estadoOfertaFundadores()).activa) redirect("/creditos?moneda=usd&error=oferta");
 
   const supabase = await createClient();
@@ -88,6 +86,8 @@ export async function accionComprarInternacional(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user || !user.email) redirect("/entrar?volver=/creditos");
+  const proveedor = proveedorInternacional(user.email);
+  if (!proveedor) redirect("/creditos?moneda=usd&error=config");
 
   const referencia = nuevaReferencia(user.id);
   const admin = getSupabaseAdmin();

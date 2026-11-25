@@ -19,6 +19,8 @@ Código: `src/lib/pagos/paypal.ts`, `src/lib/pagos/internacional.ts` (elige PayP
 4. En la app Live → **Webhooks → Add Webhook**: URL `https://miarcana.com/api/webhooks/paypal`, eventos `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED`, `PAYMENT.CAPTURE.REFUNDED`, `PAYMENT.CAPTURE.REVERSED`.
 5. Redespliega. Las claves nunca van al repositorio ni al chat.
 
+**Modo de prueba en producción:** mientras `PAYPAL_PUBLICO` no sea `1`, PayPal solo lo ven las cuentas administradoras (`ADMIN_CORREOS`); los clientes siguen con Bold. Para probar: claves Live en Production con `PAYPAL_ENV=live`, entrar como administrador a `miarcana.com/creditos?moneda=usd`, comprar el paquete de prueba (US$0,99) y reembolsarlo desde PayPal (el webhook anula la orden). Para abrirlo a todos: `PAYPAL_PUBLICO=1` y Redeploy.
+
 `PAYPAL_ACTIVO=0` apaga el pago en dólares sin borrar las claves. Sin claves de PayPal, todos pagan en pesos con Bold como hasta ahora.
 
 Precios: los mismos `precioUSDCentavos` de `src/lib/creditos.ts`, ajustados por país con `precioUSDPara` (paridad). PayPal cobra cerca de 5,4 % + cargo fijo por venta internacional.

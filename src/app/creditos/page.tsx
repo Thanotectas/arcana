@@ -37,7 +37,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
   // Fuera de Colombia (país según Vercel) se cobra en dólares con PayPal (o Lemon Squeezy si se reactiva); la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
-  const internacionalDisponible = pagoInternacionalDisponible();
+  const internacionalDisponible = pagoInternacionalDisponible((await requerirUsuario()).email);
   // Sin pago en dólares activo (sin claves de PayPal), todos ven pesos, aunque llegue ?moneda=usd.
   const internacional = internacionalDisponible && (moneda === "usd" || (moneda !== "cop" && pais !== "CO"));
   const accion = internacional ? accionComprarInternacional : accionComprar;
