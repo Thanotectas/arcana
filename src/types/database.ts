@@ -379,6 +379,7 @@ type SuscriptorTelegramRow = {
   chat_id: number;
   nombre: string | null;
   activo: boolean;
+  idioma: string;
   creado_en: string;
   actualizado_en: string;
 };
@@ -742,7 +743,7 @@ export type Database = {
       };
       suscriptores_telegram: {
         Row: SuscriptorTelegramRow;
-        Insert: Insertable<SuscriptorTelegramRow, "nombre" | "activo" | "creado_en" | "actualizado_en">;
+        Insert: Insertable<SuscriptorTelegramRow, "nombre" | "activo" | "idioma" | "creado_en" | "actualizado_en">;
         Update: Partial<SuscriptorTelegramRow>;
         Relationships: [];
       };
