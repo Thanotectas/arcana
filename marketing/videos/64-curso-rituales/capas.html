@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+#sa{position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(180deg,rgba(14,6,30,.85),rgba(14,6,30,.55) 60%,rgba(14,6,30,0))}
+#sb{position:absolute;left:0;right:0;bottom:0;height:820px;background:linear-gradient(0deg,rgba(14,6,30,.9),rgba(14,6,30,.6) 60%,rgba(14,6,30,0))}
+.c{position:absolute;left:50px;right:50px;text-align:center;opacity:0;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.85)}
+#pronto{top:140px;font-family:I;font-size:38px;letter-spacing:.35em;color:#f1d99a}
+#titulo{top:200px;font-family:C;font-size:132px;line-height:1;text-shadow:0 0 40px rgba(241,217,154,.4),0 6px 20px #000}
+#sub{top:350px;font-family:C;font-size:70px;color:#e9dcff}
+#dias{bottom:420px;font-family:C;font-size:96px;line-height:1.05}
+#lista{bottom:330px;font-family:I;font-size:38px;color:#f1d99a;letter-spacing:.04em}
+#pregunta{bottom:380px;font-family:C;font-size:100px;line-height:1.05}
+#cta{bottom:300px}
+#cta1{font-family:C;font-size:92px;line-height:1.05}
+#cta2{margin-top:26px;display:inline-block;padding:18px 36px;border-radius:999px;background:#f1d99a;color:#1a0f33;font-family:I;font-size:48px;text-shadow:none;box-shadow:0 0 40px rgba(241,217,154,.5)}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.85;text-shadow:0 2px 10px #000}
+#marca b{color:#f1d99a}
+body.ar #titulo,body.ar #sub,body.ar #dias,body.ar #pregunta,body.ar #cta1{font-family:NA;line-height:1.35}
+body.ar #titulo{font-size:110px}body.ar #sub{top:370px;font-size:62px}body.ar #dias{font-size:80px}body.ar #pregunta{font-size:82px}body.ar #cta1{font-size:80px}
+body.ar #pronto,body.ar #lista{font-family:NA;letter-spacing:0;font-size:46px}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div class="c" id="pronto"></div><div class="c" id="titulo"></div><div class="c" id="sub"></div>
+<div class="c" id="dias"></div><div class="c" id="lista"></div>
+<div class="c" id="pregunta"></div>
+<div class="c" id="cta"><div id="cta1"></div><div id="cta2" dir="ltr"></div></div>
+<p id="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const T={
+ es:{pronto:"MUY PRONTO",titulo:"Curso de rituales",sub:"con Sibila",dias:"7 días · 1 ritual por día",lista:"Velas · Luna · Limpias · Cierre de ciclo",pregunta:"¿Te aviso<br>cuando abra?",cta1:"Anótate gratis 👇",cta2:"miarcana.com/rituales",lema:"SIBILA TE LEE"},
+ tr:{pronto:"ÇOK YAKINDA",titulo:"Ritüel kursu",sub:"Sibila ile",dias:"7 gün · her gün 1 ritüel",lista:"Mumlar · Ay · Arınma · Döngü kapatma",pregunta:"Açıldığında<br>haber vereyim mi?",cta1:"Ücretsiz kaydol 👇",cta2:"miarcana.com/tr/rituales",lema:"SİBİLA SENİ OKUR"},
+ ar:{pronto:"قريبًا",titulo:"دورة الطقوس",sub:"مع سيبيلا",dias:"7 أيام · طقس كل يوم",lista:"الشموع · القمر · التنقية · إغلاق الدورات",pregunta:"هل أُخبرك<br>حين تُفتح؟",cta1:"سجّل مجانًا 👇",cta2:"miarcana.com/ar/rituales",lema:"سيبيلا تقرأ لك",rtl:true},
+};
+const H=(location.hash.slice(1)||"es,4.3,9.6,11.4,16").split(",");const L=T[H[0]];const [B,C,D,F]=H.slice(1).map(Number);
+const $=id=>document.getElementById(id);
+if(L.rtl){document.body.classList.add("ar");document.body.dir="rtl";}
+for(const k of ["pronto","titulo","sub","dias","lista","pregunta","cta1","cta2"])$(k).innerHTML=L[k];$("lema").textContent=L.lema;
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.35)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const sube=(id,t,a)=>{$(id).style.transform=`translateY(${(1-su(pr(t,a,a+.5)))*24}px)`;};
+window.pintar=(t)=>{
+ $("sa").style.opacity=ven(t,0,C-.1,.3);$("sb").style.opacity=su(pr(t,B-.4,B));
+ $("pronto").style.opacity=ven(t,.2,C-.2);$("titulo").style.opacity=ven(t,.5,C-.2);$("titulo").style.transform=`scale(${.92+.08*su(pr(t,.5,1.3))})`;
+ $("sub").style.opacity=ven(t,1.1,C-.2);
+ $("dias").style.opacity=ven(t,B,C-.1);sube("dias",t,B);$("lista").style.opacity=ven(t,B+.6,C-.1);sube("lista",t,B+.6);
+ $("pregunta").style.opacity=ven(t,C,D-.1);sube("pregunta",t,C);
+ const c=su(pr(t,D,D+.5));$("cta").style.opacity=c;sube("cta",t,D);
+ $("cta2").style.transform=`scale(${1+.04*Math.sin(Math.max(0,t-D-.5)*5)})`;
+};
+window.pintar(0);
+</script></body></html>
