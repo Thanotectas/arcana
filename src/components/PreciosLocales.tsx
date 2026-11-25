@@ -140,3 +140,20 @@ export function SelectorMoneda({ etiqueta, nota, idioma = "es" }: { etiqueta: st
     </div>
   );
 }
+
+/**
+ * Precio en dólares (lo que se cobra con PayPal fuera de Colombia) con el aproximado en la moneda de la persona
+ * debajo: «$2.49 USD» y «≈ 2,14 EUR». Nada extra si su moneda es el dólar.
+ */
+export function PrecioDolares({ usdCentavos }: { usdCentavos: number }) {
+  const c = useContext(Contexto);
+  const moneda = c?.moneda ?? "USD";
+  const tasa = c?.porUSD[moneda];
+  const local = moneda !== "USD" && tasa ? (usdCentavos / 100) * tasa : null;
+  return (
+    <>
+      {formatoUSD(usdCentavos)} <span className="text-base font-normal text-texto-suave">USD</span>
+      {local !== null && <span className="block text-xs font-normal text-texto-suave">≈ {formatoMoneda(local, moneda)}</span>}
+    </>
+  );
+}

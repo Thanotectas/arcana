@@ -8,7 +8,7 @@ import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { CuentaRegresiva } from "@/components/CuentaRegresiva";
 import { Coffee, Timer } from "lucide-react";
 import { accionComprar, accionComprarInternacional } from "@/lib/pagos/acciones";
-import { pagosInternacionalesConfigurados } from "@/lib/pagos/lemon";
+import { pagoInternacionalDisponible } from "@/lib/pagos/internacional";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { pagosConfigurados } from "@/lib/pagos/bold";
@@ -22,7 +22,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { COOKIE_CODIGO, normalizarCodigo, validarCodigo } from "@/lib/pagos/codigos";
 import { Ticket } from "lucide-react";
 import { tasasDelDia } from "@/lib/monedas";
-import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
+import { PrecioDolares, PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -35,10 +35,10 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // Código de oferta: de la URL (?codigo=) o de la cookie del enlace corto /c/CODIGO.
   const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || "";
   const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
-  // Fuera de Colombia (país según Vercel) se cobra en dólares con Lemon Squeezy; la persona puede cambiar con el enlace.
+  // Fuera de Colombia (país según Vercel) se cobra en dólares con PayPal (o Lemon Squeezy si se reactiva); la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";
-  const internacionalDisponible = pagosInternacionalesConfigurados();
-  // Sin pago en dólares activo (Lemon rechazó la tienda), todos ven pesos, aunque llegue ?moneda=usd.
+  const internacionalDisponible = pagoInternacionalDisponible((await requerirUsuario()).email);
+  // Sin pago en dólares activo (sin claves de PayPal), todos ven pesos, aunque llegue ?moneda=usd.
   const internacional = internacionalDisponible && (moneda === "usd" || (moneda !== "cop" && pais !== "CO"));
   const accion = internacional ? accionComprarInternacional : accionComprar;
   // Fuera de Colombia se paga en pesos con Bold (acepta Visa y Mastercard extranjeras): se muestra el aproximado en dólares.
@@ -48,7 +48,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // En dólares, el precio va ajustado al país (paridad de poder adquisitivo: India, Indonesia, África, Turquía…).
   const usd = (centavos: number) => precioUSDPara(centavos, pais);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) =>
-    internacional ? formatoUSD(usd(p.precioUSDCentavos)) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
+    internacional ? <PrecioDolares usdCentavos={usd(p.precioUSDCentavos)} /> : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
     return (
@@ -98,7 +98,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         ) : null}
       </p>
 
-      {!internacional && <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={t.creditos.monedaLocal.nota} idioma={idioma} />}
+      <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={internacional ? t.creditos.monedaLocal.notaUSD : t.creditos.monedaLocal.nota} idioma={idioma} />
 
       <form method="get" action="/creditos" className={`tarjeta flex flex-wrap items-center gap-3 p-4 ${codigo?.valido ? "border-oro/50" : ""}`}>
         {moneda && <input type="hidden" name="moneda" value={moneda} />}
