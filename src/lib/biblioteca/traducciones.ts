@@ -34,11 +34,27 @@ function mismaForma(o: Ficha, t: unknown): t is Ficha {
   );
 }
 
+/**
+ * Devuelve la traducción con las claves del original: a veces el modelo traduce también los nombres de los campos
+ * («descripcion» → «descricao»), así que cada valor se toma por su clave o, si no está, por su posición.
+ */
+function alinear(original: unknown, traducido: unknown): unknown {
+  if (typeof original === "string") return typeof traducido === "string" ? traducido : original;
+  if (Array.isArray(original)) return Array.isArray(traducido) ? original.map((o, i) => alinear(o, traducido[i])) : traducido;
+  if (original && typeof original === "object") {
+    if (!traducido || typeof traducido !== "object" || Array.isArray(traducido)) return traducido;
+    const t = traducido as Record<string, unknown>;
+    const valores = Object.values(t);
+    return Object.fromEntries(Object.keys(original).map((k, i) => [k, alinear((original as Record<string, unknown>)[k], k in t ? t[k] : valores[i])]));
+  }
+  return traducido;
+}
+
 /** Traduce una ficha con el modelo; null si la respuesta no sirve. */
 async function traducir(e: EntradaBiblioteca, idioma: Idioma): Promise<Ficha | null> {
   const original = e.textos.es;
   const r = await generarTexto(
-    `Traduce al ${IDIOMA_PARA_IA[idioma]} todos los textos de esta ficha de El Arcano de Sibila (la sección de tradiciones del mundo de Arcana). Devuelve SOLO el mismo JSON, con las mismas claves y la misma cantidad de secciones, párrafos, símbolos y preguntas, sin comentarios ni markdown.\n\n${JSON.stringify(original)}`,
+    `Traduce al ${IDIOMA_PARA_IA[idioma]} todos los textos de esta ficha de El Arcano de Sibila (la sección de tradiciones del mundo de Arcana). Devuelve SOLO el mismo JSON, con las mismas claves SIN traducir (titulo, descripcion, nombres, entrada, secciones, parrafos, simbolos, lista, s, d, preguntas, p, r, cta, texto, boton) y la misma cantidad de secciones, párrafos, símbolos y preguntas, sin comentarios ni markdown.\n\n${JSON.stringify(original)}`,
     [
       "Eres traductora nativa y escritora. Traduce el sentido con naturalidad, como lo escribiría desde cero un hablante nativo que conoce y respeta estas tradiciones: desde adentro de la tradición, cálido y documental.",
       "Conserva los datos, las fechas, los nombres propios y las palabras en su lengua original (nazar, khamsa, ruda, limpia, maşallah, ما شاء الله…): cuando sea útil, explícalas con su nombre local en el idioma de destino.",
@@ -48,7 +64,7 @@ async function traducir(e: EntradaBiblioteca, idioma: Idioma): Promise<Ficha | n
     { effort: "low", maxTokens: 16000, nivel: "estandar", idioma },
   );
   try {
-    const json = JSON.parse(r.slice(r.indexOf("{"), r.lastIndexOf("}") + 1)) as unknown;
+    const json = alinear(original, JSON.parse(r.slice(r.indexOf("{"), r.lastIndexOf("}") + 1)) as unknown);
     if (mismaForma(original, json)) return json;
     console.error(`[arcano] ${e.slug} al ${idioma}: forma distinta`, JSON.stringify(json).slice(0, 300));
   } catch (err) {
