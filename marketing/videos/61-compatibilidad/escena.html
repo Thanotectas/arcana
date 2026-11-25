@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;font-variant-numeric:lining-nums;
+ background:radial-gradient(90% 60% at 50% 42%,#3b1d6e 0%,#24104a 45%,#120826 100%)}
+#estrellas{position:absolute;inset:0}
+.c{position:absolute;left:40px;right:40px;text-align:center}
+.oro{color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.55),0 4px 18px rgba(0,0,0,.5)}
+.ar{font-family:NA}
+#pareja{top:760px;font-size:190px;line-height:1.15}
+#pareja .cor{font-size:120px;vertical-align:middle;margin:0 18px}
+#subtr{top:1000px;font-family:NA;font-size:70px;color:#e9dcff;opacity:0}
+.fila{position:absolute;left:0;right:0;display:flex;justify-content:center;align-items:flex-end;gap:18px;direction:rtl}
+.caja{width:150px;height:200px;border-radius:24px;border:3px solid rgba(241,217,154,.75);background:rgba(18,8,38,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 0 30px rgba(241,217,154,.18);opacity:0}
+.caja .l{font-family:NA;font-size:96px;line-height:1;color:#f1d99a}
+.caja .v{font-family:I;font-size:40px;color:#fff}
+.igual{font-family:I;font-size:78px;color:#fff;margin-inline-start:22px;align-self:center;opacity:0;direction:ltr}
+.igual b{color:#f1d99a}
+.nombreFila{position:absolute;left:0;right:0;text-align:center;font-size:58px;color:#e9dcff;opacity:0}
+#suma{top:1150px;font-family:I;font-size:96px;color:#fff;opacity:0}
+#suma b{color:#f1d99a}
+#res{top:1300px;opacity:0}
+#res .n{font-family:I;font-size:210px;line-height:1;color:#f1d99a;text-shadow:0 0 70px rgba(241,217,154,.85),0 0 140px rgba(255,170,90,.45)}
+#res .s{margin-top:8px;font-size:84px}
+#cta{top:1330px;opacity:0}
+#cta .t{font-size:84px;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.6)}
+#cta .m{font-size:96px;margin-top:6px}
+#marca{position:absolute;left:0;right:0;bottom:90px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.8}
+#marca b{color:#f1d99a}
+#destello{position:absolute;left:50%;top:1400px;width:10px;height:10px;margin:-5px;border-radius:50%;box-shadow:0 0 0 0 rgba(241,217,154,.0);opacity:0}
+</style></head><body>
+<canvas id="estrellas" width="1080" height="1920"></canvas>
+<div class="c oro" id="pareja"></div>
+<div class="c" id="subtr">ليلى + قيس</div>
+<div class="nombreFila oro" id="n1" style="top:400px"></div>
+<div class="fila" id="f1" style="top:490px"></div>
+<div class="nombreFila oro" id="n2" style="top:780px"></div>
+<div class="fila" id="f2" style="top:870px"></div>
+<div class="c" id="suma" dir="ltr">80 + 170 = <b>250</b></div>
+<div id="destello"></div>
+<div class="c" id="res"><div class="n" dir="ltr">7</div><div class="s oro" id="sentido"></div></div>
+<div class="c" id="cta"><div class="t" id="ctaT"></div><div class="m">👇</div></div>
+<p id="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const T={
+ ar:{pareja:`<span class="ar">ليلى</span><span class="cor">💞</span><span class="ar">قيس</span>`,n1:"ليلى",n2:"قيس",sentido:"روحان متصلتان",cta:"اكتب اسمك<br>واسم من تحب",lema:"سيبيلا تقرأ لك",rtl:true,tr:false},
+ tr:{pareja:`<span style="font-family:C">Leyla</span><span class="cor">💞</span><span style="font-family:C">Mecnun</span>`,n1:"Leyla · ليلى",n2:"Mecnun · قيس",sentido:"Ruh bağı",cta:"Senin ve sevdiğinin<br>ismini yaz",lema:"SİBİLA SENİ OKUR",rtl:false,tr:true},
+};
+const LANG=location.hash.slice(1)||"ar";const L=T[LANG];
+const $=id=>document.getElementById(id);
+$("pareja").innerHTML=L.pareja;$("n1").textContent=L.n1;$("n2").textContent=L.n2;$("sentido").textContent=L.sentido;$("ctaT").innerHTML=L.cta;$("lema").textContent=L.lema;
+for(const id of ["n1","n2","sentido","ctaT"]){$(id).style.fontFamily=L.rtl?"NA":"C";}
+if(L.rtl){$("cta").dir="rtl";$("sentido").dir="rtl";}
+if(L.tr){$("pareja").style.fontSize="138px";$("pareja").style.whiteSpace="nowrap";$("pareja").style.top="800px";}
+const filas=[[["ل",30],["ي",10],["ل",30],["ى",10],80],[["ق",100],["ي",10],["س",60],170]];
+filas.forEach((f,i)=>{const el=$("f"+(i+1));const total=f.pop();f.forEach(([l,v])=>{const d=document.createElement("div");d.className="caja";d.innerHTML=`<div class="l">${l}</div><div class="v">${v}</div>`;el.appendChild(d);});
+ const ig=document.createElement("div");ig.className="igual";ig.innerHTML=`= <b>${total}</b>`;el.appendChild(ig);});
+// Estrellas fijas (semilla) que titilan
+const cv=$("estrellas"),cx=cv.getContext("2d");let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+const E=[...Array(170)].map(()=>({x:rnd()*1080,y:rnd()*1920,r:.6+rnd()*2.2,f:rnd()*6.28,v:.6+rnd()*1.6}));
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const pop=(t,a)=>{const k=pr(t,a,a+.35);return k<1?1+.25*Math.sin(k*Math.PI)*(1-k):1;};
+// Tiempos (s): pareja 0–1 · letras 1–3 · suma y número 3–5 · pregunta 5–7.5
+const A=1.0,B=3.0,R=3.55,D=5.0,FIN=7.5;
+window.pintar=(t)=>{
+ cx.clearRect(0,0,1080,1920);for(const s of E){cx.globalAlpha=.25+.55*(.5+.5*Math.sin(s.f+t*s.v*2));cx.fillStyle="#f6ecff";cx.beginPath();cx.arc(s.x,s.y-t*6,s.r,0,6.3);cx.fill();}cx.globalAlpha=1;
+ // 1. La pareja, gigante; luego sube y se achica
+ const sube=su(pr(t,A-.15,A+.45));
+ $("pareja").style.opacity=Math.max(.0,1-su(pr(t,A+.2,A+.6)));
+ $("pareja").style.transform=`translateY(${-sube*420}px) scale(${(1-.35*sube)*(t<.35?(.85+.15*su(pr(t,0,.35))):1)})`;
+ $("subtr").style.opacity=L.tr?su(pr(t,.15,.45))*(1-su(pr(t,A+.1,A+.45))):0;
+ // 2. Las letras con su valor, una a una
+ ["n1","n2"].forEach((id,i)=>{$(id).style.opacity=su(pr(t,A+.15+i*.9,A+.45+i*.9));});
+ [...$("f1").children,...$("f2").children].forEach((e,i)=>{const fila=i<5?0:1;const j=fila?i-5:i;const a=A+.25+fila*.9+j*.14;const o=su(pr(t,a,a+.22));e.style.opacity=o;e.style.transform=`translateY(${(1-o)*30}px) scale(${pop(t,a)})`;});
+ // 3. Suma y número
+ $("suma").style.opacity=su(pr(t,B-.1,B+.25));$("suma").style.transform=`scale(${pop(t,B-.1)})`;
+ const oR=su(pr(t,R,R+.25));$("res").style.opacity=oR*(1-su(pr(t,D,D+.3)));$("res").style.transform=`scale(${(.6+.4*oR)*pop(t,R)})`;
+ const k=pr(t,R,R+.9);$("destello").style.opacity=k>0&&k<1?1:0;$("destello").style.boxShadow=`0 0 0 ${k*420}px rgba(241,217,154,${.28*(1-k)})`;$("marca").style.opacity=(.8*(1-su(pr(t,D,D+.3)))).toFixed(3);
+ // 4. La pregunta (el número queda arriba para que el video se pueda volver a ver)
+ const oC=su(pr(t,D,D+.35));$("cta").style.opacity=oC;$("cta").style.transform=`translateY(${(1-oC)*30}px) scale(${pop(t,D)})`;
+ $("suma").style.transform+=` translateY(${0}px)`;
+ $("suma").innerHTML=t<D?`80 + 170 = <b>250</b>`:`250 → <b>7</b> · <span style="font-family:${L.rtl?"NA":"C"};font-size:80px">${L.sentido}</span>`;
+};
+window.pintar(0);
+</script></body></html>
