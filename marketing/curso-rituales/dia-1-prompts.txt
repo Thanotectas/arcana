@@ -1,0 +1,71 @@
+CURSO «7 DÍAS PARA CERRAR EL AÑO» · DÍA 1 · «Qué es un ritual: intención, espacio y momento»
+Video de la lección: vertical 9:16, ~75 s, voz de Sibila (Marcela, ElevenLabs; la genero yo).
+Lo armo yo: clips + imágenes + voz + títulos, igual que el video 63.
+
+QUÉ NECESITO DE TI
+- 3 CLIPS en Flow / Gemini (Veo), vertical 9:16, 8 s cada uno.
+  · Clip A NECESITA LA FOTO DE SIBILA como referencia (te la mando: sibila-referencia.jpg).
+    Es el único momento del curso donde aparece Sibila: la bienvenida (y el día 7, la despedida).
+  · Clips B y C son SIN CARAS (solo manos y objetos): no necesitan foto.
+- 3 IMÁGENES en Gemini («Crear imagen», vertical 9:16). No necesitan foto de Sibila.
+- Sonido de los clips: solo ambiente (llama, papel, viento suave). Sin música y sin voces:
+  si Veo pone a Sibila a hablar, no sirve, porque la voz es la de Marcela.
+
+==================== CLIP A · Flow/Gemini CON IMAGEN DE REFERENCIA · «Sibila te da la bienvenida» ====================
+(Sube sibila-referencia.jpg como imagen de referencia / «ingrediente».)
+Vertical 9:16, cinematic medium shot, warm candlelight. The woman from the reference image (Sibila: long black wavy
+hair, deep purple veil and robe with gold embroidery, thin gold headband with a small star, crescent moon earrings)
+sits at her wooden table covered with a purple and gold cloth, in a room with arched windows and a starry night sky.
+She slowly lights a tall white candle with a long match, then looks into the camera with a calm, warm smile and opens
+her hands toward the viewer in a welcoming gesture. Soft golden light on her face, gentle candle flicker, a crystal
+ball glowing softly on the table. Slow push-in. She does not speak; her lips stay closed.
+Sound: a match striking, a soft crackle of the flame, quiet room tone. No music, no voices, no speech.
+
+==================== CLIP B · Flow (sin caras) · «Tu altar» ====================
+Vertical 9:16, cinematic close-up, top-down angle slowly tilting to eye level, warm evening light from a lamp.
+A woman's hands spread a clean cream linen cloth on a small wooden table, then place on it, one by one: a white
+candle in a brass holder, a clear glass of water, a smooth grey river stone and a green bay leaf. Calm, deliberate,
+almost ceremonial movements. Shallow depth of field, cozy home atmosphere, soft bokeh of warm lights in the background.
+Only hands and objects, no faces, no text, no logos.
+Sound: soft fabric rustle, the gentle clink of glass and stone on wood. No music, no voices.
+
+==================== CLIP C · Flow (sin caras) · «La intención escrita» ====================
+Vertical 9:16, cinematic macro shot, candlelight. A woman's hand writes a few handwritten lines on a small piece of
+paper with a pencil (the words are not readable), then folds the paper twice and slides it under the brass base of a
+lit white candle on a cream linen cloth. The flame flickers gently. Very slow push-in on the candle and the folded
+paper. Warm gold and deep violet tones. Only the hand and objects, no faces, no readable text, no logos.
+Sound: pencil on paper, paper folding, a soft candle flicker. No music, no voices.
+
+==================== IMAGEN 1 · Gemini · «El momento» ====================
+Vertical 9:16 photorealistic image, a quiet window at night seen from inside a home, a thin waxing crescent moon in a
+deep blue sky above old rooftops, a small lit candle on the windowsill, warm and calm. No people, no faces, no text,
+no logos. Lots of dark empty space in the lower third (for text).
+
+==================== IMAGEN 2 · Gemini · «Muchas tradiciones, una idea» ====================
+Vertical 9:16 photorealistic still life on a dark wooden table, warm candlelight: a blue glass evil-eye bead (nazar),
+a small brass hamsa hand, a white egg next to a glass of water, a sprig of rosemary and a lit white candle, arranged
+with care on a purple cloth with gold embroidery. Rich cobalt blue, gold and violet tones. No people, no faces, no
+text, no logos. Empty dark space in the lower third.
+
+==================== IMAGEN 3 · Gemini · «El rincón» ====================
+Vertical 9:16 photorealistic image, a simple home altar in the corner of a cozy living room at dusk: a cream linen
+cloth on a small wooden table with a white candle (unlit), a glass of water, a grey stone and a bay leaf, a folded
+note under the candle; a soft lamp and a plant nearby. Warm, peaceful, everyday. No people, no faces, no text,
+no logos. Empty space in the upper third.
+
+==================== VOZ DE SIBILA (la genero yo con Marcela) · ~75 s ====================
+Bienvenida a estos siete días… Soy Sibila, y voy a acompañarte a cerrar el año.
+Encender una vela para alumbrar la cocina no es un ritual. Encenderla pensando en alguien, en silencio, a la misma
+hora cada noche… eso sí lo es.
+Lo que convierte un gesto en ritual no es el objeto: es la intención, el espacio y el momento.
+La intención es lo que pides, lo que agradeces o lo que sueltas, dicho con tus palabras. El espacio es el lugar que
+separas del resto de la casa, aunque sea una esquina de la mesa. Y el momento es el cuándo: un día, una Luna, el final
+de un año.
+Del Mediterráneo a Turquía, del norte de África a nuestra tierra, todas las tradiciones tienen estas tres piezas.
+Hoy vas a preparar tu altar: un paño limpio, una vela blanca, un vaso de agua y algo de la naturaleza. Y vas a
+escribir, en presente, lo que quieres cerrar este año. Dobla el papel y déjalo bajo la vela… lo usaremos el último día.
+Nos vemos mañana.
+
+==================== ORDEN DEL MONTAJE (lo hago yo) ====================
+Clip A (bienvenida) → Imagen 2 (las tradiciones) → Imagen 1 (el momento) → Clip B (el altar) → Imagen 3 (el rincón)
+→ Clip C (la intención bajo la vela) → cierre con «Día 1 · Tu altar de cierre».
