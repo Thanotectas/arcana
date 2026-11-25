@@ -41,8 +41,12 @@ const T={
      ["شمال أفريقيا والشرق الأوسط","الخمسة تحرس المدخل"],["أمريكا اللاتينية","الجدّة تمرّر البيضة وتقرأ الكأس"],["","ثلاث طرق وفكرة واحدة:<br>أن نرعى من نحب"]],
   cta1:"هل جرّبت البيضة؟<br>سيبيلا تقرأ كأسك 🔮",cta2:"miarcana.com/ar/huevo"},
 };
-const TR=[[3.3,6.4],[6.8,12.4],[12.7,15.9],[16.2,20.4],[20.8,26.9],[27.2,31]];
-const LANG=location.hash.slice(1)||"es";const L=T[LANG];const $=id=>document.getElementById(id);
+// Hash: «idioma» (sin voz) o «idioma,v,fin del título,ini1,fin1,…,ini6,fin6,inicio del cierre» (con voz, a los tiempos de la voz)
+const H=(location.hash.slice(1)||"es").split(",");const LANG=H[0];const L=T[LANG];const VOZ=H[1]==="v";
+let FT=3.2,TR=[[3.3,6.4],[6.8,12.4],[12.7,15.9],[16.2,20.4],[20.8,26.9],[27.2,31]],CT=31.2;
+if(VOZ){const n=H.slice(2).map(Number);FT=n[0];TR=[0,1,2,3,4,5].map(i=>[n[1+2*i],n[2+2*i]]);CT=n[13];
+ // Con voz, el orden sigue a la narración: primero «en puertas, autos y cunas» y luego el nazar
+ const [a,b]=[L.c[1],L.c[2]];L.c[1]=[a[0],b[1]];L.c[2]=["",a[1]];}const $=id=>document.getElementById(id);
 if(L.rtl){document.body.classList.add("ar");document.body.dir="rtl";$("serie").style.letterSpacing="0";$("serie").style.fontFamily="NA";$("serie").style.fontSize="44px";$("titulo").style.fontSize="170px";$("titulo").style.top="200px";$("sub").style.top="450px";}
 $("serie").textContent=L.serie;$("titulo").textContent=L.titulo;$("sub").textContent=L.sub;$("lema").textContent=L.lema;
 $("cta1").innerHTML=L.cta1;$("cta2").textContent=L.cta2;$("cta2").dir="ltr";
@@ -50,11 +54,11 @@ L.c.forEach(([a,b],i)=>{const d=document.createElement("div");d.className="t";d.
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
 const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
 window.pintar=(t)=>{
- $("sombraA").style.opacity=ven(t,0,3.3,.3);
- $("serie").style.opacity=ven(t,.2,3.2);$("titulo").style.opacity=ven(t,.5,3.2);$("titulo").style.transform=`scale(${.92+.08*su(pr(t,.5,1.3))})`;
- $("sub").style.opacity=ven(t,1.1,3.2);
+ $("sombraA").style.opacity=ven(t,0,FT+.1,.3);
+ $("serie").style.opacity=ven(t,.2,FT);$("titulo").style.opacity=ven(t,.5,FT);$("titulo").style.transform=`scale(${.92+.08*su(pr(t,.5,1.3))})`;
+ $("sub").style.opacity=ven(t,1.1,FT);
  TR.forEach(([a,b],i)=>{const o=ven(t,a,b);const e=$("t"+i);e.style.opacity=o;e.style.transform=`translateY(${(1-su(pr(t,a,a+.5)))*24}px)`;});
- const c=su(pr(t,31.2,31.8));$("cta").style.opacity=c;$("cta").style.transform=`translateY(${(1-c)*24}px)`;
+ const c=su(pr(t,CT,CT+.6));$("cta").style.opacity=c;$("cta").style.transform=`translateY(${(1-c)*24}px)`;
 };
 window.pintar(0);
 </script></body></html>
