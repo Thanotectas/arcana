@@ -216,7 +216,7 @@ export const es = {
     },
     videos: {
       titulo: "Sibila en video",
-      intro: "Rituales, lecturas y lo que dicen las cartas, en menos de 30 segundos.",
+      intro: "Rituales, lecturas y tradiciones del mundo, en menos de un minuto.",
       activarSonido: "Activar sonido",
       silenciar: "Silenciar",
       anterior: "Anterior",

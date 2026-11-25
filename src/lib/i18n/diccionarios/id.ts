@@ -214,7 +214,7 @@ export const id: Diccionario = {
     },
     videos: {
       titulo: "Sibila dalam video",
-      intro: "Ritual, bacaan, dan pesan kartu, dalam waktu kurang dari 30 detik (berbahasa Spanyol).",
+      intro: "Ritual, bacaan, dan tradisi dunia, dalam waktu kurang dari satu menit.",
       activarSonido: "Nyalakan suara",
       silenciar: "Bisukan",
       anterior: "Sebelumnya",

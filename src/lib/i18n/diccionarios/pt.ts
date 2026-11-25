@@ -214,7 +214,7 @@ export const pt: Diccionario = {
     },
     videos: {
       titulo: "Sibila em vídeo",
-      intro: "Rituais, leituras e o que dizem as cartas, em menos de 30 segundos (em espanhol).",
+      intro: "Rituais, leituras e tradições do mundo, em menos de um minuto.",
       activarSonido: "Ativar som",
       silenciar: "Silenciar",
       anterior: "Anterior",

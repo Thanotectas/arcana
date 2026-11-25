@@ -13,21 +13,11 @@ import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } fr
 import { plantilla } from "@/lib/i18n/formato";
 import { CartasFlotantes } from "@/components/CartasFlotantes";
 import { CarruselVideos } from "@/components/CarruselVideos";
+import { VIDEOS_PORTADA } from "@/lib/videos-portada";
 import { comprasVisibles } from "@/lib/plataforma";
 import { AvisoDirecto } from "@/components/AvisoDirecto";
 
 /** Reels de Sibila para la portada (versiones web en public/videos/portada, sin fechas que venzan). */
-const VIDEOS = [
-  { id: "runas", clave: "runas", href: "/runas" },
-  { id: "abundancia", clave: "abundancia", href: "/rituales" },
-  { id: "mano", clave: "mano", href: "/quiromancia" },
-  { id: "trabajo", clave: "trabajo", href: "/rituales" },
-  { id: "chocolate", clave: "chocolate", href: "/chocolate" },
-  { id: "velas", clave: "velas", href: "/velas" },
-  { id: "aura", clave: "aura", href: "/aura" },
-  { id: "suenos", clave: "suenos", href: "/suenos" },
-  { id: "carta-astral", clave: "cartaAstral", href: "/carta-astral" },
-] as const;
 
 /** La portada en cada idioma tiene su dirección (/fr, /tr…) para Google. */
 export async function generateMetadata(): Promise<Metadata> {
@@ -64,13 +54,16 @@ export default async function Portada() {
 
       <AvisoDirecto t={t.portada.directo} sonido={t.portada.videos} idioma={idioma} conOferta={compras} />
 
-      <section>
-        <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.videos.titulo}</h2>
-        <p className="mt-2 text-center text-texto-suave">{t.portada.videos.intro}</p>
-        <div className="mt-8">
-          <CarruselVideos videos={VIDEOS.map((v) => ({ ...v, titulo: t.portada.videos.items[v.clave] }))} textos={t.portada.videos} />
-        </div>
-      </section>
+      {/* Cada idioma ve solo sus videos; si aún no tiene, la sección no aparece. */}
+      {VIDEOS_PORTADA[idioma].length > 0 && (
+        <section>
+          <h2 className="font-display text-center text-3xl font-semibold text-oro-suave">{t.portada.videos.titulo}</h2>
+          <p className="mt-2 text-center text-texto-suave">{t.portada.videos.intro}</p>
+          <div className="mt-8">
+            <CarruselVideos videos={VIDEOS_PORTADA[idioma]} textos={t.portada.videos} />
+          </div>
+        </section>
+      )}
 
       {/* Todas las lecturas: guía para elegir, buscador y vistas por lo que quieres saber, práctica o tradición. */}
       <ExplorarCatalogo

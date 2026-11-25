@@ -415,14 +415,6 @@ export function videoEn(e: EntradaBiblioteca, idioma: Idioma) {
   return e.videos?.[idioma] ?? null;
 }
 
-/** Las fichas que se muestran en El Arcano a quien entra en ese idioma: las que tienen video o texto en su idioma
- *  (en español, todas). La más reciente primero. */
-export function fichasDeIdioma(idioma: Idioma) {
-  return BIBLIOTECA.filter((e) => idioma === "es" || Boolean(e.videos?.[idioma]) || Boolean(e.textos[idioma])).sort((a, b) =>
-    b.publicada.localeCompare(a.publicada),
-  );
-}
-
 export function fichaEn(e: EntradaBiblioteca, idioma: Idioma): Ficha {
   return e.textos[idioma] ?? e.textos.es;
 }

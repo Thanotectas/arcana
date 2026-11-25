@@ -26,19 +26,19 @@ export function JsonLd({ datos }: { datos: object }) {
 }
 
 /** Invitación a probar la lectura real en Arcana. */
-export function CtaLectura({ titulo, texto, href = "/registro", boton }: { titulo: string; texto: string; href?: string; boton: string }) {
+export function CtaLectura({ titulo, texto, href = "/registro", boton, nota = "Sin tarjeta de crédito · Tu primera lectura es gratis" }: { titulo: string; texto: string; href?: string; boton: string; nota?: string }) {
   return (
     <section className="tarjeta border-oro/40 bg-oro/5 p-6 text-center sm:p-8">
       <h2 className="font-display text-2xl sm:text-3xl">{titulo}</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm text-texto-suave">{texto}</p>
       <Link href={href} className="boton boton-primario mt-4">{boton}</Link>
-      <p className="mt-2 text-xs text-texto-suave">Sin tarjeta de crédito · Tu primera lectura es gratis</p>
+      <p className="mt-2 text-xs text-texto-suave">{nota}</p>
     </section>
   );
 }
 
 /** Preguntas frecuentes visibles + su JSON-LD (FAQPage). */
-export function Preguntas({ items }: { items: { p: string; r: string }[] }) {
+export function Preguntas({ items, titulo = "Preguntas frecuentes" }: { items: { p: string; r: string }[]; titulo?: string }) {
   const ld = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -46,7 +46,7 @@ export function Preguntas({ items }: { items: { p: string; r: string }[] }) {
   };
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-2xl">Preguntas frecuentes</h2>
+      <h2 className="font-display text-2xl">{titulo}</h2>
       {items.map((it) => (
         <details key={it.p} className="tarjeta p-4">
           <summary className="cursor-pointer font-medium">{it.p}</summary>

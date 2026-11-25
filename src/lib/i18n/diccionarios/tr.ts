@@ -216,7 +216,7 @@ export const tr: Diccionario = {
     },
     videos: {
       titulo: "Videolarda Sibila",
-      intro: "Ritüeller, fallar ve kartların söyledikleri, 30 saniyeden kısa sürede (İspanyolca).",
+      intro: "Ritüeller, fallar ve dünyanın gelenekleri, bir dakikadan kısa sürede.",
       activarSonido: "Sesi aç",
       silenciar: "Sesi kapat",
       anterior: "Önceki",

@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { getIdioma } from "@/lib/i18n/servidor";
 import { alternativas } from "@/lib/i18n/rutas";
 import { sitio } from "@/lib/correo";
 import { CtaLectura, JsonLd, Migas, Preguntas } from "@/components/seo/BloquesSeo";
-import { BIBLIOTECA, entradaPorSlug, fichaEn, videoEn } from "@/lib/biblioteca/fichas";
+import { BIBLIOTECA, entradaPorSlug, videoEn } from "@/lib/biblioteca/fichas";
+import { fichaTraducida, traducirFaltantes } from "@/lib/biblioteca/traducciones";
+import { TEXTOS_ARCANO } from "@/lib/biblioteca/textos";
+
+// La primera visita en un idioma deja traduciendo la ficha en segundo plano (puede tardar un par de minutos).
+export const maxDuration = 300;
 
 export function generateStaticParams() {
   return BIBLIOTECA.map((e) => ({ slug: e.slug }));
@@ -15,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const e = entradaPorSlug((await params).slug);
   if (!e) return {};
   const idioma = await getIdioma();
-  const f = fichaEn(e, idioma);
+  const { ficha: f } = await fichaTraducida(e, idioma);
   return { title: f.titulo, description: f.descripcion, alternates: alternativas(`/biblioteca/${e.slug}`, idioma), openGraph: { type: "article", title: f.titulo, description: f.descripcion } };
 }
 
@@ -24,19 +30,22 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
   const e = entradaPorSlug((await params).slug);
   if (!e) notFound();
   const idioma = await getIdioma();
-  const f = fichaEn(e, idioma);
+  const { ficha: f, falta } = await fichaTraducida(e, idioma);
+  if (falta) after(() => traducirFaltantes(idioma, [e]));
+  const t = TEXTOS_ARCANO[idioma];
   const url = `${sitio()}/biblioteca/${e.slug}`;
   const video = videoEn(e, idioma);
   return (
-    <article className="mx-auto max-w-3xl space-y-10">
+    <article className="mx-auto max-w-3xl space-y-10" lang={falta ? "es" : idioma}>
       <JsonLd datos={{ "@context": "https://schema.org", "@type": "Article", headline: f.titulo, description: f.descripcion, datePublished: e.publicada, inLanguage: idioma, mainEntityOfPage: url, author: { "@type": "Organization", name: "Arcana" }, publisher: { "@type": "Organization", name: "Arcana" } }} />
-      <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "El Arcano de Sibila", href: "/biblioteca" }, { nombre: f.titulo, href: `/biblioteca/${e.slug}` }]} />
+      <Migas items={[{ nombre: t.inicio, href: "/" }, { nombre: t.nombre, href: "/biblioteca" }, { nombre: f.titulo, href: `/biblioteca/${e.slug}` }]} />
       <header className="space-y-3 text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">
-          <Link href="/biblioteca" className="hover:text-texto">El Arcano de Sibila</Link>
+          <Link href="/biblioteca" className="hover:text-texto">{t.nombre}</Link>
         </p>
         <h1 className="font-display text-4xl font-semibold sm:text-5xl">{f.titulo}</h1>
         <p className="text-sm text-oro-suave">{f.nombres}</p>
+        {falta && <p className="text-xs text-texto-suave">{t.traduciendo}</p>}
       </header>
       {video && (
         <figure className="mx-auto w-full max-w-sm">
@@ -74,12 +83,12 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
         </section>
       )}
 
-      <CtaLectura titulo={f.cta.titulo} texto={f.cta.texto} href={e.hrefs?.[idioma] ?? e.href} boton={f.cta.boton} />
+      <CtaLectura titulo={f.cta.titulo} texto={f.cta.texto} href={e.hrefs?.[idioma] ?? e.href} boton={f.cta.boton} nota={t.nota} />
 
-      <Preguntas items={f.preguntas} />
+      <Preguntas items={f.preguntas} titulo={t.preguntas} />
 
       <section className="space-y-2 border-t border-borde pt-6 text-sm text-texto-suave">
-        <h2 className="font-display text-xl text-texto">Fuentes</h2>
+        <h2 className="font-display text-xl text-texto">{t.fuentes}</h2>
         <ul className="list-disc space-y-1 ps-5">
           {e.fuentes.map((x) => (
             <li key={x.url}>
