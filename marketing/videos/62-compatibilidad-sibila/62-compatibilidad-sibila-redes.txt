@@ -17,3 +17,12 @@ TEXTO: Luis + María = 4 · Un hogar firme 💞 ¿Y ustedes? Escribe tu nombre y
 COMENTARIO FIJADO: Ejemplo: Luis + María = 16 + 24 = 40 → 4 · Un hogar firme 💞 Escriban sus nombres 👇
 Cómo responde: «Camila + Andrés» → Camila 💞 Andrés: 21 + 25 = 46 → 1 · Fuerza compartida ✨ La lectura completa, en el enlace de la bio
 Tabla: A J S = 1 · B K T = 2 · C L U = 3 · D M V = 4 · E N Ñ W = 5 · F O X = 6 · G P Y = 7 · H Q Z = 8 · I R = 9
+
+═══ INVITACIÓN A TELEGRAM (agregar al final del texto de cada idioma) ═══
+Sibila responde en Telegram en el idioma de cada persona (bot @MiArcanaBot):
+ES: 📲 ¿Quieres conversar con Sibila? Escríbele por Telegram: t.me/MiArcanaBot
+AR: 📲 تحدّث مع سيبيلا بالعربية على تيليغرام: t.me/MiArcanaBot
+TR: 📲 Sibila ile Türkçe sohbet et: Telegram'da t.me/MiArcanaBot
+FR: 📲 Parle avec Sibila en français sur Telegram : t.me/MiArcanaBot
+PT: 📲 Converse com a Sibila no Telegram: t.me/MiArcanaBot
+EN: 📲 Chat with Sibila on Telegram: t.me/MiArcanaBot

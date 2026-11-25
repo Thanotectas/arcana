@@ -30,6 +30,7 @@ const FIJOS: Record<IdiomaCarta, {
   tirada: (precio: string) => string;
   comenta: string;
   comunidad: (enlace: string) => string;
+  telegram: string;
   hashtags: string;
   enlaceIg: string;
   enlaceFb: string;
@@ -49,6 +50,7 @@ const FIJOS: Record<IdiomaCarta, {
     invitacion: (e) => `🔮 Bu herkesin kartı. Kartlar sana ne söylüyor? Kendi kartını ücretsiz çek: ${e}.`,
     tirada: (p) => `✨ Kendi açılımını ister misin? Sibila sorunla ilgili üç kart okur: ${p}.`,
     comenta: "💬 Burcunu yorumlara yaz, Sibila sana cevap versin.",
+    telegram: "💬 Sibila ile Türkçe sohbet et: Telegram'da t.me/MiArcanaBot",
     comunidad: (e) => `🌍 Bu kart sana ne söylüyor? Toplulukta anlat: herkes kendi dilinde yazıyor, herkes kendi dilinde okuyor: ${e}.`,
     hashtags: "#tarot #gününkartı #tarotfalı #fal #burçlar #miarcana",
     enlaceIg: "miarcana.com/tr (bağlantı biyografide)",
@@ -69,6 +71,7 @@ const FIJOS: Record<IdiomaCarta, {
     invitacion: (e) => `🔮 هذه بطاقة الجميع. ماذا تقول لك البطاقات أنت؟ اسحب بطاقتك مجانًا: ${e}.`,
     tirada: (p) => `✨ هل تريد قراءتك الخاصة؟ سيبيلا تقرأ لك ثلاث بطاقات عن سؤالك: ${p}.`,
     comenta: "💬 اكتب برجك في التعليقات وسترد عليك سيبيلا.",
+    telegram: "💬 تحدّث مع سيبيلا بالعربية على تيليغرام: t.me/MiArcanaBot",
     comunidad: (e) => `🌍 ماذا تقول لك هذه البطاقة؟ احكِ في المجتمع: كلٌّ يكتب بلغته ويقرأ الجميع بلغته: ${e}.`,
     hashtags: "#تاروت #بطاقة_اليوم #الأبراج #قراءة_التاروت #miarcana",
     enlaceIg: "miarcana.com/ar (الرابط في السيرة)",
@@ -155,6 +158,7 @@ export function textoCartaIdioma(fecha: string, idioma: IdiomaCarta, red: "insta
     f.tirada(precioUsd()),
     "",
     f.comenta,
+    f.telegram,
     f.comunidad(red === "facebook" ? (idioma === "ar" ? "miarcana دوت كوم/ar/comunidad" : "miarcana nokta com/tr/comunidad") : `miarcana.com/${idioma}/comunidad`),
     "",
     f.hashtags,

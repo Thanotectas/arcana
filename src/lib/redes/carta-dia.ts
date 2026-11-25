@@ -125,6 +125,7 @@ export function textoCartaDelDia(fecha: string, red: "instagram" | "facebook" = 
     `✨ ¿Quieres tu propia tirada? Sibila te lee tres cartas sobre tu pregunta por ${tresMonedas(PAQUETE_PRUEBA.precioCOP, PAQUETE_PRUEBA.precioUSDCentavos)}.`,
     "",
     "💬 Comenta tu signo y Sibila te responde.",
+    "📲 Y si quieres conversar con Sibila, escríbele por Telegram: t.me/MiArcanaBot",
     `🌍 ¿Qué te dice a ti esta carta? Cuéntalo en la comunidad, donde cada quien escribe en su idioma y todos se leen en el suyo: ${red === "facebook" ? "miarcana punto com, sección comunidad" : "miarcana.com/comunidad"}.`,
     "",
     mazo === "arcana" ? "#tarot #tarotarcana #cartadeldia #tarotdiario #espiritualidad #miarcana" : "#tarot #tarotenespañol #cartadeldia #tarotdiario #espiritualidad #miarcana",
