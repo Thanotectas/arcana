@@ -1,0 +1,60 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;font-variant-numeric:lining-nums}
+#sb{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(0deg,rgba(12,6,28,.92),rgba(12,6,28,.62) 55%,rgba(12,6,28,0))}
+#sa{position:absolute;left:0;right:0;top:0;height:420px;background:linear-gradient(180deg,rgba(12,6,28,.7),rgba(12,6,28,0))}
+.c{position:absolute;left:70px;right:70px;text-align:center;opacity:0;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.85)}
+.et{font-family:I;font-size:34px;letter-spacing:.32em;color:#f1d99a;text-transform:uppercase}
+.ti{font-family:C;font-size:104px;line-height:1.02;margin-top:14px}
+.su{font-family:C;font-size:54px;line-height:1.15;color:#e9dcff;margin-top:18px;font-style:italic}
+.orn{display:block;margin:22px auto 0;width:300px;height:2px;background:linear-gradient(90deg,transparent,#f1d99a,transparent)}
+#cab{top:110px}
+#cab .et{font-size:30px}
+.tres{position:absolute;left:0;right:0;bottom:470px;display:flex;justify-content:center;gap:22px;font-family:C;font-size:74px;color:#fff;text-shadow:0 4px 20px #000}
+.tres span{opacity:0}
+.tres i{font-style:normal;color:#f1d99a;opacity:0}
+#lista{bottom:300px}
+#lista p{margin:0;font-family:C;font-size:64px;line-height:1.3;opacity:0}
+#lista p b{color:#f1d99a;font-weight:normal}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.8;text-shadow:0 2px 10px #000}
+#marca b{color:#f1d99a}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div class="c" id="cab"><div class="et">La Escuela de Sibila · Día 1 de 7</div></div>
+<div class="c" id="t0" style="bottom:330px"><div class="et">7 días para cerrar el año</div><div class="ti">Qué es un ritual</div><span class="orn"></span></div>
+<div class="c" id="t1" style="bottom:360px"><div class="su">Encender una vela pensando en alguien,<br>en silencio, cada noche…</div><div class="ti" style="font-size:92px">eso es un ritual</div></div>
+<div class="tres" id="tres"><span>Intención</span><i>·</i><span>Espacio</span><i>·</i><span>Momento</span></div>
+<div class="c" id="t2" style="bottom:330px"><div class="et">1 · La intención</div><div class="ti">Lo que pides,<br>agradeces o sueltas</div><div class="su">dicho con tus palabras</div></div>
+<div class="c" id="t3" style="bottom:330px"><div class="et">2 · El espacio</div><div class="ti">Un lugar aparte</div><div class="su">aunque sea una esquina de la mesa</div></div>
+<div class="c" id="t4" style="bottom:330px"><div class="et">3 · El momento</div><div class="ti">El cuándo</div><div class="su">un día, una Luna, el final de un año</div></div>
+<div class="c" id="t5" style="bottom:330px"><div class="et" style="font-size:26px;letter-spacing:.22em">Del Mediterráneo a Latinoamérica</div><div class="ti">Muchas tradiciones,<br>una misma idea</div></div>
+<div class="c" id="lista"><div class="et" style="margin-bottom:20px">Tu altar de cierre</div><p>Un paño <b>limpio</b></p><p>Una vela <b>blanca</b></p><p>Un vaso de <b>agua</b></p><p>Algo de la <b>naturaleza</b></p></div>
+<div class="c" id="t6" style="bottom:330px"><div class="et">Tu intención</div><div class="ti">Escribe en presente<br>lo que quieres cerrar</div><div class="su">y déjalo bajo la vela</div></div>
+<div class="c" id="t7" style="bottom:330px"><div class="ti">Nos vemos mañana</div><span class="orn"></span><div class="su" style="font-style:normal;font-family:I;font-size:36px;color:#f1d99a;letter-spacing:.08em">Día 2 · Limpiar antes de pedir</div></div>
+<p id="marca"><b>ARCANA</b> · LA ESCUELA DE SIBILA</p>
+<script>
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=x=>x*x*(3-2*x);
+const ven=(t,a,b,f=.45)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+const muestra=(id,a,b)=>{const o=ven(window.__t,a,b);const e=$(id);e.style.opacity=o;e.style.transform=`translateY(${(1-su(pr(window.__t,a,a+.6)))*26}px)`;};
+window.pintar=(t)=>{
+ window.__t=t;
+ $("sa").style.opacity=ven(t,0,9.9,.4)+ven(t,63.2,67.6,.4);
+ $("cab").style.opacity=Math.max(ven(t,.3,9.7),ven(t,63.4,67.6));
+ muestra("t0",.8,9.8);
+ muestra("t1",10.4,16.9);
+ const tr=$("tres");const w=[...tr.children];
+ [20.6,21.4,21.6,22.4,22.6].forEach((a,i)=>{w[i].style.opacity=ven(t,a,23.9,.35);});
+ muestra("t2",24.2,29.9);
+ muestra("t3",30.2,35.5);
+ muestra("t4",35.8,40.8);
+ muestra("t5",41.1,48.5);
+ $("lista").style.opacity=ven(t,48.8,55.9);
+ [...$("lista").querySelectorAll("p")].forEach((p,i)=>{const a=[50.4,52.2,53.6,54.6][i];p.style.opacity=su(pr(t,a,a+.4));p.style.transform=`translateY(${(1-su(pr(t,a,a+.5)))*18}px)`;});
+ muestra("t6",56.2,62.9);
+ muestra("t7",63.3,67.6);
+ $("marca").style.opacity=(.8*(1-ven(t,48.8,55.9))).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>

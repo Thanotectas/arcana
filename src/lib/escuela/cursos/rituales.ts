@@ -29,7 +29,7 @@ export const CURSO_RITUALES: Curso = {
       resumen: "Antes de encender nada: qué hace que un gesto se vuelva ritual, y tu altar para estos siete días.",
       minutos: 15,
       bloques: [
-        { tipo: "video", titulo: "Sibila te da la bienvenida" },
+        { tipo: "video", titulo: "Sibila te da la bienvenida", src: "/escuela/rituales/dia-1.mp4", poster: "/escuela/rituales/dia-1.jpg" },
         {
           tipo: "texto",
           titulo: "Un gesto con intención",
