@@ -32,6 +32,22 @@ export function nombresDePareja(texto: string): string[] | null {
   return nombresDelComentario(texto);
 }
 
+/**
+ * Numerología pitagórica (la versión en español, portugués…: «Romeo + Julieta»): A J S = 1, B K T = 2, C L U = 3,
+ * D M V = 4, E N Ñ W = 5, F O X = 6, G P Y = 7, H Q Z = 8, I R = 9. Las tildes no cuentan.
+ */
+const PITAGORICA: Record<string, number> = {};
+["ajs", "bkt", "clu", "dmv", "enñw", "fox", "gpy", "hqz", "ir"].forEach((letras, i) => [...letras].forEach((l) => (PITAGORICA[l] = i + 1)));
+export function valorPitagorico(nombre: string) {
+  return [...nombre.toLowerCase().replace(/ñ/g, "\u0000").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\u0000/g, "ñ")].reduce((s, c) => s + (PITAGORICA[c] ?? 0), 0);
+}
+
+/** ¿El reel usa la numerología pitagórica? (si no nombra el abjad / ebced y sí la numerología). */
+export function esMetodoPitagorico(textoPublicacion: string) {
+  const t = textoPublicacion.normalize("NFC").replace(/[\u064B-\u065F\u0670]/g, "");
+  return /numerolog/i.test(t) && !/abjad|ebced|ebcet|جمل|أبجد|ابجد|حساب/i.test(t);
+}
+
 /** Escritura árabe del nombre (con los alias de Majnún) y su valor. */
 function valorNombre(nombre: string, idioma: Idioma) {
   const alias = ALIAS[nombre.toLocaleLowerCase("tr").trim()];
@@ -78,6 +94,14 @@ const UNO: Record<Idioma, (n: string, v: number) => string> = {
   hi: (n, v) => `${n} = ${v} (حساب الجُمَّل) ✨ साथ में अपने प्रिय का नाम लिखिए, हम आपकी अनुकूलता निकालेंगे 💞`,
 };
 
+const UNO_PITAGORICO: Record<Idioma, (n: string, v: number) => string> = {
+  ...UNO,
+  es: (n, v) => `${n} = ${v} en numerología ✨ Escribe al lado el nombre de quien amas y calculamos su compatibilidad 💞`,
+  en: (n, v) => `${n} = ${v} in numerology ✨ Write the name of the one you love next to it and we'll calculate your match 💞`,
+  pt: (n, v) => `${n} = ${v} na numerologia ✨ Escreva ao lado o nome de quem você ama e calculamos a compatibilidade 💞`,
+  fr: (n, v) => `${n} = ${v} en numérologie ✨ Écris à côté le prénom de la personne que tu aimes et on calcule votre compatibilité 💞`,
+};
+
 /**
  * Respuesta a un comentario en el reel de compatibilidad. Dos nombres: «{1} 💞 {2}: v1 + v2 = suma → n · sentido».
  * Un nombre: su valor e invitación al segundo. null si no hay nombres (responde Sibila, sin inventar cuentas).
@@ -87,9 +111,11 @@ export function respuestaCompatibilidad(comentario: string, textoPublicacion: st
   if (!nombres) return null;
   const arabe = esEscrituraArabe(comentario);
   const idioma: Idioma = arabe ? "ar" : idiomaConversacion(comentario) !== "es" ? idiomaConversacion(comentario) : idiomaDePublicacion(textoPublicacion);
-  const [a, b] = nombres.map((n) => valorNombre(n, idioma));
+  // En el reel en español se cuenta con la numerología pitagórica (los nombres en letras árabes, siempre con el abjad).
+  const pitagorico = esMetodoPitagorico(textoPublicacion);
+  const [a, b] = nombres.map((n) => (pitagorico && !esEscrituraArabe(n) ? { arabe: "", valor: valorPitagorico(n), mostrar: n } : valorNombre(n, idioma)));
   if (!a || a.valor <= 0) return null;
-  if (!b) return UNO[idioma](a.mostrar, a.valor);
+  if (!b) return pitagorico ? UNO_PITAGORICO[idioma](a.mostrar, a.valor) : UNO[idioma](a.mostrar, a.valor);
   if (b.valor <= 0) return null;
   const suma = a.valor + b.valor;
   const n = numeroDePareja(suma);
