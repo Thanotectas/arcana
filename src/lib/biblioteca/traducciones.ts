@@ -49,10 +49,12 @@ async function traducir(e: EntradaBiblioteca, idioma: Idioma): Promise<Ficha | n
   );
   try {
     const json = JSON.parse(r.slice(r.indexOf("{"), r.lastIndexOf("}") + 1)) as unknown;
-    return mismaForma(original, json) ? json : null;
-  } catch {
-    return null;
+    if (mismaForma(original, json)) return json;
+    console.error(`[arcano] ${e.slug} al ${idioma}: forma distinta`, JSON.stringify(json).slice(0, 300));
+  } catch (err) {
+    console.error(`[arcano] ${e.slug} al ${idioma}: JSON inválido (${err instanceof Error ? err.message : err}) ${r.length} caracteres:`, r.slice(0, 300));
   }
+  return null;
 }
 
 /** Las traducciones ya hechas (y al día) de varias fichas en un idioma. */
@@ -109,7 +111,7 @@ export async function traducirFaltantes(idioma: Idioma, entradas: EntradaBibliot
         if (error) return;
       }
       try {
-        const ficha = await traducir(e, idioma);
+        const ficha = (await traducir(e, idioma)) ?? (await traducir(e, idioma));
         if (ficha) await admin.from("biblioteca_traducciones").update({ ficha: ficha as unknown as Json, creado_en: new Date().toISOString() }).eq("slug", e.slug).eq("idioma", idioma);
         else console.error(`[arcano] la traducción de ${e.slug} al ${idioma} no tuvo la forma esperada`);
       } catch (err) {
