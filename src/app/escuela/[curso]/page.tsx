@@ -7,7 +7,8 @@ import { getIdioma } from "@/lib/i18n/servidor";
 import { INTENCIONES, FICHA_INTENCION, TONO_COLOR } from "@/lib/velas";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, precioPara } from "@/lib/escuela/servidor";
-import { lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { grado, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { Llavero } from "@/components/escuela/Llavero";
 import { Altar } from "@/components/escuela/Altar";
 import { BotonInscripcion } from "@/components/escuela/BotonInscripcion";
 import { FormularioPerfil } from "@/components/escuela/FormularioPerfil";
@@ -40,6 +41,8 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
   const pidePerfil = avance.inscrito && !avance.perfil;
   const siguiente = curso.lecciones.find((_, i) => avance.estados[i] === "abierta");
   const terminado = hechas === curso.lecciones.length;
+  const miGrado = grado(hechas, avance.perfil?.trato, curso.lecciones.length);
+  const llaves = curso.lecciones.map((l) => l.llave);
   const opcionesVela = INTENCIONES.map((v) => ({ valor: v, nombre: NOMBRE_INTENCION[v], tono: TONO_COLOR[FICHA_INTENCION[v].color] }));
 
   return (
@@ -56,10 +59,15 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
             <Link href="/escuela" className="hover:text-texto">La Escuela de Sibila</Link>
           </p>
           <h1 className="font-display text-5xl font-semibold leading-none drop-shadow-[0_4px_24px_rgba(0,0,0,.8)] sm:text-7xl">{curso.titulo}</h1>
-          <p className="font-display text-2xl italic text-violeta-suave">{avance.perfil ? `${avance.perfil.nombre}, tu camino de siete noches` : curso.subtitulo}</p>
+          <p className="font-display text-2xl italic text-violeta-suave">{avance.perfil ? `${avance.perfil.nombre} · ${miGrado.conCirculo}` : curso.subtitulo}</p>
           <div className="pt-4">
             {/* A quien aún no entra, el altar encendido: lo que va a vivir. */}
             <Altar estados={dentro ? avance.estados : avance.estados.map(() => "hecha")} />
+          </div>
+          {/* Las siete llaves del camino de iniciación */}
+          <div className="pt-2">
+            <Llavero llaves={llaves} ganadas={avance.estados.map((e) => (dentro ? e === "hecha" : false))} />
+            {!dentro && <p className="mt-3 text-sm text-texto-suave">Siete llaves, siete grados de conocimiento. Con las siete cierras el Primer Círculo.</p>}
           </div>
           {dentro && (
             <p className="text-sm text-texto-suave">

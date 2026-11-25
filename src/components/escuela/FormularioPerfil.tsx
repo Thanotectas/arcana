@@ -14,11 +14,12 @@ interface OpcionVela {
  * «Antes de empezar»: cómo quiere que Sibila la llame, qué quiere cerrar este año y qué quiere encender en el que
  * viene. La zona horaria sale del navegador (la Luna y los días de su vela se calculan en su hora).
  */
-export function FormularioPerfil({ curso, opciones, inicial }: { curso: string; opciones: OpcionVela[]; inicial?: { nombre: string; intencionCierre: string; intencionVela: string | null } }) {
+export function FormularioPerfil({ curso, opciones, inicial }: { curso: string; opciones: OpcionVela[]; inicial?: { nombre: string; intencionCierre: string; intencionVela: string | null; trato?: "a" | "o" | "e" | null } }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(inicial?.nombre ?? "");
   const [cierre, setCierre] = useState(inicial?.intencionCierre ?? "");
   const [vela, setVela] = useState<string | null>(inicial?.intencionVela ?? null);
+  const [trato, setTrato] = useState<"a" | "o" | "e" | null>(inicial?.trato ?? null);
   const [estado, setEstado] = useState<"" | "enviando" | "error">("");
 
   const enviar = async (e: React.FormEvent) => {
@@ -28,7 +29,7 @@ export function FormularioPerfil({ curso, opciones, inicial }: { curso: string; 
     const r = await fetch("/api/escuela", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accion: "perfil", curso, nombre, intencionCierre: cierre, intencionVela: vela, zona }),
+      body: JSON.stringify({ accion: "perfil", curso, nombre, intencionCierre: cierre, intencionVela: vela, trato, zona }),
     }).catch(() => null);
     if (r?.ok) return router.refresh();
     setEstado("error");
@@ -46,6 +47,28 @@ export function FormularioPerfil({ curso, opciones, inicial }: { curso: string; 
         <span className="font-display text-xl">¿Cómo quieres que te llame?</span>
         <input required maxLength={40} value={nombre} onChange={(e) => setNombre(e.target.value)} className="campo w-full" placeholder="Tu nombre" autoComplete="given-name" />
       </label>
+      <fieldset className="relative space-y-3">
+        <legend className="font-display text-xl">Al final del camino, ¿cómo quieres que te nombre?</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {([
+            ["a", "Maestra", "Buscadora → Iniciada → Maestra"],
+            ["o", "Maestro", "Buscador → Iniciado → Maestro"],
+            ["e", "Sin género", "En búsqueda → Maestría"],
+          ] as const).map(([v, titulo, detalle]) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setTrato(v)}
+              aria-pressed={trato === v}
+              className={`rounded-xl border p-3 text-center text-sm transition ${trato === v ? "border-oro/70 bg-oro/10" : "border-borde hover:border-oro/30"}`}
+            >
+              <span className="block font-display text-lg">{titulo}</span>
+              <span className="block text-xs text-texto-suave">{detalle}</span>
+            </button>
+          ))}
+        </div>
+        <span className="block text-xs text-texto-suave">Con cada lección recibes una llave y subes de grado. Con las siete, cierras el Primer Círculo.</span>
+      </fieldset>
       <label className="relative block space-y-2">
         <span className="font-display text-xl">¿Qué quieres cerrar de este año?</span>
         <textarea rows={3} maxLength={600} value={cierre} onChange={(e) => setCierre(e.target.value)} className="campo w-full" placeholder="Un miedo, una etapa, un cansancio, algo que ya terminó…" />

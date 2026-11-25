@@ -24,6 +24,9 @@ export function TestLeccion({
   audioPrevio,
   siguiente,
   ultima,
+  llave,
+  yaHecha,
+  gradoNuevo,
 }: {
   curso: string;
   leccion: number;
@@ -33,6 +36,11 @@ export function TestLeccion({
   audioPrevio: string | null;
   siguiente: string | null;
   ultima: boolean;
+  /** La llave que recibe al completar la lección por primera vez (con su ceremonia). */
+  llave: { nombre: string; simbolo: string; saber: string };
+  yaHecha: boolean;
+  /** El grado al que sube con esta llave, si cambia (Iniciada, Adepto, Maestra de rituales…). */
+  gradoNuevo: string | null;
 }) {
   const router = useRouter();
   const [respuestas, setRespuestas] = useState<Record<string, unknown>>(previas);
@@ -94,6 +102,22 @@ export function TestLeccion({
       {estado === "error" && <p className="text-sm text-red-300">No se pudo guardar. Intenta de nuevo.</p>}
 
       {resultado && resultado.total > 0 && <p className="text-sm text-texto-suave">Acertaste {resultado.correctas} de {resultado.total}.</p>}
+      {/* La ceremonia de la llave: solo la primera vez que se completa la lección. */}
+      {resultado && !yaHecha && (
+        <div className="tarjeta relative overflow-hidden border-oro/60 p-8 text-center">
+          <div className="escuela-cielo pointer-events-none absolute inset-0" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_50%_at_50%_35%,rgba(241,217,154,.25),transparent_70%)]" aria-hidden />
+          <span className="escuela-encender relative mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-oro bg-oro/15 text-5xl shadow-[0_0_60px_rgba(241,217,154,.55)]">{llave.simbolo}</span>
+          <p className="relative mt-4 text-xs uppercase tracking-[0.35em] text-oro-suave">Recibiste</p>
+          <p className="relative font-display text-4xl">{llave.nombre}</p>
+          <p className="relative mx-auto mt-2 max-w-sm text-sm text-texto-suave">Ahora sabes: {llave.saber}</p>
+          {gradoNuevo && (
+            <p className="relative mt-4 font-display text-2xl italic text-violeta-suave">
+              Tu grado en el camino: <span className="not-italic text-oro-suave">{gradoNuevo}</span>
+            </p>
+          )}
+        </div>
+      )}
       {comentario && (
         <div className="tarjeta border-oro/40 bg-oro/5 p-5">
           <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Sibila te responde</p>

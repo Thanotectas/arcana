@@ -14,14 +14,40 @@ export type PreguntaTest =
  */
 export type PasoRitual =
   | string
-  | { texto: string; accion?: "respirar" | "encender" | "escribir" | "esperar"; segundos?: number; ayuda?: string };
+  | {
+      texto: string;
+      accion?: "respirar" | "encender" | "escribir" | "esperar";
+      segundos?: number;
+      ayuda?: string;
+      /** Lo que Sibila dice en voz alta en este paso, como una meditación guiada (con pausas «…»). Sin él, lee el texto. */
+      guia?: string;
+    };
 
 export type Bloque =
   /** Video de Sibila; sin `src`, se muestra que se está grabando. */
   | { tipo: "video"; titulo: string; src?: string; poster?: string }
   | { tipo: "texto"; titulo?: string; parrafos: string[] }
-  /** Ritual para hacer en casa, con materiales, pasos y (si aplica) la herramienta de Arcana que lo personaliza. */
-  | { tipo: "ritual"; titulo: string; materiales: string[]; pasos: PasoRitual[]; cuidado?: string; herramienta?: { href: string; texto: string } }
+  /** Una frase para guardar. */
+  | { tipo: "cita"; texto: string; origen: string }
+  /** Tarjetas de saber: historia, símbolos, el origen de las palabras. */
+  | { tipo: "saberes"; titulo: string; items: { titulo: string; texto: string }[] }
+  /** El mismo gesto en distintas culturas. */
+  | { tipo: "tradiciones"; titulo: string; items: { lugar: string; emoji: string; nombre: string; texto: string }[] }
+  /**
+   * Ritual para hacer en casa, con materiales, pasos y (si aplica) la herramienta de Arcana que lo personaliza. En el
+   * ritual guiado, Sibila abre con `apertura`, guía cada paso y cierra con `cierre`, sobre el video de `fondo`.
+   */
+  | {
+      tipo: "ritual";
+      titulo: string;
+      materiales: string[];
+      pasos: PasoRitual[];
+      cuidado?: string;
+      herramienta?: { href: string; texto: string };
+      apertura?: string;
+      cierre?: string;
+      fondo?: string;
+    }
   | { tipo: "test"; titulo?: string; preguntas: PreguntaTest[] }
   /** La foto del ritual, que Sibila lee en la lectura de Arcana correspondiente (incluida en el curso). */
   | { tipo: "entrega"; titulo: string; texto: string; href: string; boton: string; lectura: string };
@@ -35,6 +61,8 @@ export interface Leccion {
   luna: "🌑" | "🌒" | "🌓" | "🌔" | "🌕" | "🌖" | "🌗" | "🌘";
   resumen: string;
   minutos: number;
+  /** La llave que la persona recibe al completar la lección: su paso en el camino de iniciación. */
+  llave: { nombre: string; simbolo: string; saber: string };
   bloques: Bloque[];
 }
 
@@ -62,4 +90,10 @@ export interface Curso {
 /** Texto de un paso, sea simple o con acción. */
 export function textoPaso(p: PasoRitual) {
   return typeof p === "string" ? p : p.texto;
+}
+
+/** Lo que Sibila dice en voz alta en un paso (su guía meditativa o, si no tiene, el texto y la ayuda). */
+export function vozPaso(p: PasoRitual) {
+  if (typeof p === "string") return p;
+  return p.guia ?? (p.ayuda ? `${p.texto} ${p.ayuda}` : p.texto);
 }

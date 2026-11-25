@@ -80,3 +80,21 @@ export function tuVela(intencion: Intencion, zona: string, desde = new Date()) {
 export function conNombre(texto: string, nombre: string | null | undefined) {
   return nombre ? texto.replace(/\{nombre\}/g, nombre) : texto.replace(/\{nombre\},\s*/g, "").replace(/^./, (c) => c.toUpperCase());
 }
+
+export type Trato = "a" | "o" | "e";
+
+const GRADOS: Record<Trato, string[]> = {
+  a: ["Buscadora", "Aprendiz", "Iniciada", "Adepta", "Maestra de rituales"],
+  o: ["Buscador", "Aprendiz", "Iniciado", "Adepto", "Maestro de rituales"],
+  e: ["En búsqueda", "Aprendiz", "En iniciación", "En el grado adepto", "Maestría de rituales"],
+};
+
+/**
+ * El grado del camino de iniciación según las llaves que tiene (de 7): Buscador (0), Aprendiz (1–2), Iniciado (3–4),
+ * Adepto (5–6) y, con las siete, Maestra o Maestro de rituales del Primer Círculo. Es simbólico: un camino de aprendizaje.
+ */
+export function grado(llaves: number, trato: Trato | null | undefined, total = 7) {
+  const t = trato ?? "e";
+  const i = llaves >= total ? 4 : llaves >= 5 ? 3 : llaves >= 3 ? 2 : llaves >= 1 ? 1 : 0;
+  return { titulo: GRADOS[t][i], nivel: i, completo: i === 4, conCirculo: i === 4 ? `${GRADOS[t][4]} del Primer Círculo` : GRADOS[t][i] };
+}

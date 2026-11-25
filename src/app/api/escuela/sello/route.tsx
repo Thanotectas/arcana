@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe } from "@/lib/escuela/servidor";
+import { grado } from "@/lib/escuela/personal";
 import { simboloDataUri } from "@/lib/marca/simbolo";
 
 /** Una vela encendida para el sello (solo cajas: lo que dibuja ImageResponse). */
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
   if (!(terminado || avance.vistaPrevia)) return NextResponse.json({ error: "sin_terminar" }, { status: 403 });
   const nombre = avance.perfil?.nombre ?? "";
   const anio = new Date().getFullYear();
+  const rango = grado(curso.lecciones.length, avance.perfil?.trato, curso.lecciones.length).conCirculo;
   const [cormorant, inter] = await Promise.all([
     readFile(join(process.cwd(), "src/app/fuentes/CormorantGaramond-SemiBold.ttf")),
     readFile(join(process.cwd(), "src/app/fuentes/Inter-Medium.ttf")),
@@ -63,7 +65,8 @@ export async function GET(request: Request) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
           <div style={{ fontFamily: "Cormorant", fontSize: 74, color: "#b7a5ff" }}>Cerré mi ciclo</div>
           {nombre && <div style={{ fontFamily: "Cormorant", fontSize: nombre.length > 16 ? 120 : 150, lineHeight: 1, color: "#ffffff" }}>{nombre}</div>}
-          <div style={{ fontFamily: "Cormorant", fontSize: 44, color: "#ece6f7", textAlign: "center" }}>{`7 días para cerrar el año · ${anio}`}</div>
+          <div style={{ fontFamily: "Cormorant", fontSize: 44, color: "#ece6f7", textAlign: "center" }}>{rango}</div>
+          <div style={{ fontSize: 28, color: "#a89fc0", letterSpacing: 3 }}>{`7 llaves · 7 días para cerrar el año · ${anio}`}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 26 }}>
           {altos.map((a, i) => <Vela key={i} alto={a} />)}

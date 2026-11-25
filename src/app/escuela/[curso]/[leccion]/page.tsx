@@ -5,9 +5,10 @@ import { AlertTriangle, ChevronLeft, ChevronRight, Clapperboard, ExternalLink, F
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, lecturasDelCurso } from "@/lib/escuela/servidor";
-import { conNombre, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
+import { conNombre, grado, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
 import { textoPaso } from "@/lib/escuela/tipos";
 import { Altar } from "@/components/escuela/Altar";
+import { EscucharTexto } from "@/components/escuela/EscucharTexto";
 import { ModoRitual } from "@/components/escuela/ModoRitual";
 import { TestLeccion } from "@/components/escuela/TestLeccion";
 
@@ -49,6 +50,12 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
   const hayVela = leccion.bloques.some((b) => b.tipo === "ritual" && b.herramienta?.href === "/velas");
   const vela = hayVela && perfil?.intencionVela ? tuVela(perfil.intencionVela, zona) : null;
   const primerTexto = leccion.bloques.findIndex((b) => b.tipo === "texto");
+  // El camino de iniciación: cuántas llaves tiene y a qué grado sube con la de hoy.
+  const hechas = avance.estados.filter((e) => e === "hecha").length;
+  const yaHecha = estado === "hecha";
+  const gradoAntes = grado(hechas, perfil?.trato, curso.lecciones.length);
+  const gradoDespues = grado(yaHecha ? hechas : hechas + 1, perfil?.trato, curso.lecciones.length);
+  const gradoNuevo = !yaHecha && gradoDespues.nivel !== gradoAntes.nivel ? gradoDespues.conCirculo : null;
 
   return (
     <article className="mx-auto max-w-2xl space-y-12" lang="es">
@@ -68,6 +75,10 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
             <img src="/cartas/arcana/la-sibila.webp" alt="" className="h-12 w-12 shrink-0 rounded-full border border-oro/50 object-cover object-top" />
             <p className="font-display text-xl italic leading-snug text-texto/90">«{conNombre(leccion.saludo, perfil?.nombre)}»</p>
           </div>
+          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-oro/40 bg-oro/10 px-4 py-1.5 text-sm text-oro-suave">
+            <span aria-hidden>{leccion.llave.simbolo}</span>
+            {yaHecha ? `Ya tienes la ${leccion.llave.nombre}` : `Hoy recibes la ${leccion.llave.nombre}`}
+          </p>
           <div className="pt-4 opacity-80">
             <Altar estados={avance.estados} tamano="chico" />
           </div>
@@ -89,12 +100,60 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
               <span><span className="font-display block text-lg text-texto">{b.titulo}</span>El video de Sibila de esta lección se está grabando.</span>
             </div>
           );
+        if (b.tipo === "cita")
+          return (
+            <blockquote key={k} className="relative mx-auto max-w-xl px-6 text-center">
+              <span className="absolute -top-6 left-0 font-display text-7xl leading-none text-oro/30" aria-hidden>“</span>
+              <p className="font-display text-2xl italic leading-snug text-texto/90 sm:text-3xl">{b.texto}</p>
+              <footer className="mt-3 text-xs uppercase tracking-[0.3em] text-oro-suave">— {b.origen}</footer>
+            </blockquote>
+          );
+        if (b.tipo === "saberes")
+          return (
+            <section key={k} className="space-y-6">
+              <Separador />
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Saberes de la tradición</p>
+                <h2 className="font-display text-4xl">{b.titulo}</h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {b.items.map((it, j) => (
+                  <div key={j} className="tarjeta relative overflow-hidden p-5">
+                    <span className="absolute right-4 top-3 font-display text-4xl text-oro/20" aria-hidden>{["I", "II", "III", "IV", "V", "VI"][j]}</span>
+                    <h3 className="font-display text-xl text-oro-suave">{it.titulo}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-texto/85">{it.texto}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        if (b.tipo === "tradiciones")
+          return (
+            <section key={k} className="space-y-6">
+              <Separador />
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Así se hace en el mundo</p>
+                <h2 className="font-display text-4xl">{b.titulo}</h2>
+              </div>
+              <ol className="relative space-y-5 border-s border-oro/30 ps-6">
+                {b.items.map((it, j) => (
+                  <li key={j} className="relative">
+                    <span className="absolute -start-[2.35rem] top-0 flex h-9 w-9 items-center justify-center rounded-full border border-oro/50 bg-noche text-lg" aria-hidden>{it.emoji}</span>
+                    <p className="text-xs uppercase tracking-[0.25em] text-oro-suave">{it.lugar}</p>
+                    <h3 className="font-display text-2xl">{it.nombre}</h3>
+                    <p className="mt-1 leading-relaxed text-texto/85">{it.texto}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          );
         if (b.tipo === "texto") {
           const capital = k === primerTexto;
           return (
             <section key={k} className="space-y-5">
               <Separador />
               {b.titulo && <h2 className="text-center font-display text-4xl">{b.titulo}</h2>}
+              <EscucharTexto curso={curso.slug} leccion={leccion.numero} bloque={k} />
               {b.parrafos.map((p, j) => (
                 <p key={j} className={`text-lg leading-relaxed text-texto/90 ${capital && j === 0 ? "escuela-capital" : ""}`}>{p}</p>
               ))}
@@ -137,7 +196,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
                   )
                 )}
               </div>
-              <ModoRitual curso={curso.slug} leccion={leccion.numero} titulo={b.titulo} materiales={b.materiales} pasos={b.pasos} cuidado={b.cuidado} notasIniciales={previo?.notas ?? {}} nombre={perfil?.nombre ?? null} />
+              <ModoRitual curso={curso.slug} leccion={leccion.numero} titulo={b.titulo} materiales={b.materiales} pasos={b.pasos} cuidado={b.cuidado} apertura={b.apertura} cierre={b.cierre} fondo={b.fondo} notasIniciales={previo?.notas ?? {}} nombre={perfil?.nombre ?? null} />
               <details className="tarjeta p-5">
                 <summary className="cursor-pointer font-display text-xl">Ver el ritual por escrito</summary>
                 <div className="mt-4 space-y-4">
@@ -192,7 +251,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
               <h2 className="font-display text-4xl">{b.titulo ?? "Tus preguntas de hoy"}</h2>
             </div>
             <div className="tarjeta p-6">
-              <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} />
+              <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} llave={leccion.llave} yaHecha={yaHecha} gradoNuevo={gradoNuevo} />
             </div>
           </section>
         );

@@ -5,7 +5,7 @@ import { esAdmin } from "@/lib/admin";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { esIntencion, type Intencion } from "@/lib/velas";
 import type { Json } from "@/types/database";
-import { textoPaso, type Curso, type Leccion, type PreguntaTest } from "./tipos";
+import { vozPaso, type Curso, type Leccion, type PreguntaTest } from "./tipos";
 import { narrarEscuela } from "./voz";
 
 export type EstadoLeccion = "hecha" | "abierta" | "manana" | "cerrada";
@@ -17,6 +17,7 @@ export interface PerfilAlumno {
   zona: string;
   intencionCierre: string;
   intencionVela: Intencion | null;
+  trato: "a" | "o" | "e" | null;
 }
 
 export interface LecturaCurso {
@@ -58,7 +59,7 @@ export async function avanceDe(curso: Curso, usuario: { id: string; email?: stri
   if (!usuario) return vacio;
   const admin = getSupabaseAdmin();
   const [{ data: insc }, { data: filas }] = await Promise.all([
-    admin.from("escuela_inscripciones").select("carta, carta_audio, creado_en, nombre, zona, intencion_cierre, intencion_vela").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
+    admin.from("escuela_inscripciones").select("carta, carta_audio, creado_en, nombre, zona, intencion_cierre, intencion_vela, trato").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
     admin.from("escuela_progreso").select("leccion, respuestas, comentario, comentario_audio, notas, completada_en").eq("usuario_id", usuario.id).eq("curso", curso.slug),
   ]);
   if (!insc && !vistaPrevia) return vacio;
@@ -76,7 +77,7 @@ export async function avanceDe(curso: Curso, usuario: { id: string; email?: stri
     return "manana";
   });
   const perfil: PerfilAlumno | null = insc?.nombre
-    ? { nombre: insc.nombre, zona: insc.zona || "America/Bogota", intencionCierre: insc.intencion_cierre ?? "", intencionVela: esIntencion(insc.intencion_vela) ? insc.intencion_vela : null }
+    ? { nombre: insc.nombre, zona: insc.zona || "America/Bogota", intencionCierre: insc.intencion_cierre ?? "", intencionVela: esIntencion(insc.intencion_vela) ? insc.intencion_vela : null, trato: insc.trato === "a" || insc.trato === "o" || insc.trato === "e" ? insc.trato : null }
     : null;
   return {
     inscrito: Boolean(insc),
@@ -132,10 +133,11 @@ export async function guardarPerfil(curso: Curso, usuario: { id: string }, datos
   const zona = String(datos.zona ?? "").trim();
   const zonaValida = /^[A-Za-z_]+(\/[A-Za-z0-9_+-]+){0,2}$/.test(zona) && zona.length <= 50 ? zona : "America/Bogota";
   const intencionVela = esIntencion(datos.intencionVela) ? datos.intencionVela : null;
+  const trato = datos.trato === "a" || datos.trato === "o" || datos.trato === "e" ? datos.trato : null;
   if (!nombre) return false;
   const { data } = await getSupabaseAdmin()
     .from("escuela_inscripciones")
-    .update({ nombre, zona: zonaValida, intencion_cierre: intencionCierre || null, intencion_vela: intencionVela })
+    .update({ nombre, zona: zonaValida, intencion_cierre: intencionCierre || null, intencion_vela: intencionVela, trato })
     .eq("usuario_id", usuario.id)
     .eq("curso", curso.slug)
     .select("curso");
@@ -151,21 +153,32 @@ export async function guardarNota(curso: Curso, leccion: Leccion, usuario: { id:
   else await admin.from("escuela_progreso").insert({ usuario_id: usuario.id, curso: curso.slug, leccion: leccion.numero, notas: notas as Json, intentos: 0 });
 }
 
-/** El paso del ritual en la voz de Sibila: el mismo audio para todas las personas (se narra la primera vez). */
-export async function audioPaso(curso: Curso, leccion: Leccion, paso: number) {
-  const ritual = leccion.bloques.find((b) => b.tipo === "ritual");
-  if (!ritual || ritual.tipo !== "ritual") return null;
-  const p = ritual.pasos[paso];
-  if (p === undefined) return null;
-  const texto = textoPaso(p) + (typeof p !== "string" && p.ayuda ? ` ${p.ayuda}` : "");
+/** Un texto del curso en la voz de Sibila, el mismo audio para todas las personas (se narra la primera vez). */
+async function audioCompartido(curso: Curso, leccion: Leccion, parte: string, texto: string) {
   const huella = createHash("sha1").update(texto).digest("hex").slice(0, 12);
-  const clave = `${curso.slug}:${leccion.numero}:${paso}:${huella}`;
+  const clave = `${curso.slug}:${leccion.numero}:${parte}:${huella}`;
   const admin = getSupabaseAdmin();
   const { data: hecho } = await admin.from("escuela_audios").select("url").eq("clave", clave).maybeSingle();
   if (hecho) return hecho.url;
   const url = await narrarEscuela(texto);
   if (url) await admin.from("escuela_audios").upsert({ clave, url }, { onConflict: "clave", ignoreDuplicates: true });
   return url;
+}
+
+/** La voz de Sibila en el ritual guiado: la apertura (-1), cada paso (0…) o el cierre (-2). */
+export async function audioPaso(curso: Curso, leccion: Leccion, paso: number) {
+  const ritual = leccion.bloques.find((b) => b.tipo === "ritual");
+  if (!ritual || ritual.tipo !== "ritual") return null;
+  const texto = paso === -1 ? ritual.apertura : paso === -2 ? ritual.cierre : ritual.pasos[paso] !== undefined ? vozPaso(ritual.pasos[paso]) : undefined;
+  if (!texto) return null;
+  return audioCompartido(curso, leccion, paso === -1 ? "apertura" : paso === -2 ? "cierre" : String(paso), texto);
+}
+
+/** Un texto de la lección leído por Sibila («Escuchar la lección»). */
+export async function audioTexto(curso: Curso, leccion: Leccion, bloque: number) {
+  const b = leccion.bloques[bloque];
+  if (!b || b.tipo !== "texto") return null;
+  return audioCompartido(curso, leccion, `texto${bloque}`, [b.titulo, ...b.parrafos].filter(Boolean).join("… "));
 }
 
 /** Las lecturas que la persona hizo desde que se inscribió (las entregas del curso), la más reciente de cada tipo. */
@@ -280,7 +293,7 @@ export async function cartaDeCierre(curso: Curso, usuario: { id: string }, perfi
     .join("\n\n");
   const carta = await generarTexto(
     `Esto es lo que la persona compartió durante los siete días del curso «${curso.titulo}»:${contexto(perfil)}\n\n${compartido || "(no escribió respuestas abiertas)"}`,
-    "Eres Sibila. Escribe la carta de cierre de ciclo para esta persona que terminó el curso de rituales: 3 o 4 párrafos cálidos, en segunda persona, que recojan lo que quiso cerrar, lo que soltó, lo que agradece y lo que quiere sembrar, con imágenes de la tradición (la vela, el agua, el humo, la semilla). Si sabes su nombre, empieza la carta con él. Escribe para ser leída en voz alta: sin títulos, listas ni emojis. Termina con una bendición sencilla para el año nuevo y firma «Sibila». Nada de promesas de resultados, salud ni dinero; no inventes datos que no estén en lo que compartió.",
+    "Eres Sibila. Escribe la carta de cierre de ciclo para esta persona que terminó el curso de rituales: 3 o 4 párrafos cálidos, en segunda persona, que recojan lo que quiso cerrar, lo que soltó, lo que agradece y lo que quiere sembrar, con imágenes de la tradición (la vela, el agua, el humo, la semilla). Si sabes su nombre, empieza la carta con él. Con estos siete días recibió las siete llaves y llega al grado de Maestra o Maestro de rituales del Primer Círculo (o «Maestría», si no usa género): reconócelo con solemnidad y ternura, como una iniciación simbólica, sin prometer poderes. Escribe para ser leída en voz alta: sin títulos, listas ni emojis. Termina con una bendición sencilla para el año nuevo y firma «Sibila». Nada de promesas de resultados, salud ni dinero; no inventes datos que no estén en lo que compartió.",
     { effort: "low", maxTokens: 1500, nivel: "estandar", idioma: "es" },
   );
   // La carta de cierre siempre va con la voz de Sibila (si la voz falla, queda el texto).

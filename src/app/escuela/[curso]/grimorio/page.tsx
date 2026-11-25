@@ -4,7 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, lecturasDelCurso } from "@/lib/escuela/servidor";
-import { NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { grado, NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { Llavero } from "@/components/escuela/Llavero";
 import { textoPaso } from "@/lib/escuela/tipos";
 import { Altar } from "@/components/escuela/Altar";
 import { AccionesGrimorio } from "@/components/escuela/AccionesGrimorio";
@@ -29,6 +30,7 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
   const tipos = curso.lecciones.flatMap((l) => l.bloques.flatMap((b) => (b.tipo === "entrega" ? [b.lectura] : [])));
   const lecturas = await lecturasDelCurso(usuario.id, avance.inscritoEn, tipos);
   const terminado = avance.estados.every((e) => e === "hecha");
+  const miGrado = grado(avance.estados.filter((e) => e === "hecha").length, perfil?.trato, curso.lecciones.length);
 
   return (
     <article className="grimorio mx-auto max-w-2xl space-y-12" lang="es">
@@ -53,8 +55,10 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
           <p className="text-xs uppercase tracking-[0.4em] text-oro-suave">Grimorio</p>
           <h1 className="font-display text-5xl font-semibold leading-tight sm:text-6xl">{perfil?.nombre ? `El libro de ${perfil.nombre}` : "Tu libro"}</h1>
           <p className="font-display text-2xl italic text-violeta-suave">{curso.titulo}</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">{miGrado.conCirculo}</p>
           <p className="text-sm text-texto-suave">{fecha(avance.inscritoEn, zona)}{terminado ? " · camino completo ✦" : ""}</p>
           <div className="pt-4"><Altar estados={avance.estados} tamano="chico" /></div>
+          <Llavero llaves={curso.lecciones.map((l) => l.llave)} ganadas={avance.estados.map((e) => e === "hecha")} compacto />
         </div>
       </header>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { audioCarta, audioComentario, audioPaso, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, inscribir } from "@/lib/escuela/servidor";
+import { audioCarta, audioComentario, audioPaso, audioTexto, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, inscribir } from "@/lib/escuela/servidor";
 
 // El comentario de Sibila, su voz y la carta de cierre tardan unos segundos.
 export const maxDuration = 120;
@@ -59,6 +59,14 @@ export async function POST(request: Request) {
   if (cuerpo.accion === "paso") {
     const audio = await audioPaso(curso, leccion, Number(cuerpo.paso)).catch((e) => {
       console.error("[escuela] voz del paso:", e instanceof Error ? e.message : e);
+      return null;
+    });
+    return NextResponse.json({ ok: Boolean(audio), audio });
+  }
+
+  if (cuerpo.accion === "texto") {
+    const audio = await audioTexto(curso, leccion, Number(cuerpo.bloque)).catch((e) => {
+      console.error("[escuela] voz de la lección:", e instanceof Error ? e.message : e);
       return null;
     });
     return NextResponse.json({ ok: Boolean(audio), audio });
