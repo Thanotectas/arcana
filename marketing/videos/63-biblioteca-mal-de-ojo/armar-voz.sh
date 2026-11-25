@@ -1,15 +1,26 @@
 #!/usr/bin/env bash
 # Video 63 · Biblioteca de Sibila #3 · El mal de ojo, CON LA VOZ DE SIBILA (ElevenLabs, Marcela, voz/<idioma>.mp3).
 # Los tramos de imagen y los títulos siguen los tiempos de la voz (medidos con faster-whisper).
-# Uso: armar-voz.sh <salida.mp4> <idioma: es | tr | ar>
+# Uso: armar-voz.sh <salida.mp4> <idioma: es | pt | en | fr | tr | ar>
 set -euo pipefail
 SALIDA="$1"; IDIOMA="$2"; DIR="$(cd "$(dirname "$0")" && pwd)"; T="$(mktemp -d)"
+# Momentos de la voz (s, medidos con faster-whisper): Grecia, Turquía, «el nazar», África, Latinoamérica, «Tres caminos», cierre, fin
 case "$IDIOMA" in
- # tramos: museo nazar bazar khamsa huevo abuela | títulos: fin del título, 6 ventanas, inicio del cierre
- es) TRAMOS="16.2 6.2 2.4 6.5 6.4 10.8"; CAPAS="8.3,8.5,16.1,16.4,22.3,22.5,24.7,25,31.2,31.5,37.6,37.9,42,42.2";;
- tr) TRAMOS="14.3 5.4 2.4 4.6 7.1 9.2";  CAPAS="6.6,6.8,14.2,14.5,19.6,19.8,22,22.3,26.6,26.9,33.7,34,37.4,37.5";;
- ar) TRAMOS="16.4 6.1 2.7 6.6 7.5 10.2"; CAPAS="7.2,7.3,16.3,16.6,22.4,22.6,25.1,25.4,31.7,32,39.2,39.5,43.4,43.5";;
+ es) M="8.2 15.76 21.9 24.16 30.6 36.76 41.22 46.48";;
+ tr) M="6.74 14.04 19.36 21.76 26.4 33.76 37.44 43.36";;
+ ar) M="7.08 15.8 22.42 25.1 31.78 38.66 43.18 49.84";;
+ en) M="7.62 15.06 20.1 23.4 29.5 36.42 41.24 45.92";;
+ fr) M="7.98 14.56 19.66 22.76 28.08 34.52 38.68 43.12";;
+ pt) M="7.78 15.04 20.84 23.34 29.0 35.08 39.58 45.76";;
 esac
+# Tramos de imagen (museo nazar bazar khamsa huevo abuela) y ventanas de los títulos, a partir de esos momentos
+read -r TRAMOS CAPAS <<< "$(python3 -c "
+g,t,n,a,l,r,c,e=map(float,'$M'.split())
+cortes=[0,t-.3,n-.3,a-.3,l-.3,r-.3,e+.8]
+tr=' '.join(f'{cortes[i+1]-cortes[i]:.2f}' for i in range(6))
+v=[g-.3,g-.1,t-.4,t-.1,n-.4,n-.1,a-.4,a-.1,l-.4,l-.1,r-.4,r-.1,c-.3,c-.2]
+print(tr.replace(' ','_'),','.join(f'{x:.2f}' for x in v))")"
+TRAMOS="${TRAMOS//_/ }"
 F=$(python3 -c "print(round(sum(map(float,'$TRAMOS'.split())),2))")
 "$DIR/base.sh" "$T/base.mp4" $TRAMOS >/dev/null
 NODE_PATH="$(npm root -g)" node "$DIR/cuadros.cjs" "$DIR/capas.html#$IDIOMA,v,$CAPAS" "$T/c" "$F"

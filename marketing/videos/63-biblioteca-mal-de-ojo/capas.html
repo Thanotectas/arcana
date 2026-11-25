@@ -28,18 +28,30 @@ body.ar .t .frase{font-size:72px}
 <script>
 // Tramos de la base (base.sh): museo 0–6.5 · nazar 6.5–12.5 · bazar 12.5–16 · khamsa 16–20.5 · huevo 20.5–27 · abuela 27–35
 const T={
- es:{serie:"BIBLIOTECA DE SIBILA · #3",titulo:"El mal de ojo",sub:"una de las creencias más antiguas del mundo",lema:"SIBILA TE LEE",
-  c:[["Grecia y Roma","La mirada que pesa"],["Turquía","El nazar: el ojo que devuelve la mirada"],["","En casas, autos y cunas"],
+ es:{serie:"EL ARCANO DE SIBILA · #3",titulo:"El mal de ojo",sub:"una de las creencias más antiguas del mundo",lema:"SIBILA TE LEE",
+  c:[["Grecia y Roma","La mirada que pesa"],["Turquía","El nazar: el ojo que devuelve la mirada"],["","En puertas, autos y cunas"],
      ["Norte de África y Oriente Medio","La khamsa cuida la entrada"],["Latinoamérica","La abuela pasa el huevo y lee el vaso"],["","Tres caminos,<br>una misma idea:<br>cuidar a los que queremos"]],
   cta1:"¿Hiciste tu limpia?<br>Sibila lee tu vaso 🔮",cta2:"miarcana.com/huevo"},
- tr:{serie:"SİBİLA'NIN KÜTÜPHANESİ · #3",titulo:"Nazar",sub:"dünyanın en eski inançlarından biri",lema:"SİBİLA SENİ OKUR",
-  c:[["Yunan ve Roma","Ağır gelen bakış"],["Türkiye","Nazar boncuğu: bakışı geri çeviren göz"],["","Evlerde, arabalarda, beşiklerde"],
+ pt:{serie:"O ARCANO DE SIBILA · #3",titulo:"Mau-olhado",sub:"uma das crenças mais antigas do mundo",lema:"SIBILA LÊ PRA VOCÊ",
+  c:[["Grécia e Roma","O olhar que pesa"],["Turquia","O nazar: o olho que devolve o olhar"],["","Nas portas, nos carros, nos berços"],
+     ["Norte da África e Oriente Médio","A khamsa protege a entrada"],["América Latina","A avó passa o ovo e lê o copo"],["","Três caminhos,<br>uma mesma ideia:<br>cuidar de quem a gente ama"]],
+  cta1:"Fez a sua limpeza?<br>Sibila lê o seu copo 🔮",cta2:"miarcana.com/pt/huevo"},
+ en:{serie:"SIBILA'S ARCANUM · #3",titulo:"The evil eye",sub:"one of the oldest beliefs in the world",lema:"SIBILA READS YOU",
+  c:[["Greece and Rome","The heavy gaze"],["Turkey","The nazar: the eye that returns the gaze"],["","On doors, in cars, over cribs"],
+     ["North Africa and the Middle East","The khamsa guards the door"],["Latin America","Grandmother passes the egg and reads the glass"],["","Three paths,<br>one same idea:<br>caring for the ones we love"]],
+  cta1:"Had your coffee?<br>Sibila reads your cup ☕🔮",cta2:"miarcana.com/en/cafe"},
+ fr:{serie:"L'ARCANE DE SIBILA · #3",titulo:"Le mauvais œil",sub:"l'une des croyances les plus anciennes du monde",lema:"SIBILA TE LIT",
+  c:[["Grèce et Rome","Le regard qui pèse"],["Turquie","Le nazar : l'œil qui renvoie le regard"],["","Aux portes, dans les voitures, sur les berceaux"],
+     ["Afrique du Nord et Moyen-Orient","La khamsa garde l'entrée"],["Amérique latine","La grand-mère passe l'œuf et lit le verre"],["","Trois chemins,<br>une même idée :<br>prendre soin de ceux qu'on aime"]],
+  cta1:"Tu as bu ton café ?<br>Sibila lit ta tasse ☕🔮",cta2:"miarcana.com/fr/cafe"},
+ tr:{serie:"SİBİLA'NIN SIRLARI · #3",titulo:"Nazar",sub:"dünyanın en eski inançlarından biri",lema:"SİBİLA SENİ OKUR",
+  c:[["Yunan ve Roma","Ağır gelen bakış"],["Türkiye","Nazar boncuğu: bakışı geri çeviren göz"],["","Kapılarda, arabalarda, beşiklerde"],
      ["Kuzey Afrika ve Orta Doğu","Hamsa kapıyı bekler"],["Latin Amerika","Büyükanne yumurtayı gezdirir, bardağı okur"],["","Üç yol, tek bir fikir:<br>sevdiklerimizi kollamak"]],
-  cta1:"Yumurta bardağını<br>Sibila okusun 🔮",cta2:"miarcana.com/tr/huevo"},
- ar:{serie:"مكتبة سيبيلا · \u2066#3\u2069",titulo:"العين",sub:"من أقدم المعتقدات في العالم",lema:"سيبيلا تقرأ لك",rtl:true,
-  c:[["اليونان وروما","النظرة الثقيلة"],["تركيا","النَّظَر: العين التي تردّ النظرة"],["","في البيوت والسيارات والمهود"],
+  cta1:"Kahveni içtin mi?<br>Fincanını Sibila okusun ☕",cta2:"miarcana.com/tr/cafe"},
+ ar:{serie:"أسرار سيبيلا · \u2066#3\u2069",titulo:"العين",sub:"من أقدم المعتقدات في العالم",lema:"سيبيلا تقرأ لك",rtl:true,
+  c:[["اليونان وروما","النظرة الثقيلة"],["تركيا","النَّظَر: العين التي تردّ النظرة"],["","على الأبواب وفي السيارات وفوق المهود"],
      ["شمال أفريقيا والشرق الأوسط","الخمسة تحرس المدخل"],["أمريكا اللاتينية","الجدّة تمرّر البيضة وتقرأ الكأس"],["","ثلاث طرق وفكرة واحدة:<br>أن نرعى من نحب"]],
-  cta1:"هل جرّبت البيضة؟<br>سيبيلا تقرأ كأسك 🔮",cta2:"miarcana.com/ar/huevo"},
+  cta1:"شربت قهوتك؟<br>سيبيلا تقرأ فنجانك ☕🔮",cta2:"miarcana.com/ar/cafe"},
 };
 // Hash: «idioma» (sin voz) o «idioma,v,fin del título,ini1,fin1,…,ini6,fin6,inicio del cierre» (con voz, a los tiempos de la voz)
 const H=(location.hash.slice(1)||"es").split(",");const LANG=H[0];const L=T[LANG];const VOZ=H[1]==="v";
