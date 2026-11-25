@@ -6,7 +6,20 @@ import { alternativas } from "@/lib/i18n/rutas";
 import { Migas } from "@/components/seo/BloquesSeo";
 import { IconoCatalogo } from "@/components/IconoCatalogo";
 import type { IconoCatalogo as ClaveIcono } from "@/lib/catalogo";
-import { BIBLIOTECA, fichaEn } from "@/lib/biblioteca/fichas";
+import type { Idioma } from "@/lib/i18n/idiomas";
+import { fichaEn, fichasDeIdioma } from "@/lib/biblioteca/fichas";
+
+/** Lo que se ve cuando todavía no hay fichas en el idioma de quien entra. */
+const PRONTO: Record<Idioma, string> = {
+  es: "Muy pronto, nuevas tradiciones.",
+  en: "New traditions are coming very soon in English.",
+  pt: "Em breve, novas tradições em português.",
+  fr: "Très bientôt, de nouvelles traditions en français.",
+  tr: "Çok yakında Türkçe yeni gelenekler.",
+  ar: "قريبًا جدًا، تقاليد جديدة بالعربية.",
+  id: "Segera hadir, tradisi baru dalam bahasa Indonesia.",
+  hi: "जल्द ही, हिंदी में नई परंपराएँ।",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -19,7 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
 /** Portada del Arcano de Sibila: una ficha por práctica, la más reciente primero. */
 export default async function PaginaBiblioteca() {
   const idioma = await getIdioma();
-  const entradas = [...BIBLIOTECA].sort((a, b) => b.publicada.localeCompare(a.publicada));
+  // Cada quien ve solo las fichas de su idioma (no los videos de todos los idiomas).
+  const entradas = fichasDeIdioma(idioma);
   return (
     <div className="mx-auto max-w-4xl space-y-10">
       <Migas items={[{ nombre: "Inicio", href: "/" }, { nombre: "El Arcano de Sibila", href: "/biblioteca" }]} />
@@ -31,6 +45,7 @@ export default async function PaginaBiblioteca() {
           cómo se hace y qué dicen sus símbolos. Una nueva tradición cada día.
         </p>
       </header>
+      {entradas.length === 0 && <p className="text-center text-texto-suave">{PRONTO[idioma]}</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         {entradas.map((e) => {
           const f = fichaEn(e, idioma);

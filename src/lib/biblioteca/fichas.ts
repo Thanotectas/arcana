@@ -30,7 +30,7 @@ export interface EntradaBiblioteca {
   /** Fecha de publicación (AAAA-MM-DD). */
   publicada: string;
   fuentes: { titulo: string; url: string }[];
-  /** Video de la ficha por idioma (en /public/arcano, versión liviana); si falta el del idioma, el de español. */
+  /** Video de la ficha por idioma (en /public/arcano, versión liviana); quien entra en otro idioma no lo ve. */
   videos?: Partial<Record<Idioma, string>> & { es: string };
   /** Imagen del video (portada y miniatura). */
   portada?: string;
@@ -410,8 +410,17 @@ export function entradaPorSlug(slug: string) {
   return BIBLIOTECA.find((e) => e.slug === slug) ?? null;
 }
 
+/** El video de la ficha en el idioma de quien la ve (sin caer en otro idioma: cada quien ve solo los de su idioma). */
 export function videoEn(e: EntradaBiblioteca, idioma: Idioma) {
-  return e.videos ? (e.videos[idioma] ?? e.videos.es) : null;
+  return e.videos?.[idioma] ?? null;
+}
+
+/** Las fichas que se muestran en El Arcano a quien entra en ese idioma: las que tienen video o texto en su idioma
+ *  (en español, todas). La más reciente primero. */
+export function fichasDeIdioma(idioma: Idioma) {
+  return BIBLIOTECA.filter((e) => idioma === "es" || Boolean(e.videos?.[idioma]) || Boolean(e.textos[idioma])).sort((a, b) =>
+    b.publicada.localeCompare(a.publicada),
+  );
 }
 
 export function fichaEn(e: EntradaBiblioteca, idioma: Idioma): Ficha {
