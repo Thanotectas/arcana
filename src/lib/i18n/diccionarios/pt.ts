@@ -880,7 +880,7 @@ export const pt: Diccionario = {
       verOferta: "Ver a oferta",
       correo: "Preço de fundadores: Círculo Arcana por {precio} para as primeiras pessoas. Restam {n} vagas, até 31 de outubro.",
     },
-    monedaLocal: { etiqueta: "Ver preços aproximados em", nota: "A cobrança é em pesos colombianos; seu banco faz a conversão, então pode variar um pouco.", cobro: "cobrado como" },
+    monedaLocal: { etiqueta: "Ver preços aproximados em", nota: "A cobrança é em pesos colombianos; seu banco faz a conversão, então pode variar um pouco.", notaUSD: "A cobrança é em dólares pelo PayPal; o valor na sua moeda é aproximado e a conversão final é feita pelo PayPal ou pelo seu banco.", cobro: "cobrado como" },
     internacional: {
       notaPesos: "De fora da Colômbia você paga em pesos colombianos com seu cartão Visa ou Mastercard; seu banco faz a conversão e, se o seu cartão permitir, a Bold oferece cobrar na sua própria moeda. Os valores em dólares são aproximados.",
       nota: "Pagamento internacional em dólares com PayPal: com sua conta PayPal ou cartão, de qualquer país.",

@@ -22,7 +22,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { COOKIE_CODIGO, normalizarCodigo, validarCodigo } from "@/lib/pagos/codigos";
 import { Ticket } from "lucide-react";
 import { tasasDelDia } from "@/lib/monedas";
-import { PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
+import { PrecioDolares, PrecioPrincipal, ProveedorMoneda, SelectorMoneda, TextoTresMonedas } from "@/components/PreciosLocales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -48,7 +48,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   // En dólares, el precio va ajustado al país (paridad de poder adquisitivo: India, Indonesia, África, Turquía…).
   const usd = (centavos: number) => precioUSDPara(centavos, pais);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) =>
-    internacional ? formatoUSD(usd(p.precioUSDCentavos)) : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
+    internacional ? <PrecioDolares usdCentavos={usd(p.precioUSDCentavos)} /> : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
     return (
@@ -98,7 +98,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
         ) : null}
       </p>
 
-      {!internacional && <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={t.creditos.monedaLocal.nota} idioma={idioma} />}
+      <SelectorMoneda etiqueta={t.creditos.monedaLocal.etiqueta} nota={internacional ? t.creditos.monedaLocal.notaUSD : t.creditos.monedaLocal.nota} idioma={idioma} />
 
       <form method="get" action="/creditos" className={`tarjeta flex flex-wrap items-center gap-3 p-4 ${codigo?.valido ? "border-oro/50" : ""}`}>
         {moneda && <input type="hidden" name="moneda" value={moneda} />}

@@ -883,7 +883,7 @@ export const en: Diccionario = {
       verOferta: "See the offer",
       correo: "Founders price: Arcana Circle for {precio} for the first people. {n} spots left, until October 31.",
     },
-    monedaLocal: { etiqueta: "See approximate prices in", nota: "You're charged in Colombian pesos; your bank does the conversion, so it may vary slightly.", cobro: "charged as" },
+    monedaLocal: { etiqueta: "See approximate prices in", nota: "You're charged in Colombian pesos; your bank does the conversion, so it may vary slightly.", notaUSD: "You're charged in US dollars through PayPal; the amount in your currency is approximate and PayPal or your bank does the final conversion.", cobro: "charged as" },
     internacional: {
       notaPesos: "From outside Colombia you pay in Colombian pesos with your Visa or Mastercard; your bank does the conversion and, if your card allows it, Bold offers to charge you in your own currency. Dollar amounts are approximate.",
       nota: "International payment in US dollars with PayPal: use your PayPal account or a card, from any country.",

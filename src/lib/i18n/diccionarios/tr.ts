@@ -882,7 +882,7 @@ export const tr: Diccionario = {
       verOferta: "Teklifi gör",
       correo: "Kurucu fiyatı: ilk gelenlere Arcana Çemberi {precio}. Kalan yer: {n}, 31 Ekim'e kadar.",
     },
-    monedaLocal: { etiqueta: "Yaklaşık fiyatları şu para biriminde gör:", nota: "Ödeme Kolombiya pesosu ile alınır; dönüşümü bankan yapar, bu yüzden biraz farklılık gösterebilir.", cobro: "tahsil edilen:" },
+    monedaLocal: { etiqueta: "Yaklaşık fiyatları şu para biriminde gör:", nota: "Ödeme Kolombiya pesosu ile alınır; dönüşümü bankan yapar, bu yüzden biraz farklılık gösterebilir.", notaUSD: "Ödeme PayPal üzerinden ABD doları ile alınır; kendi para birimindeki tutar yaklaşıktır, son dönüşümü PayPal ya da bankan yapar.", cobro: "tahsil edilen:" },
     internacional: {
       notaPesos: "Kolombiya dışından Visa ya da Mastercard kartınla Kolombiya pesosu olarak ödersin; dönüşümü bankan yapar ve kartın izin veriyorsa Bold sana kendi para biriminde ödeme seçeneği sunar. Dolar tutarları yaklaşıktır.",
       nota: "PayPal ile ABD doları cinsinden uluslararası ödeme: her ülkeden PayPal hesabınla ya da kartla.",

@@ -882,7 +882,7 @@ export const es = {
       verOferta: "Ver la oferta",
       correo: "Precio de fundadores: Círculo Arcana a {precio} para las primeras personas. Quedan {n} cupos, hasta el 31 de octubre.",
     },
-    monedaLocal: { etiqueta: "Ver precios aproximados en", nota: "Se cobra en pesos colombianos; tu banco hace la conversión, así que puede variar un poco.", cobro: "se cobra" },
+    monedaLocal: { etiqueta: "Ver precios aproximados en", nota: "Se cobra en pesos colombianos; tu banco hace la conversión, así que puede variar un poco.", notaUSD: "Se cobra en dólares con PayPal; el valor en tu moneda es aproximado y la conversión final la hace PayPal o tu banco.", cobro: "se cobra" },
     internacional: {
       notaPesos: "Desde fuera de Colombia pagas en pesos colombianos con tu tarjeta Visa o Mastercard; tu banco hace la conversión y, si tu tarjeta lo permite, Bold te ofrece pagar en tu propia moneda. Los valores en dólares son aproximados.",
       nota: "Pago internacional en dólares con PayPal: con tu cuenta PayPal o con tarjeta, desde cualquier país.",

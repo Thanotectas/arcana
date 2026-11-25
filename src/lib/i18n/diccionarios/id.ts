@@ -880,7 +880,7 @@ export const id: Diccionario = {
       verOferta: "Lihat penawaran",
       correo: "Harga pendiri: Arcana Circle seharga {precio} untuk orang-orang pertama. Tersisa {n} tempat, sampai 31 Oktober.",
     },
-    monedaLocal: { etiqueta: "Lihat perkiraan harga dalam", nota: "Kamu ditagih dalam peso Kolombia; bankmu yang melakukan konversi, jadi jumlahnya bisa sedikit berbeda.", cobro: "ditagih sebesar" },
+    monedaLocal: { etiqueta: "Lihat perkiraan harga dalam", nota: "Kamu ditagih dalam peso Kolombia; bankmu yang melakukan konversi, jadi jumlahnya bisa sedikit berbeda.", notaUSD: "Kamu ditagih dalam dolar AS lewat PayPal; jumlah dalam mata uangmu adalah perkiraan dan konversi akhirnya dilakukan PayPal atau bankmu.", cobro: "ditagih sebesar" },
     internacional: {
       notaPesos: "Dari luar Kolombia, kamu membayar dalam peso Kolombia dengan Visa atau Mastercard; bankmu yang melakukan konversi dan, jika kartumu memungkinkan, Bold menawarkan penagihan dalam mata uangmu sendiri. Jumlah dalam dolar bersifat perkiraan.",
       nota: "Pembayaran internasional dalam dolar AS dengan PayPal: pakai akun PayPal atau kartu, dari negara mana pun.",
