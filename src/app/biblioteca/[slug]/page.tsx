@@ -74,7 +74,7 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
         </section>
       )}
 
-      <CtaLectura titulo={f.cta.titulo} texto={f.cta.texto} href={e.href} boton={f.cta.boton} />
+      <CtaLectura titulo={f.cta.titulo} texto={f.cta.texto} href={e.hrefs?.[idioma] ?? e.href} boton={f.cta.boton} />
 
       <Preguntas items={f.preguntas} />
 

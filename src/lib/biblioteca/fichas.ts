@@ -25,6 +25,8 @@ export interface EntradaBiblioteca {
   clave: string;
   /** Página donde Sibila hace la lectura. */
   href: string;
+  /** Página de lectura por idioma, cuando cambia según la tradición de quien lee (si falta, `href`). */
+  hrefs?: Partial<Record<Idioma, string>>;
   /** Fecha de publicación (AAAA-MM-DD). */
   publicada: string;
   fuentes: { titulo: string; url: string }[];
@@ -300,6 +302,104 @@ export const BIBLIOTECA: EntradaBiblioteca[] = [
           titulo: "¿Te leo la taza?",
           texto: "Prepara tu café, voltea la taza, toma una foto y Sibila te lee los símbolos que dejó la borra: lo que viene, lo que se está formando y el deseo que pediste.",
           boton: "Leer mi taza de café",
+        },
+      },
+    },
+  },
+  {
+    slug: "mal-de-ojo",
+    clave: "huevo",
+    href: "/huevo",
+    // En español y portugués, la limpia con huevo; en Turquía, el mundo árabe y el resto, la lectura del café.
+    hrefs: { en: "/cafe", fr: "/cafe", tr: "/cafe", ar: "/cafe", id: "/cafe", hi: "/cafe" },
+    videos: {
+      es: "/arcano/mal-de-ojo-es.mp4",
+      pt: "/arcano/mal-de-ojo-pt.mp4",
+      en: "/arcano/mal-de-ojo-en.mp4",
+      fr: "/arcano/mal-de-ojo-fr.mp4",
+      tr: "/arcano/mal-de-ojo-tr.mp4",
+      ar: "/arcano/mal-de-ojo-ar.mp4",
+    },
+    portada: "/arcano/mal-de-ojo.jpg",
+    publicada: "2026-11-25",
+    fuentes: [
+      { titulo: "Wikipedia: Mal de ojo", url: "https://es.wikipedia.org/wiki/Mal_de_ojo" },
+      { titulo: "Wikipedia: Evil eye", url: "https://en.wikipedia.org/wiki/Evil_eye" },
+      { titulo: "Wikipedia: Nazar (amulet)", url: "https://en.wikipedia.org/wiki/Nazar_(amulet)" },
+      { titulo: "Wikipedia: Hamsa", url: "https://en.wikipedia.org/wiki/Hamsa" },
+      { titulo: "Wikipedia: Eye-cup (copas con ojos de la Grecia antigua)", url: "https://en.wikipedia.org/wiki/Eye-cup" },
+      { titulo: "Wikipedia: Fascinus (el amuleto romano)", url: "https://en.wikipedia.org/wiki/Fascinus" },
+    ],
+    textos: {
+      es: {
+        titulo: "El mal de ojo: el nazar, la khamsa y la limpia con huevo",
+        descripcion:
+          "El mal de ojo es una de las creencias más antiguas del mundo. Su historia desde Grecia y Roma, el ojo azul turco (nazar), la mano abierta de África del Norte y Oriente Medio (khamsa) y la limpia con huevo de Latinoamérica.",
+        nombres: "Mal de ojo · Nazar (نظر) · Göz değmesi · العين · Ojeado · Baskanía (βασκανία) · Fascinatio",
+        entrada:
+          "Un ojo azul de vidrio que cuelga en la puerta de una casa en Estambul. Una mano abierta de bronce en una puerta de la medina de Fez. Una abuela que pasa un huevo despacio por la cabeza de su nieto en Guadalajara. Son tres gestos distintos, en tres lenguas distintas, para una misma idea: que una mirada cargada de envidia puede pesar, y que a los que queremos hay que cuidarlos.",
+        secciones: [
+          {
+            titulo: "Una creencia tan antigua como la mirada",
+            parrafos: [
+              "La idea de que una mirada puede hacer daño aparece en casi todo el Mediterráneo, en Oriente Medio, en Asia del Sur y en Latinoamérica. Casi siempre nace del mismo lugar: la admiración que se vuelve envidia. Por eso el mal de ojo se teme más sobre lo que brilla: un bebé sano, una casa nueva, una cosecha buena, un amor que empieza.",
+              "Los griegos lo llamaban baskanía, y en el siglo VI antes de Cristo pintaban grandes pares de ojos en las copas de beber, las llamadas «copas de ojos». Los romanos hablaban de fascinatio y de invidia, y colgaban amuletos, el fascinus, en el cuello de los niños y en las puertas. El escritor Plutarco dedicó una de sus «charlas de sobremesa» a discutir por qué algunas personas parecían tener la mirada pesada.",
+            ],
+          },
+          {
+            titulo: "Turquía: el nazar, el ojo que devuelve la mirada",
+            parrafos: [
+              "Nazar es una palabra árabe que quiere decir «mirada», y en turco nazar boncuğu es la «cuenta contra la mirada»: un ojo de vidrio azul oscuro, con círculos blanco, celeste y negro. El vidrio en forma de ojo es muy antiguo en el Mediterráneo, y en la Turquía de hoy el ojo azul está en todas partes: en la puerta de las casas, en el espejo del auto, en la ropa de los bebés y en la entrada de las tiendas.",
+              "La tradición dice que el ojo azul recibe la mirada en lugar de la persona: la «devuelve». Y cuando una cuenta se rompe sin motivo, se dice que hizo su trabajo y se cambia por una nueva. Junto al nazar viven las palabras: maşallah («lo que Dios ha querido») se dice al elogiar a un niño o una casa, para que la admiración no se vuelva envidia.",
+            ],
+          },
+          {
+            titulo: "África del Norte y Oriente Medio: la khamsa cuida la entrada",
+            parrafos: [
+              "Khamsa (خمسة) quiere decir «cinco» en árabe: es la mano abierta, con sus cinco dedos, que se ve en las puertas, en los collares, en las paredes y en los regalos de boda desde Marruecos hasta el Levante. Muchas veces lleva un ojo en la palma. En el Magreb se la llama también khmisa, y la expresión «khamsa fi ‘aynek» («cinco en tu ojo») acompaña el gesto de mostrar la mano abierta ante una mirada pesada.",
+              "La mano abierta es un signo de protección compartido por pueblos y religiones de la región: en las comunidades judías sefardíes y mizrajíes se la llama «mano de Miriam», y entre cristianos del Levante, «mano de María». El nombre «mano de Fátima» se popularizó en francés en la época colonial. En el mundo árabe también se cuida con la palabra: ma sha’ Allah (ما شاء الله) se dice ante algo hermoso, igual que en Turquía.",
+            ],
+          },
+          {
+            titulo: "Latinoamérica: el ojeado, el azabache y la limpia con huevo",
+            parrafos: [
+              "En Latinoamérica el mal de ojo es sobre todo cosa de bebés: se dice que un niño «está ojeado» cuando alguien lo miró mucho o lo elogió sin tocarlo. Por eso las abuelas les ponen una pulsera de hilo rojo o una manito de azabache, la piedra negra que llegó de España, y por eso en muchas familias quien elogia a un bebé lo toca enseguida, «para que no le haga ojo».",
+              "Y cuando hace falta, llega la limpia: la abuela o la curandera pasa un huevo fresco por el cuerpo, de arriba hacia abajo, con ramas de ruda o albahaca y una oración, y luego lo rompe en un vaso de agua para leer lo que se llevó. Es la unión de las limpias de los pueblos de Mesoamérica con el huevo que llegó en los barcos europeos (te lo contamos completo en la ficha de la limpia con huevo).",
+            ],
+          },
+          {
+            titulo: "Tres caminos, una misma idea",
+            parrafos: [
+              "El ojo que devuelve la mirada, la mano que cuida la entrada y el huevo que recoge lo que pesa no son supersticiones sueltas: son maneras de decir, en cada cultura, que la envidia existe, que las palabras importan y que a los nuestros hay que cuidarlos. Por eso los tres se regalan: el nazar al recién nacido, la khamsa en la boda, la limpia de la abuela.",
+              "Son costumbres y tradiciones, no tratamientos: cuando alguien se siente mal de salud, lo primero es ver a un médico.",
+            ],
+          },
+        ],
+        simbolos: {
+          titulo: "Los guardianes de la mirada",
+          intro: "Estos son los objetos y gestos más conocidos contra el mal de ojo en las tres tradiciones:",
+          lista: [
+            { s: "Nazar boncuğu (ojo azul)", d: "Turquía y el Mediterráneo oriental: recibe la mirada y la devuelve. Si se rompe, se cambia." },
+            { s: "Khamsa (mano abierta)", d: "África del Norte y Oriente Medio: cinco dedos que cuidan la entrada de la casa." },
+            { s: "Maşallah · ما شاء الله", d: "Las palabras que acompañan un elogio para que no se vuelva envidia." },
+            { s: "Azabache", d: "Latinoamérica y España: una manito de piedra negra en la pulsera de los bebés." },
+            { s: "Hilo rojo", d: "La pulsera más sencilla y extendida para los recién nacidos en Latinoamérica." },
+            { s: "Ruda", d: "La planta de las limpias: se pone en la puerta o acompaña el huevo." },
+            { s: "Limpia con huevo", d: "El huevo recoge lo que pesa y el vaso de agua muestra lo que se llevó." },
+            { s: "Copas de ojos", d: "Grecia antigua: grandes ojos pintados en las copas de beber, siglo VI a. C." },
+          ],
+        },
+        preguntas: [
+          { p: "¿Qué es el mal de ojo?", r: "Es la creencia, presente en el Mediterráneo, Oriente Medio, Asia del Sur y Latinoamérica, de que una mirada cargada de envidia o de admiración excesiva puede pesar sobre una persona, sobre todo sobre los bebés, o sobre lo que tiene." },
+          { p: "¿Qué significa el ojo azul turco?", r: "Es el nazar boncuğu, la «cuenta contra la mirada». Nazar es una palabra árabe que significa «mirada». La tradición dice que el ojo azul recibe la mirada en lugar de la persona y la devuelve; si se rompe, hizo su trabajo y se cambia por uno nuevo." },
+          { p: "¿Qué es la khamsa o mano de Fátima?", r: "Khamsa significa «cinco» en árabe: es la mano abierta que protege la entrada de las casas en África del Norte y Oriente Medio. Las comunidades judías la llaman «mano de Miriam»; el nombre «mano de Fátima» se popularizó en francés en la época colonial." },
+          { p: "¿Por qué a los bebés se les pone azabache o hilo rojo?", r: "En Latinoamérica se dice que los bebés son los más sensibles a la mirada. La pulsera de hilo rojo o la manito de azabache es la forma tradicional de cuidarlos, y quien elogia a un bebé lo toca enseguida «para que no le haga ojo»." },
+          { p: "¿Qué tiene que ver la limpia con huevo con el mal de ojo?", r: "Es la forma latinoamericana de «quitar» el ojo: el huevo se pasa por el cuerpo para recoger lo que pesa y luego se rompe en un vaso de agua para leer lo que se llevó." },
+        ],
+        cta: {
+          titulo: "¿Te leo?",
+          texto: "Si hiciste tu limpia, toma una foto de tu vaso y Sibila te lee lo que se llevó el huevo. Y si eres de la tradición del café, voltea tu taza: Sibila lee los símbolos de la borra.",
+          boton: "Leer con Sibila",
         },
       },
     },
