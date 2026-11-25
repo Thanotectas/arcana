@@ -51,14 +51,23 @@ export async function avanceDe(curso: Curso, usuario: { id: string; email?: stri
   };
 }
 
+/** Precio para esta persona: el de fundadores si se anotó en la lista de espera (con su cuenta o su correo). */
+export async function precioPara(curso: Curso, usuario: { id: string; email?: string | null } | null) {
+  if (!usuario || curso.costoFundadores === undefined) return curso.costo;
+  const filtros = [`usuario_id.eq.${usuario.id}`, ...(usuario.email ? [`correo.eq.${usuario.email.toLowerCase()}`] : [])].join(",");
+  const { count } = await getSupabaseAdmin().from("lista_espera").select("id", { count: "exact", head: true }).eq("curso", curso.slug).or(filtros);
+  return count ? curso.costoFundadores : curso.costo;
+}
+
 /** Inscribe con cobro (o gratis en vista previa). Devuelve 'ok', 'ya_inscrito', 'sin_creditos' o 'cerrado'. */
 export async function inscribir(curso: Curso, usuario: { id: string; email?: string | null }) {
   const vistaPrevia = esAdmin(usuario.email);
   if (!curso.abierto && !vistaPrevia) return "cerrado";
+  const costo = vistaPrevia ? 0 : await precioPara(curso, usuario);
   const { data, error } = await getSupabaseAdmin().rpc("inscribir_curso", {
     p_usuario: usuario.id,
     p_curso: curso.slug,
-    p_costo: vistaPrevia ? 0 : curso.costo,
+    p_costo: costo,
     p_incluidos: vistaPrevia ? 0 : curso.creditosIncluidos,
   });
   if (error) throw new Error(error.message);

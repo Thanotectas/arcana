@@ -31,7 +31,7 @@ Reglas: desde adentro de la tradición; nada de promesas de resultados, salud ni
 - Clips: 2–3 por lección en Flow/Gemini (prompts por lección, como el video 63). Total ≈ 15–20 clips.
 - Voz de Marcela: ≈ 4.500 créditos de ElevenLabs por idioma (7 × ~1,5 min). Empezar en español; luego árabe y turco.
 - Programación (reutilizando lo existente): página del curso, avance por día, cuestionarios, avisos, carta final.
-- Precio: en créditos, a decidir antes de abrir (no se cobra nada sin visto bueno).
+- Precio (aprobado el 25 de noviembre): 20 créditos; 15 para quien se anotó en la lista de espera (fundadores = paquete Buscador, 24.900 COP / 5,99 USD). Incluye 10 créditos para las 4 lecturas del curso. Se abre cambiando `abierto: true` en src/lib/escuela/cursos/rituales.ts.
 
 ## Próximos pasos
 1. Publicar el video 64 (es/tr/ar) y medir la lista de espera.

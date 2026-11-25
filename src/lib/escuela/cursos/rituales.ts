@@ -18,6 +18,7 @@ export const CURSO_RITUALES: Curso = {
   ],
   portada: "/escuela/rituales.jpg",
   costo: 20,
+  costoFundadores: 15, // = paquete Buscador (24.900 COP / 5,99 USD), aprobado el 25 de noviembre
   creditosIncluidos: 10,
   abierto: false,
   horasEntreLecciones: 16,

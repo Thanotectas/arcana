@@ -37,6 +37,8 @@ export interface Curso {
   lecciones: Leccion[];
   /** Precio en créditos (se cobra al inscribirse). */
   costo: number;
+  /** Precio para quien se anotó en la lista de espera con su correo (fundadores). */
+  costoFundadores?: number;
   /** Créditos que se abonan al inscribirse para las lecturas de las entregas. */
   creditosIncluidos: number;
   /** Sin abrir, solo las cuentas administradoras lo ven y lo prueban (gratis). */

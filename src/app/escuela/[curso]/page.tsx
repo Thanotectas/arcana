@@ -5,7 +5,7 @@ import { Check, Clock, Flame, Lock } from "lucide-react";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { getIdioma } from "@/lib/i18n/servidor";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { avanceDe } from "@/lib/escuela/servidor";
+import { avanceDe, precioPara } from "@/lib/escuela/servidor";
 import { BotonInscripcion } from "@/components/escuela/BotonInscripcion";
 import { ListaEspera } from "@/components/ListaEspera";
 import { TEXTOS_LISTA_ESPERA, CURSOS as CURSOS_ESPERA, type Curso as CursoEspera } from "@/lib/lista-espera/textos";
@@ -20,7 +20,8 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
   const curso = cursoPorSlug((await params).curso);
   if (!curso) notFound();
   const [usuario, idioma] = await Promise.all([getUsuarioOpcional(), getIdioma()]);
-  const avance = await avanceDe(curso, usuario);
+  const [avance, precio] = await Promise.all([avanceDe(curso, usuario), precioPara(curso, usuario)]);
+  const fundador = precio < curso.costo;
   const dentro = avance.inscrito || avance.vistaPrevia;
   const hechas = avance.estados.filter((e) => e === "hecha").length;
   const enEspera = (CURSOS_ESPERA as readonly string[]).includes(curso.slug);
@@ -48,7 +49,10 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
 
       {!avance.inscrito && (curso.abierto || avance.vistaPrevia) && (
         <section className="tarjeta border-oro/40 bg-oro/5 p-6 text-center">
-          <p className="font-display text-3xl">{avance.vistaPrevia && !curso.abierto ? "Gratis (vista previa)" : `${curso.costo} créditos`}</p>
+          <p className="font-display text-3xl">
+            {avance.vistaPrevia && !curso.abierto ? "Gratis (vista previa)" : fundador ? <><s className="me-2 text-xl text-texto-suave">{curso.costo}</s>{precio} créditos</> : `${curso.costo} créditos`}
+          </p>
+          {fundador && !avance.vistaPrevia && <p className="text-sm text-oro-suave">Precio de fundadores: te anotaste en la lista de espera ✨</p>}
           <p className="mt-1 text-sm text-texto-suave">Incluye {curso.creditosIncluidos} créditos para las lecturas de Sibila de tus rituales.</p>
           <div className="mt-4"><BotonInscripcion curso={curso.slug} conSesion={Boolean(usuario)} texto="Inscribirme" /></div>
         </section>
