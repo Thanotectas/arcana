@@ -1,4 +1,5 @@
 import type { Idioma } from "@/lib/i18n/idiomas";
+import type { Curso } from "@/lib/lista-espera/textos";
 
 /**
  * «El Arcano de Sibila: saberes del mundo». Una ficha por práctica: su historia, cómo se hace, sus símbolos y
@@ -34,6 +35,8 @@ export interface EntradaBiblioteca {
   videos?: Partial<Record<Idioma, string>> & { es: string };
   /** Imagen del video (portada y miniatura). */
   portada?: string;
+  /** Curso con lista de espera que se invita al final de la ficha. */
+  curso?: Curso;
   textos: Partial<Record<Idioma, Ficha>> & { es: Ficha };
 }
 
@@ -400,6 +403,94 @@ export const BIBLIOTECA: EntradaBiblioteca[] = [
           titulo: "¿Te leo?",
           texto: "Si hiciste tu limpia, toma una foto de tu vaso y Sibila te lee lo que se llevó el huevo. Y si eres de la tradición del café, voltea tu taza: Sibila lee los símbolos de la borra.",
           boton: "Leer con Sibila",
+        },
+      },
+    },
+  },
+  {
+    slug: "rituales-de-vela",
+    clave: "velas",
+    href: "/velas",
+    curso: "rituales",
+    portada: "/videos/portada/velas.jpg",
+    publicada: "2026-11-25",
+    fuentes: [
+      { titulo: "Wikipedia: Votive candle (la vela votiva)", url: "https://en.wikipedia.org/wiki/Votive_candle" },
+      { titulo: "Wikipedia: Candle (historia de la vela)", url: "https://en.wikipedia.org/wiki/Candle" },
+      { titulo: "Wikipedia: Week-day names (los días y los siete astros)", url: "https://en.wikipedia.org/wiki/Week-day_names" },
+      { titulo: "Wikipedia: Lunar phase (las fases de la Luna)", url: "https://en.wikipedia.org/wiki/Lunar_phase" },
+      { titulo: "Wikipedia: Botánica (las tiendas de hierbas y velas)", url: "https://en.wikipedia.org/wiki/Botanica" },
+    ],
+    textos: {
+      es: {
+        titulo: "Los rituales de vela: colores, días, fases de la Luna y cómo se hacen",
+        descripcion:
+          "Encender una vela con una intención es uno de los rituales más antiguos y extendidos del mundo. Su historia, qué significa cada color, qué día y qué fase de la Luna elegir, cómo se prepara y qué se mira en la llama y en la cera.",
+        nombres: "Vela de intención · Veladora · Vela votiva · Ceromancia (lectura de la cera)",
+        entrada:
+          "Una mujer que enciende una veladora frente a una foto en la mesa del comedor. Un hombre que, antes de una entrevista, prende una vela verde un jueves. Una abuela que pasa la mano sobre la llama y dice una oración que aprendió de su madre. Encender una vela con una intención es quizás el ritual más sencillo y más compartido del mundo: un poco de cera, una mecha y algo que pedir.",
+        secciones: [
+          {
+            titulo: "La luz como ofrenda",
+            parrafos: [
+              "Desde la Antigüedad, encender una luz ha sido una forma de hablar con lo sagrado: lámparas de aceite en los templos de Egipto, de Grecia y de Roma, y más tarde velas de cera de abeja en las iglesias. En la tradición cristiana nació la vela votiva, de la palabra latina votum, «promesa»: una vela que se enciende para acompañar un pedido o para agradecer uno cumplido.",
+              "En Latinoamérica esa costumbre se mezcló con saberes indígenas y africanos, y la vela se volvió parte de la vida de todos los días: la veladora de siete días en su vaso de vidrio, las velas de colores de los mercados, las botánicas del Caribe y de las ciudades de Estados Unidos, donde se venden junto a hierbas, aceites e inciensos.",
+            ],
+          },
+          {
+            titulo: "El lenguaje de los colores",
+            parrafos: [
+              "Cada color habla de una intención. No es una regla escrita en un solo libro, sino un lenguaje que se fue formando entre muchas tradiciones y que hoy comparten casi todas: el rosa y el rojo para el amor, el verde para el dinero y la abundancia, el blanco para la limpieza y la protección, el azul para la calma, el amarillo para la claridad, el naranja para el éxito, el morado para la intuición y el negro para cerrar ciclos y soltar.",
+              "La tradición también dice que, si no se tiene el color, una vela blanca sirve para cualquier intención: el blanco contiene a todos.",
+            ],
+          },
+          {
+            titulo: "El día y la Luna",
+            parrafos: [
+              "Los días de la semana llevan el nombre de los siete astros que veían los antiguos: el lunes es de la Luna, el martes de Marte, el miércoles de Mercurio, el jueves de Júpiter y el viernes de Venus; el domingo, en muchas lenguas, es el día del Sol, y el sábado se asocia a Saturno. De ahí viene la costumbre de elegir el día según la intención: el viernes de Venus para el amor, el jueves de Júpiter para la abundancia, el domingo del Sol para el éxito, el miércoles de Mercurio para la claridad, el lunes de la Luna para la intuición y la calma, y el sábado de Saturno para proteger y cerrar.",
+              "La Luna marca el otro ritmo: con la Luna creciente se enciende lo que se quiere atraer, con la llena se pide que algo culmine o se vea claro, con la menguante se suelta lo que pesa, y la Luna nueva es el momento de sembrar una intención que empieza.",
+            ],
+          },
+          {
+            titulo: "Cómo se prepara la vela",
+            parrafos: [
+              "Muchas familias empiezan por limpiar el espacio y escribir la intención en un papel, en presente y con palabras propias. Luego se «viste» la vela: se unta con un poco de aceite de la base hacia la mecha para atraer, o de la mecha hacia la base para soltar, y a veces se le marca con una aguja el nombre o la palabra de lo que se pide.",
+              "Se enciende con un fósforo y no con el encendedor, dice la costumbre, y se deja arder sin soplarla: si hay que apagarla, se usa un apagavelas o los dedos humedecidos. Y lo más importante: una vela nunca se deja sola. Se pone sobre un plato o un vaso firme, lejos de cortinas, niños y mascotas.",
+            ],
+          },
+          {
+            titulo: "Lo que dicen la llama y la cera",
+            parrafos: [
+              "Mirar la llama y lo que queda de la vela es un arte con nombre propio: la ceromancia, la lectura de la cera. La llama alta y firme se lee como un pedido que avanza; la que baila o chisporrotea, como algo que se mueve alrededor; el humo negro, como obstáculos que se están quemando; la cera que corre como lágrimas, como emociones que se liberan.",
+              "Al final se observan los restos: si la cera quedó limpia, si dibujó figuras, si el vaso se ennegreció. Cada tradición tiene su escuela, y la lectura siempre se hace pensando en la intención con la que se encendió la vela.",
+            ],
+          },
+        ],
+        simbolos: {
+          titulo: "Qué vela encender",
+          intro: "Así lo hacemos en Arcana, siguiendo la tradición de los colores, los días y la Luna:",
+          lista: [
+            { s: "Rosa (o rojo) · viernes", d: "Amor y reconciliación, con la Luna creciente." },
+            { s: "Verde (o amarillo) · jueves", d: "Dinero y prosperidad, con la Luna creciente." },
+            { s: "Blanco (o azul) · sábado", d: "Protección y limpieza, con la Luna llena." },
+            { s: "Azul (o blanco) · lunes", d: "Calma y sanación emocional, con la Luna menguante." },
+            { s: "Amarillo (o blanco) · miércoles", d: "Claridad para decidir, con la Luna llena." },
+            { s: "Negro (o morado) · sábado", d: "Cerrar un ciclo y soltar, con la Luna menguante." },
+            { s: "Naranja (o amarillo) · domingo", d: "Éxito y nuevos comienzos, con la Luna nueva." },
+            { s: "Morado (o azul) · lunes", d: "Intuición y sueños, con la Luna llena." },
+          ],
+        },
+        preguntas: [
+          { p: "¿Qué color de vela encender para cada intención?", r: "La tradición usa el rosa o el rojo para el amor, el verde para el dinero, el blanco para la protección, el azul para la calma, el amarillo para la claridad, el naranja para el éxito, el morado para la intuición y el negro para cerrar ciclos. Si no tienes el color, una vela blanca sirve para cualquier intención." },
+          { p: "¿Qué día es mejor para encender una vela?", r: "Cada día lleva el nombre de un astro: el viernes (Venus) para el amor, el jueves (Júpiter) para la abundancia, el domingo (Sol) para el éxito, el miércoles (Mercurio) para la claridad, el lunes (Luna) para la intuición y el sábado (Saturno) para proteger y cerrar." },
+          { p: "¿Se puede soplar una vela de ritual?", r: "La costumbre dice que no: se deja consumir o se apaga con un apagavelas o con los dedos humedecidos. Y nunca se deja encendida sin nadie que la cuide." },
+          { p: "¿Qué significa el humo negro en una vela?", r: "En la ceromancia, el humo negro se lee como obstáculos o cargas que se están quemando. Se mira siempre junto con la intención con la que se encendió la vela." },
+          { p: "¿Qué es la ceromancia?", r: "Es la lectura de la cera y de la llama: cómo ardió la vela, qué figuras dejó la cera y cómo quedó el vaso o el plato." },
+        ],
+        cta: {
+          titulo: "¿Qué dijo tu vela?",
+          texto: "Elige tu intención y Sibila te dice qué vela encender, qué día y con qué Luna. Cuando termine de arder, fotografía los restos y Sibila lee lo que la cera y la llama dejaron dicho.",
+          boton: "Mi ritual de vela",
         },
       },
     },

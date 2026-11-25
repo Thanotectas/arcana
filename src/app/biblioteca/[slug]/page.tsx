@@ -9,6 +9,9 @@ import { CtaLectura, JsonLd, Migas, Preguntas } from "@/components/seo/BloquesSe
 import { BIBLIOTECA, entradaPorSlug, videoEn } from "@/lib/biblioteca/fichas";
 import { fichaTraducida, traducirFaltantes } from "@/lib/biblioteca/traducciones";
 import { TEXTOS_ARCANO } from "@/lib/biblioteca/textos";
+import { getUsuarioOpcional } from "@/lib/dal";
+import { ListaEspera } from "@/components/ListaEspera";
+import { TEXTOS_LISTA_ESPERA } from "@/lib/lista-espera/textos";
 
 // La primera visita en un idioma deja traduciendo la ficha en segundo plano (puede tardar un par de minutos).
 export const maxDuration = 300;
@@ -84,6 +87,8 @@ export default async function PaginaFicha({ params }: { params: Promise<{ slug: 
       )}
 
       <CtaLectura titulo={f.cta.titulo} texto={f.cta.texto} href={e.hrefs?.[idioma] ?? e.href} boton={f.cta.boton} nota={t.nota} />
+
+      {e.curso && <ListaEspera curso={e.curso} idioma={idioma} origen={`arcano/${e.slug}`} textos={TEXTOS_LISTA_ESPERA[idioma]} correoInicial={(await getUsuarioOpcional())?.email ?? ""} />}
 
       <Preguntas items={f.preguntas} titulo={t.preguntas} />
 

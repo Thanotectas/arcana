@@ -154,6 +154,7 @@ type ComunidadMensajeRow = {
 };
 
 type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: string };
+type ListaEsperaRow = { id: number; curso: string; correo: string; usuario_id: string | null; idioma: string; origen: string | null; creado_en: string };
 type BibliotecaTraduccionRow = { slug: string; idioma: string; version: string; ficha: Json | null; creado_en: string };
 type ComunidadReaccionRow = { mensaje_id: number; usuario_id: string; emoji: "✨" | "🔮" | "🙏"; creado_en: string };
 type ComunidadReporteRow = { mensaje_id: number; usuario_id: string; creado_en: string };
@@ -716,6 +717,12 @@ export type Database = {
         Row: ComunidadTraduccionRow;
         Insert: ComunidadTraduccionRow;
         Update: Partial<ComunidadTraduccionRow>;
+        Relationships: [];
+      };
+      lista_espera: {
+        Row: ListaEsperaRow;
+        Insert: Insertable<ListaEsperaRow, "id" | "usuario_id" | "idioma" | "origen" | "creado_en">;
+        Update: Partial<ListaEsperaRow>;
         Relationships: [];
       };
       biblioteca_traducciones: {

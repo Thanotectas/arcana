@@ -6,6 +6,9 @@ import { FICHA_INTENCION, TONO_COLOR, type Intencion } from "@/lib/velas";
 import { COSTOS } from "@/lib/creditos";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
+import { getUsuarioOpcional } from "@/lib/dal";
+import { ListaEspera } from "@/components/ListaEspera";
+import { TEXTOS_LISTA_ESPERA } from "@/lib/lista-espera/textos";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -57,7 +60,7 @@ const VIDAS: readonly { id: string; intencion: Intencion }[] = [
 
 /** Guía pública: cómo se hace cada ritual y qué se puede ver. */
 export default async function PaginaRituales() {
-  const t = await getT();
+  const [t, idioma, usuario] = await Promise.all([getT(), getIdioma(), getUsuarioOpcional()]);
   const guias = t.rituales.guias as Record<string, Guia>;
   const atraer = t.rituales.atraer;
   const temas = atraer.temas as Record<string, TemaAtraer>;
@@ -186,6 +189,8 @@ export default async function PaginaRituales() {
           </section>
         );
       })}
+
+      <ListaEspera curso="rituales" idioma={idioma} origen="rituales" textos={TEXTOS_LISTA_ESPERA[idioma]} correoInicial={usuario?.email ?? ""} />
 
       <section>
         <h2 className="font-display mb-3 text-2xl">{t.rituales.otras}</h2>
