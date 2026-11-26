@@ -397,7 +397,12 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (esPublicacionYildizname(publicacion)) respuestaAbjad = respuestaYildizname(i.texto, publicacion, redPlantilla(i.red));
     else if (esPublicacionCompatibilidad(publicacion)) respuestaAbjad = respuestaCompatibilidad(i.texto, publicacion, redPlantilla(i.red));
     else if (esPublicacionCartaNacimiento(publicacion)) respuestaAbjad = respuestaCartaNacimiento(i.texto, publicacion, redPlantilla(i.red));
-    else if (esPublicacionLetra(publicacion) && letraDelComentario(i.texto)) respuestaAbjad = respuestaLetra(i.texto, publicacion);
+    // Un comentario de una sola letra es el juego de la inicial, aunque no se haya podido leer el texto de la publicación
+    // (Instagram a veces lo devuelve vacío en los primeros minutos): una letra suelta no tiene otra lectura.
+    else if (letraDelComentario(i.texto)) {
+      if (!esPublicacionLetra(publicacion)) console.info(`[redes letra] ${i.red} ${i.objetoId}: letra sin texto de la publicación reconocido (${publicacion.length} caracteres)`);
+      respuestaAbjad = respuestaLetra(i.texto, publicacion);
+    }
     else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, redPlantilla(i.red));
   }
 

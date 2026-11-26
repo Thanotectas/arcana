@@ -77,7 +77,8 @@ export async function textoDePublicacion(red: RedMeta, id: string): Promise<stri
   const campo = red === "instagram" ? "caption" : "message";
   const r = await llamar<Record<string, string | undefined>>(`${id}?fields=${campo}`);
   const texto = r[campo] ?? "";
-  textos.set(clave, { texto, hasta: Date.now() + 3_600_000 });
+  // Un texto vacío no se guarda: Instagram a veces lo devuelve vacío justo después de publicar.
+  if (texto) textos.set(clave, { texto, hasta: Date.now() + 3_600_000 });
   return texto;
 }
 
