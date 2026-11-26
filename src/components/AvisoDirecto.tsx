@@ -4,21 +4,24 @@ import type { Diccionario } from "@/lib/i18n/diccionarios";
 import { LOCALE_INTL, type Idioma } from "@/lib/i18n/idiomas";
 import { plantilla } from "@/lib/i18n/formato";
 import { VideoInvitacion } from "@/components/VideoInvitacion";
-import { PROXIMO_DIRECTO, ZONA_DIRECTO, diasParaDirecto, estadoDirecto } from "@/lib/marca/directo";
+import { DIRECTO_TIKTOK, PROXIMO_DIRECTO, ZONA_DIRECTO, diasParaDirecto, estadoDirecto } from "@/lib/marca/directo";
+import { vivoAhora } from "@/lib/en-vivo-ahora";
 
 /**
  * Aviso del próximo directo de Sibila en la portada: el video de invitación,
  * día y hora, recordatorio de YouTube y la oferta de esa noche. Durante el
  * directo invita a entrar; cuando termina deja de mostrarse solo.
  */
-export function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
+export async function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
   t: Diccionario["portada"]["directo"];
   sonido: { activarSonido: string; silenciar: string };
   idioma: Idioma;
   /** false en la app de Google Play, donde no se muestran compras. */
   conOferta?: boolean;
 }) {
-  const estado = estadoDirecto();
+  // Un directo prendido a mano («Estoy en vivo ahora» en /admin/en-vivo) manda sobre el horario fijo.
+  const manual = await vivoAhora().catch(() => null);
+  const estado = manual ? "en-vivo" : estadoDirecto();
   if (!estado) return null;
 
   const inicio = new Date(PROXIMO_DIRECTO.inicio);
@@ -28,7 +31,8 @@ export function AvisoDirecto({ t, sonido, idioma, conOferta = true }: {
   const dia = dias === 0 ? t.hoy : dias === 1 ? t.manana : fecha.charAt(0).toUpperCase() + fecha.slice(1);
   const hora = new Intl.DateTimeFormat(locale, { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(inicio);
   const enVivo = estado === "en-vivo";
-  const { video, codigo, url, emision } = PROXIMO_DIRECTO;
+  const { video, codigo, emision } = PROXIMO_DIRECTO;
+  const url = manual?.en === "tiktok" ? DIRECTO_TIKTOK.envivo : PROXIMO_DIRECTO.url;
 
   return (
     <section className="tarjeta mx-auto grid max-w-4xl items-center gap-6 overflow-hidden p-5 sm:grid-cols-[14rem_1fr] sm:gap-8 sm:p-6">

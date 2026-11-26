@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Clock, Copy, Hand, Mic, Play, Send, Ticket, Trash2 } from "lucide-react";
-import { accionAlternarCodigo, accionCierre, accionJuego, accionPausa, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
+import { accionAlternarCodigo, accionCierre, accionVivoAhora, accionJuego, accionPausa, accionCrearCodigo, accionPreguntaManual, accionVaciarCola, type EstadoEnVivo } from "@/lib/en-vivo-acciones";
 import { BotonEnviar } from "@/components/BotonEnviar";
 import { Aviso } from "@/components/Aviso";
 
@@ -116,6 +116,46 @@ export function AlternarCodigo({ codigo, activo }: { codigo: string; activo: boo
       </BotonEnviar>
       {estado.error && <span className="ml-2 text-xs text-peligro">{estado.error}</span>}
     </form>
+  );
+}
+
+/**
+ * Interruptor «Estoy en vivo ahora»: prende un directo a cualquier hora (la web lo anuncia y Sibila no se despide
+ * por el horario fijo) o lo apaga (Sibila se despide al terminar la lectura en curso).
+ */
+export function InterruptorVivo({ prendido, en, desde }: { prendido: boolean; en: "tiktok" | "youtube"; desde: string | null }) {
+  const [estado, enviar] = useActionState<EstadoEnVivo, FormData>(accionVivoAhora, {});
+  return (
+    <div className="space-y-3">
+      <form action={enviar} className="flex flex-wrap items-center gap-4">
+        <input type="hidden" name="prender" value={prendido ? "0" : "1"} />
+        <BotonEnviar
+          className={`inline-flex items-center gap-3 rounded-full border-2 px-5 py-2.5 text-lg font-semibold transition ${prendido ? "border-red-400 bg-red-500/20 text-red-200" : "border-oro/60 bg-oro/10 text-oro-suave hover:bg-oro/20"}`}
+          cargando={prendido ? "Apagando…" : "Prendiendo…"}
+        >
+          <span className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition ${prendido ? "bg-red-500" : "bg-borde"}`} aria-hidden>
+            <span className={`absolute h-5 w-5 rounded-full bg-white shadow transition-all ${prendido ? "left-6" : "left-1"}`} />
+          </span>
+          {prendido ? "En vivo ahora · apagar" : "Iniciar un directo ahora"}
+        </BotonEnviar>
+        {!prendido && (
+          <label className="flex items-center gap-2 text-sm text-texto-suave">
+            En
+            <select name="en" defaultValue={en} className="campo py-1.5">
+              <option value="tiktok">TikTok</option>
+              <option value="youtube">YouTube</option>
+            </select>
+          </label>
+        )}
+        {prendido && desde && (
+          <span className="text-sm text-texto-suave">
+            Desde las {new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(new Date(desde))} en {en === "youtube" ? "YouTube" : "TikTok"} · se apaga solo a las 8 horas
+          </span>
+        )}
+      </form>
+      {estado.error && <Aviso>{estado.error}</Aviso>}
+      {estado.mensaje && <Aviso tipo="exito">{estado.mensaje}</Aviso>}
+    </div>
   );
 }
 

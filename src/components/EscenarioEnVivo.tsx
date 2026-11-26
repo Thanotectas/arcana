@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EscenaMesa } from "@/components/EscenaMesa";
 import { Bell } from "lucide-react";
 import { Marca } from "./Logo";
 import { CieloEnVivo } from "./CieloEnVivo";
@@ -230,7 +231,8 @@ function MarcoCamara({
       {/* Halo exterior: respira con la voz de Sibila. */}
       <div className="pointer-events-none absolute -inset-2 rounded-[22px]" style={{ boxShadow: `0 0 ${28 + nivel * 110}px ${conAlfa(color, 0.3 + nivel * 0.55)}`, transition: "box-shadow 90ms linear" }} />
       <div className="absolute inset-0 rounded-2xl border-2 bg-black/80 p-[6px]" style={{ borderColor: conAlfa(color, 0.8) }}>
-        <div className={`flex h-full w-full items-center justify-center rounded-xl bg-[#0b0716] px-8 text-center text-violeta-suave ${pequeno ? "text-lg" : "text-3xl"}`}>{children}</div>
+        {/* Debajo de la cámara: la mesa de Sibila. Si el presentador oculta su cámara, se ve esta escena. */}
+        <div className={`relative h-full w-full overflow-hidden rounded-xl bg-[#0b0716] ${pequeno ? "text-sm" : "text-xl"}`}>{children}</div>
       </div>
       {/* Luz que recorre el borde mientras Sibila lee. */}
       {lectura && <div className="marco-luz pointer-events-none absolute -inset-[5px] rounded-[20px]" style={{ "--marco-color": color } as React.CSSProperties} />}
@@ -758,7 +760,7 @@ export function EscenarioEnVivo({
                 Sibila lee desde un círculo abajo, con sus subtítulos, y las cartas van compactas entre los dos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1400 }} nivel={nivel} modo="cielo" />
             <MarcoCamara posicion="left-[60px] right-[60px] top-[110px] h-[820px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
-              Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)
+              <EscenaMesa pista="Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)" />
             </MarcoCamara>
             <div className="absolute left-[60px] top-[1395px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
               {escena ? (
@@ -778,7 +780,7 @@ export function EscenarioEnVivo({
                 cámara del presentador es lo principal (arriba, 860×484) y Sibila habla desde un círculo junto a sus subtítulos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1330 }} nivel={nivel} modo="cielo" />
             <MarcoCamara posicion="left-[110px] right-[110px] top-[118px] h-[484px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
-              Aquí va tu cámara (ponla encima, del mismo tamaño)
+              <EscenaMesa pista="Aquí va tu cámara: ponla encima, del mismo tamaño" />
             </MarcoCamara>
             <div className="absolute left-[96px] top-[1262px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
               {escena ? (
@@ -813,7 +815,7 @@ export function EscenarioEnVivo({
             {/* La mesa en vivo: recuadro (16:9) donde LIVE Studio pone, encima, la cámara de las manos, la vela y la baraja.
                 TikTok castiga como «pregrabado» un LIVE sin nada en tiempo real; así se ve que hay alguien, sin mostrar la cara. */}
             <MarcoCamara posicion="right-[110px] top-[400px] h-[214px] w-[380px]" etiqueta="Mi mesa · en vivo" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null} pequeno>
-              Aquí va la cámara de la mesa
+              <EscenaMesa pista="Aquí va la cámara de la mesa" />
             </MarcoCamara>
           </>
         ) : (

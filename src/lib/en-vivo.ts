@@ -14,6 +14,7 @@ import { sintetizar, vozConfigurada } from "@/lib/redes/voz";
 import { tokenVigente, youtubeConectado } from "@/lib/redes/youtube";
 import { codigoVigente } from "@/lib/pagos/codigos";
 import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
+import { vivoVigente } from "@/lib/en-vivo-ahora";
 import { ganadorConPrioridad, revisarAdivinanzas, usarPrioridad } from "@/lib/en-vivo-juego";
 import { TELEGRAM } from "@/lib/marca/redes";
 import { createHash } from "node:crypto";
@@ -886,8 +887,13 @@ export async function enPausa(admin: Admin): Promise<boolean> {
   return Date.parse(data.pausa_hasta) > Date.now();
 }
 
-export function horaCierre(estado: { cierre_en?: string | null } | null, ahora = Date.now()): number {
+export function horaCierre(estado: { cierre_en?: string | null; vivo_desde?: string | null } | null, ahora = Date.now()): number {
   const manual = estado?.cierre_en ? Date.parse(estado.cierre_en) : NaN;
+  // Directo prendido a mano («Estoy en vivo ahora»): el horario fijo no cuenta; solo una hora de cierre puesta después.
+  if (vivoVigente(estado, ahora)) {
+    const desde = Date.parse(estado!.vivo_desde!);
+    return Number.isFinite(manual) && manual > desde ? manual : Number.POSITIVE_INFINITY;
+  }
   if (Number.isFinite(manual) && ahora - manual < VENTANA_CIERRE) return manual;
   return Date.parse(PROXIMO_DIRECTO.fin) - 3 * 60_000;
 }

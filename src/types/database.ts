@@ -291,6 +291,8 @@ type EnVivoEstadoRow = {
   juego_ganador_en: string | null;
   juego_fin: string | null;
   actualizado_en: string;
+  vivo_desde: string | null;
+  vivo_en: string | null;
 };
 
 type ChatVisitaRow = {
@@ -648,7 +650,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en" | "vivo_desde" | "vivo_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };

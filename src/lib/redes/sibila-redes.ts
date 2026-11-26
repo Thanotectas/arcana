@@ -1,7 +1,8 @@
 import "server-only";
 import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
 import { pareceConsulta, tipoDeMensaje } from "@/lib/en-vivo";
-import { PROXIMO_DIRECTO, estadoDirecto } from "@/lib/marca/directo";
+import { PROXIMO_DIRECTO } from "@/lib/marca/directo";
+import { estadoDirectoActual } from "@/lib/en-vivo-ahora";
 import { VOZ_NATURAL } from "./voz-sibila";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -342,7 +343,7 @@ async function subirFotoMarcada(admin: SupabaseClient<Database>, idMeta: string,
 async function encolarDelAviso(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
   const nombre = (i.remitente ?? "").split(/\s+/)[0] || "";
   const texto = i.texto.trim();
-  const r = respuestasDirecto(idiomaConversacion(texto), nombre, estadoDirecto() === "en-vivo", PROXIMO_DIRECTO.inicio);
+  const r = respuestasDirecto(idiomaConversacion(texto), nombre, (await estadoDirectoActual()) === "en-vivo", PROXIMO_DIRECTO.inicio);
   const firmar = (t: string) => `${t}\n\n${r.firma}`;
   if (i.imagen && !texto) return firmar(r.foto);
   if (!pareceConsulta(texto)) return firmar(r.saludo);

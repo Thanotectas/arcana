@@ -1733,3 +1733,32 @@ html[lang="ar"] [class*="tracking-"] {
   .escuela-trazo, .escuela-llave-trazo { animation: none; stroke-dashoffset: 0; }
   .escuela-carta-interior { transition: none; }
 }
+
+/* ───────────── La mesa de Sibila (debajo de la cámara en el escenario del directo) ───────────── */
+@keyframes mesa-girar { to { transform: rotate(360deg); } }
+.mesa-sello { transform-box: view-box; transform-origin: 500px 250px; animation: mesa-girar 140s linear infinite; }
+@keyframes mesa-titilar {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); opacity: 1; }
+  20% { transform: scale(0.94, 1.08) skewX(2deg); }
+  45% { transform: scale(1.05, 0.93) skewX(-3deg); opacity: 0.9; }
+  70% { transform: scale(0.97, 1.05) skewX(1.5deg); }
+}
+.mesa-llama { animation: mesa-titilar 1.7s ease-in-out infinite; }
+@keyframes mesa-halo { 0%, 100% { opacity: 0.85; } 50% { opacity: 0.6; } 75% { opacity: 1; } }
+.mesa-halo { animation: mesa-halo 2.3s ease-in-out infinite; }
+@keyframes mesa-humo {
+  0% { opacity: 0; transform: translateY(20px); }
+  25% { opacity: 0.22; }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+.mesa-humo { animation: mesa-humo 9s ease-in-out infinite; }
+@keyframes mesa-chispa {
+  0% { opacity: 0; transform: translateY(0); }
+  15% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-220px); }
+}
+.mesa-chispa { animation: mesa-chispa 8s ease-in infinite; }
+@keyframes mesa-carta { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.mesa-carta > * { animation: mesa-carta 6s ease-in-out infinite; animation-delay: inherit; }
+@keyframes mesa-pista { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.mesa-pista { animation: mesa-pista 20s ease-out forwards; }

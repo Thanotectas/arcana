@@ -7,8 +7,9 @@ import { creditosVoz, vozConfigurada } from "@/lib/redes/voz";
 import { youtubeConectado } from "@/lib/redes/youtube";
 import { metaConfigurado } from "@/lib/redes/meta";
 import { publicacionDelDirecto } from "@/lib/en-vivo-facebook";
-import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, LanzarJuego, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
+import { AlternarCodigo, CierreDirecto, CrearCodigo, DireccionEscenario, InterruptorVivo, LanzarJuego, PausaPresentador, PreguntaManual, VaciarCola } from "@/components/admin/ControlEnVivo";
 import { listarCodigos, venceSugerido } from "@/lib/pagos/codigos";
+import { vivoVigente } from "@/lib/en-vivo-ahora";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sibila en vivo", robots: { index: false, follow: false } };
@@ -53,6 +54,12 @@ export default async function PaginaAdminEnVivo() {
           <a href="/vivo" className="text-oro-suave underline">miarcana.com/vivo</a> (el QR sale en pantalla).
         </p>
       </div>
+
+      <section className={`tarjeta space-y-2 p-5 ${vivoVigente(estado) ? "border-red-400/60" : ""}`}>
+        <h2 className="font-display text-2xl font-semibold">Directo a cualquier hora</h2>
+        <p className="text-sm text-texto-suave">Prende esto cuando empieces un LIVE fuera del horario: la web, la Sala y Sibila en redes anuncian que estás en vivo, y Sibila no se despide por el horario. Al apagarlo, se despide.</p>
+        <InterruptorVivo prendido={vivoVigente(estado)} en={estado?.vivo_en === "youtube" ? "youtube" : "tiktok"} desde={vivoVigente(estado) ? (estado?.vivo_desde ?? null) : null} />
+      </section>
 
       {vozConfigurada() && <AvisoCreditos creditos={creditos} />}
 

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requerirAdmin } from "@/lib/admin";
 import { LectorPantalla } from "@/components/admin/LectorPantalla";
-import { CierreDirecto, PreguntaManual } from "@/components/admin/ControlEnVivo";
+import { CierreDirecto, InterruptorVivo, PreguntaManual } from "@/components/admin/ControlEnVivo";
+import { vivoVigente } from "@/lib/en-vivo-ahora";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { horaCierre } from "@/lib/en-vivo";
 
@@ -20,6 +21,11 @@ export default async function PaginaPantalla() {
         ← Sibila en vivo
       </Link>
       <h1 className="font-display text-3xl">Leer el chat de TikTok</h1>
+      <section className={`tarjeta space-y-2 p-5 ${vivoVigente(estado) ? "border-red-400/60" : ""}`}>
+        <h2 className="font-display text-2xl font-semibold">Directo a cualquier hora</h2>
+        <p className="text-sm text-texto-suave">Prende esto cuando empieces un LIVE fuera del horario: la web, la Sala y Sibila en redes anuncian que estás en vivo, y Sibila no se despide por el horario. Al apagarlo, se despide.</p>
+        <InterruptorVivo prendido={vivoVigente(estado)} en={estado?.vivo_en === "youtube" ? "youtube" : "tiktok"} desde={vivoVigente(estado) ? (estado?.vivo_desde ?? null) : null} />
+      </section>
       <ol className="list-decimal space-y-1 pl-5 text-sm text-texto-suave">
         <li>Abre esta página en el computador del directo, en Chrome o Edge, en una ventana aparte (puede quedar detrás de LIVE Studio, pero no la minimices).</li>
         <li>Toca «Compartir la pantalla» y elige la ventana de <strong>TikTok LIVE Studio</strong>.</li>

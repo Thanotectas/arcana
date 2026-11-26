@@ -12,6 +12,7 @@ import { BUCKET_FOTOS, MARCA_HUEVO, escenarioActivo, faltaFecha, tipoDeMensaje, 
 import { normalizarCodigo } from "@/lib/pagos/codigos";
 import { diasParaDirecto, estadoDirecto, estadoTikTok } from "@/lib/marca/directo";
 import { pedirJuego } from "@/lib/en-vivo-juego";
+import { vivoAhora } from "@/lib/en-vivo-ahora";
 import { signoPorFecha } from "@/lib/zodiaco";
 import { esIdioma } from "@/lib/i18n/idiomas";
 
@@ -31,7 +32,7 @@ const POR_HORA = 2;
 /** Se reciben consultas desde /vivo el día de un directo (YouTube o TikTok, desde 12 h antes) o con el escenario al aire. */
 async function recibeConsultas(admin: ReturnType<typeof getSupabaseAdmin>) {
   const youtubeHoy = estadoDirecto() === "en-vivo" || (estadoDirecto() === "proximo" && diasParaDirecto() === 0);
-  return youtubeHoy || Boolean(estadoTikTok()) || (await escenarioActivo(admin));
+  return youtubeHoy || Boolean(estadoTikTok()) || Boolean(await vivoAhora().catch(() => null)) || (await escenarioActivo(admin));
 }
 
 /** Pregunta escrita en /vivo (sin foto), por ejemplo de quien llega desde TikTok o Facebook: entra a la fila como el chat. */
@@ -204,6 +205,24 @@ export async function accionCierre(_prev: EstadoEnVivo, formData: FormData): Pro
   revalidatePath("/admin/en-vivo");
   const texto = new Intl.DateTimeFormat("es-CO", { hour: "numeric", minute: "2-digit", timeZone: "America/Bogota" }).format(cierre);
   return { mensaje: ahora ? "Sibila se despide al terminar la lectura que está en curso." : `Sibila se despide a las ${texto}.` };
+}
+
+/**
+ * «Estoy en vivo ahora»: prende un directo a cualquier hora, sin depender del horario fijo. La web, la Sala y
+ * Sibila en redes dicen que hay directo (el botón lleva a TikTok o a YouTube, según se elija) y Sibila no se
+ * despide por el horario. Al apagarlo, Sibila se despide al terminar la lectura en curso.
+ */
+export async function accionVivoAhora(_prev: EstadoEnVivo, formData: FormData): Promise<EstadoEnVivo> {
+  await requerirAdmin();
+  const prender = formData.get("prender") === "1";
+  const en = formData.get("en") === "youtube" ? "youtube" : "tiktok";
+  const cambios = prender
+    ? { vivo_desde: new Date().toISOString(), vivo_en: en, cierre_en: null, despedida_en: null, pausa_hasta: null }
+    : { vivo_desde: null, cierre_en: new Date().toISOString(), despedida_en: null };
+  const { error } = await getSupabaseAdmin().from("en_vivo_estado").update(cambios).eq("id", 1);
+  if (error) return { error: error.message.includes("vivo_") ? "Falta aplicar la migración 0082 (directo a cualquier hora)." : error.message };
+  for (const ruta of ["/admin/en-vivo", "/admin/en-vivo/pantalla", "/", "/inicio", "/vivo", "/en-vivo"]) revalidatePath(ruta);
+  return { mensaje: prender ? `¡Estás en vivo en ${en === "youtube" ? "YouTube" : "TikTok"}! La web ya lo anuncia.` : "Directo apagado: Sibila se despide al terminar la lectura en curso." };
 }
 
 /** «La carta escondida»: el escenario la empieza en la siguiente vuelta (después de la lectura en curso). */

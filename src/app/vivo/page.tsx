@@ -1,3 +1,4 @@
+import { vivoAhora } from "@/lib/en-vivo-ahora";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -19,12 +20,14 @@ export const metadata: Metadata = {
  */
 export default async function PaginaVivo() {
   const activo = await escenarioActivo(getSupabaseAdmin()).catch(() => false);
-  const estado = estadoDirecto();
+  // Un directo prendido a mano en /admin/en-vivo manda sobre el horario fijo.
+  const manual = await vivoAhora().catch(() => null);
+  const estado = manual?.en === "youtube" ? "en-vivo" : estadoDirecto();
   const inicio = new Date(PROXIMO_DIRECTO.inicio);
   const fecha = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, weekday: "long", day: "numeric", month: "long" }).format(inicio);
   const hora = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(inicio);
   // Directo de TikTok de hoy: el aviso y el formulario para dejar la foto desde antes.
-  const tiktok = estadoTikTok();
+  const tiktok = manual?.en === "tiktok" ? "en-vivo" : estadoTikTok();
   const horaTiktok = new Intl.DateTimeFormat("es-CO", { timeZone: ZONA_DIRECTO, hour: "numeric", minute: "2-digit" }).format(new Date(DIRECTO_TIKTOK.inicio));
   if (tiktok) {
     return (
