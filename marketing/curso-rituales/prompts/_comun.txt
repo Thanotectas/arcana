@@ -1,0 +1,12 @@
+INDICACIONES PARA TODOS LOS DÍAS (2 al 8)
+- Todo vertical 9:16. Clips de 8 s en Flow / Gemini (Veo). Imágenes en Gemini («Crear imagen»).
+- SIN CARAS en los días 2 a 7: solo manos, objetos, paisajes y personas de espaldas o lejanas.
+  NO necesitan la foto de Sibila.
+- Sibila aparece solo el día 1 (bienvenida, ya hecho) y el DÍA 8, la noche del Círculo
+  (su despedida). Ese clip SÍ necesita la foto de referencia: sibila-referencia.jpg.
+- Sonido de los clips: solo ambiente (llama, humo, agua, papel). Sin música y sin voces.
+  Si Veo pone a Sibila a hablar, genera otra toma: la voz es la de Marcela.
+- Nada de texto legible, logos, símbolos religiosos en primer plano, mezquitas ni libros sagrados.
+- Mándame cada día como archivos: clips (a, b, c) e imágenes (1, 2, 3). Yo genero la voz,
+  armo el video (< 10 MB) y lo pongo en la lección.
+- Si un clip sale mal, una imagen con zoom lento funciona igual: no gastes de más.
