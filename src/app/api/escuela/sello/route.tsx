@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   if (!(terminado || avance.vistaPrevia)) return NextResponse.json({ error: "sin_terminar" }, { status: 403 });
   const nombre = avance.perfil?.nombre ?? "";
   const anio = new Date().getFullYear();
-  const rango = grado(curso.lecciones.length, avance.perfil?.trato, curso.lecciones.length).conCirculo;
+  const rango = grado(7, avance.perfil?.trato, 7, true).conCirculo;
   const [cormorant, inter] = await Promise.all([
     readFile(join(process.cwd(), "src/app/fuentes/CormorantGaramond-SemiBold.ttf")),
     readFile(join(process.cwd(), "src/app/fuentes/Inter-Medium.ttf")),

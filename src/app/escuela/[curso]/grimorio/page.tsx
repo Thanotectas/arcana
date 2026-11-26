@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { avanceDe, lecturasDelCurso } from "@/lib/escuela/servidor";
-import { grado, NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { avanceDe, lecturasDelCurso, NOTA_PRACTICA, NOTA_PROYECTO } from "@/lib/escuela/servidor";
+import { LibroDelCurso } from "@/components/escuela/LibroDelCurso";
+import { gradoDe, NOMBRE_INTENCION } from "@/lib/escuela/personal";
 import { Llavero } from "@/components/escuela/Llavero";
 import { textoPaso } from "@/lib/escuela/tipos";
 import { Altar } from "@/components/escuela/Altar";
@@ -30,7 +31,8 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
   const tipos = curso.lecciones.flatMap((l) => l.bloques.flatMap((b) => (b.tipo === "entrega" ? [b.lectura] : [])));
   const lecturas = await lecturasDelCurso(usuario.id, avance.inscritoEn, tipos);
   const terminado = avance.estados.every((e) => e === "hecha");
-  const miGrado = grado(avance.estados.filter((e) => e === "hecha").length, perfil?.trato, curso.lecciones.length);
+  const miGrado = gradoDe(curso, avance.estados, perfil?.trato);
+  const conLlave = curso.lecciones.map((l, i) => ({ l, e: avance.estados[i] })).filter(({ l }) => !l.final);
 
   return (
     <article className="grimorio mx-auto max-w-2xl space-y-12" lang="es">
@@ -57,8 +59,8 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
           <p className="font-display text-2xl italic text-violeta-suave">{curso.titulo}</p>
           <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">{miGrado.conCirculo}</p>
           <p className="text-sm text-texto-suave">{fecha(avance.inscritoEn, zona)}{terminado ? " · camino completo ✦" : ""}</p>
-          <div className="pt-4"><Altar estados={avance.estados} tamano="chico" /></div>
-          <Llavero llaves={curso.lecciones.map((l) => l.llave)} ganadas={avance.estados.map((e) => e === "hecha")} compacto />
+          <div className="pt-4"><Altar estados={conLlave.map(({ e }) => e)} tamano="chico" /></div>
+          <Llavero llaves={conLlave.map(({ l }) => l.llave)} ganadas={conLlave.map(({ e }) => e === "hecha")} compacto />
         </div>
       </header>
 
@@ -78,15 +80,17 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
         const preguntas = l.bloques.flatMap((b) => (b.tipo === "test" ? b.preguntas : []));
         const entrega = l.bloques.find((b) => b.tipo === "entrega");
         const lectura = entrega?.tipo === "entrega" ? lecturas.get(entrega.lectura) : undefined;
-        const notas = Object.entries(p?.notas ?? {}).filter(([, v]) => v.trim());
+        const notas = Object.entries(p?.notas ?? {}).filter(([k, v]) => k !== "revisiones" && v.trim());
+        const practica = l.bloques.find((b) => b.tipo === "practica");
+        const proyecto = l.bloques.find((b) => b.tipo === "proyecto");
         const abiertas = preguntas.map((q, j) => (q.tipo === "abierta" ? { p: q.p, r: String(p?.respuestas?.[String(j)] ?? "").trim() } : null)).filter((x): x is { p: string; r: string } => Boolean(x?.r));
         const vacio = !notas.length && !abiertas.length && !p?.comentario && !lectura;
         return (
           <section key={l.numero} className="dia space-y-5">
             <div className="flex items-center gap-4">
-              <span className="text-4xl" aria-hidden>{l.luna}</span>
+              <span className="text-4xl" aria-hidden>{l.final ? "✦" : l.luna}</span>
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Día {l.numero}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">{l.final ? "La noche del Círculo" : `Día ${l.numero}`}</p>
                 <h2 className="font-display text-3xl leading-tight">{l.titulo}</h2>
               </div>
             </div>
@@ -95,7 +99,15 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
             ) : (
               <div className="space-y-4 border-s border-oro/30 ps-5">
                 {notas.map(([paso, texto]) => {
-                  const enunciado = ritual?.tipo === "ritual" && ritual.pasos[Number(paso)] !== undefined ? textoPaso(ritual.pasos[Number(paso)]) : "En tu ritual";
+                  const campo = proyecto?.tipo === "proyecto" && paso.startsWith(NOTA_PROYECTO) ? proyecto.campos.find((c) => NOTA_PROYECTO + c.clave === paso) : undefined;
+                  const enunciado =
+                    paso === NOTA_PRACTICA && practica?.tipo === "practica"
+                      ? `Práctica entre lunas · ${practica.titulo}`
+                      : campo
+                        ? `Tu propio ritual · ${campo.etiqueta}`
+                        : ritual?.tipo === "ritual" && ritual.pasos[Number(paso)] !== undefined
+                          ? textoPaso(ritual.pasos[Number(paso)])
+                          : "En tu ritual";
                   return (
                     <div key={paso}>
                       <p className="text-xs uppercase tracking-[0.2em] text-oro-suave">{enunciado}</p>
@@ -141,6 +153,17 @@ export default async function PaginaGrimorio({ params }: { params: Promise<{ cur
           <p className="relative text-xs uppercase tracking-[0.3em] text-violeta-suave">Tu carta de cierre de ciclo</p>
           {avance.cartaAudio && <audio controls src={avance.cartaAudio} className="relative mt-3 w-full" />}
           {avance.carta.split(/\n{2,}/).map((x, k) => <p key={k} className="relative mt-4 font-display text-xl leading-relaxed">{x}</p>)}
+        </section>
+      )}
+
+      {/* El apéndice del grimorio: el libro de consulta, para tenerlo también impreso */}
+      {curso.libro && (
+        <section className="dia space-y-6">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Apéndice</p>
+            <h2 className="font-display text-4xl">Libro de consulta</h2>
+          </div>
+          <LibroDelCurso libro={curso.libro} />
         </section>
       )}
 

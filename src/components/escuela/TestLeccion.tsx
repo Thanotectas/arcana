@@ -12,6 +12,9 @@ interface Resultado {
   total: number;
   detalle: { indice: number; acierto: boolean | null; porque?: string }[];
   comentario: string | null;
+  aprobada: boolean;
+  minimo?: number;
+  faltaProyecto?: boolean;
 }
 
 /** Preguntas de la lección: se corrigen las de opción, Sibila comenta las abiertas y la lección queda hecha. */
@@ -27,6 +30,7 @@ export function TestLeccion({
   llave,
   yaHecha,
   gradoNuevo,
+  prueba = false,
 }: {
   curso: string;
   leccion: number;
@@ -41,6 +45,8 @@ export function TestLeccion({
   yaHecha: boolean;
   /** El grado al que sube con esta llave, si cambia (Iniciada, Adepto, Maestra de rituales…). */
   gradoNuevo: string | null;
+  /** La prueba del Círculo: el comentario de Sibila es la revisión del proyecto (se muestra allá, no aquí). */
+  prueba?: boolean;
 }) {
   const router = useRouter();
   const [respuestas, setRespuestas] = useState<Record<string, unknown>>(previas);
@@ -48,7 +54,8 @@ export function TestLeccion({
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [carta, setCarta] = useState<string | null>(null);
   const [cartaAudio, setCartaAudio] = useState<string | null>(null);
-  const comentario = resultado?.comentario ?? comentarioPrevio;
+  const comentario = prueba ? null : (resultado?.comentario ?? comentarioPrevio);
+  const aprobada = resultado ? resultado.aprobada : yaHecha;
   const completo = preguntas.every((p, i) => p.tipo !== "opcion" || typeof respuestas[String(i)] === "number");
 
   const enviar = async (e: React.FormEvent) => {
@@ -97,13 +104,25 @@ export function TestLeccion({
       })}
 
       <button type="submit" disabled={!completo || estado === "enviando"} className="boton boton-primario">
-        {estado === "enviando" ? "Sibila está leyendo…" : resultado || comentarioPrevio ? "Enviar de nuevo" : "Terminar la lección"}
+        {estado === "enviando" ? "Sibila está leyendo…" : prueba ? (aprobada ? "Enviar de nuevo" : resultado ? "Intentar de nuevo" : "Presentar la prueba") : resultado || comentarioPrevio ? "Enviar de nuevo" : "Terminar la lección"}
       </button>
       {estado === "error" && <p className="text-sm text-red-300">No se pudo guardar. Intenta de nuevo.</p>}
 
       {resultado && resultado.total > 0 && <p className="text-sm text-texto-suave">Acertaste {resultado.correctas} de {resultado.total}.</p>}
+      {resultado && !resultado.aprobada && (
+        <div className="tarjeta border-violeta/40 p-5 text-sm">
+          {resultado.faltaProyecto ? (
+            <p>Antes de la prueba, diseña tu propio ritual (arriba) y envíaselo a Sibila.</p>
+          ) : (
+            <p>
+              Para cerrar el Círculo necesitas {resultado.minimo} aciertos de {resultado.total}. Lee las explicaciones, repasa tu grimorio y el libro de
+              correspondencias, y vuelve a intentarlo cuando quieras: no hay límite.
+            </p>
+          )}
+        </div>
+      )}
       {/* La ceremonia de la llave: solo la primera vez que se completa la lección. */}
-      {resultado && !yaHecha && (
+      {resultado?.aprobada && !yaHecha && (
         <div className="tarjeta relative overflow-hidden border-oro/60 p-8 text-center">
           <div className="escuela-cielo pointer-events-none absolute inset-0" aria-hidden />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_50%_at_50%_35%,rgba(241,217,154,.25),transparent_70%)]" aria-hidden />
@@ -140,7 +159,7 @@ export function TestLeccion({
           ))}
         </div>
       )}
-      {(resultado || comentarioPrevio) && (
+      {aprobada && (resultado || comentarioPrevio) && (
         <p className="text-sm">
           {ultima ? (
             <Link href={`/escuela/${curso}`} className="text-oro-suave underline">Volver al curso</Link>

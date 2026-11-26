@@ -48,7 +48,14 @@ export type Bloque =
       cierre?: string;
       fondo?: string;
     }
-  | { tipo: "test"; titulo?: string; preguntas: PreguntaTest[] }
+  /** «Para profundizar»: la historia larga, para leer o escuchar con la voz de Sibila. */
+  | { tipo: "profundizar"; titulo: string; parrafos: string[] }
+  /** «Práctica entre lunas»: lo que la persona hace en las horas hasta la próxima lección; al abrirla, cuenta cómo le fue. */
+  | { tipo: "practica"; titulo: string; texto: string; pasos: string[]; pregunta: string }
+  /** El proyecto final: la persona diseña su propio ritual y Sibila se lo revisa. */
+  | { tipo: "proyecto"; titulo: string; texto: string; campos: { clave: string; etiqueta: string; ayuda: string }[] }
+  /** Preguntas; con `aprobar`, la lección solo se completa con ese mínimo de aciertos (la prueba final). */
+  | { tipo: "test"; titulo?: string; preguntas: PreguntaTest[]; aprobar?: number }
   /** La foto del ritual, que Sibila lee en la lectura de Arcana correspondiente (incluida en el curso). */
   | { tipo: "entrega"; titulo: string; texto: string; href: string; boton: string; lectura: string };
 
@@ -63,6 +70,8 @@ export interface Leccion {
   minutos: number;
   /** La llave que la persona recibe al completar la lección: su paso en el camino de iniciación. */
   llave: { nombre: string; simbolo: string; saber: string };
+  /** La lección final (la prueba del Círculo): no es una llave más, sino la que otorga la maestría. */
+  final?: boolean;
   bloques: Bloque[];
 }
 
@@ -85,8 +94,21 @@ export interface Curso {
   abierto: boolean;
   /** Horas que deben pasar desde que se completa una lección para que se abra la siguiente. */
   horasEntreLecciones: number;
+  /** El libro de consulta del curso: correspondencias, glosario y cuidados. */
+  libro?: LibroCurso;
   /** Garantía: días desde la inscripción para pedir la devolución (antes de completar la segunda lección). */
   garantiaDias: number;
+}
+
+export interface LibroCurso {
+  correspondencias: { titulo: string; nota?: string; columnas: string[]; filas: string[][] }[];
+  glosario: { termino: string; origen?: string; texto: string }[];
+  cuidado: { titulo: string; texto: string }[];
+}
+
+/** Las lecciones que dan llave (todas menos la final). */
+export function leccionesConLlave(curso: Curso) {
+  return curso.lecciones.filter((l) => !l.final);
 }
 
 /** Texto de un paso, sea simple o con acción. */

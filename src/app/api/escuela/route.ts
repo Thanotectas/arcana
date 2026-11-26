@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { audioCarta, audioComentario, audioPaso, audioTexto, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, inscribir, reembolsar } from "@/lib/escuela/servidor";
+import { audioCarta, audioComentario, audioPaso, audioTexto, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, guardarProyecto, inscribir, reembolsar } from "@/lib/escuela/servidor";
 
 // El comentario de Sibila, su voz y la carta de cierre tardan unos segundos.
 export const maxDuration = 120;
@@ -13,6 +13,7 @@ export const maxDuration = 120;
  * - perfil { nombre, zona, intencionCierre, intencionVela }
  * - leccion { leccion, respuestas }: corrige, Sibila comenta y la lección queda hecha
  * - nota { leccion, paso, texto }: lo que escribe en el ritual guiado
+ * - proyecto { leccion, campos }: el ritual propio del final; Sibila lo revisa
  * - paso { leccion, paso }: la voz de Sibila para un paso del ritual
  * - escuchar { leccion }: el comentario de la lección en la voz de Sibila
  */
@@ -50,16 +51,22 @@ export async function POST(request: Request) {
     const respuestas = cuerpo.respuestas && typeof cuerpo.respuestas === "object" ? (cuerpo.respuestas as Record<string, unknown>) : {};
     const resultado = await completarLeccion(curso, leccion, usuario, respuestas, avance.perfil);
     const ultima = leccion.numero === curso.lecciones[curso.lecciones.length - 1].numero;
-    const carta = ultima && avance.inscrito ? await cartaDeCierre(curso, usuario, avance.perfil).catch(() => null) : null;
+    const carta = ultima && resultado.aprobada && avance.inscrito ? await cartaDeCierre(curso, usuario, avance.perfil).catch(() => null) : null;
     const cartaAudio = carta ? await audioCarta(curso, usuario) : null;
     return NextResponse.json({ ok: true, resultado, carta, cartaAudio });
   }
 
   if (cuerpo.accion === "nota") {
     const paso = Number(cuerpo.paso);
-    if (!Number.isInteger(paso) || paso < 0 || paso > 30) return NextResponse.json({ ok: false }, { status: 400 });
+    if (!Number.isInteger(paso) || paso < 0 || paso > 99) return NextResponse.json({ ok: false }, { status: 400 });
     await guardarNota(curso, leccion, usuario, paso, String(cuerpo.texto ?? ""));
     return NextResponse.json({ ok: true });
+  }
+
+  if (cuerpo.accion === "proyecto") {
+    const datos = cuerpo.campos && typeof cuerpo.campos === "object" ? (cuerpo.campos as Record<string, unknown>) : {};
+    const r = await guardarProyecto(curso, leccion, usuario, datos, avance.perfil);
+    return NextResponse.json(r, { status: r.ok ? 200 : 400 });
   }
 
   if (cuerpo.accion === "paso") {

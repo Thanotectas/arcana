@@ -1,5 +1,6 @@
 import { faseLunar } from "@/lib/luna";
 import { FICHA_INTENCION, TONO_COLOR, type ColorVela, type Intencion } from "@/lib/velas";
+import type { Curso } from "./tipos";
 
 /** Lo que dice la tradición de cada fase (para la tarjeta «Tu Luna hoy»). */
 const FASES = [
@@ -91,10 +92,20 @@ const GRADOS: Record<Trato, string[]> = {
 
 /**
  * El grado del camino de iniciación según las llaves que tiene (de 7): Buscador (0), Aprendiz (1–2), Iniciado (3–4),
- * Adepto (5–6) y, con las siete, Maestra o Maestro de rituales del Primer Círculo. Es simbólico: un camino de aprendizaje.
+ * Adepto (5 a 7) y, al superar la prueba del Círculo, Maestra o Maestro de rituales del Primer Círculo. Es simbólico:
+ * un camino de aprendizaje. Sin prueba final en el curso, la maestría llega con todas las llaves.
  */
-export function grado(llaves: number, trato: Trato | null | undefined, total = 7) {
+export function grado(llaves: number, trato: Trato | null | undefined, total = 7, prueba = llaves >= total) {
   const t = trato ?? "e";
-  const i = llaves >= total ? 4 : llaves >= 5 ? 3 : llaves >= 3 ? 2 : llaves >= 1 ? 1 : 0;
+  const i = prueba ? 4 : llaves >= 5 ? 3 : llaves >= 3 ? 2 : llaves >= 1 ? 1 : 0;
   return { titulo: GRADOS[t][i], nivel: i, completo: i === 4, conCirculo: i === 4 ? `${GRADOS[t][4]} del Primer Círculo` : GRADOS[t][i] };
+}
+
+/** El grado de una persona en un curso, según sus lecciones hechas (las llaves) y la prueba final. */
+export function gradoDe(curso: Curso, estados: string[], trato: Trato | null | undefined) {
+  const conLlave = curso.lecciones.map((l, i) => ({ l, hecha: estados[i] === "hecha" })).filter(({ l }) => !l.final);
+  const llaves = conLlave.filter((x) => x.hecha).length;
+  const final = curso.lecciones.findIndex((l) => l.final);
+  const prueba = final >= 0 ? estados[final] === "hecha" : llaves >= conLlave.length;
+  return { ...grado(llaves, trato, conLlave.length, prueba), llaves };
 }

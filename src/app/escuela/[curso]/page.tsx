@@ -7,7 +7,7 @@ import { getIdioma } from "@/lib/i18n/servidor";
 import { INTENCIONES, FICHA_INTENCION, TONO_COLOR } from "@/lib/velas";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, precioPara } from "@/lib/escuela/servidor";
-import { grado, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
+import { gradoDe, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
 import { Llavero } from "@/components/escuela/Llavero";
 import { Temario } from "@/components/escuela/Temario";
 import { BotonGarantia } from "@/components/escuela/BotonGarantia";
@@ -43,19 +43,27 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
   const pidePerfil = avance.inscrito && !avance.perfil;
   const siguiente = curso.lecciones.find((_, i) => avance.estados[i] === "abierta");
   const terminado = hechas === curso.lecciones.length;
-  const miGrado = grado(hechas, avance.perfil?.trato, curso.lecciones.length);
-  const llaves = curso.lecciones.map((l) => l.llave);
+  const miGrado = gradoDe(curso, avance.estados, avance.perfil?.trato);
+  const conLlave = curso.lecciones.map((l, i) => ({ l, e: avance.estados[i] })).filter(({ l }) => !l.final);
+  const llaves = conLlave.map(({ l }) => l.llave);
+  const noches = conLlave.length;
+  const velasHechas = conLlave.filter(({ e }) => e === "hecha").length;
   const contar = (tipo: "saberes" | "tradiciones") => curso.lecciones.reduce((s, l) => s + l.bloques.reduce((t, b) => t + (b.tipo === tipo ? b.items.length : 0), 0), 0);
   const incluye = [
-    `${curso.lecciones.length} lecciones, una por día, de ${Math.min(...curso.lecciones.map((l) => l.minutos))} a ${Math.max(...curso.lecciones.map((l) => l.minutos))} minutos`,
-    `${curso.lecciones.length} rituales guiados con la voz de Sibila`,
+    `${noches} lecciones, una por noche, y la noche del Círculo`,
+    `${noches} rituales guiados con la voz de Sibila`,
+    "«Para profundizar» en cada lección, para leer o escuchar",
+    `${noches} prácticas entre lunas para hacer en casa`,
+    "Tu propio ritual, diseñado por ti y revisado por Sibila",
+    "La prueba del Primer Círculo",
+    "Libro de consulta: correspondencias, glosario y cuidados",
     "Videos de Sibila y lecciones que puedes escuchar",
     `${contar("saberes")} saberes y ${contar("tradiciones")} tradiciones del mundo`,
     "Tu Luna y tu vela calculadas para ti",
     `${curso.creditosIncluidos} créditos para que Sibila lea tus rituales`,
     "Sibila comenta tus respuestas, con su voz",
     "Grimorio descargable con todo lo que escribes",
-    "7 llaves, grados y una carta final de Sibila",
+    "7 llaves, 5 grados y una carta final de Sibila",
     "Sello de cierre para compartir",
     "Sin horarios: lo haces a tu ritmo, en el celular",
     `Garantía: ${curso.garantiaDias} días, antes de la segunda lección`,
@@ -79,21 +87,21 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
           <p className="font-display text-2xl italic text-violeta-suave">{avance.perfil ? `${avance.perfil.nombre} · ${miGrado.conCirculo}` : curso.subtitulo}</p>
           <div className="pt-4">
             {/* A quien aún no entra, el altar encendido: lo que va a vivir. */}
-            <Altar estados={dentro ? avance.estados : avance.estados.map(() => "hecha")} />
+            <Altar estados={dentro ? conLlave.map(({ e }) => e) : conLlave.map(() => "hecha")} />
           </div>
           {/* Las siete llaves del camino de iniciación */}
           <div className="pt-2">
-            <Llavero llaves={llaves} ganadas={avance.estados.map((e) => (dentro ? e === "hecha" : false))} />
-            {!dentro && <p className="mt-3 text-sm text-texto-suave">Siete llaves, siete grados de conocimiento. Con las siete cierras el Primer Círculo.</p>}
+            <Llavero llaves={llaves} ganadas={conLlave.map(({ e }) => dentro && e === "hecha")} />
+            {!dentro && <p className="mt-3 text-sm text-texto-suave">Siete llaves y una noche final: diseñas tu propio ritual y presentas la prueba del Primer Círculo.</p>}
           </div>
           {dentro && (
             <p className="text-sm text-texto-suave">
-              {terminado ? "Encendiste las siete velas ✦" : `${hechas} de ${curso.lecciones.length} velas encendidas`} · {luna.emoji} {luna.nombre} hoy
+              {terminado ? "Cerraste el Primer Círculo ✦" : velasHechas === noches ? "Siete velas encendidas · te espera la noche del Círculo" : `${velasHechas} de ${noches} velas encendidas`} · {luna.emoji} {luna.nombre} hoy
             </p>
           )}
           {dentro && siguiente && !pidePerfil && (
             <Link href={`/escuela/${curso.slug}/${siguiente.numero}`} className="boton boton-primario">
-              {hechas === 0 ? "Comenzar el día 1" : `Continuar: día ${siguiente.numero}`}
+              {hechas === 0 ? "Comenzar el día 1" : siguiente.final ? "Ir a la noche del Círculo" : `Continuar: día ${siguiente.numero}`}
             </Link>
           )}
           {dentro && terminado && (
@@ -164,7 +172,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
       <section className="space-y-6">
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">El camino</p>
-          <h2 className="font-display text-4xl">Siete noches, siete lunas</h2>
+          <h2 className="font-display text-4xl">Siete noches, siete lunas y el Círculo</h2>
         </div>
         <ol className="relative mx-auto max-w-2xl space-y-4 before:absolute before:bottom-6 before:start-[35px] before:top-6 before:w-px before:bg-gradient-to-b before:from-oro/60 before:via-violeta/40 before:to-transparent">
           {curso.lecciones.map((l, i) => {
@@ -173,10 +181,10 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
             const contenido = (
               <>
                 <span className={`relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border text-2xl ${e === "hecha" ? "border-oro bg-oro/15 shadow-[0_0_24px_rgba(241,217,154,.35)]" : e === "abierta" ? "border-oro/60 bg-noche" : "border-borde bg-noche opacity-70"}`}>
-                  {e === "hecha" ? <Flame className="escuela-llama h-6 w-6 text-oro" aria-hidden /> : l.luna}
+                  {e === "hecha" ? <Flame className="escuela-llama h-6 w-6 text-oro" aria-hidden /> : l.final ? "✦" : l.luna}
                 </span>
                 <span className="flex-1">
-                  <span className="text-xs uppercase tracking-[0.25em] text-violeta-suave">Día {l.numero} · {l.minutos} min</span>
+                  <span className="text-xs uppercase tracking-[0.25em] text-violeta-suave">{l.final ? "La noche del Círculo" : `Día ${l.numero}`} · {l.minutos} min</span>
                   <span className="font-display block text-2xl leading-tight">{l.titulo}</span>
                   <span className="block text-sm text-texto-suave">{e === "manana" ? "Se abre mañana: deja que el ritual de hoy repose." : l.resumen}</span>
                 </span>
@@ -211,6 +219,15 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
               <span className="text-sm text-texto-suave">Todo lo que escribes, tus rituales y las lecturas de Sibila, en un libro tuyo.</span>
             </span>
           </Link>
+          {curso.libro && (
+            <Link href={`/escuela/${curso.slug}/libro`} className="tarjeta group flex items-center gap-4 p-6 transition hover:border-oro/40 sm:col-span-2">
+              <ScrollText className="h-10 w-10 shrink-0 text-oro" aria-hidden />
+              <span>
+                <span className="font-display block text-2xl">Libro de consulta</span>
+                <span className="text-sm text-texto-suave">Correspondencias de colores, días, lunas, plantas y piedras; el glosario y los cuidados del ritual.</span>
+              </span>
+            </Link>
+          )}
         </section>
       )}
 

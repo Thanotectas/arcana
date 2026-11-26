@@ -193,7 +193,7 @@ export async function audioPaso(curso: Curso, leccion: Leccion, paso: number) {
 /** Un texto de la lección leído por Sibila («Escuchar la lección»). */
 export async function audioTexto(curso: Curso, leccion: Leccion, bloque: number) {
   const b = leccion.bloques[bloque];
-  if (!b || b.tipo !== "texto") return null;
+  if (!b || (b.tipo !== "texto" && b.tipo !== "profundizar")) return null;
   return audioCompartido(curso, leccion, `texto${bloque}`, [b.titulo, ...b.parrafos].filter(Boolean).join("… "));
 }
 
@@ -228,6 +228,24 @@ export interface ResultadoTest {
   total: number;
   detalle: { indice: number; acierto: boolean | null; porque?: string }[];
   comentario: string | null;
+  /** Si la lección quedó completa (la prueba final pide un mínimo de aciertos y el proyecto entregado). */
+  aprobada: boolean;
+  /** Aciertos que pide la prueba, si los pide. */
+  minimo?: number;
+  /** Falta entregar el proyecto antes de la prueba. */
+  faltaProyecto?: boolean;
+}
+
+/** La clave de la reflexión de la práctica entre lunas dentro de las notas de la lección. */
+export const NOTA_PRACTICA = "90";
+/** Prefijo de los campos del proyecto final dentro de las notas de la lección. */
+export const NOTA_PROYECTO = "proyecto:";
+
+/** Cómo nombrar cada nota cuando Sibila la lee. */
+function etiquetaNota(clave: string, leccion: number) {
+  if (clave === NOTA_PRACTICA) return `Día ${leccion} · cómo le fue con la práctica entre lunas`;
+  if (clave.startsWith(NOTA_PROYECTO)) return `Su propio ritual · ${clave.slice(NOTA_PROYECTO.length)}`;
+  return `Día ${leccion} · escribió en su ritual`;
 }
 
 /** Quién es la persona para Sibila (nombre e intención), si lo contó. */
@@ -261,7 +279,13 @@ export async function completarLeccion(curso: Curso, leccion: Leccion, usuario: 
 
   const { data: previa } = await admin.from("escuela_progreso").select("intentos, comentario, respuestas, notas, completada_en").eq("usuario_id", usuario.id).eq("curso", curso.slug).eq("leccion", leccion.numero).maybeSingle();
   const abiertas = preguntas.map((p, i) => (p.tipo === "abierta" && limpias[String(i)] ? `Pregunta: ${p.p}\nRespuesta: ${limpias[String(i)]}` : null)).filter(Boolean) as string[];
-  const notas = Object.values((previa?.notas ?? {}) as Record<string, string>).filter(Boolean);
+  const notasPrevias = (previa?.notas ?? {}) as Record<string, string>;
+  const notas = Object.values(notasPrevias).filter(Boolean);
+  const prueba = leccion.bloques.find((b) => b.tipo === "test" && b.aprobar);
+  const minimo = prueba?.tipo === "test" ? prueba.aprobar : undefined;
+  const pideProyecto = leccion.bloques.some((b) => b.tipo === "proyecto");
+  const faltaProyecto = pideProyecto && !Object.keys(notasPrevias).some((k) => k.startsWith(NOTA_PROYECTO) && notasPrevias[k]);
+  const aprobada = Boolean(previa?.completada_en) || (!faltaProyecto && (minimo === undefined || correctas >= minimo));
   const mismas = previa?.completada_en && JSON.stringify(previa.respuestas) === JSON.stringify(limpias);
   let comentario: string | null = previa?.comentario ?? null;
   if (abiertas.length && !mismas && (previa?.intentos ?? 0) < 5) {
@@ -281,14 +305,51 @@ export async function completarLeccion(curso: Curso, leccion: Leccion, usuario: 
       respuestas: limpias as Json,
       comentario,
       intentos: (previa?.intentos ?? 0) + 1,
-      completada_en: previa?.completada_en ?? ahora,
+      completada_en: previa?.completada_en ?? (aprobada ? ahora : null),
       actualizado_en: ahora,
       // Si Sibila escribió otro comentario, el audio anterior ya no corresponde.
       ...(comentario !== (previa?.comentario ?? null) ? { comentario_audio: null } : {}),
     },
     { onConflict: "usuario_id,curso,leccion" },
   );
-  return { correctas, total: opciones, detalle, comentario };
+  return { correctas, total: opciones, detalle, comentario, aprobada, minimo, faltaProyecto };
+}
+
+/**
+ * El proyecto final: la persona diseña su propio ritual y Sibila se lo revisa como maestra (el comentario de la
+ * lección, que luego puede escuchar con su voz). Hasta 4 revisiones.
+ */
+export async function guardarProyecto(curso: Curso, leccion: Leccion, usuario: { id: string }, datos: Record<string, unknown>, perfil: PerfilAlumno | null) {
+  const bloque = leccion.bloques.find((b) => b.tipo === "proyecto");
+  if (!bloque || bloque.tipo !== "proyecto") return { ok: false as const, error: "proyecto" };
+  const admin = getSupabaseAdmin();
+  const { data: fila } = await admin.from("escuela_progreso").select("notas, intentos, comentario").eq("usuario_id", usuario.id).eq("curso", curso.slug).eq("leccion", leccion.numero).maybeSingle();
+  const notas = { ...((fila?.notas ?? {}) as Record<string, string>) };
+  const campos = bloque.campos.map((c) => ({ ...c, valor: String(datos[c.clave] ?? "").trim().slice(0, 2000) }));
+  if (campos.filter((c) => c.valor).length < Math.min(4, campos.length)) return { ok: false as const, error: "incompleto" };
+  for (const c of campos) notas[NOTA_PROYECTO + c.clave] = c.valor;
+  const revisiones = Number(notas.revisiones ?? 0);
+  let comentario = fila?.comentario ?? null;
+  if (revisiones < 4) {
+    comentario = await generarTexto(
+      `Proyecto final del curso «${curso.titulo}»: la persona diseñó su propio ritual con lo aprendido en los siete días (el altar, el humo, el agua y el huevo, el fuego y los colores, soltar con el papel, agradecer con la mesa y el café, sembrar).${contexto(perfil)}\n\n${campos.map((c) => `${c.etiqueta}: ${c.valor || "(sin escribir)"}`).join("\n")}`,
+      "Eres Sibila, la maestra del curso de rituales de Arcana, revisando el ritual que diseñó tu alumna o alumno para cerrar el Primer Círculo. Escribe 2 o 3 párrafos cálidos y concretos, desde adentro de la tradición: reconoce lo que está bien pensado (la intención clara, el momento, los elementos, la apertura y el cierre), sugiere uno o dos ajustes con lo que dice la tradición (por ejemplo el color o el día de la vela, la fase de la Luna, terminar el humo en la puerta, devolver la ceniza a la tierra), y señala con tacto si algo no es seguro (fuego sin cuidado, ingerir plantas, hacer un ritual sobre otra persona sin su permiso). Termina diciéndole que su ritual está listo para la prueba del Círculo. Si sabes su nombre, úsalo una vez. Para ser leído en voz alta: sin listas, títulos ni emojis. Nada de promesas de resultados, salud ni dinero.",
+      { effort: "low", maxTokens: 900, nivel: "estandar", idioma: "es" },
+    ).catch(() => comentario);
+    notas.revisiones = String(revisiones + 1);
+  }
+  const ahora = new Date().toISOString();
+  if (fila) {
+    await admin
+      .from("escuela_progreso")
+      .update({ notas: notas as Json, comentario, actualizado_en: ahora, ...(comentario !== (fila.comentario ?? null) ? { comentario_audio: null } : {}) })
+      .eq("usuario_id", usuario.id)
+      .eq("curso", curso.slug)
+      .eq("leccion", leccion.numero);
+  } else {
+    await admin.from("escuela_progreso").insert({ usuario_id: usuario.id, curso: curso.slug, leccion: leccion.numero, notas: notas as Json, comentario, intentos: 0, completada_en: null });
+  }
+  return { ok: true as const, comentario };
 }
 
 /** Al terminar la última lección: la carta de cierre de ciclo, escrita por Sibila con lo que la persona compartió. */
@@ -302,14 +363,16 @@ export async function cartaDeCierre(curso: Curso, usuario: { id: string }, perfi
       const l = curso.lecciones.find((x) => x.numero === f.leccion);
       const ps = l?.bloques.flatMap((b) => (b.tipo === "test" ? b.preguntas : [])) ?? [];
       const r = (f.respuestas ?? {}) as Record<string, unknown>;
-      const notas = Object.values((f.notas ?? {}) as Record<string, string>).filter(Boolean).map((n) => `Día ${f.leccion} · escribió en su ritual:\n${n}`);
+      const notas = Object.entries((f.notas ?? {}) as Record<string, string>)
+        .filter(([k, n]) => n && k !== "revisiones")
+        .map(([k, n]) => `${etiquetaNota(k, f.leccion)}:\n${n}`);
       return [...notas, ...ps.map((p, i) => (p.tipo === "abierta" && typeof r[String(i)] === "string" && r[String(i)] ? `Día ${f.leccion} · ${p.p}\n${r[String(i)]}` : null))];
     })
     .filter(Boolean)
     .join("\n\n");
   const carta = await generarTexto(
-    `Esto es lo que la persona compartió durante los siete días del curso «${curso.titulo}»:${contexto(perfil)}\n\n${compartido || "(no escribió respuestas abiertas)"}`,
-    "Eres Sibila. Escribe la carta de cierre de ciclo para esta persona que terminó el curso de rituales: 3 o 4 párrafos cálidos, en segunda persona, que recojan lo que quiso cerrar, lo que soltó, lo que agradece y lo que quiere sembrar, con imágenes de la tradición (la vela, el agua, el humo, la semilla). Si sabes su nombre, empieza la carta con él. Con estos siete días recibió las siete llaves y llega al grado de Maestra o Maestro de rituales del Primer Círculo (o «Maestría», si no usa género): reconócelo con solemnidad y ternura, como una iniciación simbólica, sin prometer poderes. Escribe para ser leída en voz alta: sin títulos, listas ni emojis. Termina con una bendición sencilla para el año nuevo y firma «Sibila». Nada de promesas de resultados, salud ni dinero; no inventes datos que no estén en lo que compartió.",
+    `Esto es lo que la persona compartió durante los siete días y la noche del Círculo del curso «${curso.titulo}»:${contexto(perfil)}\n\n${compartido || "(no escribió respuestas abiertas)"}`,
+    "Eres Sibila. Escribe la carta de cierre de ciclo para esta persona que terminó el curso de rituales: 3 o 4 párrafos cálidos, en segunda persona, que recojan lo que quiso cerrar, lo que soltó, lo que agradece y lo que quiere sembrar, con imágenes de la tradición (la vela, el agua, el humo, la semilla). Si sabes su nombre, empieza la carta con él. Con estos siete días recibió las siete llaves, diseñó su propio ritual y superó la prueba del Círculo: llega al grado de Maestra o Maestro de rituales del Primer Círculo (o «Maestría», si no usa género). Menciona su propio ritual si lo compartió. Reconócelo con solemnidad y ternura, como una iniciación simbólica, sin prometer poderes. Escribe para ser leída en voz alta: sin títulos, listas ni emojis. Termina con una bendición sencilla para el año nuevo y firma «Sibila». Nada de promesas de resultados, salud ni dinero; no inventes datos que no estén en lo que compartió.",
     { effort: "low", maxTokens: 1500, nivel: "estandar", idioma: "es" },
   );
   // La carta de cierre siempre va con la voz de Sibila (si la voz falla, queda el texto).

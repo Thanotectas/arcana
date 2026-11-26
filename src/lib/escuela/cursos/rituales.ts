@@ -1,4 +1,5 @@
 import type { Curso } from "../tipos";
+import { LIBRO_RITUALES } from "./rituales-libro";
 
 /**
  * Curso piloto: «7 días para cerrar el año». Una lección por día; cada una se apoya en una lectura que ya existe en
@@ -13,9 +14,12 @@ export const CURSO_RITUALES: Curso = {
   titulo: "7 días para cerrar el año",
   subtitulo: "Tu iniciación en los rituales, con Sibila",
   descripcion:
-    "Un ritual por día para despedir el año con intención: preparar tu espacio, limpiar, encender la vela correcta, soltar lo que pesa, agradecer y sembrar lo que viene. Cada lección trae un video de Sibila, la historia de la tradición y cómo se vive en el mundo, un ritual guiado con su voz, unas preguntas para ti y, cuando hay foto, Sibila te lee lo que quedó.",
+    "Un ritual por noche para despedir el año con intención: preparar tu espacio, limpiar, encender la vela correcta, soltar lo que pesa, agradecer y sembrar lo que viene. Cada lección trae un video de Sibila, la historia de la tradición y cómo se vive en el mundo, un ritual guiado con su voz, una práctica para los días siguientes y, cuando hay foto, Sibila te lee lo que quedó. La octava noche diseñas tu propio ritual y presentas la prueba del Primer Círculo.",
   promesas: [
-    "7 lecciones de 20 a 30 minutos, una por día",
+    "7 noches de ritual y la noche del Círculo (unas 8 horas en total con las prácticas, a tu ritmo)",
+    "En cada lección, «Para profundizar»: la historia larga, para leer o escuchar",
+    "Una práctica entre lunas para los días siguientes",
+    "Tu propio ritual, revisado por Sibila, y la prueba del Primer Círculo",
     "Rituales de Latinoamérica, Turquía, el mundo árabe, Irán, el Mediterráneo y Asia",
     "Cada ritual, guiado por la voz de Sibila como una meditación",
     "Sibila lee tu vaso, tu vela, tu taza y tu tirada (lecturas incluidas)",
@@ -29,6 +33,7 @@ export const CURSO_RITUALES: Curso = {
   abierto: false,
   horasEntreLecciones: 16,
   garantiaDias: 7,
+  libro: LIBRO_RITUALES,
   lecciones: [
     // ───────────────────────────── DÍA 1 ─────────────────────────────
     {
@@ -38,7 +43,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, hoy empieza tu cierre de año. Antes de encender nada, vamos a preparar el lugar donde va a pasar todo.",
       titulo: "Qué es un ritual: intención, espacio y momento",
       resumen: "Qué convierte un gesto en ritual, cómo lo viven distintas culturas y tu altar para estos siete días.",
-      minutos: 25,
+      minutos: 35,
       bloques: [
         { tipo: "video", titulo: "Sibila te da la bienvenida", src: "/escuela/rituales/dia-1.mp4", poster: "/escuela/rituales/dia-1.jpg" },
         {
@@ -70,6 +75,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Mediterráneo", emoji: "🕯️", nombre: "La lámpara ante la imagen", texto: "En Grecia, Italia y España, muchas casas guardan un rincón con una imagen y una lámpara de aceite o una vela que se enciende para pedir o agradecer." },
             { lugar: "China y Vietnam", emoji: "🏮", nombre: "El altar de los antepasados", texto: "En el centro de la casa, un altar con fotos de la familia, incienso, fruta y té. Se enciende incienso para honrarlos y pedir su compañía." },
             { lugar: "Mundo árabe y Turquía", emoji: "🧿", nombre: "La entrada de la casa", texto: "Más que un altar, se cuida el umbral: la khamsa o el nazar junto a la puerta, y palabras como «bismillah» o «maşallah» al entrar y al elogiar." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "La anatomía de un ritual",
+          parrafos: [
+            "Si miras con atención cualquier ritual del mundo, una boda, un altar de muertos, una vela ante una imagen, vas a encontrar siempre la misma arquitectura. Conocerla es lo que separa a quien repite un ritual de quien sabe crearlo. Por eso empezamos por aquí: al final de estos siete días, tú vas a diseñar el tuyo.",
+            "Primero, la apertura. Es el momento en que se marca que algo distinto va a empezar: se apagan las luces fuertes, se respira, se enciende el fuego, se dice una palabra. En la misa es la señal de la cruz; en una ceremonia andina, el saludo a los cuatro rumbos; en tu casa puede ser simplemente sentarte frente al altar y cerrar los ojos. Sin apertura, el ritual se confunde con lo cotidiano.",
+            "Después, la intención. Es el porqué del ritual, dicho con tus palabras y, si se puede, en voz alta. La tradición dice que la intención que se nombra empieza a moverse. Por eso conviene que sea una sola, clara, en presente: no «ojalá algún día», sino «cierro este año con gratitud».",
+            "Luego, la acción: el gesto que lleva la intención al cuerpo. Encender, pasar el humo, romper el huevo, quemar el papel, sembrar la semilla. La acción usa los elementos, fuego, agua, tierra y aire, porque las tradiciones dicen que lo que tocamos con las manos se graba más hondo que lo que solo pensamos.",
+            "Por último, el cierre. Se agradece, se apaga, se devuelve a la tierra lo que se usó y se vuelve a la vida de todos los días. El cierre es tan importante como la apertura: un ritual sin cierre queda abierto, como una puerta que nadie cerró. Las abuelas lo sabían: después de la limpia, un vaso de agua y descanso.",
+            "Alrededor de esas cuatro piezas están el espacio y el momento. Los antiguos romanos tenían en cada casa un pequeño altar, el lararium, donde cada día se ofrecía a los lares, los espíritus protectores del hogar. Los griegos honraban a Hestia en el fuego del hogar, el centro de la casa. Y casi todos los pueblos eligieron el umbral, la puerta, el atardecer, el cambio de año, como el momento de los ritos: en latín, umbral se dice limen, y de ahí viene la palabra «liminal», lo que está en el borde.",
+            "El antropólogo Victor Turner, siguiendo a Van Gennep, llamó así a ese estado de en medio: ya no eres quien eras y todavía no eres quien serás. Estos siete días son exactamente eso. Tu altar es el umbral. Cada noche que vuelves a él, cruzas un poco más.",
           ],
         },
         {
@@ -115,8 +133,15 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "opcion", p: "¿Qué convierte un gesto en ritual?", opciones: ["Usar objetos caros", "La intención, el espacio y el momento", "Hacerlo a medianoche"], correcta: 1, porque: "No hace falta nada caro ni una hora especial: lo que importa es la intención con que lo haces, el lugar que separas y el momento que eliges." },
             { tipo: "opcion", p: "¿Qué elementos reúne tu altar?", opciones: ["Solo el fuego", "Fuego, agua y tierra (y el aire, cuando hay humo)", "Ninguno en especial"], correcta: 1, porque: "La vela, el vaso de agua y la piedra o la hoja: muchas tradiciones reúnen los elementos para que nada falte." },
             { tipo: "opcion", p: "¿Cómo conviene escribir una intención?", opciones: ["En presente y con tus propias palabras", "En futuro y muy general", "Copiada de un libro"], correcta: 0, porque: "La tradición dice que lo que se nombra en presente ya empieza a ocurrir, y tus palabras pesan más que las de cualquier libro." },
-            { tipo: "abierta", p: "¿Qué quieres cerrar este año? Cuéntaselo a Sibila.", ayuda: "Lo que escribas aquí lo usará Sibila en tu carta de cierre del día 7." },
+            { tipo: "abierta", p: "¿Qué quieres cerrar este año? Cuéntaselo a Sibila.", ayuda: "Lo que escribas aquí lo usará Sibila en tu carta de cierre, al final del camino." },
           ],
+        },
+        {
+          tipo: "practica",
+          titulo: "Tres minutos frente al altar",
+          texto: "Hasta la próxima lección, vuelve a tu altar una vez al día. No hace falta encender nada: la repetición es lo que convierte un rincón en un lugar sagrado.",
+          pasos: ["Siéntate frente al altar tres minutos, con la espalda recta.", "Pon una mano sobre el paño y repite tu intención en voz baja.", "Por la mañana, cambia el agua del vaso y tira la vieja a una planta o al desagüe.", "Antes de irte, agradece. Nada más."],
+          pregunta: "¿Pudiste volver a tu altar? ¿Qué notaste al repetir tu intención?",
         },
       ],
     },
@@ -128,7 +153,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, tu altar ya está listo. Hoy le abrimos las ventanas a la casa y dejamos que el humo se lleve lo viejo.",
       titulo: "Limpiar antes de pedir: el humo y las hierbas",
       resumen: "Copal, romero, bakhoor y üzerlik: cómo se limpia una casa con humo en distintas tradiciones.",
-      minutos: 25,
+      minutos: 35,
       bloques: [
         { tipo: "video", titulo: "El humo que limpia" },
         {
@@ -159,6 +184,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Península arábiga", emoji: "🌙", nombre: "Bakhoor", texto: "Se quema para recibir invitados, en las fiestas y los viernes; el humo perfumado pasa por cada habitación." },
             { lugar: "Turquía e Irán", emoji: "🧿", nombre: "Üzerlik / espand", texto: "Las semillas se queman y el humo se pasa en círculo sobre la cabeza de quien se cuida del nazar." },
             { lugar: "Mediterráneo", emoji: "🌿", nombre: "Romero y laurel", texto: "Las abuelas quemaban ramitas de romero y laurel para «limpiar el aire» de la casa después de una enfermedad o una mala racha." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "El humo sagrado: de los templos de Arabia a tu casa",
+          parrafos: [
+            "Hace más de tres mil años, las caravanas cruzaban el desierto de Arabia cargadas de una mercancía más valiosa que el oro: resinas aromáticas. El olíbano, que en muchas lenguas se llama simplemente incienso, crecía en los árboles de Dhofar, en el sur de Omán, y en las costas de Somalia. Desde allí viajaba por la Ruta del Incienso hasta Egipto, Jerusalén, Grecia y Roma. Hoy esos paisajes son patrimonio de la humanidad.",
+            "En los templos de Egipto se quemaba incienso al amanecer, al mediodía y al atardecer, y los sacerdotes preparaban el kyphi, una mezcla de resinas, miel y vino para la noche. En el templo de Jerusalén había un altar solo para el incienso. Los griegos llamaban thymiama a la ofrenda de humo, y los romanos la llevaron a cada casa. El humo subía, decían, hasta donde la voz no alcanza.",
+            "Del otro lado del océano, los pueblos de Mesoamérica hacían lo mismo con el copal, que los mayas llaman pom. Lo quemaban en sus templos, en las cuevas sagradas y en los campos de maíz. Todavía hoy, en México y Guatemala, el copal perfuma los altares de muertos, las procesiones y las limpias de las curanderas. En los Andes se sahúma con q'uwa y otras hierbas de altura en las ofrendas a la Pachamama.",
+            "La Iglesia heredó el humo de Roma y de Jerusalén. En la catedral de Santiago de Compostela, desde la Edad Media, el botafumeiro, un incensario enorme, vuela de un lado a otro de la nave colgado de una cuerda, movido por ocho hombres. Dicen que nació para perfumar a los peregrinos que llegaban después de semanas de camino; con el tiempo se volvió una de las imágenes más hermosas del humo sagrado.",
+            "En el mundo árabe y en el Golfo, el humo es hospitalidad. El bakhoor se quema en el mabkhara y se pasa por la casa antes de que lleguen los invitados; al despedirlos, se les ofrece el humo para que perfumen su ropa. En Turquía e Irán, las semillas de üzerlik o espand se queman cuando alguien recibe demasiados elogios: el chasquido de la semilla rompe la mirada pesada.",
+            "¿Por qué el humo limpia? La tradición da varias respuestas que se parecen. Porque es aire que se ve: hace visible lo invisible. Porque sube: lleva hacia arriba lo que pedimos. Porque se va: sale por la ventana y se lleva lo que ya no es nuestro. Por eso la regla de casi todas las tradiciones es la misma que seguiste hoy: de adentro hacia afuera, de los rincones a la puerta, con las ventanas abiertas.",
+            "Una palabra sobre el respeto. Algunas plantas sagradas se volvieron moda y hoy escasean: el palo santo, por ejemplo, debe venir de madera caída, y hay salvias silvestres sobreexplotadas. La tradición enseña que no hace falta lo raro: el romero de tu cocina, el laurel, la canela, una resina comprada con cuidado. Lo que limpia es tu recorrido, no la etiqueta.",
           ],
         },
         {
@@ -201,6 +239,13 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "abierta", p: "¿Qué sentiste al recorrer tu casa? ¿Hubo algún rincón que te costó más?" },
           ],
         },
+        {
+          tipo: "practica",
+          titulo: "El aire de cada mañana",
+          texto: "El humo limpió tu casa; ahora la mantenemos respirando. Hasta la próxima lección, empieza el día dejando entrar aire nuevo.",
+          pasos: ["Al levantarte, abre las ventanas cinco minutos, aunque haga frío.", "Si te sobraron hierbas, sahúma un solo rincón que sientas pesado.", "Fíjate en los olores de tu casa: cuáles te gustan, cuáles no.", "Deja una ramita de romero o laurel en la entrada."],
+          pregunta: "¿Cómo se sintió tu casa estos días? ¿Hubo un rincón que siguió pesando?",
+        },
       ],
     },
     // ───────────────────────────── DÍA 3 ─────────────────────────────
@@ -211,7 +256,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, hoy hacemos la limpia de las abuelas. Ten a mano un huevo, un vaso de agua y un rato de calma.",
       titulo: "La limpia con huevo",
       resumen: "La limpia de las abuelas latinoamericanas, sus parientes en el mundo y cómo se lee el vaso.",
-      minutos: 30,
+      minutos: 40,
       bloques: [
         { tipo: "video", titulo: "La abuela pasa el huevo" },
         {
@@ -242,6 +287,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Italia", emoji: "🇮🇹", nombre: "El aceite del malocchio", texto: "Se dejan caer gotas de aceite en un plato con agua: si se expanden y se unen en forma de ojo, había malocchio. Las palabras para quitarlo se aprenden en Nochebuena." },
             { lugar: "Turquía", emoji: "🇹🇷", nombre: "Kurşun dökme", texto: "Se derrite plomo y se vierte en un recipiente con agua sostenido sobre la cabeza de la persona. Las formas que toma el plomo muestran el nazar que se rompió." },
             { lugar: "El Caribe y Estados Unidos", emoji: "🌺", nombre: "Las botánicas", texto: "En las botánicas de Nueva York, Miami o San Juan se venden huevos, ruda, velas y aguas para hacer la limpia en casa." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "La mirada, el huevo y el agua que habla",
+          parrafos: [
+            "Pocas creencias están tan extendidas en el mundo como la del mal de ojo. En Grecia se llama mati; en Italia, malocchio; en Turquía y el mundo árabe, nazar o ayn; en América Latina, simplemente ojo. Ya el filósofo Plutarco, hace casi dos mil años, dedicó una de sus conversaciones de sobremesa a preguntarse por qué algunas miradas parecen dañar. La idea es siempre la misma: una mirada cargada de envidia, o de admiración excesiva, deja un peso en quien la recibe.",
+            "Por eso los amuletos que protegen de la mirada se parecen tanto entre sí: el ojo de vidrio azul de Turquía y Grecia, la khamsa o mano de cinco dedos del Magreb, el cuerno rojo de Nápoles, la pulsera roja de los bebés en Latinoamérica, el azabache de Galicia y del Caribe. Todos tienen la misma función: devolver la mirada o atraparla antes de que llegue.",
+            "El huevo ocupa un lugar especial en las historias del origen. Los órficos griegos contaban que el mundo nació de un huevo cósmico; en la India, el Hiranyagarbha, el embrión de oro; en China, Pangu despertó dentro de un huevo y separó el cielo de la tierra. Un objeto que contiene la vida entera, cerrado, perfecto. No es raro que tantas tradiciones lo eligieran para recoger lo que pesa: es la vida que absorbe y protege a la vida.",
+            "La limpia con huevo que hoy hiciste es mestiza, como América. Los pueblos de Mesoamérica ya barrían el cuerpo con ramas de hierbas, flores y copal; los europeos trajeron la gallina y su huevo. Las curanderas unieron las dos cosas y crearon algo nuevo que se hace desde México hasta la Patagonia, y en cada botánica de Nueva York, Miami o San Juan. Suele acompañarse de oraciones, del nombre de la persona dicho en voz alta y de una ramita de ruda o de albahaca.",
+            "Leer el agua es todavía más antiguo. En la Mesopotamia de hace cuatro mil años, los sacerdotes adivinos vertían aceite en un cuenco con agua y leían las formas: se llamó lecanomancia. El malocchio italiano es su pariente directo: gotas de aceite que se unen en forma de ojo. En Turquía, el kurşun dökme vierte plomo derretido en agua; en Europa central se hacía lo mismo con plomo o cera la noche de Año Nuevo. Siempre el agua como espejo de lo que no se ve.",
+            "Las curanderas tienen cada una su escuela para leer el vaso, y conviene saber que no hay una sola verdad. Lo que todas comparten es la actitud: mirar sin miedo, con calma, y recordar que lo que aparece en el vaso es lo que se fue, no lo que se quedó. Por eso, después de leerlo, se desecha lejos de la casa, se lava uno las manos y se bebe agua fresca.",
+            "Si quieres seguir aprendiendo, El Arcano tiene la historia completa de la limpia y del mal de ojo en distintas culturas, y en tu libro de consulta encontrarás la tabla para leer el vaso.",
           ],
         },
         {
@@ -286,6 +344,13 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "abierta", p: "¿Qué te dijo tu vaso? ¿Te sorprendió algo?" },
           ],
         },
+        {
+          tipo: "practica",
+          titulo: "Agua y sal en la entrada",
+          texto: "Una práctica de las abuelas para la noche después de una limpia: el agua con sal recoge lo que quedó en el aire de la casa.",
+          pasos: ["Antes de dormir, llena un vaso con agua y una cucharada de sal.", "Déjalo junto a la puerta de entrada, por dentro.", "Al despertar, tíralo al desagüe sin mirarlo mucho y lava el vaso.", "Bebe agua fresca y fíjate si recuerdas lo que soñaste."],
+          pregunta: "¿Cómo dormiste después de tu limpia? ¿Soñaste algo que quieras guardar?",
+        },
       ],
     },
     // ───────────────────────────── DÍA 4 ─────────────────────────────
@@ -296,7 +361,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, hoy tu intención se vuelve fuego. Vamos a elegir tu vela, tu día y tu Luna.",
       titulo: "El lenguaje de las velas: color, día y Luna",
       resumen: "El fuego en las tradiciones del mundo, los colores, los días de los astros y la vela de tu intención.",
-      minutos: 30,
+      minutos: 40,
       bloques: [
         { tipo: "video", titulo: "Una intención hecha fuego" },
         {
@@ -327,6 +392,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Tradición judía", emoji: "✡️", nombre: "Las velas del Shabat", texto: "Cada viernes al atardecer, en las casas judías se encienden dos velas para recibir el día de descanso." },
             { lugar: "India", emoji: "🪔", nombre: "Las diyas de Diwali", texto: "En la fiesta de las luces se encienden lámparas de barro con aceite en puertas y ventanas: la luz que vence a la oscuridad." },
             { lugar: "Egipto", emoji: "🏮", nombre: "El fanous de Ramadán", texto: "Los faroles de colores iluminan calles y casas durante el mes de Ramadán: una tradición que viene de El Cairo de hace siglos." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "La luz que acompaña: historia de la vela y de los siete días",
+          parrafos: [
+            "Antes de la vela fue la lámpara: un cuenco de barro con aceite y una mecha. Así se alumbraban los templos de Egipto, de Grecia y de Roma, y así siguen las diyas de la India en Diwali. Los romanos fabricaron las primeras velas sumergiendo papiro o juncos en sebo una y otra vez; de su palabra candela vienen candelabro y candelaria.",
+            "La cera de abeja fue durante siglos un lujo: ardía limpia, sin humo ni mal olor, y por eso se reservó para los templos y las iglesias. Se decía que las abejas, que viven en comunidad y trabajan para la reina, hacían una luz pura. En la fiesta de la Candelaria, el 2 de febrero, se bendicen las velas que acompañarán a la familia todo el año, y en muchos pueblos de América se guardan para encenderlas en las tormentas.",
+            "Las veladoras de siete días, en su vaso de vidrio, son la forma latinoamericana de la vela votiva: se encienden ante la imagen de un santo, una virgen o la foto de alguien querido, y acompañan el pedido una semana entera. Los colores se fueron asociando a las intenciones por tradición popular, por la liturgia y por los astros: así se formó el lenguaje que hoy aprendiste.",
+            "¿Por qué cada día tiene su astro? Los astrónomos de la antigüedad veían siete luces que se movían contra el fondo de estrellas fijas: Saturno, Júpiter, Marte, el Sol, Venus, Mercurio y la Luna, en ese orden, del más lento al más rápido. Asignaron a cada hora del día uno de ellos, en ese orden, y el astro de la primera hora daba nombre al día. El historiador romano Dion Casio lo explicó hace casi dos mil años, y por eso la semana sigue ese orden hasta hoy: el día del Sol, de la Luna, de Marte, de Mercurio, de Júpiter, de Venus y de Saturno.",
+            "En español se conservan casi todos: lunes, martes, miércoles, jueves y viernes. El sábado viene del hebreo shabat, el día de descanso, y el domingo, del latín dominicus, el día del Señor. Pero en inglés el sábado sigue siendo de Saturno, Saturday, y el domingo, del Sol, Sunday. Cuando eliges el jueves para la abundancia, estás usando un calendario de miles de años.",
+            "La Luna marca el otro ritmo. Durante unos catorce días crece, y durante otros catorce mengua. Las tradiciones agrícolas sembraban y cosechaban con ella, y los rituales la siguen: la creciente para atraer, la llena para culminar y agradecer, la menguante para soltar, la nueva para sembrar en silencio. No hace falta esperar la fecha perfecta: si el día y la Luna coinciden, mejor; si no, la intención manda.",
+            "Y una costumbre que vale la pena guardar: la vela de ritual no se sopla. La tradición dice que el soplo dispersa la intención; se apaga con los dedos humedecidos, con un apagavelas o tapándola, y se agradece. Así la llama se despide sin violencia, como debe terminar todo lo que se hizo con cuidado.",
           ],
         },
         {
@@ -371,6 +449,13 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "abierta", p: "¿Qué intención pusiste en tu vela? ¿Qué palabra marcaste y cómo ardió?" },
           ],
         },
+        {
+          tipo: "practica",
+          titulo: "Leer la llama",
+          texto: "Tu vela sigue hablando mientras arde. Hasta la próxima lección, regálale unos minutos de atención cada vez que esté encendida.",
+          pasos: ["Cuando tu vela esté encendida, siéntate frente a ella tres minutos.", "Observa la llama: ¿alta y quieta, baila, chispea, echa humo?", "Anota en una línea lo que viste, con la fecha.", "Apágala sin soplar y agradece."],
+          pregunta: "¿Cómo ardió tu vela? ¿Qué te dijo la llama?",
+        },
       ],
     },
     // ───────────────────────────── DÍA 5 ─────────────────────────────
@@ -381,7 +466,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, hoy toca soltar. Lo que escribas hoy no viene contigo al año nuevo.",
       titulo: "Soltar: el fuego que transforma",
       resumen: "Los años viejos de los Andes, el fuego de Irán, el papel de Japón y tu ritual para dejar ir.",
-      minutos: 25,
+      minutos: 35,
       bloques: [
         { tipo: "video", titulo: "Lo que se va con el humo" },
         {
@@ -412,6 +497,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Irán", emoji: "🇮🇷", nombre: "Chaharshanbe Suri", texto: "La última noche de miércoles antes del Nowruz se salta sobre hogueras diciendo: «Mi palidez para ti, tu fuerza roja para mí». El fuego se lleva lo débil." },
             { lugar: "Japón", emoji: "🇯🇵", nombre: "Toshikoshi no Ōharae", texto: "A fin de año, en los santuarios sintoístas se pasa un muñeco de papel por el cuerpo para traspasarle las impurezas, y luego se purifica." },
             { lugar: "Latinoamérica", emoji: "📜", nombre: "El papel de medianoche", texto: "Se escribe lo que no se quiere llevar al año nuevo y se quema con las doce campanadas." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "Los fuegos del cambio en el mundo",
+          parrafos: [
+            "Pocas imágenes son tan universales como la de una hoguera en la noche del cambio. En el antiguo Irán, el fuego era sagrado: los templos zoroastrianos mantienen todavía hoy llamas encendidas durante siglos, porque el fuego es la luz de la verdad. De esa tradición viene el Chaharshanbe Suri, la última noche de miércoles antes del año nuevo persa, en que se salta sobre las fogatas diciendo: «mi palidez para ti, tu fuerza roja para mí».",
+            "En España y en buena parte de América Latina, la noche de San Juan, entre el 23 y el 24 de junio, se encienden hogueras y se salta sobre ellas tres o siete veces; se escriben deseos y miedos en papeles y se arrojan al fuego. Es una fiesta cristiana sobre una más antigua, la del solsticio de verano en el norte, cuando la noche es la más corta del año.",
+            "En Valencia, cada marzo, las Fallas levantan enormes figuras de cartón y madera, los ninots, que critican con humor lo que pasó en el año. La noche del 19, la Cremà, todas arden a la vez. La UNESCO las reconoció como patrimonio inmaterial de la humanidad. Es la misma idea de los años viejos de Ecuador y de los Andes: dar forma a lo que se va y despedirlo con fuego, en comunidad, con lágrimas y con risa.",
+            "En muchos pueblos de América, el Sábado de Gloria se quema al Judas, un muñeco que representa la traición y lo que no se quiere en la comunidad. Y en Japón, al final del año, los santuarios sintoístas reciben muñecos de papel en los que cada persona traspasó sus impurezas, para purificarlos. El gesto es universal: poner afuera lo que pesa adentro, para poder verlo y entregarlo.",
+            "¿Y la ceniza? El Miércoles de Ceniza, en la tradición católica, se marca la frente con la ceniza de los ramos del año anterior: lo que fue verde y vivo vuelve como recuerdo de que todo se transforma. En el campo, la ceniza de la hoguera se esparce sobre la tierra porque la nutre. Por eso, en tu ritual, la ceniza no se tira a la basura: vuelve a la tierra para que lo que soltaste se convierta en abono.",
+            "Los alquimistas, que soñaban con transformar la materia, llamaban calcinatio al primer paso de su obra: quemar hasta la ceniza para separar lo puro de lo impuro. Lo leían también como una enseñanza para el alma. No hace falta creer en la piedra filosofal para entenderlo: a veces hay que dejar arder lo que fuimos para descubrir qué queda.",
+            "Soltar no es olvidar, ni negar, ni fingir que no dolió. La tradición lo dice con las palabras que usaste hoy: «te agradezco lo que me enseñaste». Se suelta con gratitud, porque lo que se suelta con rabia vuelve; lo que se suelta agradeciendo, se va en paz.",
           ],
         },
         {
@@ -451,6 +549,13 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "abierta", p: "Sin dar detalles si no quieres: ¿cómo te sentiste al ver arder el papel?" },
           ],
         },
+        {
+          tipo: "practica",
+          titulo: "Una cosa menos",
+          texto: "Soltar también se hace con las cosas. Hasta la próxima lección, deja ir algo material que ya no te acompaña.",
+          pasos: ["Elige un objeto que ya no usas o que te trae un recuerdo pesado.", "Agradécele en voz baja lo que fue.", "Regálalo, dónalo o deséchalo con respeto.", "Fíjate en el espacio vacío que dejó: es lugar para lo nuevo."],
+          pregunta: "¿Qué soltaste? ¿Cómo se sintió el espacio que quedó?",
+        },
       ],
     },
     // ───────────────────────────── DÍA 6 ─────────────────────────────
@@ -461,7 +566,7 @@ export const CURSO_RITUALES: Curso = {
       saludo: "{nombre}, después de soltar, agradecer. Hoy ponemos la mesa como para alguien querido.",
       titulo: "Agradecer: la mesa, las uvas y el café",
       resumen: "La gratitud en distintas culturas: las doce uvas, el mar de Iemanjá, la sobremesa y la taza que se voltea.",
-      minutos: 30,
+      minutos: 40,
       bloques: [
         { tipo: "video", titulo: "Una mesa para agradecer" },
         {
@@ -492,6 +597,19 @@ export const CURSO_RITUALES: Curso = {
             { lugar: "Brasil", emoji: "🌊", nombre: "Las siete olas de Iemanjá", texto: "En Año Nuevo, vestidos de blanco, se saltan siete olas en el mar y se dejan flores para Iemanjá, la madre de las aguas, en agradecimiento." },
             { lugar: "Turquía y mundo árabe", emoji: "☕", nombre: "La taza volteada", texto: "Después del café se voltea la taza, se espera a que se enfríe y se leen las figuras de la borra entre amigas y familia." },
             { lugar: "Irán", emoji: "🌱", nombre: "La mesa del Nowruz", texto: "El haft-sin reúne siete cosas que empiezan con «s» en persa: brotes, manzana, ajo, vinagre…, cada una con su bendición para el año." },
+          ],
+        },
+        {
+          tipo: "profundizar",
+          titulo: "La mesa, el café y el arte de leer la taza",
+          parrafos: [
+            "La gratitud es quizás el ritual más antiguo de todos. Los pueblos agrícolas agradecían la cosecha con fiestas y ofrendas: en los Andes, cada agosto, se abre la tierra para darle de comer a la Pachamama con hojas de coca, chicha, dulces y flores, porque se cree que en ese mes la tierra tiene hambre. Agradecer es devolver un poco de lo que se recibió.",
+            "El café nació en las tierras altas de Etiopía y cruzó el mar hacia Yemen, donde los sufíes lo tomaban para mantenerse despiertos en sus oraciones nocturnas. Desde el puerto de Moca llegó a La Meca, a El Cairo y, en el siglo XVI, a Estambul, donde se abrieron algunos de los primeros cafés del mundo, alrededor de 1550. Allí nació el café turco: molido como polvo, hervido lentamente en el cezve y servido sin colar, con su espuma.",
+            "En el mundo árabe, el café es hospitalidad sagrada. Se prepara con cardamomo en la dallah, la cafetera de pico largo, y se sirve en tacitas sin asa llamadas finjan. Quien sirve sostiene la cafetera con la mano izquierda y la taza con la derecha; el invitado sacude suavemente la taza cuando ya no quiere más. La UNESCO reconoció en 2013 la cultura del café turco y en 2015 el café árabe como patrimonio inmaterial de la humanidad.",
+            "La lectura de la borra nació de esa sobremesa. Después de tomar, se tapa la taza con el plato, se pide un deseo, se voltea hacia uno mismo y se espera a que se enfríe. Luego alguien de la familia, casi siempre una mujer mayor, lee las figuras. En Europa se hizo lo mismo con las hojas de té desde el siglo XVII, y se le dio un nombre culto: tasseografía, de la palabra francesa tasse, taza.",
+            "La taza tiene un mapa. Muchas lectoras dicen que la zona cerca del asa eres tú y tu casa; lo que está lejos del asa, los demás y lo que viene de afuera. El borde habla de lo próximo; el fondo, de lo lejano o de lo profundo. Las figuras claras y abiertas son caminos que se abren; las líneas, viajes; los pájaros, noticias; un corazón, amor; un anillo, compromiso. Y casi siempre se lee también el plato, que muestra lo que se va.",
+            "En Brasil, la gratitud mira al mar: el 31 de diciembre millones de personas vestidas de blanco llevan flores a Iemanjá, la madre de las aguas, y saltan siete olas pidiendo un deseo con cada una. En Salvador de Bahía, el 2 de febrero, los pescadores le llevan barcas llenas de regalos. Agradecer al agua es reconocer que nos sostiene.",
+            "Las doce uvas tienen una historia más reciente: se cuenta que a comienzos del siglo XX los productores de uva de Alicante tuvieron una cosecha enorme y popularizaron la costumbre de comer una por campanada. Sea cual sea su origen, viajó a toda América porque tiene algo profundamente ritual: doce gestos, doce deseos, el año entero en la palma de la mano.",
           ],
         },
         {
@@ -532,6 +650,13 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "abierta", p: "De las doce cosas que agradeces, ¿cuál es la que más te importa?" },
           ],
         },
+        {
+          tipo: "practica",
+          titulo: "Tres gracias antes de dormir",
+          texto: "La gratitud se entrena como un músculo. Hasta la próxima lección, termina cada día agradeciendo.",
+          pasos: ["Antes de dormir, escribe tres cosas que agradeces de ese día, aunque sean pequeñas.", "Dile «gracias» de verdad a una persona, mirándola a los ojos.", "Si tomas café, voltea otra vez la taza y mira qué figura aparece primero.", "Guarda la lista junto a la de las doce gracias."],
+          pregunta: "¿A quién le diste las gracias? ¿Qué agradeciste que no esperabas?",
+        },
       ],
     },
     // ───────────────────────────── DÍA 7 ─────────────────────────────
@@ -539,10 +664,10 @@ export const CURSO_RITUALES: Curso = {
       numero: 7,
       llave: { nombre: "Llave de la Semilla", simbolo: "🌱", saber: "Sembrar el año que viene y leer tres cartas para un cierre." },
       luna: "🌗",
-      saludo: "{nombre}, último día. Hoy sembramos lo que viene… y al final te espera mi carta.",
+      saludo: "{nombre}, séptima noche. Hoy sembramos lo que viene… y mañana te espera la noche del Círculo.",
       titulo: "Sembrar el año nuevo",
       resumen: "Las semillas del Nowruz, las lentejas de Italia, la maleta de Latinoamérica, tu carta al año y tus tres cartas.",
-      minutos: 30,
+      minutos: 40,
       bloques: [
         { tipo: "video", titulo: "Lo que siembras hoy" },
         {
@@ -576,6 +701,19 @@ export const CURSO_RITUALES: Curso = {
           ],
         },
         {
+          tipo: "profundizar",
+          titulo: "Las semillas del tiempo y las cartas que hablan",
+          parrafos: [
+            "Sembrar para el año nuevo es una de las costumbres más antiguas del mundo. Para el Nowruz, el año nuevo persa que llega con el equinoccio de primavera, cada familia hace brotar semillas de trigo, lentejas o cebada en un plato: el sabzeh. Lo pone en la mesa del haft-sin junto a la manzana, el ajo, el vinagre y las monedas. El día trece de las fiestas, el Sizdah Bedar, la familia sale al campo y arroja los brotes al agua que corre, llevándose con ellos lo malo del año.",
+            "En la antigua Grecia, las mujeres sembraban en macetas los jardines de Adonis: semillas que brotaban muy rápido y se marchitaban pronto, para llorar al joven amado de Afrodita que moría y renacía cada año. En Sicilia y el sur de Italia, todavía hoy se hacen brotar granos de trigo en la oscuridad para adornar los altares del Jueves Santo: brotes pálidos que hablan de la vida que vuelve.",
+            "La semilla enseña paciencia. Lo que siembras hoy no se ve mañana. Por eso tantas tradiciones acompañan la siembra con una espera: la carta que escribiste hoy y abrirás dentro de un año es una semilla de tiempo. Las cápsulas del tiempo modernas, enterradas en los cimientos de un edificio para que alguien las abra dentro de cien años, son el mismo gesto: confiar en que alguien, tú misma o tú mismo, estará ahí para recibirla.",
+            "Las cartas del tarot nacieron en el norte de Italia en el siglo XV, como un juego de naipes de lujo para las cortes de Milán y Ferrara: los tarocchi, con sus triunfos pintados a mano. Durante tres siglos fueron sobre todo un juego. A finales del siglo XVIII, en París, Antoine Court de Gébelin escribió que guardaban la sabiduría de Egipto, y un adivino llamado Etteilla publicó la primera forma de leerlas. Desde entonces, el tarot se volvió un lenguaje de símbolos para mirarse por dentro.",
+            "La tirada de tres cartas es la más sencilla y la más antigua de las que se usan hoy: pasado, presente y futuro. Para un cierre de año la leemos como lo que dejas, lo que llevas y lo que llega. Lo importante no es si la carta es «buena» o «mala», sino qué te dice a ti: el tarot habla en imágenes, y cada imagen se abre de manera distinta para cada persona.",
+            "Hoy, además, releíste el papel del primer día. Esa es la prueba más hermosa de un ritual: no lo que pasa afuera, sino cómo cambió la manera en que lo sientes. Si algo pesa menos, si una palabra ya no te representa, si te dan ganas de corregirla, el ritual hizo su trabajo.",
+            "Mañana es la noche del Círculo. No vas a seguir un ritual mío: vas a crear el tuyo. Esta noche, antes de dormir, piensa qué te gustaría pedir, agradecer o soltar con tus propias manos. Ya tienes las siete llaves.",
+          ],
+        },
+        {
           tipo: "ritual",
           titulo: "Carta al año que viene",
           fondo: "/escuela/rituales/fondos/luna.mp4",
@@ -599,7 +737,7 @@ export const CURSO_RITUALES: Curso = {
             { texto: "Guarda el sobre en un lugar especial. Lo abrirás el próximo diciembre.", guia: "Guarda el sobre en un lugar especial… Un cajón, un libro, tu altar… Dentro de un año lo abrirás… y verás todo lo que creció." },
           ],
           cierre:
-            "Mira tu vela encendida… Siete días, siete gestos… preparaste, limpiaste, soltaste, encendiste, agradeciste y sembraste… Este cierre es tuyo… Gracias por caminar conmigo… Ahora, termina tu lección… te espera mi carta.",
+            "Mira tu vela encendida… Siete días, siete gestos… preparaste, limpiaste, soltaste, encendiste, agradeciste y sembraste… Ya tienes las siete llaves… Termina tu lección… y descansa… La próxima es la noche del Círculo: ahí el ritual lo creas tú.",
           herramienta: { href: "/tarot", texto: "Saca tus tres cartas" },
         },
         { tipo: "entrega", titulo: "Tu tirada de cierre", texto: "Haz tu tirada de tres cartas con Sibila: lo que dejas, lo que llevas y lo que llega. Incluida en el curso.", href: "/tarot", boton: "Sacar mis tres cartas", lectura: "tarot_tres" },
@@ -610,6 +748,91 @@ export const CURSO_RITUALES: Curso = {
             { tipo: "opcion", p: "¿Por qué se comen lentejas en Italia en Año Nuevo?", opciones: ["Porque se parecen a monedas", "Porque son verdes", "Porque crecen rápido"], correcta: 0, porque: "Su forma recuerda a pequeñas monedas: abundancia para el año." },
             { tipo: "abierta", p: "¿Qué quieres sembrar para el año que viene? Sibila lo usará en tu carta de cierre." },
           ],
+        },
+        {
+          tipo: "practica",
+          titulo: "La semilla en el plato y tu ritual",
+          texto: "Como en el Nowruz, vas a hacer brotar algo mientras imaginas tu propio ritual para la noche del Círculo.",
+          pasos: ["Pon algodón húmedo en un plato y siembra un puñado de lentejas o de trigo.", "Déjalo junto a tu altar y riégalo con unas gotas cada día.", "Mientras lo riegas, piensa qué quieres pedir, agradecer o soltar en tu propio ritual.", "Anota ideas: qué intención, qué día, qué elementos, cómo empezarías y cómo cerrarías."],
+          pregunta: "¿Brotó tu semilla? ¿Qué ritual imaginas para la noche del Círculo?",
+        },
+      ],
+    },
+    // ─────────────────────── LA NOCHE DEL CÍRCULO ───────────────────────
+    {
+      numero: 8,
+      final: true,
+      llave: { nombre: "Sello del Primer Círculo", simbolo: "✦", saber: "Diseñar y sostener tu propio ritual: intención, momento, elementos, apertura, acción y cierre." },
+      luna: "🌘",
+      saludo: "{nombre}, tienes las siete llaves. Esta noche no te guío yo: tú creas tu ritual, yo lo leo contigo, y después presentas tu prueba.",
+      titulo: "La noche del Círculo: tu propio ritual",
+      resumen: "Lo que hace a una maestra o un maestro: crear un ritual propio. Sibila lo revisa y presentas la prueba del Primer Círculo.",
+      minutos: 45,
+      bloques: [
+        { tipo: "video", titulo: "Sibila te espera en el Círculo" },
+        {
+          tipo: "texto",
+          titulo: "Lo que hace a una maestra",
+          parrafos: [
+            "Durante siete noches seguiste mis rituales. Preparaste un altar, limpiaste tu casa con humo, pasaste el huevo, encendiste tu vela, quemaste lo que pesaba, agradeciste en tu mesa y sembraste. Cada gesto te dio una llave.",
+            "Pero una maestra, un maestro, no es quien repite un ritual: es quien sabe crearlo. Quien entiende por qué se abre y por qué se cierra, por qué ese color y no otro, por qué esa Luna, qué elemento pide cada intención. Esta noche vas a demostrarte que ya lo sabes.",
+            "Primero vas a diseñar tu propio ritual, con tus palabras, para algo que de verdad quieras pedir, agradecer o soltar en el año que viene. Yo lo voy a leer y te voy a decir lo que veo, como hacían las maestras con sus aprendices. Puedes corregirlo y enviármelo de nuevo.",
+            "Después vas a presentar la prueba del Primer Círculo: quince preguntas sobre lo que aprendiste en estos siete días. Si te equivocas, no pasa nada: repasas tu grimorio y tu libro de consulta, y vuelves a intentarlo. Cuando la superes, recibirás tu sello, tu grado y mi carta.",
+          ],
+        },
+        { tipo: "cita", texto: "La aprendiz sigue el ritual. La maestra sabe por qué existe.", origen: "Enseñanza de Sibila" },
+        {
+          tipo: "saberes",
+          titulo: "Las piezas de tu ritual",
+          items: [
+            { titulo: "La intención", texto: "Una sola, clara, en presente y con tus palabras. Pregúntate: ¿quiero atraer, agradecer, proteger o soltar? De eso depende todo lo demás." },
+            { titulo: "El momento", texto: "El día de su astro, la fase de la Luna que la acompaña (creciente para atraer, menguante para soltar, llena para agradecer, nueva para sembrar) y una hora de umbral: el amanecer o el anochecer." },
+            { titulo: "Los elementos", texto: "La vela del color de tu intención, el agua, el humo, la tierra, las plantas o las piedras que le correspondan. Tu libro de consulta tiene las tablas." },
+            { titulo: "Abrir y cerrar", texto: "La apertura marca que empieza algo distinto; el cierre agradece, apaga sin soplar y devuelve a la tierra lo que se usó. Un ritual sin cierre queda abierto." },
+          ],
+        },
+        {
+          tipo: "proyecto",
+          titulo: "Tu propio ritual",
+          texto: "Escríbelo como si se lo fueras a enseñar a otra persona. No tiene que ser largo: tiene que tener sentido. Completa al menos cuatro partes; cuantas más completes, mejor podrá leerlo Sibila.",
+          campos: [
+            { clave: "nombre", etiqueta: "El nombre de tu ritual", ayuda: "Ponle un nombre que te guste. Por ejemplo: «La vela del camino abierto»." },
+            { clave: "intencion", etiqueta: "Tu intención", ayuda: "¿Qué pides, agradeces, proteges o sueltas? Escríbela en presente, con tus palabras." },
+            { clave: "momento", etiqueta: "El momento", ayuda: "Qué día de la semana, qué fase de la Luna y a qué hora, y por qué los elegiste." },
+            { clave: "elementos", etiqueta: "Los elementos y el espacio", ayuda: "Qué vas a usar (color de la vela, agua, humo, plantas, piedras, papel) y dónde lo vas a hacer." },
+            { clave: "apertura", etiqueta: "La apertura", ayuda: "Cómo empieza: qué haces o dices para marcar que el ritual comienza." },
+            { clave: "accion", etiqueta: "La acción", ayuda: "Los pasos del ritual, en orden: el gesto que lleva tu intención al cuerpo." },
+            { clave: "cierre", etiqueta: "El cierre", ayuda: "Cómo agradeces, cómo apagas y qué haces con lo que usaste." },
+          ],
+        },
+        {
+          tipo: "test",
+          titulo: "La prueba del Primer Círculo",
+          aprobar: 11,
+          preguntas: [
+            { tipo: "opcion", p: "¿Qué tres piezas convierten un gesto en ritual?", opciones: ["Objetos caros, una hora exacta y un maestro", "La intención, el espacio y el momento", "El fuego, el agua y la sal"], correcta: 1, porque: "Lo que hace un ritual es la intención con que lo haces, el lugar que separas y el momento que eliges." },
+            { tipo: "opcion", p: "Según Van Gennep, ¿cuáles son los tres momentos de un rito de paso?", opciones: ["Pedir, esperar y recibir", "Separarse, cruzar el umbral y volver con algo nuevo", "Encender, mirar y apagar"], correcta: 1, porque: "Separación, umbral y regreso: el camino que siguieron tus siete noches." },
+            { tipo: "opcion", p: "¿Por qué es tan importante el cierre de un ritual?", opciones: ["Porque un ritual sin cierre queda abierto", "Porque es la parte más larga", "No es importante: basta con la intención"], correcta: 0, porque: "Se agradece, se apaga, se devuelve lo que se usó y se vuelve a la vida de todos los días." },
+            { tipo: "opcion", p: "Al sahumar una casa, ¿cómo se recorre?", opciones: ["De la puerta hacia adentro, para que el humo se quede", "Del rincón más lejano hacia la puerta, con las ventanas abiertas", "Solo en el dormitorio"], correcta: 1, porque: "De adentro hacia afuera: el humo se despide por la puerta y se lleva lo que nombraste." },
+            { tipo: "opcion", p: "¿De qué lengua viene la palabra «copal»?", opciones: ["Del árabe", "Del latín", "Del náhuatl copalli"], correcta: 2, porque: "Los mexicas lo llamaban copalli; los mayas lo llaman pom." },
+            { tipo: "opcion", p: "¿Qué se hace con las semillas de üzerlik o espand?", opciones: ["Se queman contra el mal de ojo; nunca se comen", "Se hierven en té", "Se siembran en Año Nuevo"], correcta: 0, porque: "Se queman y su chasquido, dice la tradición, rompe la mirada pesada. Pueden ser tóxicas: no se ingieren." },
+            { tipo: "opcion", p: "En la limpia con huevo, ¿qué se hace con el huevo y el agua al terminar?", opciones: ["Se guardan en el altar una semana", "Se desechan lejos de la casa y se lavan las manos", "Se cocinan"], correcta: 1, porque: "Lo que se recogió no se queda en casa: se devuelve a la tierra o se desecha lejos." },
+            { tipo: "opcion", p: "¿Cómo se descubre el malocchio en la tradición italiana?", opciones: ["Con gotas de aceite en un plato con agua", "Con plomo derretido", "Con hojas de té"], correcta: 0, porque: "Si el aceite se abre y forma un ojo, había malocchio. Es pariente de la antigua lecanomancia." },
+            { tipo: "opcion", p: "Para la claridad en una decisión, ¿qué sigue la tradición?", opciones: ["Vela negra, sábado", "Vela amarilla, miércoles (Mercurio)", "Vela rosa, viernes"], correcta: 1, porque: "El amarillo es la claridad y el miércoles es de Mercurio, el astro de las palabras y las decisiones." },
+            { tipo: "opcion", p: "¿Cómo se viste una vela para soltar algo?", opciones: ["Con aceite de la base hacia la mecha", "Con aceite de la mecha hacia la base", "No se viste nunca"], correcta: 1, porque: "Hacia abajo, de la mecha a la base, para soltar; hacia arriba, para atraer." },
+            { tipo: "opcion", p: "¿De qué astro es el viernes?", opciones: ["De Venus: el amor y la reconciliación", "De Saturno", "Del Sol"], correcta: 0, porque: "Viernes viene de Veneris dies, el día de Venus." },
+            { tipo: "opcion", p: "¿Qué fase de la Luna se elige para sembrar una intención en silencio?", opciones: ["La Luna nueva", "La Luna llena", "Ninguna en especial"], correcta: 0, porque: "La nueva es la semilla en la tierra oscura; la creciente atrae, la llena culmina y la menguante suelta." },
+            { tipo: "opcion", p: "Después de quemar el papel, ¿qué se hace con la ceniza?", opciones: ["Se tira a la basura de la cocina", "Se guarda en el bolsillo", "Se devuelve a la tierra, a una maceta o al jardín"], correcta: 2, porque: "Lo que soltaste se convierte en abono para lo que vas a sembrar." },
+            { tipo: "opcion", p: "¿Qué hace la familia persa con el sabzeh al final del Nowruz?", opciones: ["Lo arroja al agua que corre", "Lo quema", "Lo regala a los vecinos"], correcta: 0, porque: "El día trece, Sizdah Bedar, los brotes se llevan al río y se llevan con ellos lo malo del año." },
+            { tipo: "opcion", p: "¿Qué enseña la ética del ritual?", opciones: ["Que un ritual puede reemplazar al médico", "Que se puede hacer un ritual sobre otra persona sin su permiso", "Ritualizar sobre lo propio y buscar ayuda profesional cuando hace falta"], correcta: 2, porque: "El ritual acompaña tu casa, tus emociones y tus decisiones; no sustituye a un profesional ni se impone a otra persona." },
+          ],
+        },
+        {
+          tipo: "practica",
+          titulo: "Tu ritual, una vez al mes",
+          texto: "Un ritual se vuelve tuyo cuando lo repites. Después de cerrar el Círculo, llévalo contigo al año que viene.",
+          pasos: ["Haz tu propio ritual en la próxima Luna que le corresponda.", "Vuelve a tu altar cada Luna nueva o llena, aunque sea tres minutos.", "Anota en tu grimorio lo que cambia de una vez a otra.", "El próximo diciembre, abre la carta que escribiste la séptima noche."],
+          pregunta: "¿Cuándo vas a hacer tu ritual por primera vez?",
         },
       ],
     },

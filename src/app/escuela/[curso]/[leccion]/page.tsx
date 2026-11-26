@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AlertTriangle, ChevronLeft, ChevronRight, Clapperboard, ExternalLink, Flame, Moon, Sparkles } from "lucide-react";
+import { AlertTriangle, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clapperboard, ExternalLink, Flame, Moon, Sparkles } from "lucide-react";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { avanceDe, lecturasDelCurso } from "@/lib/escuela/servidor";
-import { conNombre, grado, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
-import { textoPaso } from "@/lib/escuela/tipos";
+import { avanceDe, lecturasDelCurso, NOTA_PRACTICA, NOTA_PROYECTO } from "@/lib/escuela/servidor";
+import { conNombre, gradoDe, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
+import { leccionesConLlave, textoPaso } from "@/lib/escuela/tipos";
 import { Altar } from "@/components/escuela/Altar";
 import { EscucharTexto } from "@/components/escuela/EscucharTexto";
 import { ModoRitual } from "@/components/escuela/ModoRitual";
+import { ProyectoRitual } from "@/components/escuela/ProyectoRitual";
+import { ReflexionPractica } from "@/components/escuela/ReflexionPractica";
 import { TestLeccion } from "@/components/escuela/TestLeccion";
 
 export async function generateMetadata({ params }: { params: Promise<{ curso: string; leccion: string }> }): Promise<Metadata> {
@@ -51,11 +53,16 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
   const vela = hayVela && perfil?.intencionVela ? tuVela(perfil.intencionVela, zona) : null;
   const primerTexto = leccion.bloques.findIndex((b) => b.tipo === "texto");
   // El camino de iniciación: cuántas llaves tiene y a qué grado sube con la de hoy.
-  const hechas = avance.estados.filter((e) => e === "hecha").length;
   const yaHecha = estado === "hecha";
-  const gradoAntes = grado(hechas, perfil?.trato, curso.lecciones.length);
-  const gradoDespues = grado(yaHecha ? hechas : hechas + 1, perfil?.trato, curso.lecciones.length);
+  const gradoAntes = gradoDe(curso, avance.estados, perfil?.trato);
+  const gradoDespues = gradoDe(curso, avance.estados.map((e, j) => (j === i ? "hecha" : e)), perfil?.trato);
   const gradoNuevo = !yaHecha && gradoDespues.nivel !== gradoAntes.nivel ? gradoDespues.conCirculo : null;
+  const estadosAltar = avance.estados.filter((_, j) => !curso.lecciones[j].final);
+  const totalNoches = leccionesConLlave(curso).length;
+  // La práctica entre lunas de la lección anterior: al abrir esta, cuenta cómo le fue.
+  const practicaAnterior = ant?.bloques.find((b) => b.tipo === "practica");
+  const notasAnteriores = (ant && avance.progreso.get(ant.numero)?.notas) || {};
+  const notasHoy = previo?.notas ?? {};
 
   return (
     <article className="mx-auto max-w-2xl space-y-12" lang="es">
@@ -68,7 +75,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
             <Link href={`/escuela/${curso.slug}`} className="hover:text-texto">{curso.titulo}</Link>
           </p>
           <p className="text-6xl" aria-hidden>{leccion.luna}</p>
-          <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">Día {leccion.numero} de {curso.lecciones.length} · {leccion.minutos} min</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">{leccion.final ? "La noche del Círculo" : `Día ${leccion.numero} de ${totalNoches}`} · {leccion.minutos} min</p>
           <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">{leccion.titulo}</h1>
           <div className="mx-auto flex max-w-lg items-start gap-3 pt-3 text-start">
             {/* eslint-disable-next-line @next/next/no-img-element -- retrato pequeño estático */}
@@ -77,13 +84,23 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           </div>
           <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-oro/40 bg-oro/10 px-4 py-1.5 text-sm text-oro-suave">
             <span aria-hidden>{leccion.llave.simbolo}</span>
-            {yaHecha ? `Ya tienes la ${leccion.llave.nombre}` : `Hoy recibes la ${leccion.llave.nombre}`}
+            {leccion.final
+              ? yaHecha
+                ? `Ya tienes el ${leccion.llave.nombre}`
+                : `Hoy presentas tu prueba y recibes el ${leccion.llave.nombre}`
+              : yaHecha
+                ? `Ya tienes la ${leccion.llave.nombre}`
+                : `Hoy recibes la ${leccion.llave.nombre}`}
           </p>
           <div className="pt-4 opacity-80">
-            <Altar estados={avance.estados} tamano="chico" />
+            <Altar estados={estadosAltar} tamano="chico" />
           </div>
         </div>
       </header>
+
+      {ant && practicaAnterior?.tipo === "practica" && (
+        <ReflexionPractica curso={curso.slug} leccion={ant.numero} titulo={practicaAnterior.titulo} pregunta={practicaAnterior.pregunta} inicial={notasAnteriores[NOTA_PRACTICA] ?? ""} />
+      )}
 
       {leccion.bloques.map((b, k) => {
         if (b.tipo === "video")
@@ -217,6 +234,58 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
               </details>
             </section>
           );
+        if (b.tipo === "profundizar")
+          return (
+            <section key={k}>
+              <details className="tarjeta group overflow-hidden border-oro/30">
+                <summary className="flex cursor-pointer list-none items-center gap-4 p-5 [&::-webkit-details-marker]:hidden">
+                  <BookOpen className="h-7 w-7 shrink-0 text-oro" aria-hidden />
+                  <span className="flex-1">
+                    <span className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Para profundizar · unos {Math.max(3, Math.round(b.parrafos.join(" ").split(/\s+/).length / 150))} minutos</span>
+                    <span className="font-display block text-2xl leading-tight">{b.titulo}</span>
+                  </span>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-oro transition group-open:rotate-180" aria-hidden />
+                </summary>
+                <div className="space-y-4 border-t border-borde px-5 pb-6 pt-5 sm:px-8">
+                  <EscucharTexto curso={curso.slug} leccion={leccion.numero} bloque={k} />
+                  {b.parrafos.map((p, j) => (
+                    <p key={j} className="leading-relaxed text-texto/90">{p}</p>
+                  ))}
+                </div>
+              </details>
+            </section>
+          );
+        if (b.tipo === "practica")
+          return (
+            <section key={k} className="tarjeta relative space-y-4 overflow-hidden border-violeta/40 p-6 sm:p-8">
+              <div className="escuela-cielo pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+              <div className="relative text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Práctica entre lunas · hasta la próxima lección</p>
+                <h2 className="font-display text-3xl">{b.titulo}</h2>
+              </div>
+              <p className="relative text-texto/90">{b.texto}</p>
+              <ol className="relative list-inside list-decimal space-y-1.5 text-sm text-texto/85 marker:text-oro">
+                {b.pasos.map((p) => <li key={p}>{p}</li>)}
+              </ol>
+              <p className="relative text-xs text-texto-suave">{sig ? "Al abrir la próxima lección, Sibila te preguntará cómo te fue." : "Llévala contigo: es tuya."}</p>
+            </section>
+          );
+        if (b.tipo === "proyecto") {
+          const iniciales = Object.fromEntries(b.campos.map((c) => [c.clave, notasHoy[NOTA_PROYECTO + c.clave] ?? ""]));
+          return (
+            <section key={k} className="space-y-6">
+              <Separador />
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Tu obra</p>
+                <h2 className="font-display text-4xl">{b.titulo}</h2>
+              </div>
+              <p className="text-lg leading-relaxed text-texto/90">{b.texto}</p>
+              <div className="tarjeta p-6">
+                <ProyectoRitual curso={curso.slug} leccion={leccion.numero} campos={b.campos} iniciales={iniciales} revision={previo?.comentario ?? null} audio={previo?.comentarioAudio ?? null} />
+              </div>
+            </section>
+          );
+        }
         if (b.tipo === "entrega") {
           const hecha = lecturas.get(b.lectura);
           return (
@@ -251,7 +320,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
               <h2 className="font-display text-4xl">{b.titulo ?? "Tus preguntas de hoy"}</h2>
             </div>
             <div className="tarjeta p-6">
-              <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} llave={leccion.llave} yaHecha={yaHecha} gradoNuevo={gradoNuevo} />
+              <TestLeccion curso={curso.slug} leccion={leccion.numero} preguntas={b.preguntas} previas={previo?.respuestas ?? {}} comentarioPrevio={previo?.comentario ?? null} audioPrevio={previo?.comentarioAudio ?? null} siguiente={siguiente} ultima={!sig} llave={leccion.llave} yaHecha={yaHecha} gradoNuevo={gradoNuevo} prueba={Boolean(leccion.final)} />
             </div>
           </section>
         );
