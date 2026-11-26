@@ -1,0 +1,24 @@
+VIDEO 65 · «LA PRIMERA LETRA DE QUIEN OCUPA TU MENTE» · un solo clip con Sibila
+Flow / Gemini (Veo) · vertical 9:16 · 8 s · CON IMAGEN DE REFERENCIA (sube sibila-referencia.jpg como «ingrediente»)
+Sonido: solo ambiente. Sibila NO habla (labios cerrados). Si Veo la pone a hablar, genera otra toma.
+
+==================== PROMPT (cópialo tal cual) ====================
+Vertical 9:16, cinematic close-up to medium shot, night, warm candlelight. The woman from the reference image
+(Sibila: long black wavy hair, deep purple veil and robe with gold embroidery, thin gold headband with a small star,
+crescent moon earrings) sits at her wooden table covered with a purple and gold cloth, a starry sky through arched
+windows behind her. She lifts one finger and slowly traces a single elegant golden calligraphic stroke in the air
+(an abstract flowing curve, not a readable letter); the glowing stroke floats in front of her and splits into four
+small swirling lights: a tiny flame, a wisp of wind, a droplet of water and a glowing green leaf, which circle around
+the stroke. She looks straight into the camera with a knowing, playful half smile, raises one eyebrow, and gently
+points her finger toward the viewer, as if inviting them to answer. Golden particles drift in the air, soft bokeh,
+slow push-in. She does not speak; her lips stay closed. No text, no readable letters, no logos.
+Sound: soft magical shimmer when the stroke appears, a faint crackle of candle flame, quiet room tone.
+No music, no voices, no speech.
+
+==================== CÓMO LO ARMO YO ====================
+- El clip va en cámara lenta (~16 s) y encima los textos y la voz de Sibila (es, ar, tr; luego los demás).
+- Pantalla 1 (gancho, 0–3 s): «Escribe SOLO la primera letra del nombre de quien ocupa tu mente 👇»
+- Pantalla 2: los 4 elementos con sus letras árabes (fuego ا ه ط م ف ش ذ · aire ب و ي ن ص ت ض ·
+  agua ج ز ك س ق ث ظ · tierra د ح ل ع ر خ غ).
+- Pantalla 3: «Sibila te responde: cómo te ama esa persona… y qué necesita de ti»
+- Cierre: «Escribe la letra 👇» (sin enlace: la conversación sigue en los comentarios y por mensaje).
