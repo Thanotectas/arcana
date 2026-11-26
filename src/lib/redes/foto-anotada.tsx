@@ -1,6 +1,6 @@
 import "server-only";
 import sharp from "sharp";
-import { png } from "./reel";
+import { png, textoArabe } from "./reel";
 
 /**
  * Foto de la limpia marcada por Sibila: óvalos dorados sobre los detalles que
@@ -80,9 +80,20 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
     return { m, ow, oh, cx: px + m.x * pw, cy: m.y * ph };
   });
   const ocupadas: Caja[] = ovalos.map((o) => ({ x: o.cx - o.ow / 2, y: o.cy - o.oh / 2, w: o.ow, h: o.oh }));
+  // Las etiquetas en árabe (o persa, urdu) se dibujan con Pango: ImageResponse no une sus letras ni las ordena de
+  // derecha a izquierda, y su motor de fuentes falla con la fuente árabe («lookupType 5 not yet supported»).
+  const arabes = await Promise.all(
+    ovalos.map((o) => {
+      const texto = o.m.viene ? `${o.m.etiqueta} ✦` : o.m.etiqueta;
+      return /[\u0600-\u06FF\u0750-\u077F]/.test(texto) ? textoArabe(texto, 26, o.m.viene ? VIOLETA : ORO, 470).catch(() => null) : Promise.resolve(null);
+    }),
+  );
+  // Si la lectura fue en árabe, el pie también.
+  const pieArabe = arabes.some(Boolean) ? await textoArabe("قرأتها سيبيلا · Arcana", 34, ORO, 900).catch(() => null) : null;
   const dibujos = ovalos.map((o, i) => {
-    const texto = o.m.viene ? `✦ ${o.m.etiqueta}` : o.m.etiqueta;
-    const ew = Math.min(520, 40 + texto.length * 19);
+    const arabe = arabes[i];
+    const texto = arabe ? "" : o.m.viene ? `✦ ${o.m.etiqueta}` : o.m.etiqueta;
+    const ew = arabe ? Math.min(520, arabe.ancho + 44) : Math.min(520, 40 + texto.length * 19);
     const eh = 52;
     const dentro = (c: Caja) => c.x >= 12 && c.y >= 12 && c.x + c.w <= ANCHO - 12 && c.y + c.h <= ph - 12;
     const ajustar = (c: Caja): Caja => ({ ...c, x: Math.min(ANCHO - c.w - 16, Math.max(16, c.x)) });
@@ -118,7 +129,7 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
       candidatos.find(dentro) ??
       candidatos[0];
     ocupadas.push(libre);
-    return { ...o, texto, etiqueta: libre };
+    return { ...o, texto, arabe, etiqueta: libre };
   });
 
   const dibujo = await png(
@@ -160,13 +171,23 @@ export async function anotarFoto(foto: Buffer, marcas: MarcaFoto[]): Promise<Buf
                 color,
               }}
             >
-              {d.texto}
+              {d.arabe ? (
+                // eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image
+                <img src={d.arabe.uri} width={d.arabe.ancho} height={d.arabe.alto} alt="" />
+              ) : (
+                d.texto
+              )}
             </div>
           </div>
         );
       })}
       <div style={{ position: "absolute", left: 0, right: 0, top: ph, height: PIE, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, #1a0f3a, #0b0716)", borderTop: `2px solid ${ORO}88` }}>
-        <span style={{ fontFamily: "Cormorant", fontSize: 40, color: ORO }}>Leído por Sibila · Arcana</span>
+        {pieArabe ? (
+          // eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image
+          <img src={pieArabe.uri} width={pieArabe.ancho} height={pieArabe.alto} alt="" />
+        ) : (
+          <span style={{ fontFamily: "Cormorant", fontSize: 40, color: ORO }}>Leído por Sibila · Arcana</span>
+        )}
       </div>
     </div>,
     alto,

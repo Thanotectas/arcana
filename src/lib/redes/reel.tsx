@@ -116,7 +116,7 @@ function prepararFuentesPango() {
   })());
 }
 
-async function textoArabe(texto: string, pt: number, color: string, ancho: number): Promise<{ uri: string; ancho: number; alto: number }> {
+export async function textoArabe(texto: string, pt: number, color: string, ancho: number): Promise<{ uri: string; ancho: number; alto: number }> {
   await prepararFuentesPango();
   const escapado = texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const imagen = await sharp({
