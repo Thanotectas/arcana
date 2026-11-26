@@ -597,3 +597,32 @@ async function probarHaiku(admin: SupabaseClient<Database>, i: Interaccion, idio
     await admin.from("redes_sombra").insert({ id_meta: i.idMeta, red: i.red, tipo: i.tipo, idioma, texto: i.texto.slice(0, 2000), enviada, haiku_ms: Date.now() - inicio, error: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
   }
 }
+
+/**
+ * Respuestas del juego de la inicial que se reenvían a mano: filas de comentarios marcadas desde la base con
+ * estado 'pendiente' y detalle 'reenviar-letra' (por ejemplo, las que se llevaron una respuesta general antes de
+ * reconocer el juego). Se toma cada fila antes de enviar, así dos avisos seguidos no responden dos veces.
+ */
+export async function reenviarLetras(admin: SupabaseClient<Database>, maximo = 5): Promise<string[]> {
+  const { data } = await admin.from("interacciones_redes").select("id, red, id_meta, objeto_id, texto").eq("estado", "pendiente").eq("detalle", "reenviar-letra").limit(maximo);
+  const hechas: string[] = [];
+  for (const f of data ?? []) {
+    const { data: tomada } = await admin.from("interacciones_redes").update({ detalle: "reenviando-letra" }).eq("id", f.id).eq("detalle", "reenviar-letra").select("id").maybeSingle();
+    if (!tomada || f.red === "youtube") continue;
+    const red = f.red as "instagram" | "facebook";
+    const publicacion = f.objeto_id ? await textoDePublicacion(red, f.objeto_id).catch(() => "") : "";
+    const texto = respuestaLetra(f.texto, publicacion);
+    if (!texto) {
+      await admin.from("interacciones_redes").update({ estado: "omitida", detalle: "reenvío: no es una letra" }).eq("id", f.id);
+      continue;
+    }
+    try {
+      await responderComentario(red, f.id_meta, texto);
+      await admin.from("interacciones_redes").update({ estado: "respondida", respuesta: texto, detalle: "reenviada: juego de la inicial" }).eq("id", f.id);
+      hechas.push(`${f.id}: ${texto.slice(0, 40)}`);
+    } catch (e) {
+      await admin.from("interacciones_redes").update({ estado: "error", detalle: `reenvío: ${e instanceof Error ? e.message : String(e)}`.slice(0, 500) }).eq("id", f.id);
+    }
+  }
+  return hechas;
+}
