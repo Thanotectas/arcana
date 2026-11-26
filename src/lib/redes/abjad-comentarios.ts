@@ -51,6 +51,14 @@ export function idiomaDePublicacion(texto: string): Idioma {
 /** Palabras que se comentan solas y no son nombres (agradecer, reaccionar, criticar). */
 const NO_NOMBRES = /^(gracias|grac|amen|amén|ok|okay|wow|hola|si|sí|no|thanks|thank you|thx|yes|nice|love|merci|obrigad[oa]|terima kasih|teşekkürler|tesekkurler|sağol|merhaba|selam|maşallah|mashallah|masha ?allah|inshallah|haram|günah|shirk|bid'?ah|شكرا|شكراً|حرام|شرك|بدعة|نعم|لا|ماشاء الله|ما شاء الله|سبحان الله|الله أكبر|الحمد لله|آمين|امين|مرحبا|السلام عليكم)$/i;
 
+const PALABRAS_DE_FRASE = new Set(
+  (
+    "رجاء ممكن رد ردي ردو ارجو أرجو فضلك سمحت لو كيف ماذا شو وين متى ليش لماذا هل اريد أريد بدي ابغى خاص الخاص عالخاص اسمي احسب احسبي شوف شوفي " +
+    "por favor quiero mi nombre como cómo que qué donde dónde cuando cuándo respondeme respóndeme please my name what how want reply " +
+    "lütfen benim adım nasıl cevap por favor meu nome quero"
+  ).split(" "),
+);
+
 /** El nombre del comentario, si el comentario es solo un nombre (sin emojis ni signos); si no, null. */
 export function nombreDelComentario(texto: string): string | null {
   const limpio = texto
@@ -63,6 +71,8 @@ export function nombreDelComentario(texto: string): string | null {
   const palabras = limpio.split(" ");
   if (palabras.length > 4 || palabras.some((p) => p.length < 2)) return null;
   if (NO_NOMBRES.test(limpio)) return null;
+  // Una frase corta («رجاءاً ممكن رد», «por favor respóndeme») no es un nombre aunque tenga pocas palabras.
+  if (palabras.some((p) => PALABRAS_DE_FRASE.has(p.toLowerCase().replace(/ا$/, "")))) return null;
   return limpio;
 }
 

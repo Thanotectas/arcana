@@ -88,8 +88,18 @@ export async function responderComentario(red: RedMeta, idComentario: string, te
   // Facebook admite una foto en la respuesta (attachment_url); Instagram solo texto.
   const cuerpo: Record<string, unknown> = { message: red === "facebook" ? sinEnlaces(texto) : texto };
   if (red === "facebook" && imagenUrl) cuerpo.attachment_url = imagenUrl;
-  const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, cuerpo);
-  return String(r.id ?? "");
+  try {
+    const r = await llamar<{ id?: string }>(`${idComentario}/${red === "instagram" ? "replies" : "comments"}`, cuerpo);
+    return String(r.id ?? "");
+  } catch (e) {
+    // En Facebook, los reels y videos compartidos desde Instagram no admiten respuestas públicas de la página por la API
+    // (#200 Permissions error). La respuesta llega igual como respuesta privada a ese comentario, por Messenger.
+    if (red !== "facebook" || !(e instanceof Error) || !e.message.includes("(código 200)")) throw e;
+    const { id } = await paginaMeta();
+    const r = await llamar<{ message_id?: string }>(`${id}/messages`, { recipient: { comment_id: idComentario }, message: { text: sinEnlaces(texto) } });
+    console.info(`[meta facebook] ${idComentario}: respuesta pública no permitida, enviada en privado`);
+    return `privada:${r.message_id ?? ""}`;
+  }
 }
 
 /** Envía un mensaje directo (Instagram o Messenger) como respuesta a quien escribió. */
