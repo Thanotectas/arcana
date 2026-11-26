@@ -9,6 +9,7 @@ import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, precioPara } from "@/lib/escuela/servidor";
 import { grado, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
 import { Llavero } from "@/components/escuela/Llavero";
+import { Temario } from "@/components/escuela/Temario";
 import { Altar } from "@/components/escuela/Altar";
 import { BotonInscripcion } from "@/components/escuela/BotonInscripcion";
 import { FormularioPerfil } from "@/components/escuela/FormularioPerfil";
@@ -106,6 +107,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
               </div>
             ))}
           </div>
+          <Temario curso={curso} />
           {(curso.abierto || avance.vistaPrevia) && (
             <div className="tarjeta relative overflow-hidden border-oro/40 p-8 text-center">
               <div className="escuela-cielo pointer-events-none absolute inset-0 opacity-50" aria-hidden />
@@ -123,7 +125,8 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
         </section>
       )}
 
-      {/* El camino lunar: un día por fase */}
+      {/* El camino lunar: un día por fase (a quien aún no entra, el temario ya se lo cuenta) */}
+      {dentro && (
       <section className="space-y-6">
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">El camino</p>
@@ -158,6 +161,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
           })}
         </ol>
       </section>
+      )}
 
       {dentro && avance.perfil && (
         <section className="grid gap-4 sm:grid-cols-2">
