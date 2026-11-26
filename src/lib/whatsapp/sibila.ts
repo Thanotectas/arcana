@@ -130,7 +130,7 @@ export async function atender(admin: SupabaseClient<Database>, telefono: string,
   const conversacion = hilo.slice(0, -1).map((m) => `${m.rol === "persona" ? "Persona" : "Sibila"}: «${m.contenido.replace(/»/g, "”")}»`).join("\n");
   const entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje de ${nombre ? `«${nombre}»` : "la persona"}: «${texto.replace(/»/g, "”")}»`;
 
-  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: "auto" });
+  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: "auto", cachear: true, funcion: "whatsapp · conversación" });
 
   const mandaCarta = respuesta.includes(MARCA_CARTA);
   const pideHumano = respuesta.includes(MARCA_HUMANO);

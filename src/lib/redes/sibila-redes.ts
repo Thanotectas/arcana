@@ -501,26 +501,26 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
     else if (modoPagina) {
       const pedido = `${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`;
-      respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA, funcion: "redes · llevar a la página" }).catch(() => respuestaLimite(idiomaFijo));
+      respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA, funcion: "redes · llevar a la página", cachear: true }).catch(() => respuestaLimite(idiomaFijo));
       // El modelo económico a veces responde en español a quien escribe en árabe o devuelve su instrucción: se rehace con
       // el estándar y, si vuelve a fallar, va la respuesta fija en su idioma.
       if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
-        respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "estandar", idioma: idiomaEsperado, funcion: "redes · llevar a la página (rehecha)" }).catch(() => respuestaLimite(idiomaFijo));
+        respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "estandar", idioma: idiomaEsperado, funcion: "redes · llevar a la página (rehecha)", cachear: true }).catch(() => respuestaLimite(idiomaFijo));
         if (respuestaDefectuosa(respuesta, idiomaEsperado)) respuesta = respuestaLimite(idiomaFijo);
       }
     }
-    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, funcion: `redes · foto (${i.tipo})`, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
+    else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, funcion: `redes · foto (${i.tipo})`, cachear: true, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else {
       // Comentarios y mensajes directos con el modelo estándar: son públicos o llevan la lectura gratis, y la calidad
       // es lo que da confianza. El económico queda para las respuestas cortas que llevan a la página.
       const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${EJEMPLOS_REDES}\n\n${await contexto(signo)}`;
       sombra = { entrada, sistema };
       const nivel = "estandar" as const;
-      respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA, funcion: `redes · ${i.tipo}${cartaOfrecida ? " (con lectura gratis)" : ""}` });
+      respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA, funcion: `redes · ${i.tipo}${cartaOfrecida ? " (con lectura gratis)" : ""}`, cachear: true });
       // Si la respuesta se fue a otro idioma (español a quien escribe en árabe), se rehace una vez.
       // (También en los mensajes directos, y si se coló la instrucción en vez del mensaje.)
       if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
-        respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado, funcion: `redes · ${i.tipo} (rehecha)` }).catch(() => respuesta);
+        respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado, funcion: `redes · ${i.tipo} (rehecha)`, cachear: true }).catch(() => respuesta);
         if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
           await marcar("omitida", { detalle: "respuesta defectuosa dos veces (otro idioma o instrucción): no se envió" });
           if (i.tipo === "mensaje") await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }]).catch(() => undefined);
@@ -583,7 +583,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
 async function probarHaiku(admin: SupabaseClient<Database>, i: Interaccion, idioma: Idioma, sombra: { entrada: string; sistema: string }, enviada: string) {
   const inicio = Date.now();
   try {
-    const haiku = await generarTexto(sombra.entrada, sombra.sistema, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: idioma === "es" ? "auto" : idioma, razonar: true, funcion: "redes · prueba Haiku (no se envía)" });
+    const haiku = await generarTexto(sombra.entrada, sombra.sistema, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: idioma === "es" ? "auto" : idioma, razonar: true, funcion: "redes · prueba Haiku (no se envía)", cachear: true });
     await admin.from("redes_sombra").insert({ id_meta: i.idMeta, red: i.red, tipo: i.tipo, idioma, texto: i.texto.slice(0, 2000), enviada, haiku, haiku_defectuosa: respuestaDefectuosa(haiku, idioma), haiku_ms: Date.now() - inicio });
   } catch (e) {
     await admin.from("redes_sombra").insert({ id_meta: i.idMeta, red: i.red, tipo: i.tipo, idioma, texto: i.texto.slice(0, 2000), enviada, haiku_ms: Date.now() - inicio, error: (e instanceof Error ? e.message : String(e)).slice(0, 300) });

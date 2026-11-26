@@ -186,7 +186,7 @@ export async function atenderTelegram(admin: Admin, aviso: AvisoTelegram): Promi
   const entrada = `${conversacion ? `Conversación reciente:\n${conversacion}\n\n` : ""}Nuevo mensaje de ${nombre ? `«${nombre}»` : "la persona"}: «${texto.replace(/»/g, "”")}»\n(Su enlace de inicio: ${enlaceInicio(idioma)})`;
 
   // Modelo estándar: es la conversación con la persona, y la calidad es lo que da confianza.
-  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "estandar", idioma: idioma === "es" ? "auto" : idioma });
+  let respuesta = await generarTexto(entrada, `${INSTRUCCIONES}\n\n${await hechos()}`, { effort: "low", maxTokens: 500, nivel: "estandar", idioma: idioma === "es" ? "auto" : idioma, cachear: true, funcion: "telegram · conversación" });
   const mandaCarta = respuesta.includes(MARCA_CARTA);
   const pideHumano = respuesta.includes(MARCA_HUMANO);
   respuesta = respuesta.replace(MARCA_CARTA, "").replace(MARCA_HUMANO, "").replace(/^#+\s*/gm, "").replace(/\*\*/g, "").trim();

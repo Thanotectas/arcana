@@ -76,6 +76,12 @@ export interface OpcionesTexto {
    * coma la respuesta). Sin razonar, Haiku a veces mezcla sus instrucciones en el texto o se va de idioma.
    */
   razonar?: boolean;
+  /**
+   * Las instrucciones (sistemaExtra) se repiten igual en muchas llamadas (redes, Telegram, chat de la página): se
+   * guardan en caché una hora y desde la segunda llamada se cobran a una décima parte. El idioma va aparte, después,
+   * así la caché sirve para todos los idiomas. No usarlo si las instrucciones cambian en cada llamada.
+   */
+  cachear?: boolean;
   /** Nombre de la función para el registro de gasto (/admin/ia). Sin él, se usa el comienzo de las instrucciones. */
   funcion?: string;
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
@@ -99,6 +105,23 @@ export async function generarTexto(
   opciones: OpcionesTexto = {},
   alTexto?: (fragmento: string) => void,
 ): Promise<string> {
+  if (!opciones.cachear) return generarTextoDirecto(usuario, sistemaExtra, opciones, alTexto);
+  try {
+    return await generarTextoDirecto(usuario, sistemaExtra, opciones, alTexto);
+  } catch (e) {
+    // Si la API rechaza el pedido con caché (400), se repite sin ella: nadie se queda sin respuesta por la caché.
+    if (!(e instanceof Anthropic.BadRequestError)) throw e;
+    console.error("[ia] pedido con caché rechazado, se repite sin caché:", e.message);
+    return generarTextoDirecto(usuario, sistemaExtra, { ...opciones, cachear: false }, alTexto);
+  }
+}
+
+async function generarTextoDirecto(
+  usuario: string,
+  sistemaExtra: string,
+  opciones: OpcionesTexto,
+  alTexto?: (fragmento: string) => void,
+): Promise<string> {
   const client = getCliente();
   const idioma = opciones.idioma ?? IDIOMA_PREDETERMINADO;
 
@@ -113,6 +136,8 @@ export async function generarTexto(
   ];
 
   const modelo = modeloPara(opciones.nivel);
+  // Con la caché de una hora, todos los bloques en caché van a una hora: una entrada larga después de una corta es un 400.
+  const cache = opciones.cachear ? ({ type: "ephemeral", ttl: "1h" } as const) : ({ type: "ephemeral" } as const);
   // Haiku no tiene reintento en el servidor con otro modelo si declina: se le pide sin `fallbacks`.
   const conRespaldo = !modelo.startsWith("claude-haiku");
   const stream = client.beta.messages.stream({
@@ -126,15 +151,22 @@ export async function generarTexto(
       {
         type: "text",
         text: SISTEMA_BASE,
-        cache_control: { type: "ephemeral" },
+        cache_control: cache,
       },
       ...(opciones.conocimiento
-        ? [{ type: "text" as const, text: `Manual de referencia de Arcana para esta práctica (léelo antes de interpretar; sus reglas mandan):\n\n${opciones.conocimiento}`, cache_control: { type: "ephemeral" as const } }]
+        ? [{ type: "text" as const, text: `Manual de referencia de Arcana para esta práctica (léelo antes de interpretar; sus reglas mandan):\n\n${opciones.conocimiento}`, cache_control: cache }]
         : []),
-      {
-        type: "text",
-        text: instruccionIdioma(idioma) + (sistemaExtra ? "\n\n" + sistemaExtra : ""),
-      },
+      ...(opciones.cachear && sistemaExtra
+        ? [
+            { type: "text" as const, text: sistemaExtra, cache_control: cache },
+            { type: "text" as const, text: instruccionIdioma(idioma) },
+          ]
+        : [
+            {
+              type: "text" as const,
+              text: instruccionIdioma(idioma) + (sistemaExtra ? "\n\n" + sistemaExtra : ""),
+            },
+          ]),
     ],
     messages: [{ role: "user", content: contenido }],
   });
@@ -168,9 +200,15 @@ const PRECIOS: [RegExp, number, number, number, number][] = [
 ];
 
 /** Costo estimado de una llamada, con el modelo que de verdad respondió (puede ser el de respaldo). */
-export function costoDe(modelo: string, u: { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }) {
+export function costoDe(
+  modelo: string,
+  u: { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null; cache_creation?: { ephemeral_1h_input_tokens?: number | null } | null },
+) {
   const p = PRECIOS.find(([re]) => re.test(modelo)) ?? PRECIOS[1];
-  return ((u.input_tokens ?? 0) * p[1] + (u.output_tokens ?? 0) * p[2] + (u.cache_read_input_tokens ?? 0) * p[3] + (u.cache_creation_input_tokens ?? 0) * p[4]) / 1_000_000;
+  // Escribir en la caché de una hora cuesta 2 × la entrada (la de cinco minutos, 1,25 ×).
+  const unaHora = u.cache_creation?.ephemeral_1h_input_tokens ?? 0;
+  const cincoMin = Math.max(0, (u.cache_creation_input_tokens ?? 0) - unaHora);
+  return ((u.input_tokens ?? 0) * p[1] + (u.output_tokens ?? 0) * p[2] + (u.cache_read_input_tokens ?? 0) * p[3] + cincoMin * p[4] + unaHora * p[1] * 2) / 1_000_000;
 }
 
 /** Nombre corto de la función a partir de sus instrucciones (la primera frase), cuando quien llama no lo da. */
