@@ -10,6 +10,7 @@ import { avanceDe, precioPara } from "@/lib/escuela/servidor";
 import { gradoDe, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
 import { Llavero } from "@/components/escuela/Llavero";
 import { Temario } from "@/components/escuela/Temario";
+import { PolvoEstelar } from "@/components/escuela/PolvoEstelar";
 import { BotonGarantia } from "@/components/escuela/BotonGarantia";
 import { Altar } from "@/components/escuela/Altar";
 import { BotonInscripcion } from "@/components/escuela/BotonInscripcion";
@@ -72,6 +73,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
 
   return (
     <div className="mx-auto max-w-4xl space-y-14" lang="es">
+      <PolvoEstelar />
       {/* Portada: video de velas de fondo, cielo y el título */}
       <section className="relative -mx-4 overflow-hidden border-borde sm:mx-0 sm:rounded-3xl sm:border">
         <video autoPlay muted loop playsInline preload="metadata" poster={curso.portada} className="absolute inset-0 h-full w-full object-cover opacity-55" aria-hidden>

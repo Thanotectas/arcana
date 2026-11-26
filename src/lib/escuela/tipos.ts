@@ -48,6 +48,8 @@ export type Bloque =
       cierre?: string;
       fondo?: string;
     }
+  /** La rueda de intenciones interactiva (color, día, astro, Luna, planta y piedra de cada intención). */
+  | { tipo: "rueda"; titulo: string; texto: string }
   /** «Para profundizar»: la historia larga, para leer o escuchar con la voz de Sibila. */
   | { tipo: "profundizar"; titulo: string; parrafos: string[] }
   /** «Práctica entre lunas»: lo que la persona hace en las horas hasta la próxima lección; al abrirla, cuenta cómo le fue. */

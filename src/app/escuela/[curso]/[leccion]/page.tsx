@@ -5,11 +5,15 @@ import { AlertTriangle, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Clappe
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe, lecturasDelCurso, NOTA_PRACTICA, NOTA_PROYECTO } from "@/lib/escuela/servidor";
-import { conNombre, gradoDe, lunaHoy, NOMBRE_INTENCION, tuVela } from "@/lib/escuela/personal";
+import { conNombre, gradoDe, lunaHoy, NOMBRE_INTENCION, ruedaDeIntenciones, tuVela } from "@/lib/escuela/personal";
 import { leccionesConLlave, textoPaso } from "@/lib/escuela/tipos";
 import { Altar } from "@/components/escuela/Altar";
 import { EscucharTexto } from "@/components/escuela/EscucharTexto";
 import { ModoRitual } from "@/components/escuela/ModoRitual";
+import { CartasSaber } from "@/components/escuela/CartasSaber";
+import { ConstelacionTradiciones } from "@/components/escuela/ConstelacionTradiciones";
+import { PolvoEstelar } from "@/components/escuela/PolvoEstelar";
+import { RuedaIntenciones } from "@/components/escuela/RuedaIntenciones";
 import { ProyectoRitual } from "@/components/escuela/ProyectoRitual";
 import { ReflexionPractica } from "@/components/escuela/ReflexionPractica";
 import { TestLeccion } from "@/components/escuela/TestLeccion";
@@ -66,6 +70,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
 
   return (
     <article className="mx-auto max-w-2xl space-y-12" lang="es">
+      <PolvoEstelar />
       {/* Encabezado: la Luna del día, el título y Sibila que te saluda */}
       <header className="relative -mx-4 overflow-hidden px-6 pb-8 pt-12 text-center sm:mx-0 sm:rounded-3xl sm:border sm:border-borde">
         <div className="escuela-cielo absolute inset-0" aria-hidden />
@@ -76,7 +81,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           </p>
           <p className="text-6xl" aria-hidden>{leccion.luna}</p>
           <p className="text-sm uppercase tracking-[0.3em] text-oro-suave">{leccion.final ? "La noche del Círculo" : `Día ${leccion.numero} de ${totalNoches}`} · {leccion.minutos} min</p>
-          <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">{leccion.titulo}</h1>
+          <h1 className="escuela-brillo font-display text-4xl font-semibold leading-tight sm:text-5xl">{leccion.titulo}</h1>
           <div className="mx-auto flex max-w-lg items-start gap-3 pt-3 text-start">
             {/* eslint-disable-next-line @next/next/no-img-element -- retrato pequeño estático */}
             <img src="/cartas/arcana/la-sibila.webp" alt="" className="h-12 w-12 shrink-0 rounded-full border border-oro/50 object-cover object-top" />
@@ -119,55 +124,54 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           );
         if (b.tipo === "cita")
           return (
-            <blockquote key={k} className="relative mx-auto max-w-xl px-6 text-center">
+            <blockquote key={k} className="escuela-revelar relative mx-auto max-w-xl px-6 text-center">
               <span className="absolute -top-6 left-0 font-display text-7xl leading-none text-oro/30" aria-hidden>“</span>
-              <p className="font-display text-2xl italic leading-snug text-texto/90 sm:text-3xl">{b.texto}</p>
+              <p className="escuela-tinta font-display text-2xl italic leading-snug text-texto/90 sm:text-3xl" aria-label={b.texto}>
+                {b.texto.split(" ").map((w, j) => (
+                  <span key={j} aria-hidden style={{ animationDelay: `${0.4 + j * 0.12}s` }}>{w}&nbsp;</span>
+                ))}
+              </p>
               <footer className="mt-3 text-xs uppercase tracking-[0.3em] text-oro-suave">— {b.origen}</footer>
             </blockquote>
           );
         if (b.tipo === "saberes")
           return (
-            <section key={k} className="space-y-6">
+            <section key={k} className="escuela-revelar space-y-6">
               <Separador />
               <div className="text-center">
                 <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Saberes de la tradición</p>
                 <h2 className="font-display text-4xl">{b.titulo}</h2>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {b.items.map((it, j) => (
-                  <div key={j} className="tarjeta relative overflow-hidden p-5">
-                    <span className="absolute right-4 top-3 font-display text-4xl text-oro/20" aria-hidden>{["I", "II", "III", "IV", "V", "VI"][j]}</span>
-                    <h3 className="font-display text-xl text-oro-suave">{it.titulo}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-texto/85">{it.texto}</p>
-                  </div>
-                ))}
-              </div>
+              <CartasSaber items={b.items} />
             </section>
           );
         if (b.tipo === "tradiciones")
           return (
-            <section key={k} className="space-y-6">
+            <section key={k} className="escuela-revelar space-y-6">
               <Separador />
               <div className="text-center">
                 <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Así se hace en el mundo</p>
                 <h2 className="font-display text-4xl">{b.titulo}</h2>
               </div>
-              <ol className="relative space-y-5 border-s border-oro/30 ps-6">
-                {b.items.map((it, j) => (
-                  <li key={j} className="relative">
-                    <span className="absolute -start-[2.35rem] top-0 flex h-9 w-9 items-center justify-center rounded-full border border-oro/50 bg-noche text-lg" aria-hidden>{it.emoji}</span>
-                    <p className="text-xs uppercase tracking-[0.25em] text-oro-suave">{it.lugar}</p>
-                    <h3 className="font-display text-2xl">{it.nombre}</h3>
-                    <p className="mt-1 leading-relaxed text-texto/85">{it.texto}</p>
-                  </li>
-                ))}
-              </ol>
+              <ConstelacionTradiciones items={b.items} />
+            </section>
+          );
+        if (b.tipo === "rueda")
+          return (
+            <section key={k} className="escuela-revelar space-y-6">
+              <Separador />
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Interactivo</p>
+                <h2 className="font-display text-4xl">{b.titulo}</h2>
+                <p className="mx-auto mt-2 max-w-md text-texto-suave">{b.texto}</p>
+              </div>
+              <RuedaIntenciones items={ruedaDeIntenciones()} inicial={perfil?.intencionVela ?? null} />
             </section>
           );
         if (b.tipo === "texto") {
           const capital = k === primerTexto;
           return (
-            <section key={k} className="space-y-5">
+            <section key={k} className="escuela-revelar space-y-5">
               <Separador />
               {b.titulo && <h2 className="text-center font-display text-4xl">{b.titulo}</h2>}
               <EscucharTexto curso={curso.slug} leccion={leccion.numero} bloque={k} />
@@ -179,7 +183,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
         }
         if (b.tipo === "ritual")
           return (
-            <section key={k} className="space-y-6">
+            <section key={k} className="escuela-revelar space-y-6">
               <Separador />
               <div className="text-center">
                 <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Tu ritual de hoy</p>
@@ -236,7 +240,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           );
         if (b.tipo === "profundizar")
           return (
-            <section key={k}>
+            <section key={k} className="escuela-revelar">
               <details className="tarjeta group overflow-hidden border-oro/30">
                 <summary className="flex cursor-pointer list-none items-center gap-4 p-5 [&::-webkit-details-marker]:hidden">
                   <BookOpen className="h-7 w-7 shrink-0 text-oro" aria-hidden />
@@ -257,7 +261,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           );
         if (b.tipo === "practica")
           return (
-            <section key={k} className="tarjeta relative space-y-4 overflow-hidden border-violeta/40 p-6 sm:p-8">
+            <section key={k} className="escuela-revelar tarjeta relative space-y-4 overflow-hidden border-violeta/40 p-6 sm:p-8">
               <div className="escuela-cielo pointer-events-none absolute inset-0 opacity-40" aria-hidden />
               <div className="relative text-center">
                 <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Práctica entre lunas · hasta la próxima lección</p>
@@ -273,7 +277,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
         if (b.tipo === "proyecto") {
           const iniciales = Object.fromEntries(b.campos.map((c) => [c.clave, notasHoy[NOTA_PROYECTO + c.clave] ?? ""]));
           return (
-            <section key={k} className="space-y-6">
+            <section key={k} className="escuela-revelar space-y-6">
               <Separador />
               <div className="text-center">
                 <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Tu obra</p>
@@ -313,7 +317,7 @@ export default async function PaginaLeccion({ params }: { params: Promise<{ curs
           );
         }
         return (
-          <section key={k} className="space-y-5">
+          <section key={k} className="escuela-revelar space-y-5">
             <Separador />
             <div className="text-center">
               <p className="text-xs uppercase tracking-[0.35em] text-violeta-suave">Para ti</p>

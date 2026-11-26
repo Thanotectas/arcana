@@ -1655,3 +1655,81 @@ html[lang="ar"] [class*="tracking-"] {
 @media print {
   .no-imprimir { display: none !important; }
 }
+
+/* ===== Escuela: efectos místicos ===== */
+/* Las secciones aparecen con un brillo al entrar en pantalla (solo donde el navegador lo sabe hacer con CSS). */
+@supports (animation-timeline: view()) {
+  .escuela-revelar {
+    animation: escuela-revelar linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+@keyframes escuela-revelar {
+  from { opacity: 0; transform: translateY(28px) scale(0.985); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+/* Títulos con un reflejo dorado que pasa despacio. */
+.escuela-brillo {
+  background: linear-gradient(100deg, currentColor 40%, #f1d99a 50%, currentColor 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: escuela-brillo 6s ease-in-out infinite;
+}
+@keyframes escuela-brillo {
+  0%, 60% { background-position: 100% 0; }
+  100% { background-position: -50% 0; }
+}
+/* La cita se escribe palabra por palabra, como tinta. */
+.escuela-tinta > span {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(6px);
+  animation: escuela-tinta 0.9s ease-out forwards;
+}
+@keyframes escuela-tinta {
+  to { opacity: 1; filter: none; transform: none; }
+}
+/* Cartas que se voltean. */
+.escuela-carta { perspective: 1200px; }
+.escuela-carta-interior {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.3, 0.8, 0.2, 1);
+  display: grid;
+}
+.escuela-carta-interior > * { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.escuela-carta-dorso { transform: rotateY(180deg); }
+.escuela-carta[data-volteada="true"] .escuela-carta-interior { transform: rotateY(180deg); }
+.escuela-carta-frente {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(241, 217, 154, 0.18), transparent 60%),
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(241, 217, 154, 0.06) 0deg 10deg, transparent 10deg 20deg),
+    linear-gradient(160deg, #1d1638, #120d26);
+}
+/* Estrella de la constelación que late. */
+.escuela-estrella { animation: escuela-latir 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes escuela-latir {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+.escuela-trazo { stroke-dasharray: 600; stroke-dashoffset: 600; animation: escuela-trazo 2.4s ease-out forwards; }
+@keyframes escuela-trazo { to { stroke-dashoffset: 0; } }
+/* Destello al acertar. */
+.escuela-acierto { animation: escuela-acierto 0.9s ease-out; }
+@keyframes escuela-acierto {
+  0% { box-shadow: 0 0 0 0 rgba(241, 217, 154, 0.7); }
+  100% { box-shadow: 0 0 0 18px rgba(241, 217, 154, 0); }
+}
+/* La llave que se dibuja en la ceremonia. */
+.escuela-llave-trazo { stroke-dasharray: 400; stroke-dashoffset: 400; animation: escuela-trazo 2.2s ease-in-out forwards; }
+.escuela-girar { animation: escuela-girar 40s linear infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes escuela-girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .escuela-revelar, .escuela-brillo, .escuela-estrella, .escuela-girar, .escuela-acierto { animation: none !important; }
+  .escuela-tinta > span { animation: none; opacity: 1; filter: none; transform: none; }
+  .escuela-trazo, .escuela-llave-trazo { animation: none; stroke-dashoffset: 0; }
+  .escuela-carta-interior { transition: none; }
+}

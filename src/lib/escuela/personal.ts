@@ -109,3 +109,34 @@ export function gradoDe(curso: Curso, estados: string[], trato: Trato | null | u
   const prueba = final >= 0 ? estados[final] === "hecha" : llaves >= conLlave.length;
   return { ...grado(llaves, trato, conLlave.length, prueba), llaves };
 }
+
+/** Plantas y piedras de cada intención (las mismas del libro de consulta). */
+const PLANTA_PIEDRA: Record<Intencion, { planta: string; piedra: string }> = {
+  amor: { planta: "Pétalos de rosa y canela", piedra: "Cuarzo rosa" },
+  dinero: { planta: "Albahaca y canela", piedra: "Citrino" },
+  proteccion: { planta: "Ruda y romero", piedra: "Obsidiana" },
+  sanacion: { planta: "Lavanda", piedra: "Amatista" },
+  claridad: { planta: "Romero y laurel", piedra: "Cuarzo blanco" },
+  cierre: { planta: "Mirra y ruda", piedra: "Obsidiana" },
+  exito: { planta: "Laurel y canela", piedra: "Ojo de tigre" },
+  intuicion: { planta: "Lavanda y mirra", piedra: "Amatista" },
+};
+
+/** La rueda de intenciones: para cada una, su vela, su día, su astro, su Luna, su planta y su piedra. */
+export function ruedaDeIntenciones() {
+  return (Object.keys(FICHA_INTENCION) as Intencion[]).map((i) => {
+    const f = FICHA_INTENCION[i];
+    return {
+      clave: i,
+      nombre: NOMBRE_INTENCION[i],
+      vela: `Vela ${NOMBRE_COLOR[f.color]}`,
+      alterna: `o ${NOMBRE_COLOR[f.alterno]}`,
+      tono: TONO_COLOR[f.color],
+      dia: DIAS[f.dia],
+      astro: ASTRO_DIA[f.dia],
+      fase: NOMBRE_FASE[f.fase],
+      ...PLANTA_PIEDRA[i],
+    };
+  });
+}
+export type ItemRueda = ReturnType<typeof ruedaDeIntenciones>[number];

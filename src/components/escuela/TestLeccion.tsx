@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
 import type { PreguntaTest } from "@/lib/escuela/tipos";
 import { EscucharSibila } from "./EscucharSibila";
+import { CeremoniaLlave } from "./CeremoniaLlave";
+import { sonarCampanitas } from "@/lib/escuela/sonido";
 
 interface Resultado {
   correctas: number;
@@ -65,6 +67,7 @@ export function TestLeccion({
     const datos = (await r?.json().catch(() => null)) as { ok?: boolean; resultado?: Resultado; carta?: string | null; cartaAudio?: string | null } | null;
     if (!datos?.ok || !datos.resultado) return setEstado("error");
     setResultado(datos.resultado);
+    if (datos.resultado.correctas > 0 && !(datos.resultado.aprobada && !yaHecha)) sonarCampanitas(0.08);
     setCarta(datos.carta ?? null);
     setCartaAudio(datos.cartaAudio ?? null);
     setEstado("");
@@ -81,7 +84,7 @@ export function TestLeccion({
             {p.tipo === "opcion" ? (
               <div className="space-y-2">
                 {p.opciones.map((o, j) => (
-                  <label key={j} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm transition ${respuestas[String(i)] === j ? "border-oro/60 bg-oro/10" : "border-borde hover:border-oro/30"}`}>
+                  <label key={j} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm transition ${respuestas[String(i)] === j ? "border-oro/60 bg-oro/10" : "border-borde hover:border-oro/30"} ${d?.acierto && respuestas[String(i)] === j ? "escuela-acierto" : ""}`}>
                     <input type="radio" name={`p${i}`} checked={respuestas[String(i)] === j} onChange={() => setRespuestas({ ...respuestas, [String(i)]: j })} className="accent-[#f1d99a]" />
                     {o}
                   </label>
@@ -122,21 +125,7 @@ export function TestLeccion({
         </div>
       )}
       {/* La ceremonia de la llave: solo la primera vez que se completa la lección. */}
-      {resultado?.aprobada && !yaHecha && (
-        <div className="tarjeta relative overflow-hidden border-oro/60 p-8 text-center">
-          <div className="escuela-cielo pointer-events-none absolute inset-0" aria-hidden />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_50%_at_50%_35%,rgba(241,217,154,.25),transparent_70%)]" aria-hidden />
-          <span className="escuela-encender relative mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-oro bg-oro/15 text-5xl shadow-[0_0_60px_rgba(241,217,154,.55)]">{llave.simbolo}</span>
-          <p className="relative mt-4 text-xs uppercase tracking-[0.35em] text-oro-suave">Recibiste</p>
-          <p className="relative font-display text-4xl">{llave.nombre}</p>
-          <p className="relative mx-auto mt-2 max-w-sm text-sm text-texto-suave">Ahora sabes: {llave.saber}</p>
-          {gradoNuevo && (
-            <p className="relative mt-4 font-display text-2xl italic text-violeta-suave">
-              Tu grado en el camino: <span className="not-italic text-oro-suave">{gradoNuevo}</span>
-            </p>
-          )}
-        </div>
-      )}
+      {resultado?.aprobada && !yaHecha && <CeremoniaLlave llave={llave} gradoNuevo={gradoNuevo} />}
       {comentario && (
         <div className="tarjeta border-oro/40 bg-oro/5 p-5">
           <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">Sibila te responde</p>

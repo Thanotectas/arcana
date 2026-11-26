@@ -395,6 +395,11 @@ export const CURSO_RITUALES: Curso = {
           ],
         },
         {
+          tipo: "rueda",
+          titulo: "La rueda de las intenciones",
+          texto: "Elige una intención y mira cómo cambia la llama: cada deseo tiene su color, su día, su astro, su Luna, su planta y su piedra.",
+        },
+        {
           tipo: "profundizar",
           titulo: "La luz que acompaña: historia de la vela y de los siete días",
           parrafos: [

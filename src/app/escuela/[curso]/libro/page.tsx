@@ -5,6 +5,9 @@ import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
 import { avanceDe } from "@/lib/escuela/servidor";
 import { LibroDelCurso } from "@/components/escuela/LibroDelCurso";
+import { PolvoEstelar } from "@/components/escuela/PolvoEstelar";
+import { RuedaIntenciones } from "@/components/escuela/RuedaIntenciones";
+import { ruedaDeIntenciones } from "@/lib/escuela/personal";
 
 export async function generateMetadata({ params }: { params: Promise<{ curso: string }> }): Promise<Metadata> {
   const c = cursoPorSlug((await params).curso);
@@ -33,6 +36,11 @@ export default async function PaginaLibro({ params }: { params: Promise<{ curso:
           </nav>
         </div>
       </header>
+      <PolvoEstelar />
+      <section className="space-y-4">
+        <h2 className="text-center font-display text-3xl">La rueda de las intenciones</h2>
+        <RuedaIntenciones items={ruedaDeIntenciones()} inicial={avance.perfil?.intencionVela ?? null} />
+      </section>
       <LibroDelCurso libro={curso.libro} />
       <p className="text-center text-sm"><Link href={`/escuela/${curso.slug}`} className="text-oro-suave hover:text-texto">Volver al camino</Link></p>
     </article>
