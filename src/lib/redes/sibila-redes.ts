@@ -19,6 +19,7 @@ import { fechaBogota } from "./carta-dia";
 import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDePublicacion, type Interaccion, type RedSibila } from "./meta";
 import { responderComentarioYoutube, textoDeVideo } from "./youtube";
 import { esPublicacionAbjad, idiomaDePublicacion, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
+import { esPublicacionLetra, letraDelComentario, respuestaLetra } from "./letra-comentarios";
 import { esPublicacionYildizname, respuestaYildizname } from "./yildizname-comentarios";
 import { esPublicacionCartaNacimiento, respuestaCartaNacimiento } from "./nacimiento-comentarios";
 import { esPublicacionCompatibilidad, respuestaCompatibilidad } from "./compatibilidad-comentarios";
@@ -395,6 +396,7 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (esPublicacionYildizname(publicacion)) respuestaAbjad = respuestaYildizname(i.texto, publicacion, redPlantilla(i.red));
     else if (esPublicacionCompatibilidad(publicacion)) respuestaAbjad = respuestaCompatibilidad(i.texto, publicacion, redPlantilla(i.red));
     else if (esPublicacionCartaNacimiento(publicacion)) respuestaAbjad = respuestaCartaNacimiento(i.texto, publicacion, redPlantilla(i.red));
+    else if (esPublicacionLetra(publicacion) && letraDelComentario(i.texto)) respuestaAbjad = respuestaLetra(i.texto, publicacion);
     else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, redPlantilla(i.red));
   }
 
