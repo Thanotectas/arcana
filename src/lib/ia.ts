@@ -71,6 +71,11 @@ export interface OpcionesTexto {
   nivel?: NivelIA;
   /** Idioma en que debe escribirse la respuesta; "auto": el de quien escribe (el directo). */
   idioma?: Idioma | "auto";
+  /**
+   * Solo afecta a Haiku: con `razonar`, piensa antes de responder (con margen de tokens para que el razonamiento no se
+   * coma la respuesta). Sin razonar, Haiku a veces mezcla sus instrucciones en el texto o se va de idioma.
+   */
+  razonar?: boolean;
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
   imagenes?: ImagenEntrada[];
   /** Manual de la biblioteca de Sibila para este tema (src/lib/conocimiento); va en caché. */
@@ -110,10 +115,10 @@ export async function generarTexto(
   const conRespaldo = !modelo.startsWith("claude-haiku");
   const stream = client.beta.messages.stream({
     model: modelo,
-    max_tokens: opciones.maxTokens ?? 4000,
+    max_tokens: (opciones.maxTokens ?? 4000) + (!conRespaldo && opciones.razonar ? 3000 : 0),
     ...(conRespaldo ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
     // En Haiku el razonamiento interno se come el max_tokens de textos cortos y la respuesta llegaba vacía: se apaga.
-    ...(conRespaldo ? {} : { thinking: { type: "disabled" as const } }),
+    ...(conRespaldo || opciones.razonar ? {} : { thinking: { type: "disabled" as const } }),
     output_config: { effort: opciones.effort ?? "medium" },
     system: [
       {

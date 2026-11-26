@@ -108,6 +108,18 @@ const HOSTS_FOTOS = ["fbcdn.net", "fbsbx.com", "cdninstagram.com", "facebook.com
 /** Mensajes directos previos que entran como contexto. */
 const CONTEXTO = 10;
 
+/**
+ * Ejemplos de respuestas que acercan a la página: cálidas, concretas, en el idioma de la persona, con el enlace en su
+ * idioma y una invitación clara. Y lo que nunca se hace. Se dan a Sibila para que el tono no dependa del modelo.
+ */
+const EJEMPLOS_REDES = `Ejemplos de respuestas buenas (inspírate en el tono y la estructura; nunca las copies ni repitas sus frases):
+- Comentario «فاطمة» (solo un nombre) → «أهلًا فاطمة 🌙 اسمك جميل ويحمل معنى الدفء. اسحبي بطاقة يومك مجانًا في miarcana.com/ar وانظري ما تحمله لك اليوم.»
+- Comentario «Soy escorpio 🦂» → «Escorpio, hoy la Luna te pide soltar algo que ya cumplió su ciclo antes de empezar lo nuevo. Saca tu carta del día gratis en miarcana.com y mira qué te trae ✨»
+- Mensaje «Merhaba» → «Merhaba, hoş geldin 🌙 Ben Sibila. Aklında ne var: aşk mı, iş mi, yoksa gördüğün bir rüya mı? Bana yaz, buradan sana kısa bir okuma yapayım. Günlük kartın da miarcana.com/tr adresinde ücretsiz.»
+- Mensaje «ممكن» (corto, sin pregunta) → «أهلًا بك 🌙 أنا هنا وأسمعك. ما الذي يشغل بالك: الحب، العمل، السفر؟ اكتب سؤالك بكلماتك وسأقرأ لك عليه.»
+- Mensaje «I can't log in to my account» → «I'm sorry, that's frustrating. Could you send me a screenshot of what you see when you try to log in? Someone from our team will write to you here to sort it out.» y al final la marca para pasar a una persona.
+Nunca: explicar lo que la persona escribió («"ممكن" تعني…», «quiere decir que…»), mezclar dos idiomas en la respuesta, escribir notas o instrucciones para ti misma («Dile…», «la persona…»), poner etiquetas como «Respuesta:» o «تعليق», ni decir que solo atiendes en algunos idiomas. El enlace va siempre con el idioma de la persona (miarcana.com/ar, /tr, /en…; en español, miarcana.com).`;
+
 const INSTRUCCION_COMENTARIO = `Estás respondiendo un comentario público en una publicación de Arcana en redes sociales, como Sibila.
 Reglas:
 - Una respuesta de 1 a 3 frases, máximo 260 caracteres, cálida y concreta. Un emoji como mucho. Sin hashtags, sin enlaces con https (escribe miarcana.com a secas si invitas).
@@ -481,6 +493,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   const idiomaEsperado: Idioma = i.tipo === "comentario" && !/\p{L}/u.test(i.texto) && publicacion ? idiomaDePublicacion(publicacion) : idiomaFijo;
   const idiomaIA = idiomaEsperado === "es" ? ("auto" as const) : idiomaEsperado;
   let respuesta: string;
+  // Para la prueba en paralelo de Haiku: lo que se le pidió a Sonnet (solo en el camino principal de texto).
+  let sombra: { entrada: string; sistema: string } | null = null;
   try {
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaAbjad) respuesta = respuestaAbjad;
@@ -499,7 +513,8 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     else {
       // Comentarios y mensajes directos con el modelo estándar: son públicos o llevan la lectura gratis, y la calidad
       // es lo que da confianza. El económico queda para las respuestas cortas que llevan a la página.
-      const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${await contexto(signo)}`;
+      const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${EJEMPLOS_REDES}\n\n${await contexto(signo)}`;
+      sombra = { entrada, sistema };
       const nivel = "estandar" as const;
       respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA });
       // Si la respuesta se fue a otro idioma (español a quien escribe en árabe), se rehace una vez.
@@ -555,5 +570,22 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
   }
   await marcar("respondida", { respuesta, humano: pideHumano, ...(modoPagina ? { detalle: DETALLE_LIMITE } : respuestaFija ? { detalle: DETALLE_FOTO_FIJA } : lecturaBasica && i.tipo === "mensaje" ? { detalle: DETALLE_LECTURA } : {}) });
   if (pideHumano) await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }, { rol: "asistente", contenido: respuesta }]).catch((e) => console.error("[redes aviso]", e));
+  // Prueba en paralelo: la persona ya recibió la respuesta de Sonnet; se guarda la que habría escrito Haiku (sin enviarla).
+  // (La mitad de las veces: alcanza para comparar y no alarga cada aviso de Meta.)
+  if (sombra && process.env.REDES_SOMBRA_HAIKU !== "0" && Math.random() < 0.5) await probarHaiku(admin, i, idiomaEsperado, sombra, respuesta);
   return pideHumano ? "humano" : "respondido";
+}
+
+/**
+ * Prueba en paralelo de Haiku (no se envía): misma entrada y mismas instrucciones que la respuesta de Sonnet, con
+ * Haiku pensando antes de responder. Se guarda en redes_sombra para comparar la calidad antes de cambiar de modelo.
+ */
+async function probarHaiku(admin: SupabaseClient<Database>, i: Interaccion, idioma: Idioma, sombra: { entrada: string; sistema: string }, enviada: string) {
+  const inicio = Date.now();
+  try {
+    const haiku = await generarTexto(sombra.entrada, sombra.sistema, { effort: "low", maxTokens: 1000, nivel: "economico", idioma: idioma === "es" ? "auto" : idioma, razonar: true });
+    await admin.from("redes_sombra").insert({ id_meta: i.idMeta, red: i.red, tipo: i.tipo, idioma, texto: i.texto.slice(0, 2000), enviada, haiku, haiku_defectuosa: respuestaDefectuosa(haiku, idioma), haiku_ms: Date.now() - inicio });
+  } catch (e) {
+    await admin.from("redes_sombra").insert({ id_meta: i.idMeta, red: i.red, tipo: i.tipo, idioma, texto: i.texto.slice(0, 2000), enviada, haiku_ms: Date.now() - inicio, error: (e instanceof Error ? e.message : String(e)).slice(0, 300) });
+  }
 }
