@@ -77,7 +77,30 @@ Ahora ya no haces lecturas ni sigues la conversación por mensaje: con mucho car
 - Si es spam o publicidad ajena, responde exactamente ${MARCA_OMITIR}.
 ${VOZ_NATURAL}`;
 /** Lo que siempre se atiende aunque la persona haya llegado al límite: pagos, cuenta, pedir a una persona. */
-const PIDE_AYUDA = /\b(hablar con (una |alguien|alg[uú]n)|persona real|humano|asesor|alguien del equipo|pago|pagu[eé]|cobr|reembols|tarjeta|cr[eé]ditos? no|mi cuenta|no me deja|no puedo entrar|error|queja)/i;
+const PIDE_AYUDA = new RegExp(
+  [
+    // español
+    "\\b(hablar con (una |alguien|alg[uú]n)|persona real|humano|asesor|alguien del equipo|pago|pagu[eé]|cobr|reembols|tarjeta|cr[eé]ditos? no|mi cuenta|la cuenta|no me deja|no puedo entrar|no funciona|error|queja)",
+    // inglés, portugués y francés
+    "\\b(real person|human|account|log ?in|sign ?up|can'?t (enter|access|register)|doesn'?t work|not working|payment|refund|charged|card|conta|pagamento|cart[aã]o|n[aã]o consigo|n[aã]o funciona|compte|paiement|rembourse|carte|je n'arrive pas|ne marche pas)",
+    // turco
+    "(hesab|hesap|giri[sş] yapam|[cç]al[ıi][sş]m[ıi]yor|[oö]deme|kart[ıi]m|para iadesi|hata|sorun)",
+    // árabe (también dialectal: «ماشتغل», «ما بيشتغل», «ما يفتح»)
+    "(حساب|الحساب|حسابي|دفع|الدفع|بطاقة|فلوس|استرجاع|ما ?بيشتغل|ماشتغل|ما ?يشتغل|لا يعمل|ما ?يفتح|ما ?بيفتح|مشكلة|خطأ|غلط|ما قدرت|لا أستطيع|موظف|شخص حقيقي)",
+  ].join("|"),
+  "i",
+);
+/**
+ * ¿La respuesta del modelo trae sus instrucciones en vez del mensaje? («Dile con calidez que…», «"…" تعني que quiere
+ * preguntar», una etiqueta suelta como «تعليق» o «Respuesta:» en la primera línea.) Entonces no se envía tal cual.
+ */
+function pareceInstruccion(respuesta: string) {
+  const lineas = respuesta.trim().split("\n");
+  const etiqueta = lineas.length > 1 && /^\s*(تعليق|رد|الرد|رسالة|Comentario|Respuesta|Mensaje|Yanıt|Cevap|Reply|Answer|Resposta|Réponse)\s*:?\s*$/iu.test(lineas[0]);
+  return etiqueta || /(?<![\p{L}])(Dile|dile|Invítala|invítala|Invítalo|invítalo|Explícale|Respóndele|la persona|Sibila le|quiere preguntar)(?![\p{L}])/u.test(respuesta);
+}
+/** ¿Hay que rehacer la respuesta? (otro idioma del que escribió la persona, o se coló la instrucción). */
+const respuestaDefectuosa = (respuesta: string, idioma: Idioma) => pareceInstruccion(respuesta) || (idioma !== "es" && idiomaEquivocado(respuesta, idioma));
 /** La respuesta fija de antes (solo español): sigue contando como «no fue lectura» en las filas viejas. Las nuevas se marcan con DETALLE_FOTO_FIJA. */
 const RESPUESTA_FOTO_FIJA_ANTIGUA = "¡Recibí tu foto! 💛 Para leerla con calma, súbela en miarcana.com/huevo (o en miarcana.com/velas si es una vela): te digo lo que salió, lo que viene y qué hacer. Tu primera lectura completa es gratis al crear tu cuenta.";
 /** Hosts de donde Meta sirve las fotos adjuntas; cualquier otra URL se ignora. */
@@ -462,7 +485,16 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
     if (respuestaDirecto) respuesta = respuestaDirecto;
     else if (respuestaAbjad) respuesta = respuestaAbjad;
     else if (respuestaFija) respuesta = respuestaFotoFija(idiomaFijo);
-    else if (modoPagina) respuesta = await generarTexto(`${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
+    else if (modoPagina) {
+      const pedido = `${entrada}${i.imagen ? "\n(Mandó una foto.)" : ""}`;
+      respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "economico", idioma: idiomaIA }).catch(() => respuestaLimite(idiomaFijo));
+      // El modelo económico a veces responde en español a quien escribe en árabe o devuelve su instrucción: se rehace con
+      // el estándar y, si vuelve a fallar, va la respuesta fija en su idioma.
+      if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
+        respuesta = await generarTexto(pedido, INSTRUCCION_PAGINA(modoPagina), { effort: "low", maxTokens: 600, nivel: "estandar", idioma: idiomaEsperado }).catch(() => respuestaLimite(idiomaFijo));
+        if (respuestaDefectuosa(respuesta, idiomaEsperado)) respuesta = respuestaLimite(idiomaFijo);
+      }
+    }
     else if (foto) respuesta = await generarTexto(`${entrada}\n(Adjuntó la foto que ves.)`, `${instruccionFoto(i.tipo, Math.floor(Math.random() * ENFOQUES_FOTO.length))}\n\n${await hechos()}`, { effort: "low", maxTokens: 1600, nivel: "estandar", idioma: idiomaIA, imagenes: [foto], conocimiento: TEMAS_MANUAL.map((t) => manual(t)).join("\n\n") });
     else {
       // Comentarios y mensajes directos con el modelo estándar: son públicos o llevan la lectura gratis, y la calidad
@@ -471,8 +503,15 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       const nivel = "estandar" as const;
       respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA });
       // Si la respuesta se fue a otro idioma (español a quien escribe en árabe), se rehace una vez.
-      if (i.tipo === "comentario" && idiomaEsperado !== "es" && idiomaEquivocado(respuesta, idiomaEsperado))
+      // (También en los mensajes directos, y si se coló la instrucción en vez del mensaje.)
+      if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
         respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado }).catch(() => respuesta);
+        if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
+          await marcar("omitida", { detalle: "respuesta defectuosa dos veces (otro idioma o instrucción): no se envió" });
+          if (i.tipo === "mensaje") await avisarHumano(i, [...hilo, { rol: "persona", contenido: i.texto }]).catch(() => undefined);
+          return "defectuosa";
+        }
+      }
     }
   } catch (e) {
     await marcar("error", { detalle: `Sibila: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}` });
