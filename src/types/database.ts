@@ -154,7 +154,7 @@ type ComunidadMensajeRow = {
 };
 
 type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: string };
-type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; carta_audio: string | null; nombre: string | null; zona: string | null; intencion_cierre: string | null; intencion_vela: string | null; trato: string | null; creado_en: string };
+type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; carta_audio: string | null; nombre: string | null; zona: string | null; intencion_cierre: string | null; intencion_vela: string | null; trato: string | null; creado_en: string; reembolsado_en: string | null; garantia_usada: boolean };
 type EscuelaAudioRow = { clave: string; url: string; creado_en: string };
 type EscuelaProgresoRow = { usuario_id: string; curso: string; leccion: number; respuestas: Json; comentario: string | null; comentario_audio: string | null; notas: Json; intentos: number; completada_en: string | null; actualizado_en: string };
 type ListaEsperaRow = { id: number; curso: string; correo: string; usuario_id: string | null; idioma: string; origen: string | null; creado_en: string };
@@ -724,7 +724,7 @@ export type Database = {
       };
       escuela_inscripciones: {
         Row: EscuelaInscripcionRow;
-        Insert: Insertable<EscuelaInscripcionRow, "creditos" | "carta" | "carta_audio" | "nombre" | "zona" | "intencion_cierre" | "intencion_vela" | "trato" | "creado_en">;
+        Insert: Insertable<EscuelaInscripcionRow, "creditos" | "carta" | "carta_audio" | "nombre" | "zona" | "intencion_cierre" | "intencion_vela" | "trato" | "creado_en" | "reembolsado_en" | "garantia_usada">;
         Update: Partial<EscuelaInscripcionRow>;
         Relationships: [];
       };
@@ -880,6 +880,10 @@ export type Database = {
       };
       inscribir_curso: {
         Args: { p_usuario: string; p_curso: string; p_costo: number; p_incluidos: number };
+        Returns: string;
+      };
+      reembolsar_curso: {
+        Args: { p_usuario: string; p_curso: string; p_incluidos: number; p_dias: number };
         Returns: string;
       };
       devolver_creditos: {

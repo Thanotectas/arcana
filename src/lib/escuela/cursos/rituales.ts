@@ -28,6 +28,7 @@ export const CURSO_RITUALES: Curso = {
   creditosIncluidos: 10,
   abierto: false,
   horasEntreLecciones: 16,
+  garantiaDias: 7,
   lecciones: [
     // ───────────────────────────── DÍA 1 ─────────────────────────────
     {

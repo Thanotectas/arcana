@@ -50,18 +50,22 @@ export interface Avance {
   inscritoEn: string | null;
   perfil: PerfilAlumno | null;
   progreso: Map<number, ProgresoLeccion>;
+  /** Hasta cuándo puede pedir la devolución (null si ya no aplica: pasó el plazo, avanzó o ya la usó). */
+  garantiaHasta: string | null;
 }
 
 /** Inscripción, perfil, lecciones hechas y cuáles están abiertas (una por día: la siguiente se abre horas después). */
 export async function avanceDe(curso: Curso, usuario: { id: string; email?: string | null } | null): Promise<Avance> {
   const vistaPrevia = Boolean(usuario && esAdmin(usuario.email));
-  const vacio: Avance = { inscrito: false, vistaPrevia, estados: curso.lecciones.map(() => "cerrada"), proxima: null, carta: null, cartaAudio: null, inscritoEn: null, perfil: null, progreso: new Map() };
+  const vacio: Avance = { inscrito: false, vistaPrevia, estados: curso.lecciones.map(() => "cerrada"), proxima: null, carta: null, cartaAudio: null, inscritoEn: null, perfil: null, progreso: new Map(), garantiaHasta: null };
   if (!usuario) return vacio;
   const admin = getSupabaseAdmin();
-  const [{ data: insc }, { data: filas }] = await Promise.all([
-    admin.from("escuela_inscripciones").select("carta, carta_audio, creado_en, nombre, zona, intencion_cierre, intencion_vela, trato").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
+  const [{ data: inscFila }, { data: filas }] = await Promise.all([
+    admin.from("escuela_inscripciones").select("carta, carta_audio, creado_en, nombre, zona, intencion_cierre, intencion_vela, trato, creditos, reembolsado_en, garantia_usada").eq("usuario_id", usuario.id).eq("curso", curso.slug).maybeSingle(),
     admin.from("escuela_progreso").select("leccion, respuestas, comentario, comentario_audio, notas, completada_en").eq("usuario_id", usuario.id).eq("curso", curso.slug),
   ]);
+  // Quien usó la garantía deja de estar inscrito (su avance se guarda por si vuelve).
+  const insc = inscFila && !inscFila.reembolsado_en ? inscFila : null;
   if (!insc && !vistaPrevia) return vacio;
   const filasPorLeccion = new Map((filas ?? []).map((f) => [f.leccion, f]));
   const completada = (n: number) => filasPorLeccion.get(n)?.completada_en ?? null;
@@ -79,7 +83,11 @@ export async function avanceDe(curso: Curso, usuario: { id: string; email?: stri
   const perfil: PerfilAlumno | null = insc?.nombre
     ? { nombre: insc.nombre, zona: insc.zona || "America/Bogota", intencionCierre: insc.intencion_cierre ?? "", intencionVela: esIntencion(insc.intencion_vela) ? insc.intencion_vela : null, trato: insc.trato === "a" || insc.trato === "o" || insc.trato === "e" ? insc.trato : null }
     : null;
+  const plazo = insc ? new Date(insc.creado_en).getTime() + curso.garantiaDias * 86400_000 : 0;
+  const avanzo = curso.lecciones.slice(1).some((l) => completada(l.numero));
+  const garantiaHasta = insc && insc.creditos > 0 && !insc.garantia_usada && !avanzo && plazo > Date.now() ? new Date(plazo).toISOString() : null;
   return {
+    garantiaHasta,
     inscrito: Boolean(insc),
     vistaPrevia,
     estados,
@@ -124,6 +132,14 @@ export async function inscribir(curso: Curso, usuario: { id: string; email?: str
   });
   if (error) throw new Error(error.message);
   return String(data);
+}
+
+/** La garantía: devuelve lo pagado (menos las lecturas incluidas) y cierra la inscripción. Devuelve los créditos devueltos o el motivo. */
+export async function reembolsar(curso: Curso, usuario: { id: string }) {
+  const { data, error } = await getSupabaseAdmin().rpc("reembolsar_curso", { p_usuario: usuario.id, p_curso: curso.slug, p_incluidos: curso.creditosIncluidos, p_dias: curso.garantiaDias });
+  if (error) throw new Error(error.message);
+  const r = String(data);
+  return r.startsWith("ok:") ? { ok: true as const, creditos: Number(r.slice(3)) } : { ok: false as const, motivo: r };
 }
 
 /** Guarda lo que la persona cuenta al empezar (y lo puede cambiar después). Solo con inscripción. */

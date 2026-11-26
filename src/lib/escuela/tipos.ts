@@ -85,6 +85,8 @@ export interface Curso {
   abierto: boolean;
   /** Horas que deben pasar desde que se completa una lección para que se abra la siguiente. */
   horasEntreLecciones: number;
+  /** Garantía: días desde la inscripción para pedir la devolución (antes de completar la segunda lección). */
+  garantiaDias: number;
 }
 
 /** Texto de un paso, sea simple o con acción. */

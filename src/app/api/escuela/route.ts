@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { cursoPorSlug } from "@/lib/escuela/cursos";
-import { audioCarta, audioComentario, audioPaso, audioTexto, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, inscribir } from "@/lib/escuela/servidor";
+import { audioCarta, audioComentario, audioPaso, audioTexto, avanceDe, cartaDeCierre, completarLeccion, guardarNota, guardarPerfil, inscribir, reembolsar } from "@/lib/escuela/servidor";
 
 // El comentario de Sibila, su voz y la carta de cierre tardan unos segundos.
 export const maxDuration = 120;
@@ -9,6 +9,7 @@ export const maxDuration = 120;
 /**
  * Escuela de Sibila: POST { accion, curso, ... }
  * - inscribir
+ * - garantia: devuelve los créditos (primeros días, antes de la segunda lección, una sola vez)
  * - perfil { nombre, zona, intencionCierre, intencionVela }
  * - leccion { leccion, respuestas }: corrige, Sibila comenta y la lección queda hecha
  * - nota { leccion, paso, texto }: lo que escribe en el ritual guiado
@@ -25,6 +26,11 @@ export async function POST(request: Request) {
   if (cuerpo.accion === "inscribir") {
     const r = await inscribir(curso, usuario).catch(() => "error");
     return NextResponse.json({ ok: r === "ok" || r === "ya_inscrito", estado: r }, { status: r === "error" ? 500 : 200 });
+  }
+
+  if (cuerpo.accion === "garantia") {
+    const r = await reembolsar(curso, usuario).catch(() => null);
+    return NextResponse.json(r ?? { ok: false, motivo: "error" }, { status: r ? 200 : 500 });
   }
 
   const avance = await avanceDe(curso, usuario);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookOpenText, Check, Clapperboard, Flame, Lock, Moon, ScrollText, Sparkles, Wand2 } from "lucide-react";
+import { BookOpenText, Check, ShieldCheck, Clapperboard, Flame, Lock, Moon, ScrollText, Sparkles, Wand2 } from "lucide-react";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { getIdioma } from "@/lib/i18n/servidor";
 import { INTENCIONES, FICHA_INTENCION, TONO_COLOR } from "@/lib/velas";
@@ -10,6 +10,7 @@ import { avanceDe, precioPara } from "@/lib/escuela/servidor";
 import { grado, lunaHoy, NOMBRE_INTENCION } from "@/lib/escuela/personal";
 import { Llavero } from "@/components/escuela/Llavero";
 import { Temario } from "@/components/escuela/Temario";
+import { BotonGarantia } from "@/components/escuela/BotonGarantia";
 import { Altar } from "@/components/escuela/Altar";
 import { BotonInscripcion } from "@/components/escuela/BotonInscripcion";
 import { FormularioPerfil } from "@/components/escuela/FormularioPerfil";
@@ -44,6 +45,21 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
   const terminado = hechas === curso.lecciones.length;
   const miGrado = grado(hechas, avance.perfil?.trato, curso.lecciones.length);
   const llaves = curso.lecciones.map((l) => l.llave);
+  const contar = (tipo: "saberes" | "tradiciones") => curso.lecciones.reduce((s, l) => s + l.bloques.reduce((t, b) => t + (b.tipo === tipo ? b.items.length : 0), 0), 0);
+  const incluye = [
+    `${curso.lecciones.length} lecciones, una por día, de ${Math.min(...curso.lecciones.map((l) => l.minutos))} a ${Math.max(...curso.lecciones.map((l) => l.minutos))} minutos`,
+    `${curso.lecciones.length} rituales guiados con la voz de Sibila`,
+    "Videos de Sibila y lecciones que puedes escuchar",
+    `${contar("saberes")} saberes y ${contar("tradiciones")} tradiciones del mundo`,
+    "Tu Luna y tu vela calculadas para ti",
+    `${curso.creditosIncluidos} créditos para que Sibila lea tus rituales`,
+    "Sibila comenta tus respuestas, con su voz",
+    "Grimorio descargable con todo lo que escribes",
+    "7 llaves, grados y una carta final de Sibila",
+    "Sello de cierre para compartir",
+    "Sin horarios: lo haces a tu ritmo, en el celular",
+    `Garantía: ${curso.garantiaDias} días, antes de la segunda lección`,
+  ];
   const opcionesVela = INTENCIONES.map((v) => ({ valor: v, nombre: NOMBRE_INTENCION[v], tono: TONO_COLOR[FICHA_INTENCION[v].color] }));
 
   return (
@@ -90,6 +106,14 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
         <p className="rounded-xl border border-violeta/40 p-3 text-center text-xs text-violeta-suave">Vista previa de administrador: el curso aún no está abierto. Puedes inscribirte gratis para recorrerlo.</p>
       )}
 
+      {avance.inscrito && avance.garantiaHasta && (
+        <BotonGarantia
+          curso={curso.slug}
+          hasta={avance.garantiaHasta}
+          devolucion={`Te devolvemos los créditos que pagaste, menos los ${curso.creditosIncluidos} de lecturas incluidas que te dimos al inscribirte.`}
+        />
+      )}
+
       {pidePerfil && <FormularioPerfil curso={curso.slug} opciones={opcionesVela} />}
 
       {/* Inscripción o lista de espera */}
@@ -108,6 +132,15 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
             ))}
           </div>
           <Temario curso={curso} />
+          {/* Este curso incluye: la lista concreta, como en cualquier plataforma de cursos */}
+          <div className="tarjeta mx-auto max-w-2xl p-6 sm:p-8">
+            <h2 className="mb-4 text-center font-display text-3xl">Este curso incluye</h2>
+            <ul className="grid gap-x-6 gap-y-2.5 text-sm sm:grid-cols-2">
+              {incluye.map((t) => (
+                <li key={t} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden />{t}</li>
+              ))}
+            </ul>
+          </div>
           {(curso.abierto || avance.vistaPrevia) && (
             <div className="tarjeta relative overflow-hidden border-oro/40 p-8 text-center">
               <div className="escuela-cielo pointer-events-none absolute inset-0 opacity-50" aria-hidden />
@@ -116,6 +149,7 @@ export default async function PaginaCurso({ params }: { params: Promise<{ curso:
               </p>
               {fundador && !avance.vistaPrevia && <p className="relative mt-1 text-sm text-oro-suave">Precio de fundadores: te anotaste en la lista de espera ✨</p>}
               <p className="relative mt-2 text-sm text-texto-suave">Incluye {curso.creditosIncluidos} créditos para que Sibila lea tus rituales.</p>
+              <p className="relative mt-3 inline-flex items-center gap-1.5 text-sm text-oro-suave"><ShieldCheck className="h-4 w-4" aria-hidden />Garantía de la primera lección: si no te convence, te devolvemos los créditos del curso.</p>
               <div className="relative mt-5"><BotonInscripcion curso={curso.slug} conSesion={Boolean(usuario)} texto="Encender mi primera vela" /></div>
             </div>
           )}
