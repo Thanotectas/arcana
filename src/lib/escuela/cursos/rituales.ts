@@ -155,7 +155,7 @@ export const CURSO_RITUALES: Curso = {
       resumen: "Copal, romero, bakhoor y üzerlik: cómo se limpia una casa con humo en distintas tradiciones.",
       minutos: 35,
       bloques: [
-        { tipo: "video", titulo: "El humo que limpia" },
+        { tipo: "video", titulo: "El humo que limpia", src: "/escuela/rituales/dia-2.mp4", poster: "/escuela/rituales/dia-2.jpg" },
         {
           tipo: "texto",
           titulo: "Una casa que respira",
