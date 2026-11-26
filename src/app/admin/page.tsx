@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2, MessageSquareHeart, Mic, MessagesSquare } from "lucide-react";
+import { Megaphone, Mail, BarChart3, MessageCircle, HandCoins, Radio, Send, Gift, Share2, Filter, Smartphone, Gamepad2, MessageSquareHeart, Mic, MessagesSquare, Cpu } from "lucide-react";
 import { requerirAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Administración", robots: { index: false, follow: false } };
 
 const HERRAMIENTAS = [
   { href: "/admin/resumen", icono: BarChart3, titulo: "Estado del negocio", texto: "Registros, ventas, lecturas, correos y redes de la última semana. Llega por correo cada lunes a las 7:00." },
+  { href: "/admin/ia", icono: Cpu, titulo: "Gasto de IA", texto: "Cuánto cuesta Claude por función y por modelo: hoy, los últimos 7 y 30 días, y qué llamada sale más cara." },
   { href: "/admin/juego", icono: Gamepad2, titulo: "El Camino del Loco", texto: "Jugadores por día, cuántos vuelven, cuántos crean cuenta y cuántos compran lecturas después de jugar." },
   { href: "/admin/comunidad", icono: MessagesSquare, titulo: "Comunidad", texto: "Moderar la comunidad de miarcana.com/comunidad: mensajes en revisión, reportados y los últimos publicados." },
   { href: "/admin/opiniones", icono: MessageSquareHeart, titulo: "Opiniones de la app", texto: "Lo que escriben con el botón «Tu opinión» (probadores de Google Play): qué arreglar en cada versión." },

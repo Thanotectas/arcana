@@ -76,6 +76,8 @@ export interface OpcionesTexto {
    * coma la respuesta). Sin razonar, Haiku a veces mezcla sus instrucciones en el texto o se va de idioma.
    */
   razonar?: boolean;
+  /** Nombre de la función para el registro de gasto (/admin/ia). Sin él, se usa el comienzo de las instrucciones. */
+  funcion?: string;
   /** Imágenes que acompañan al mensaje (por ejemplo, la palma de la mano). */
   imagenes?: ImagenEntrada[];
   /** Manual de la biblioteca de Sibila para este tema (src/lib/conocimiento); va en caché. */
@@ -152,7 +154,48 @@ export async function generarTexto(
     .map((b) => b.text)
     .join("\n")
     .trim();
+  await registrarUso(opciones.funcion ?? etiquetaDe(sistemaExtra), mensaje);
   // Nunca se devuelve (ni se guarda) un texto vacío: quien llama lo trata como error y no lo cachea.
   if (!texto) throw new Error(`[ia] respuesta vacía de ${modelo} (stop_reason: ${mensaje.stop_reason})`);
   return texto;
+}
+
+/** Precio por millón de tokens (USD): entrada, salida, lectura de caché, escritura de caché (1,25 × entrada). */
+const PRECIOS: [RegExp, number, number, number, number][] = [
+  [/opus/, 4, 20, 0.2, 5],
+  [/sonnet/, 2, 10, 0.1, 2.5],
+  [/haiku/, 0.1, 0.5, 0.01, 0.125],
+];
+
+/** Costo estimado de una llamada, con el modelo que de verdad respondió (puede ser el de respaldo). */
+export function costoDe(modelo: string, u: { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }) {
+  const p = PRECIOS.find(([re]) => re.test(modelo)) ?? PRECIOS[1];
+  return ((u.input_tokens ?? 0) * p[1] + (u.output_tokens ?? 0) * p[2] + (u.cache_read_input_tokens ?? 0) * p[3] + (u.cache_creation_input_tokens ?? 0) * p[4]) / 1_000_000;
+}
+
+/** Nombre corto de la función a partir de sus instrucciones (la primera frase), cuando quien llama no lo da. */
+function etiquetaDe(sistemaExtra?: string) {
+  const primera = (sistemaExtra ?? "").trim().split(/[.\n:]/)[0]?.trim() ?? "";
+  return primera ? primera.slice(0, 80) : "sin instrucciones";
+}
+
+/** Guarda tokens y costo de la llamada (para /admin/ia). Si falla, no interrumpe nada. */
+export async function registrarUso(funcion: string, mensaje: { model: string; usage: Parameters<typeof costoDe>[1] }) {
+  try {
+    const { getSupabaseAdmin } = await import("./supabase/admin");
+    const u = mensaje.usage;
+    await getSupabaseAdmin()
+      .from("ia_uso")
+      .insert({
+        funcion: funcion.slice(0, 120),
+        modelo: mensaje.model,
+        entrada: u.input_tokens ?? 0,
+        salida: u.output_tokens ?? 0,
+        cache_lectura: u.cache_read_input_tokens ?? 0,
+        cache_escritura: u.cache_creation_input_tokens ?? 0,
+        costo_usd: Number(costoDe(mensaje.model, u).toFixed(6)),
+      });
+  } catch (e) {
+    console.error("[ia] registro de uso:", e instanceof Error ? e.message : e);
+  }
 }

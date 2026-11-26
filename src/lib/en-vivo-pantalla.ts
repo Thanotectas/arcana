@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import { getCliente } from "@/lib/ia";
+import { getCliente, registrarUso } from "@/lib/ia";
 
 /**
  * Lee el chat de un LIVE de TikTok desde una captura de la pantalla (LIVE Studio no da los comentarios por API):
@@ -36,6 +36,7 @@ export async function leerChatDePantalla(imagenBase64: string, tipo: "image/jpeg
       },
     ],
   });
+  await registrarUso("en vivo · leer el chat de la pantalla", r);
   const texto = r.content.map((b) => (b.type === "text" ? b.text : "")).join("");
   const json = /\{[\s\S]*\}/.exec(texto)?.[0];
   if (!json) return [];

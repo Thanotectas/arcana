@@ -157,6 +157,7 @@ type ComunidadTraduccionRow = { mensaje_id: number; idioma: string; texto: strin
 type EscuelaInscripcionRow = { usuario_id: string; curso: string; creditos: number; carta: string | null; carta_audio: string | null; nombre: string | null; zona: string | null; intencion_cierre: string | null; intencion_vela: string | null; trato: string | null; creado_en: string; reembolsado_en: string | null; garantia_usada: boolean };
 type EscuelaAudioRow = { clave: string; url: string; creado_en: string };
 type EscuelaProgresoRow = { usuario_id: string; curso: string; leccion: number; respuestas: Json; comentario: string | null; comentario_audio: string | null; notas: Json; intentos: number; completada_en: string | null; actualizado_en: string };
+type IaUsoRow = { id: number; funcion: string; modelo: string; entrada: number; salida: number; cache_lectura: number; cache_escritura: number; costo_usd: number; creado_en: string };
 type RedesSombraRow = { id: number; id_meta: string; red: string; tipo: string; idioma: string | null; texto: string; enviada: string; haiku: string | null; haiku_defectuosa: boolean | null; haiku_ms: number | null; error: string | null; creado_en: string };
 type ListaEsperaRow = { id: number; curso: string; correo: string; usuario_id: string | null; idioma: string; origen: string | null; creado_en: string };
 type BibliotecaTraduccionRow = { slug: string; idioma: string; version: string; ficha: Json | null; creado_en: string };
@@ -739,6 +740,12 @@ export type Database = {
         Row: EscuelaProgresoRow;
         Insert: Insertable<EscuelaProgresoRow, "respuestas" | "comentario" | "comentario_audio" | "notas" | "intentos" | "completada_en" | "actualizado_en">;
         Update: Partial<EscuelaProgresoRow>;
+        Relationships: [];
+      };
+      ia_uso: {
+        Row: IaUsoRow;
+        Insert: Insertable<IaUsoRow, "id" | "entrada" | "salida" | "cache_lectura" | "cache_escritura" | "costo_usd" | "creado_en">;
+        Update: Partial<IaUsoRow>;
         Relationships: [];
       };
       redes_sombra: {
