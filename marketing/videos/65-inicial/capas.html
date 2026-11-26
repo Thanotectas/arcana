@@ -1,0 +1,75 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent}
+#sa{position:absolute;left:0;right:0;top:0;height:620px;background:linear-gradient(180deg,rgba(10,6,24,.85),rgba(10,6,24,.5) 60%,rgba(10,6,24,0))}
+#sb{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(0deg,rgba(10,6,24,.9),rgba(10,6,24,.6) 55%,rgba(10,6,24,0));opacity:0}
+#gancho{position:absolute;top:140px;left:50px;right:50px;text-align:center;color:#fff;text-shadow:0 4px 22px #000}
+#g1{font-family:C;font-size:104px;line-height:1.02}
+#g2{font-family:C;font-size:60px;line-height:1.1;color:#e9dcff;margin-top:16px;font-style:italic}
+#mini{position:absolute;top:120px;left:50px;right:50px;text-align:center;font-family:I;font-size:40px;color:#f1d99a;opacity:0;text-shadow:0 2px 14px #000}
+#tabla{position:absolute;left:60px;right:60px;bottom:300px;opacity:1}
+.fila{display:flex;align-items:center;gap:22px;margin-top:22px;padding:18px 28px;border-radius:30px;background:rgba(12,8,30,.72);border:2px solid rgba(241,217,154,.55);opacity:0;box-shadow:0 0 30px rgba(0,0,0,.4)}
+.fila .e{font-size:62px;width:76px;text-align:center}
+.fila .n{font-family:C;font-size:62px;color:#f1d99a;width:200px;flex:none}
+.fila .l{font-family:C;font-size:56px;color:#fff;letter-spacing:.04em;word-spacing:.12em;flex:1;text-align:center;white-space:nowrap}
+#como{position:absolute;left:60px;right:60px;bottom:360px;text-align:center;color:#fff;opacity:0;text-shadow:0 4px 18px #000}
+#c1{font-family:C;font-size:96px;line-height:1.05}
+#c2{font-family:C;font-size:80px;line-height:1.05;color:#f1d99a;margin-top:18px;opacity:0}
+#cta{position:absolute;left:50px;right:50px;bottom:330px;text-align:center;opacity:0}
+#cta1{font-family:C;font-size:130px;line-height:1;color:#fff;text-shadow:0 0 40px rgba(241,217,154,.5),0 6px 22px #000}
+#cta2{margin-top:30px;font-family:I;font-size:54px;color:#f1d99a;text-shadow:0 0 26px rgba(241,217,154,.55),0 3px 12px #000}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.85;text-shadow:0 2px 10px #000}
+#marca b{color:#f1d99a}
+body.ar{direction:rtl}
+body.tr .fila .l{font-size:46px;letter-spacing:0}
+body.ar #g1,body.ar #g2,body.ar #mini,body.ar .fila .n,body.ar #c1,body.ar #c2,body.ar #cta1,body.ar #cta2,body.ar #marca span{font-family:NA}
+body.ar #g1{font-size:88px;line-height:1.35}body.ar #g2{font-size:56px;font-style:normal;line-height:1.4}
+body.ar .fila .l{font-family:NA;font-size:60px;letter-spacing:.25em}
+body.ar #c1{font-size:84px;line-height:1.35}body.ar #c2{font-size:72px;line-height:1.4}
+body.ar #cta1{font-size:110px;line-height:1.3}body.ar #mini{font-size:44px}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div id="gancho"><div id="g1"></div><div id="g2"></div></div>
+<div id="mini"></div>
+<div id="tabla"></div>
+<div id="como"><div id="c1"></div><div id="c2"></div></div>
+<div id="cta"><div id="cta1"></div><div id="cta2"></div></div>
+<p id="marca"><b>ARCANA</b> · <span id="lema"></span></p>
+<script>
+const LATINAS=["A E H M F V","B P O U W I Y N T","C J K Q S Z","D G L R X"];
+const T={
+ es:{g1:"Escribe SOLO la<br>primera letra 👇",g2:"del nombre de quien<br>ocupa tu mente",mini:"👇 La primera letra de quien ocupa tu mente",el:["Fuego","Aire","Agua","Tierra"],c1:"Cómo te ama<br>esa persona…",c2:"…y qué necesita de ti",cta1:"Escribe<br>la letra 👇",cta2:"Sibila te responde 🔮",lema:"SIBILA TE LEE"},
+ en:{g1:"Write ONLY the<br>first letter 👇",g2:"of the name of the person<br>on your mind",mini:"👇 The first letter of the one on your mind",el:["Fire","Air","Water","Earth"],c1:"How this person<br>loves you…",c2:"…and what they need from you",cta1:"Write<br>the letter 👇",cta2:"Sibila answers you 🔮",lema:"SIBILA READS FOR YOU"},
+ pt:{g1:"Escreva SÓ a<br>primeira letra 👇",g2:"do nome de quem<br>ocupa a sua mente",mini:"👇 A primeira letra de quem ocupa a sua mente",el:["Fogo","Ar","Água","Terra"],c1:"Como essa pessoa<br>te ama…",c2:"…e do que ela precisa de você",cta1:"Escreva<br>a letra 👇",cta2:"Sibila te responde 🔮",lema:"SIBILA LÊ PRA VOCÊ"},
+ fr:{g1:"Écris SEULEMENT la<br>première lettre 👇",g2:"du prénom de la personne<br>qui occupe tes pensées",mini:"👇 La première lettre de la personne dans tes pensées",el:["Feu","Air","Eau","Terre"],c1:"Comment cette<br>personne t'aime…",c2:"…et ce dont elle a besoin",cta1:"Écris<br>la lettre 👇",cta2:"Sibila te répond 🔮",lema:"SIBILA LIT POUR TOI"},
+ tr:{g1:"Sadece İLK<br>HARFİ yaz 👇",g2:"aklındaki kişinin<br>adının",mini:"👇 Aklındaki kişinin adının ilk harfi",el:["Ateş","Hava","Su","Toprak"],c1:"O kişi seni<br>nasıl seviyor…",c2:"…ve senden neye ihtiyaç duyuyor",cta1:"Harfi<br>yaz 👇",cta2:"Sibila cevap veriyor 🔮",lema:"SIBILA SENİN İÇİN OKUYOR",letras:["A E H M F V Ş","B P O Ö U Ü I İ Y N T","C Ç J K S Z","D G Ğ L R"]},
+ ar:{g1:"اكتب أول حرف فقط 👇",g2:"من اسم الشخص الذي يشغل بالك",mini:"👇 أول حرف من اسم من يشغل بالك",el:["ناري","هوائي","مائي","ترابي"],c1:"كيف يحبك هذا الشخص…",c2:"…وماذا يحتاج منك",cta1:"اكتب الحرف 👇",cta2:"سيبيلا تجيبك 🔮",lema:"سيبيلا تقرأ لك",letras:["ا ه ط م ف ش ذ","ب و ي ن ص ت ض","ج ز ك س ق ث ظ","د ح ل ع ر خ غ"]},
+};
+const EMOJI=["🔥","🌬️","💧","🌿"];
+// #idioma,fuego,aire,agua,tierra,como,final,fin
+const [L,...ts]=decodeURIComponent(location.hash.slice(1)).split(",");
+const [tF,tA,tW,tE,tC,tX,tFin]=ts.map(Number);
+const x=T[L];document.body.className=L;
+const $=id=>document.getElementById(id);
+$("g1").innerHTML=x.g1;$("g2").innerHTML=x.g2;$("mini").textContent=x.mini;$("c1").innerHTML=x.c1;$("c2").textContent=x.c2;$("cta1").innerHTML=x.cta1;$("cta2").textContent=x.cta2;$("lema").textContent=x.lema;
+const letras=x.letras||LATINAS;
+$("tabla").innerHTML=x.el.map((n,i)=>`<div class="fila"><span class="e">${EMOJI[i]}</span><span class="n">${n}</span><span class="l">${letras[i]}</span></div>`).join("");
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=v=>v*v*(3-2*v);
+const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+window.pintar=t=>{
+ // Gancho grande al inicio; luego queda chico arriba todo el video.
+ const g=1-su(pr(t,tF-1.0,tF-0.4));$("gancho").style.opacity=g*su(pr(t,0,.35));
+ $("gancho").style.transform=`scale(${1+0.04*Math.sin(t*2.2)})`;
+ $("mini").style.opacity=su(pr(t,tF-0.5,tF));
+ $("sb").style.opacity=su(pr(t,tF-0.8,tF-0.2));
+ const filas=[...$("tabla").children],tiempos=[tF,tA,tW,tE];
+ const finTabla=tC-0.15;
+ filas.forEach((f,i)=>{const a=tiempos[i]-0.15;const o=ven(t,a,finTabla,.3);f.style.opacity=o;f.style.transform=`translateX(${(1-su(pr(t,a,a+.35)))*(L==="ar"?-60:60)}px) scale(${1+0.06*Math.max(0,1-pr(t,a,a+.6))})`;f.style.boxShadow=`0 0 ${40*Math.max(0,1-pr(t,a,a+.8))}px rgba(241,217,154,.8)`;});
+ $("como").style.opacity=ven(t,tC,tX-0.1);$("c2").style.opacity=su(pr(t,tC+1.6,tC+2.1));
+ const c=su(pr(t,tX,tX+.4));$("cta").style.opacity=c;$("cta1").style.transform=`scale(${1+0.05*Math.sin((t-tX)*4)})`;
+ $("marca").style.opacity=(0.85*(1-ven(t,tF-0.3,tC-0.1))).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
