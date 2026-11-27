@@ -14,7 +14,7 @@ import { ConexionMeta } from "@/components/admin/ConexionMeta";
 import { BotonMetricas } from "@/components/admin/BotonMetricas";
 import { BotonesAutomaticas } from "@/components/admin/BotonesAutomaticas";
 import { interacciones, promediosPorTipo, type MetricaRed } from "@/lib/redes/metricas";
-import { estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
+import { diagnosticoMensajesInstagram, estadoSuscripcion, metaConfigurado } from "@/lib/redes/meta";
 import { cuentaTiktok, tiktokConfigurado } from "@/lib/redes/tiktok";
 import { vozConfigurada } from "@/lib/redes/voz";
 import { cuentaYoutube, privacidadYoutube, youtubeConfigurado } from "@/lib/redes/youtube";
@@ -63,12 +63,13 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
   const porAprobar = todas.filter((p) => p.estado === "borrador" && p.fecha >= hoy);
   const programadas = todas.filter((p) => (p.estado === "aprobada" || p.estado === "publicando") && p.fecha >= sumarDias(hoy, -2));
   const historial = todas.filter((p) => !porAprobar.includes(p) && !programadas.includes(p)).reverse();
-  const [{ data: cartaDia }, diagnostico, { data: ultimasInteracciones }, suscripcion, { data: metricasData }] = await Promise.all([
+  const [{ data: cartaDia }, diagnostico, { data: ultimasInteracciones }, suscripcion, { data: metricasData }, mensajesIg] = await Promise.all([
     getSupabaseAdmin().from("publicaciones_redes").select("red, tipo, fecha, estado, detalle, referencia").gte("fecha", sumarDias(hoy, -7)).order("fecha", { ascending: false }).order("tipo").limit(40),
     diagnosticoFacebook(),
     getSupabaseAdmin().from("interacciones_redes").select("id, red, tipo, remitente, texto, respuesta, estado, humano, detalle, creado_en").order("creado_en", { ascending: false }).limit(40),
     metaConfigurado() ? estadoSuscripcion() : Promise.resolve(null),
     getSupabaseAdmin().from("metricas_redes").select("*").gte("fecha", sumarDias(hoy, -14)).order("fecha", { ascending: false }).limit(80),
+    metaConfigurado() ? diagnosticoMensajesInstagram() : Promise.resolve(null),
   ]);
   const [youtube, { data: subidasYoutube }] = await Promise.all([
     youtubeConfigurado() ? cuentaYoutube(getSupabaseAdmin()) : Promise.resolve(null),
@@ -316,6 +317,14 @@ export default async function PaginaAdminRedes({ searchParams }: { searchParams:
           </p>
         )}
         {suscripcion?.tokenDeUsuario && <p className="text-xs text-oro-suave">META_PAGE_TOKEN es un token de usuario: funciona, pero vence. Cámbialo por el token de la página.</p>}
+        {mensajesIg && (
+          <p className={`text-sm ${mensajesIg.ok ? "text-exito" : "text-peligro"}`}>
+            Mensajes directos de Instagram:{" "}
+            {mensajesIg.ok
+              ? `la app los puede leer (${mensajesIg.conversaciones} conversaciones recientes). Si aun así no llegan avisos, falta suscribir el campo «messages» del objeto Instagram en los webhooks de la app.`
+              : `Meta no da acceso: ${mensajesIg.error}`}
+          </p>
+        )}
         {metaConfigurado() && <ConexionMeta suscrita={Boolean(suscripcion?.suscrita)} />}
         <h3 className="pt-3 font-semibold">Últimas interacciones</h3>
         {ultimasInteracciones?.length ? (

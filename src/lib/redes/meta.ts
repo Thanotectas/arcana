@@ -131,6 +131,20 @@ export async function estadoSuscripcion(): Promise<EstadoSuscripcion> {
 }
 
 /**
+ * ¿Puede la app leer los mensajes directos de Instagram? Lista una conversación: si Meta niega el permiso
+ * (instagram_manage_messages, acceso a mensajes de la cuenta), el error dice qué falta.
+ */
+export async function diagnosticoMensajesInstagram(): Promise<{ ok: boolean; conversaciones?: number; error?: string }> {
+  try {
+    const pagina = await paginaMeta();
+    const r = await llamar<{ data?: unknown[] }>(`${pagina.id}/conversations?platform=instagram&limit=5`);
+    return { ok: true, conversaciones: r.data?.length ?? 0 };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/**
  * Suscribe la página a los avisos de esta app. Intenta comentarios (feed) y
  * mensajes juntos; si el token no tiene el permiso de uno, suscribe el otro
  * solo para que al menos los comentarios funcionen. Devuelve lo suscrito y
