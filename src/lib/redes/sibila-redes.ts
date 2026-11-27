@@ -558,12 +558,17 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       // Comentarios y mensajes directos con el modelo estándar: son públicos o llevan la lectura gratis, y la calidad
       // es lo que da confianza. El económico queda para las respuestas cortas que llevan a la página.
       const sistema = `${i.tipo === "comentario" ? INSTRUCCION_COMENTARIO : INSTRUCCION_MENSAJE}\n\n${EJEMPLOS_REDES}\n\n${await contexto(signo)}`;
-      sombra = { entrada, sistema };
-      const nivel = "estandar" as const;
-      respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel, idioma: idiomaIA, funcion: `redes · ${i.tipo}${cartaOfrecida ? " (con lectura gratis)" : ""}`, cachear: true });
+      // Comentarios con Haiku razonando (la prueba en paralelo lo dejó a la altura en los comentarios); si falla o sale
+      // defectuoso, se rehace con Sonnet abajo. Los mensajes directos siguen con Sonnet (deciden compras y lecturas) y
+      // siguen en la prueba en paralelo.
+      const comentarioHaiku = i.tipo === "comentario" && process.env.REDES_COMENTARIOS_HAIKU !== "0";
+      if (!comentarioHaiku) sombra = { entrada, sistema };
+      respuesta = comentarioHaiku
+        ? await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "economico", razonar: true, idioma: idiomaIA, funcion: "redes · comentario (Haiku)", cachear: true }).catch(() => "")
+        : await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaIA, funcion: `redes · ${i.tipo}${cartaOfrecida ? " (con lectura gratis)" : ""}`, cachear: true });
       // Si la respuesta se fue a otro idioma (español a quien escribe en árabe), se rehace una vez.
       // (También en los mensajes directos, y si se coló la instrucción en vez del mensaje.)
-      if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
+      if (!respuesta.trim() || respuestaDefectuosa(respuesta, idiomaEsperado)) {
         respuesta = await generarTexto(entrada, sistema, { effort: "low", maxTokens: 1000, nivel: "estandar", idioma: idiomaEsperado, funcion: `redes · ${i.tipo} (rehecha)`, cachear: true }).catch(() => respuesta);
         if (respuestaDefectuosa(respuesta, idiomaEsperado)) {
           await marcar("omitida", { detalle: "respuesta defectuosa dos veces (otro idioma o instrucción): no se envió" });

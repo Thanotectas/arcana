@@ -53,11 +53,14 @@ const NO_NOMBRES = /^(gracias|grac|amen|amén|ok|okay|wow|hola|si|sí|no|thanks|
 
 const PALABRAS_DE_FRASE = new Set(
   (
-    "رجاء ممكن رد ردي ردو ارجو أرجو فضلك سمحت لو كيف ماذا شو وين متى ليش لماذا هل اريد أريد بدي ابغى خاص الخاص عالخاص اسمي احسب احسبي شوف شوفي " +
+    "رجاء ممكن رد ردي ردو ارجو أرجو فضلك سمحت لو كيف ماذا شو وين متى ليش لماذا هل اريد أريد بدي ابغى خاص الخاص عالخاص اسم اسمي احسب احسبي شوف شوفي " +
     "por favor quiero mi nombre como cómo que qué donde dónde cuando cuándo respondeme respóndeme please my name what how want reply " +
     "lütfen benim adım nasıl cevap por favor meu nome quero"
   ).split(" "),
 );
+
+const PREFIJOS_NOMBRE =
+  /^(?:(?:(?:ممكن|لو سمحت|لو سمحتي|من فضلك|رجاء|احسب(?:ي|و)?|احسبلي|حساب|قيمة|ما قيمة|شو قيمة)\s+)*(?:اسم|اسمي|إسم|إسمي)\s+|(?:mi nombre es|me llamo|my name is|meu nome é|meu nome e|je m'appelle|benim adım|adım|ismim)\s+)/iu;
 
 /** El nombre del comentario, si el comentario es solo un nombre (sin emojis ni signos); si no, null. */
 export function nombreDelComentario(texto: string): string | null {
@@ -66,6 +69,9 @@ export function nombreDelComentario(texto: string): string | null {
     .replace(/[ً-ٰٟ]/g, "") // vocales cortas árabes
     .replace(/[^\p{L}\s'-]/gu, " ")
     .replace(/\s+/g, " ")
+    .trim()
+    // «ممكن اسم ميساء», «اسمي فاطمة», «mi nombre es Ana»: se quita lo que va antes del nombre.
+    .replace(PREFIJOS_NOMBRE, "")
     .trim();
   if (!limpio || limpio.length > 40 || /\d|\?|؟/.test(texto)) return null;
   const palabras = limpio.split(" ");

@@ -26,8 +26,19 @@ export function esPublicacionLetra(texto: string) {
   return /primera letra|la inicial|first letter|the initial|primeira letra|première lettre|ilk harf|أول حرف|اول حرف|الحرف الأول|الحرف الاول|huruf pertama|पहला अक्षर/i.test(texto);
 }
 
+/** Nombres de las letras árabes («حرف عين» = ع): quien escribe el nombre de la letra en vez de la letra. */
+const NOMBRES_LETRAS: Record<string, string> = {
+  "الف": "ا", "ألف": "ا", "اليف": "ا", "باء": "ب", "با": "ب", "تاء": "ت", "تا": "ت", "ثاء": "ث", "ثا": "ث", "جيم": "ج", "حاء": "ح", "حا": "ح",
+  "خاء": "خ", "خا": "خ", "دال": "د", "ذال": "ذ", "راء": "ر", "را": "ر", "زاي": "ز", "زين": "ز", "سين": "س", "شين": "ش", "صاد": "ص",
+  "ضاد": "ض", "طاء": "ط", "طا": "ط", "ظاء": "ظ", "ظا": "ظ", "عين": "ع", "غين": "غ", "فاء": "ف", "فا": "ف", "قاف": "ق", "كاف": "ك",
+  "لام": "ل", "ميم": "م", "نون": "ن", "هاء": "ه", "ها": "ه", "واو": "و", "ياء": "ي", "يا": "ي",
+};
+
 /** La letra del comentario, si el comentario es una sola letra (con o sin emojis, signos o la palabra «letra»). */
 export function letraDelComentario(texto: string): string | null {
+  // «حرف عين», «حرف الميم»: la palabra حرف seguida del nombre de la letra.
+  const conNombre = texto.normalize("NFC").replace(/[ً-ٰٟ]/g, "").match(/(?:^|\s)(?:ال)?حرف\s+(?:ال)?(\p{L}+)\s*$/u);
+  if (conNombre && NOMBRES_LETRAS[conNombre[1]]) return NOMBRES_LETRAS[conNombre[1]];
   const limpio = texto
     .normalize("NFC")
     .replace(/@\S+/g, " ")
