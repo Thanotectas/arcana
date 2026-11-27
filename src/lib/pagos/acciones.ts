@@ -140,3 +140,23 @@ export async function accionComprarInternacional(formData: FormData) {
   }
   redirect(url);
 }
+
+/**
+ * Compra en un toque desde la invitación «se terminaron tus créditos»: el paquete Inicial (alcanza para casi
+ * cualquier lectura, más el regalo de la primera compra), en dólares con PayPal fuera de Colombia y en pesos con
+ * Bold en Colombia, sin pasar por la página de paquetes.
+ */
+export async function accionCompraRapida(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar?volver=/creditos");
+  const pais = (await headers()).get("x-vercel-ip-country") ?? "CO";
+  const datos = new FormData();
+  datos.set("paquete", "inicial");
+  const codigo = formData.get("codigo");
+  if (codigo) datos.set("codigo", String(codigo));
+  if (pais !== "CO" && proveedorInternacional(user.email)) return accionComprarInternacional(datos);
+  return accionComprar(datos);
+}

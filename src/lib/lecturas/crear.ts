@@ -30,14 +30,15 @@ export async function usuarioActual() {
  * escribe después /api/lecturas/[id]/generar mientras la persona la ve.
  * Solo el servidor crea lecturas (la tabla no admite inserts de usuarios).
  */
-export async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada: unknown; resultado: unknown }) {
+/** `costo`: tarifa propia de una variante (p. ej. la lectura completa del nombre); por defecto, la del tipo. */
+export async function crearLectura(datos: { tipo: TipoLectura; titulo: string; entrada: unknown; resultado: unknown; costo?: number }) {
   const { supabase, user } = await usuarioActual();
   const perfil = await getPerfil();
   const idioma = await getIdioma();
   const entrada = { ...(datos.entrada as Record<string, unknown>), idioma };
   // Las cuentas ilimitadas pasan por el cobro (queda registro) sin pagar nada.
-  const costo = perfil?.ilimitado ? 0 : COSTOS[datos.tipo];
-  const costoTarifa = COSTOS[datos.tipo];
+  const costoTarifa = datos.costo ?? COSTOS[datos.tipo];
+  const costo = perfil?.ilimitado ? 0 : costoTarifa;
   const referencia = `${datos.tipo}-${Date.now()}`;
 
   if (costoTarifa > 0) {

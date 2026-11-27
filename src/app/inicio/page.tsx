@@ -18,6 +18,7 @@ import { AvisoDirecto } from "@/components/AvisoDirecto";
 import { EventoMeta } from "@/components/EventoMeta";
 import { ExplorarCatalogo } from "@/components/ExplorarCatalogo";
 import { catalogoConTextos } from "@/lib/catalogo";
+import { InvitacionCreditos } from "@/components/InvitacionCreditos";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -95,6 +96,9 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
           </Link>
         </div>
       </section>
+
+      {/* Sin créditos: la compra en un toque, antes de que la persona choque con el cobro en una lectura. */}
+      {compras && !perfil?.ilimitado && (perfil?.creditos ?? 0) === 0 && <InvitacionCreditos />}
 
       <AvisoDiario clavePublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null} />
 

@@ -403,6 +403,8 @@ export interface ResultadoAbjad {
   madre: PersonaAbjad | null;
   /** Nombre + nombre de la madre, como se suma en la tradición (solo si hay madre). */
   conMadre: { total: number; reduccion: number[]; raiz: number } | null;
+  /** Lectura completa: el nombre de otra persona, para ver cómo se encuentran los elementos (opcional). */
+  otro?: PersonaAbjad | null;
 }
 
 export function calcularPersona(nombre: string, escritura: string, idioma: Idioma): PersonaAbjad {

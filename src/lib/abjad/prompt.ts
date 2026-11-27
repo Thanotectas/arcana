@@ -33,10 +33,39 @@ export function resumenAbjad(r: ResultadoAbjad) {
   );
 }
 
+/** Elementos de la ciencia de las letras como temperamento en el amor y el trabajo (la misma clave que el juego de la inicial). */
+const AMOR_ELEMENTO =
+  "Claves de temperamento por elemento (las mismas que usa Arcana en el juego de la inicial): fuego, ama con intensidad y de frente, necesita admiración y entusiasmo compartido; aire, ama con palabras e ideas, necesita libertad y ser escuchado; agua, ama hondo y en silencio, necesita ternura y confianza; tierra, ama con hechos y para quedarse, necesita constancia y promesas cumplidas.";
+
+function promptCompleto(r: ResultadoAbjad, idioma: Idioma): Prompt {
+  const primera = r.persona.letras[0];
+  const regente = primera ? `Letra inicial (la que «rige» el nombre en la lectura popular): ${primera.escrita} ${NOMBRE_LETRA[primera.base]} = ${primera.valor}, ${NOMBRE_ELEMENTO[primera.elemento]}` : "";
+  const otro = r.otro ? `\n\n${describirPersona(r.otro, "Nombre de la otra persona")}` : "";
+  const conMadre = Boolean(r.madre && r.conMadre);
+  return {
+    usuario:
+      `Escribe la LECTURA COMPLETA del nombre de esta persona según el ḥisāb al-jummal y la ciencia de las letras, como tradición cultural y espejo para conocerse. Es la lectura premium de Arcana: profunda, cuidada, personal, que la persona quiera guardar y compartir.\n\n${resumenAbjad(r)}\n${regente}${otro}\n\n${AMOR_ELEMENTO}\n\n` +
+      `Estructura: ## Tu nombre en letras árabes (letra por letra con su valor y su elemento; si fue transcrito desde letras latinas, dilo con naturalidad), ` +
+      `## La letra que rige tu nombre (la inicial: su lugar en el orden abjad, su elemento y el carácter que la tradición popular le asocia), ` +
+      `## El número de tu nombre (el total, cómo se compone y qué letras pesan más), ## Tu raíz (la reducción paso a paso, sus luces y lo que pide cuidar), ` +
+      `## Tus elementos (el reparto, el dominante y el que escasea, como temperamento), ` +
+      `## Cómo amas y qué necesitas (desde tus elementos dominantes y tu letra inicial: cómo das y recibes cariño, qué te hace sentir querido o querida, qué te apaga), ` +
+      `## Tus dones en el trabajo y en tu camino (talentos y maneras de trabajar que sugieren tus letras, sin predecir éxitos ni dinero), ` +
+      (conMadre ? `## Con el nombre de tu madre (el valor de ambos y su suma, como lazo de origen, con ternura), ` : "") +
+      (r.otro ? `## Tus letras y las de ${r.otro.nombre || "esa persona"} (cómo se encuentran sus elementos y los tuyos: dónde fluyen, dónde se piden paciencia, qué puede aprender cada uno del otro. SIN puntaje, sin porcentaje, sin veredicto, sin decir si deben o no estar juntos ni si se casarán), ` : "") +
+      `## Para esta etapa (cuatro preguntas o gestos concretos para la semana), ## Síntesis (un párrafo cálido que la persona quiera releer). ` +
+      `Usa el nombre de la persona. Extensión: 1300 a 1700 palabras. Precisión y respeto por la tradición; nada de magia, talismanes, protecciones, remedios, afirmaciones religiosas ni predicciones.`,
+    sistemaExtra:
+      TRADICION_ABJAD +
+      " EXCEPCIÓN de la lectura completa: se permite comparar los elementos de las letras con otro nombre como reflexión sobre temperamentos, nunca como cálculo de compatibilidad, puntaje o decisión.",
+    opciones: { idioma, effort: "medium", maxTokens: 6000, nivel: "premium" },
+  };
+}
+
 export function promptAbjad(entrada: Record<string, unknown>, resultado: Record<string, unknown>, idioma: Idioma): Prompt {
-  void entrada;
   const r = resultado as unknown as ResultadoAbjad;
   if (!r?.persona?.letras) return { usuario: "Explica en dos frases que no se pudo leer este cálculo abjad y que la persona puede intentarlo de nuevo.", opciones: { idioma, effort: "low", maxTokens: 300 } };
+  if (entrada?.completa === true) return promptCompleto(r, idioma);
   const conMadre = Boolean(r.madre && r.conMadre);
   return {
     usuario:

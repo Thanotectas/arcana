@@ -1,4 +1,5 @@
 import type { Idioma } from "@/lib/i18n/idiomas";
+import { TEXTOS_COMPLETA } from "@/lib/abjad/completa";
 import { ELEMENTOS, type Elemento, type PersonaAbjad, type ResultadoAbjad } from "@/lib/abjad/calculo";
 import { TEXTOS_ABJAD, type TextosAbjad } from "@/lib/abjad/textos";
 
@@ -9,13 +10,13 @@ const COLOR_ELEMENTO: Record<Elemento, string> = {
   tierra: "#7fd6a4",
 };
 
-function Persona({ p, t, principal }: { p: PersonaAbjad; t: TextosAbjad; principal: boolean }) {
+function Persona({ p, t, principal, etiqueta }: { p: PersonaAbjad; t: TextosAbjad; principal: boolean; etiqueta?: string }) {
   const maximo = Math.max(1, ...ELEMENTOS.map((e) => p.elementos[e]));
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-start">
         <div className="min-w-0">
-          <p className="text-xs uppercase tracking-widest text-violeta-suave">{principal ? t.tuNombre : t.madreTitulo}</p>
+          <p className="text-xs uppercase tracking-widest text-violeta-suave">{etiqueta ?? (principal ? t.tuNombre : t.madreTitulo)}</p>
           {p.nombre && <p className="font-display text-xl text-texto">{p.nombre}</p>}
           <p lang="ar" dir="rtl" className="font-display text-5xl leading-tight text-oro-suave">{p.escritura}</p>
           {p.transcrita && <p className="mt-1 text-xs text-texto-suave">{t.transcritaNota}</p>}
@@ -103,6 +104,11 @@ export function VistaAbjad({ entrada, resultado, idioma }: { entrada: Record<str
               </p>
             </div>
           )}
+        </div>
+      )}
+      {r.otro && (
+        <div className="tarjeta fondo-arabesco p-5 sm:p-6">
+          <Persona p={r.otro} t={t} principal={false} etiqueta={TEXTOS_COMPLETA[idioma].otro.replace(/\s*[(（].*[)）]\s*$/, "")} />
         </div>
       )}
     </section>

@@ -123,6 +123,9 @@ export const COSTO_PREGUNTA = 1;
 export const PREGUNTAS_GRATIS_POR_LECTURA = 1;
 
 /** Créditos de regalo en la primera compra (ver acreditar_orden en la migración 0007). */
+/** Lectura completa del nombre (abjad con letra regente, elementos en el amor y el trabajo, y otro nombre opcional). */
+export const COSTO_NOMBRE_COMPLETO = 5;
+
 export const BONO_PRIMERA_COMPRA = 2;
 
 /** Cartas del día gratuitas por usuario y día. */
