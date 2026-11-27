@@ -19,6 +19,8 @@ import { EventoMeta } from "@/components/EventoMeta";
 import { ExplorarCatalogo } from "@/components/ExplorarCatalogo";
 import { catalogoConTextos } from "@/lib/catalogo";
 import { InvitacionCreditos } from "@/components/InvitacionCreditos";
+import { BannerPromo } from "@/components/BannerPromo";
+import { promoActiva } from "@/lib/promo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -96,6 +98,8 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
           </Link>
         </div>
       </section>
+
+      {compras && promoActiva() && <BannerPromo />}
 
       {/* Sin créditos: la compra en un toque, antes de que la persona choque con el cobro en una lectura. */}
       {compras && !perfil?.ilimitado && (perfil?.creditos ?? 0) === 0 && <InvitacionCreditos />}

@@ -1,3 +1,4 @@
+import { codigoPromo, promoActiva } from "@/lib/promo";
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { requerirUsuario, getPerfil, getHaComprado, circuloActivo } from "@/lib/dal";
@@ -33,7 +34,8 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   await requerirUsuario();
   const [{ error, moneda, codigo: codigoUrl }, perfil, t, haComprado, idioma, h, oferta, jar, tasas] = await Promise.all([searchParams, getPerfil(), getT(), getHaComprado(), getIdioma(), headers(), estadoOfertaFundadores(), cookies(), tasasDelDia()]);
   // Código de oferta: de la URL (?codigo=) o de la cookie del enlace corto /c/CODIGO.
-  const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || "";
+  // Durante la promoción (Black Friday / viernes blanco), su código se aplica solo si no hay otro.
+  const textoCodigo = normalizarCodigo(codigoUrl) || jar.get(COOKIE_CODIGO)?.value || (promoActiva() ? codigoPromo(idioma) : "");
   const codigo = textoCodigo ? await validarCodigo(getSupabaseAdmin(), textoCodigo) : null;
   // Fuera de Colombia (país según Vercel) se cobra en dólares con PayPal (o Lemon Squeezy si se reactiva); la persona puede cambiar con el enlace.
   const pais = h.get("x-vercel-ip-country") ?? "CO";

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { PortadaProducto } from "@/components/PortadaProducto";
+import { BannerPromo } from "@/components/BannerPromo";
+import { promoActiva } from "@/lib/promo";
+import { comprasVisibles } from "@/lib/plataforma";
 import { requerirUsuario, getPerfil } from "@/lib/dal";
 import { COSTOS, COSTO_NOMBRE_COMPLETO } from "@/lib/creditos";
 import { TEXTOS_COMPLETA } from "@/lib/abjad/completa";
@@ -25,6 +28,7 @@ export default async function PaginaAbjad() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <PortadaProducto clave="abjad" />
+      {promoActiva() && (await comprasVisibles()) && <BannerPromo />}
       <div>
         <p className="text-sm uppercase tracking-[0.3em] text-violeta-suave">{t.seccion}</p>
         <h1 className="font-display text-4xl font-semibold">{t.titulo}</h1>

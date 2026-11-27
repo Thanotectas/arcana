@@ -5,6 +5,10 @@ import { correoCampana, type TipoCorreo } from "@/lib/correos/plantillas";
 import { INVITACION_COMUNIDAD_HASTA, correoComunidad } from "@/lib/correos/comunidad";
 import { REGALO_CREDITOS_HASTA, correoRegaloCreditos, idiomaCorreo } from "@/lib/correos/regalo-creditos";
 import { esAdmin } from "@/lib/admin";
+import { correoPromo } from "@/lib/correos/promo";
+
+/** Días (Bogotá) en que sale el correo único de la promoción del fin de semana (Black Friday / viernes blanco). */
+const PROMO_FECHAS = ["2026-11-28", "2026-11-29", "2026-11-30"];
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
@@ -111,8 +115,21 @@ export async function GET(request: Request) {
     }
   }
   const loteRegalo = regalar.slice(0, maximo);
-  const conRegalo = new Set(loteRegalo.map((c) => c.id));
-  const loteComunidad = invitar.filter((c) => !conRegalo.has(c.id)).slice(0, Math.max(0, maximo - loteRegalo.length));
+  // 4a''. Promoción del fin de semana: una vez por persona, a todas las que aceptan correos.
+  const promocion: typeof regalar = [];
+  if (PROMO_FECHAS.includes(fecha)) {
+    const { data: yaPromo } = await admin.from("correos").select("usuario_id").eq("tipo", "promo_viernes");
+    const excluir = new Set([...(yaPromo ?? []).map((c) => c.usuario_id), ...loteRegalo.map((c) => c.id)]);
+    for (const p of perfiles) {
+      const u = usuarios.get(p.id);
+      if (!u || excluir.has(p.id) || esAdmin(u.correo)) continue;
+      if ((enviadosPor.get(p.id) ?? []).some((c) => ahora - c.en < 20 * 3_600_000)) continue;
+      promocion.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma, pais: p.pais });
+    }
+  }
+  const lotePromo = promocion.slice(0, Math.max(0, maximo - loteRegalo.length));
+  const conRegalo = new Set([...loteRegalo.map((c) => c.id), ...lotePromo.map((c) => c.id)]);
+  const loteComunidad = invitar.filter((c) => !conRegalo.has(c.id)).slice(0, Math.max(0, maximo - loteRegalo.length - lotePromo.length));
   const enComunidad = new Set([...loteComunidad.map((c) => c.id), ...conRegalo]);
 
   // 4b. Segmentación.
@@ -131,7 +148,23 @@ export async function GET(request: Request) {
     candidatos.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma, tipo, dias: Math.round(dias) });
   }
   candidatos.sort((a, b) => PRIORIDAD[a.tipo] - PRIORIDAD[b.tipo] || b.dias - a.dias);
-  const lote = candidatos.slice(0, Math.max(0, maximo - loteComunidad.length - loteRegalo.length));
+  const lote = candidatos.slice(0, Math.max(0, maximo - loteComunidad.length - loteRegalo.length - lotePromo.length));
+
+  // 5'. Promoción del fin de semana.
+  let promos = 0;
+  for (const c of lotePromo) {
+    const idioma = idiomaCorreo(esIdioma(c.idioma) ? c.idioma : IDIOMA_PREDETERMINADO, c.pais);
+    const baja = urlBaja(c.id);
+    const correo = correoPromo({ nombre: c.nombre, idioma, urlBaja: baja });
+    const r = await enviarCorreo({ para: c.correo, asunto: correo.asunto, html: correo.html, texto: correo.texto, etiqueta: "promo_viernes", cabeceras: { "List-Unsubscribe": `<${baja}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
+    await admin.from("correos").insert({ usuario_id: c.id, tipo: "promo_viernes", asunto: correo.asunto, estado: r.ok ? "enviado" : "error", id_proveedor: r.ok ? r.id : null, detalle: r.ok ? null : r.error });
+    if (r.ok) promos++;
+    else {
+      console.error("[cron correos] promoción fallida", c.id, r.error);
+      if (/^(401|403|422|429)/.test(r.error)) break;
+    }
+    await new Promise((res) => setTimeout(res, 600));
+  }
 
   // 5. Regalo de créditos.
   let regalos = 0;
@@ -203,5 +236,5 @@ export async function GET(request: Request) {
     await new Promise((res) => setTimeout(res, 600));
   }
 
-  return Response.json({ perfiles: perfiles.length, regalos, comunidad: invitados, candidatos: candidatos.length, enviados, fallidos, ...resumen });
+  return Response.json({ perfiles: perfiles.length, regalos, promos, comunidad: invitados, candidatos: candidatos.length, enviados, fallidos, ...resumen });
 }

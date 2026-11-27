@@ -15,12 +15,13 @@ import { cookies, headers } from "next/headers";
 import { precioUSDPara } from "./paridad";
 import { COOKIE_CODIGO, validarCodigo } from "./codigos";
 import { origenPendiente } from "../origen";
+import { codigoPromo, promoActiva } from "../promo";
 
 /** Código de oferta del formulario o de la cookie del enlace corto; si vale para el paquete, créditos extra. */
 async function extrasPorCodigo(paquete: string) {
   const cookie = (await cookies()).get(COOKIE_CODIGO)?.value;
   return async (formData: FormData) => {
-    const texto = String(formData.get("codigo") ?? "") || cookie || "";
+    const texto = String(formData.get("codigo") ?? "") || cookie || (promoActiva() ? codigoPromo(await getIdioma()) : "");
     if (!texto) return { codigo: null, extra: 0 };
     const r = await validarCodigo(getSupabaseAdmin(), texto, paquete);
     return r.valido ? { codigo: r.codigo, extra: r.creditosExtra } : { codigo: null, extra: 0 };
