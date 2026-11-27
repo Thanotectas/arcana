@@ -1,0 +1,71 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent}
+#sa{position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(180deg,rgba(12,10,28,.82),rgba(12,10,28,.45) 60%,rgba(12,10,28,0))}
+#sb{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(0deg,rgba(12,10,28,.92),rgba(12,10,28,.6) 55%,rgba(12,10,28,0));opacity:0}
+.c{position:absolute;left:50px;right:50px;text-align:center;color:#fff;font-family:C;text-shadow:0 4px 22px rgba(0,0,0,.9)}
+#gancho{top:130px}
+#g0{font-family:I;font-size:34px;letter-spacing:.35em;color:#f6e7b8;text-transform:uppercase}
+#g1{font-size:122px;line-height:1.02;margin-top:14px;color:#fff8e6;text-shadow:0 0 50px rgba(246,231,184,.55),0 6px 24px rgba(0,0,0,.9)}
+#mini{top:110px;font-family:I;font-size:38px;color:#f6e7b8;opacity:0}
+#mas{bottom:430px;opacity:0}
+#cinco{font-size:300px;line-height:.9;color:#f6d77a;text-shadow:0 0 70px rgba(246,215,122,.8),0 8px 30px rgba(0,0,0,.9)}
+#cinco2{font-size:74px;line-height:1.05;margin-top:56px}
+#lista{bottom:380px;opacity:0}
+#l0{font-size:74px;line-height:1.08;margin-bottom:22px}
+.it{display:inline-block;margin:10px 8px 0;padding:14px 30px;border-radius:999px;background:rgba(255,248,230,.12);border:2px solid rgba(246,231,184,.7);font-family:I;font-size:40px;opacity:0}
+#cta{bottom:330px;opacity:0}
+#hasta{display:inline-block;padding:16px 36px;border-radius:999px;background:#f6d77a;color:#14102a;font-family:I;font-size:44px;text-shadow:none}
+#cta1{font-size:100px;line-height:1.05;margin-top:30px;color:#fff8e6}
+#cta2{font-family:I;font-size:44px;margin-top:20px;color:#f6e7b8}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#f6e7b8;opacity:.85;text-shadow:0 2px 10px #000}
+body.ar{direction:rtl}
+body.ar .c,body.ar #cinco2,body.ar #l0,body.ar #cta1,body.ar .it,body.ar #hasta,body.ar #cta2,body.ar #g1,body.ar #mini{font-family:NA}
+body.ar #g0{font-family:NA;letter-spacing:0;font-size:44px}
+body.ar #g1{font-size:104px;line-height:1.35}body.ar #cinco2{font-size:66px;line-height:1.45}body.ar #l0{font-size:64px;line-height:1.45}
+body.ar #cta1{font-size:88px;line-height:1.35}body.ar .it{font-size:42px}body.ar #hasta{font-size:44px}body.ar #mini{font-size:42px}
+body.ar #cinco{font-family:I;direction:ltr;unicode-bidi:isolate}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div id="gancho" class="c"><div id="g0"></div><div id="g1"></div></div>
+<div id="mini" class="c"></div>
+<div id="mas" class="c"><div id="cinco">+5</div><div id="cinco2"></div></div>
+<div id="lista" class="c"><div id="l0"></div><div id="items"></div></div>
+<div id="cta" class="c"><div id="hasta"></div><div id="cta1"></div><div id="cta2"></div></div>
+<p id="marca"><b>ARCANA</b> · miarcana.com</p>
+<script>
+const T={
+ es:{g0:"Black Friday",g1:"Sibila abrió<br>su cofre ✨",mini:"✨ Black Friday en Arcana",c2:"créditos de regalo<br>en cualquier paquete",l0:"Pagas lo mismo<br>y lees más",it:["Tu nombre","Tu carta astral","Tu pregunta"],hasta:"⏳ Hasta el lunes a medianoche",cta1:"Enlace en la bio 🔮",cta2:"miarcana.com"},
+ en:{g0:"Black Friday",g1:"Sibila opened<br>her chest ✨",mini:"✨ Black Friday at Arcana",c2:"gift credits<br>on any pack",l0:"Same price,<br>more readings",it:["Your name","Your birth chart","Your question"],hasta:"⏳ Until Monday at midnight",cta1:"Link in bio 🔮",cta2:"miarcana.com"},
+ pt:{g0:"Black Friday",g1:"A Sibila abriu<br>o baú ✨",mini:"✨ Black Friday na Arcana",c2:"créditos de presente<br>em qualquer pacote",l0:"Você paga o mesmo<br>e lê mais",it:["Seu nome","Seu mapa astral","Sua pergunta"],hasta:"⏳ Até segunda à meia-noite",cta1:"Link na bio 🔮",cta2:"miarcana.com"},
+ fr:{g0:"Black Friday",g1:"Sibila a ouvert<br>son coffret ✨",mini:"✨ Black Friday chez Arcana",c2:"crédits offerts<br>sur chaque pack",l0:"Même prix,<br>plus de lectures",it:["Ton prénom","Ton thème astral","Ta question"],hasta:"⏳ Jusqu'à lundi minuit",cta1:"Lien en bio 🔮",cta2:"miarcana.com"},
+ tr:{g0:"Efsane Cuma",g1:"Sibila sandığını<br>açtı ✨",mini:"✨ Arcana'da Efsane Cuma",c2:"hediye kredi<br>her pakete",l0:"Aynı fiyat,<br>daha çok okuma",it:["Adın","Doğum haritan","Sorun"],hasta:"⏳ Pazartesi gece yarısına kadar",cta1:"Bağlantı biyografide 🔮",cta2:"miarcana.com"},
+ ar:{g0:"الجمعة البيضاء",g1:"سيبيلا فتحت<br>صندوقها لك ✨",mini:"✨ الجمعة البيضاء في أركانا",c2:"نقاط هدية<br>مع أي باقة",l0:"السعر نفسه<br>وقراءات أكثر",it:["اسمك","خريطتك الفلكية","سؤالك"],hasta:"⏳ حتى منتصف ليل الاثنين",cta1:"الرابط في البايو 🔮",cta2:"miarcana.com"},
+};
+// #idioma,cinco,pagas,lunes,enlace,fin
+const [L,...ts]=decodeURIComponent(location.hash.slice(1)).split(",");
+const [t5,tP,tL,tE,tFin]=ts.map(Number);
+const x=T[L];document.body.className=L;
+const $=id=>document.getElementById(id);
+$("g0").textContent=x.g0;$("g1").innerHTML=x.g1;$("mini").textContent=x.mini;$("cinco2").innerHTML=x.c2;$("l0").innerHTML=x.l0;$("hasta").textContent=x.hasta;$("cta1").textContent=x.cta1;$("cta2").textContent=x.cta2;
+$("items").innerHTML=x.it.map(s=>`<span class="it">${s}</span>`).join("");
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=v=>v*v*(3-2*v);
+const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+window.pintar=t=>{
+ const g=1-su(pr(t,t5-0.7,t5-0.2));$("gancho").style.opacity=g*su(pr(t,0,.35));
+ $("gancho").style.transform=`scale(${1+0.03*Math.sin(t*2.2)})`;
+ $("mini").style.opacity=su(pr(t,t5-0.3,t5+0.2))*(1-su(pr(t,tE-0.5,tE-0.1)));
+ $("sb").style.opacity=su(pr(t,t5-0.6,t5));
+ const m=ven(t,t5-0.1,tP-0.1);$("mas").style.opacity=m;
+ $("cinco").style.transform=`scale(${0.6+0.4*su(pr(t,t5-0.1,t5+0.5))+0.03*Math.sin(t*5)})`;
+ $("lista").style.opacity=ven(t,tP,tL-0.1);
+ [...$("items").children].forEach((el,i)=>{const a=tP+0.9+i*0.55;const o=su(pr(t,a,a+.35));el.style.opacity=o;el.style.transform=`translateY(${(1-o)*30}px)`;});
+ const c=su(pr(t,tL-0.1,tL+.35));$("cta").style.opacity=c;
+ $("cta1").style.opacity=su(pr(t,tE,tE+.4));$("cta2").style.opacity=su(pr(t,tE+.3,tE+.7));
+ $("cta1").style.transform=`scale(${1+0.04*Math.sin((t-tE)*4)})`;
+ $("marca").style.opacity=(0.85*(1-ven(t,t5-0.2,tE))).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
