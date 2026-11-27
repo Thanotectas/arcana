@@ -89,12 +89,12 @@ const SIGNIFICADOS: Record<Idioma, readonly string[]> = {
 
 /** «[nombre] = [valor] en حساب الجُمَّل, raíz [n]: [significado]» + invitación al enlace (bio en Instagram, perfil en Facebook). */
 const PLANTILLA: Record<Idioma, (n: string, v: number, r: number, s: string, red: "instagram" | "facebook") => string> = {
-  es: (n, v, r, s, red) => `${n} = ${v} en حساب الجُمَّل, raíz ${r}: ${s}. Lo que tu nombre dice de ti, completo, en el enlace ${red === "facebook" ? "de nuestro perfil" : "de la bio"} 🔮`,
+  es: (n, v, r, s, red) => `${n} = ${v} en حساب الجُمَّل, raíz ${r}: ${s}. La lectura completa de tu nombre (cómo amas, tus dones y la letra que lo rige), en el enlace ${red === "facebook" ? "de nuestro perfil" : "de la bio"} 🔮`,
   en: (n, v, r, s, red) => `${n} = ${v} in حساب الجُمَّل, root ${r}: ${s}. The full reading of your name is in the link ${red === "facebook" ? "on our profile" : "in our bio"} 🔮`,
   pt: (n, v, r, s, red) => `${n} = ${v} em حساب الجُمَّل, raiz ${r}: ${s}. A leitura completa do seu nome está no link ${red === "facebook" ? "do nosso perfil" : "da bio"} 🔮`,
   fr: (n, v, r, s, red) => `${n} = ${v} en حساب الجُمَّل, racine ${r} : ${s}. La lecture complète de ton prénom est dans le lien ${red === "facebook" ? "de notre profil" : "de la bio"} 🔮`,
   tr: (n, v, r, s, red) => `${n} = ${v} (حساب الجُمَّل, ebced), kök ${r}: ${s}. Adının tam yorumu ${red === "facebook" ? "profilimizdeki" : "biyografideki"} bağlantıda 🔮`,
-  ar: (n, v, r, s, red) => `${n} = ${v} في حساب الجُمَّل، الجذر ${r}: ${s}. القراءة الكاملة لاسمك في الرابط ${red === "facebook" ? "الموجود في صفحتنا" : "الموجود في السيرة"} 🔮`,
+  ar: (n, v, r, s, red) => `${n} = ${v} في حساب الجُمَّل، الجذر ${r}: ${s}. القراءة الكاملة لاسمك (كيف تحب، ومواهبك، والحرف الذي يحكم اسمك) في الرابط ${red === "facebook" ? "الموجود في صفحتنا" : "الموجود في السيرة"} 🔮`,
   id: (n, v, r, s, red) => `${n} = ${v} dalam حساب الجُمَّل, akar ${r}: ${s}. Bacaan lengkap namamu ada di tautan ${red === "facebook" ? "di profil kami" : "di bio"} 🔮`,
   hi: (n, v, r, s, red) => `${n} = ${v} (حساب الجُمَّل), मूलांक ${r}: ${s}। आपके नाम की पूरी रीडिंग ${red === "facebook" ? "हमारी प्रोफ़ाइल" : "बायो"} के लिंक में है 🔮`,
 };
