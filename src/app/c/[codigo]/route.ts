@@ -13,6 +13,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const res = NextResponse.redirect(`${sitio()}/creditos${codigo ? `?codigo=${codigo}` : ""}`);
   if (codigo) res.cookies.set(COOKIE_CODIGO, codigo, { path: "/", maxAge: 86_400, sameSite: "lax", httpOnly: true, secure: true });
   // Los códigos se dicen en el directo de YouTube: si la persona no traía origen, es de ahí.
-  if (!request.cookies.get(COOKIE_ORIGEN)?.value) res.cookies.set(COOKIE_ORIGEN, serializarOrigen({ fuente: "youtube", medio: "en-vivo", campana: codigo?.toLowerCase() }), { ...OPCIONES_COOKIE_ORIGEN, secure: true });
+  // Desde un correo (utm_source=correo), el origen es el correo.
+  const desdeCorreo = request.nextUrl.searchParams.get("utm_source") === "correo";
+  if (!request.cookies.get(COOKIE_ORIGEN)?.value) res.cookies.set(COOKIE_ORIGEN, serializarOrigen(desdeCorreo ? { fuente: "correo", medio: "email", campana: codigo?.toLowerCase() } : { fuente: "youtube", medio: "en-vivo", campana: codigo?.toLowerCase() }), { ...OPCIONES_COOKIE_ORIGEN, secure: true });
   return res;
 }

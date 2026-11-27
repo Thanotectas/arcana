@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo, urlBaja } from "@/lib/correo";
 import { correoCampana, type TipoCorreo } from "@/lib/correos/plantillas";
 import { INVITACION_COMUNIDAD_HASTA, correoComunidad } from "@/lib/correos/comunidad";
+import { REGALO_CREDITOS_HASTA, correoRegaloCreditos, idiomaCorreo } from "@/lib/correos/regalo-creditos";
+import { esAdmin } from "@/lib/admin";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { esIdioma, IDIOMA_PREDETERMINADO } from "@/lib/i18n/idiomas";
 import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
@@ -48,7 +50,7 @@ export async function GET(request: Request) {
   const maximo = Math.max(1, Number(process.env.CORREOS_MAXIMO ?? 80) || 80);
 
   // 1. Perfiles que aceptan correos.
-  const { data: perfiles, error } = await admin.from("perfiles").select("id, nombre, idioma, creado_en, recibe_correos").eq("recibe_correos", true).limit(5000);
+  const { data: perfiles, error } = await admin.from("perfiles").select("id, nombre, idioma, creado_en, recibe_correos, creditos, ilimitado, pais").eq("recibe_correos", true).limit(5000);
   if (error) return Response.json({ error: "perfiles", detalle: error.message }, { status: 500 });
   if (!perfiles?.length) return Response.json({ candidatos: 0, enviados: 0 });
 
@@ -92,8 +94,26 @@ export async function GET(request: Request) {
       invitar.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma });
     }
   }
-  const loteComunidad = invitar.slice(0, maximo);
-  const enComunidad = new Set(loteComunidad.map((c) => c.id));
+  // 4a'. Regalo de créditos (una vez por persona, hasta REGALO_CREDITOS_HASTA): quien se quedó sin créditos y nunca
+  // compró recibe el código VUELVE. Va antes que la Comunidad: es lo que más ayuda a que la persona vuelva a leer.
+  const regalar: { id: string; correo: string; nombre: string | null; idioma: string; pais: string | null }[] = [];
+  if (fecha <= REGALO_CREDITOS_HASTA) {
+    const [{ data: yaRegalo }, { data: compras }] = await Promise.all([
+      admin.from("correos").select("usuario_id").eq("tipo", "regalo_creditos"),
+      admin.from("ordenes").select("usuario_id").eq("estado", "aprobada").eq("es_prueba", false),
+    ]);
+    const excluir = new Set([...(yaRegalo ?? []), ...(compras ?? [])].map((c) => c.usuario_id));
+    for (const p of perfiles) {
+      const u = usuarios.get(p.id);
+      if (!u || excluir.has(p.id) || p.ilimitado || p.creditos > 0 || esAdmin(u.correo)) continue;
+      if ((enviadosPor.get(p.id) ?? []).some((c) => ahora - c.en < 20 * 3_600_000)) continue;
+      regalar.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma, pais: p.pais });
+    }
+  }
+  const loteRegalo = regalar.slice(0, maximo);
+  const conRegalo = new Set(loteRegalo.map((c) => c.id));
+  const loteComunidad = invitar.filter((c) => !conRegalo.has(c.id)).slice(0, Math.max(0, maximo - loteRegalo.length));
+  const enComunidad = new Set([...loteComunidad.map((c) => c.id), ...conRegalo]);
 
   // 4b. Segmentación.
   const candidatos: Candidato[] = [];
@@ -111,7 +131,23 @@ export async function GET(request: Request) {
     candidatos.push({ id: p.id, correo: u.correo, nombre: p.nombre, idioma: p.idioma, tipo, dias: Math.round(dias) });
   }
   candidatos.sort((a, b) => PRIORIDAD[a.tipo] - PRIORIDAD[b.tipo] || b.dias - a.dias);
-  const lote = candidatos.slice(0, Math.max(0, maximo - loteComunidad.length));
+  const lote = candidatos.slice(0, Math.max(0, maximo - loteComunidad.length - loteRegalo.length));
+
+  // 5. Regalo de créditos.
+  let regalos = 0;
+  for (const c of loteRegalo) {
+    const idioma = idiomaCorreo(esIdioma(c.idioma) ? c.idioma : IDIOMA_PREDETERMINADO, c.pais);
+    const baja = urlBaja(c.id);
+    const correo = correoRegaloCreditos({ nombre: c.nombre, idioma, urlBaja: baja });
+    const r = await enviarCorreo({ para: c.correo, asunto: correo.asunto, html: correo.html, texto: correo.texto, etiqueta: "regalo_creditos", cabeceras: { "List-Unsubscribe": `<${baja}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
+    await admin.from("correos").insert({ usuario_id: c.id, tipo: "regalo_creditos", asunto: correo.asunto, estado: r.ok ? "enviado" : "error", id_proveedor: r.ok ? r.id : null, detalle: r.ok ? null : r.error });
+    if (r.ok) regalos++;
+    else {
+      console.error("[cron correos] regalo de créditos fallido", c.id, r.error);
+      if (/^(401|403|422|429)/.test(r.error)) break;
+    }
+    await new Promise((res) => setTimeout(res, 600));
+  }
 
   // 5a. Invitaciones a la Comunidad.
   let invitados = 0;
@@ -167,5 +203,5 @@ export async function GET(request: Request) {
     await new Promise((res) => setTimeout(res, 600));
   }
 
-  return Response.json({ perfiles: perfiles.length, comunidad: invitados, candidatos: candidatos.length, enviados, fallidos, ...resumen });
+  return Response.json({ perfiles: perfiles.length, regalos, comunidad: invitados, candidatos: candidatos.length, enviados, fallidos, ...resumen });
 }
