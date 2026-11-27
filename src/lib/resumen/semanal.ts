@@ -8,6 +8,7 @@ import { fechaBogota } from "@/lib/redes/carta-dia";
 import { fechaLargaEs, sumarDias } from "@/lib/redes/calendario";
 import { interacciones, promediosPorTipo, type PromedioTipo } from "@/lib/redes/metricas";
 import { tasasDelDia } from "@/lib/monedas";
+import { esAdmin } from "@/lib/admin";
 
 /** Lo que cuesta mantener Arcana al mes (pesos): la meta mínima de ingresos. */
 export const META_MENSUAL_COP = 500_000;
@@ -120,7 +121,16 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
     contar(admin.from("mensajes_asistente").select("id", { count: "exact", head: true }).eq("rol", "persona").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)), "asistente"),
   ]);
 
-  const { data: ordenes, error: errorOrdenes } = await admin
+  // Las cuentas de administración compran para probar los pagos: sus órdenes no cuentan como ventas.
+  const idsAdmin = new Set<string>();
+  for (let pagina = 1; pagina <= 10; pagina++) {
+    const { data } = await admin.auth.admin.listUsers({ page: pagina, perPage: 1000 });
+    for (const u of data?.users ?? []) if (esAdmin(u.email)) idsAdmin.add(u.id);
+    if ((data?.users.length ?? 0) < 1000) break;
+  }
+  const deCliente = <T extends { usuario_id: string }>(lista: T[] | null) => (lista ?? []).filter((o) => !idsAdmin.has(o.usuario_id));
+
+  const { data: ordenesTodas, error: errorOrdenes } = await admin
     .from("ordenes")
     .select("usuario_id, paquete, monto_centavos, moneda, creado_en")
     .eq("estado", "aprobada")
@@ -129,6 +139,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
     .lt("creado_en", iso(hasta))
     .limit(5000);
   if (errorOrdenes) throw new Error(`ordenes: ${errorOrdenes.message}`);
+  const ordenes = deCliente(ordenesTodas);
   const ventasSemana = (ordenes ?? []).filter((o) => o.creado_en >= iso(desde));
   const ventasAntes = (ordenes ?? []).filter((o) => o.creado_en < iso(desde));
   const sumaCop = (lista: typeof ventasSemana) => Math.round(lista.filter((o) => o.moneda === "COP").reduce((s, o) => s + o.monto_centavos, 0) / 100);
@@ -159,7 +170,8 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   // Embudo: cuentas nuevas de la semana → primera lectura → sin créditos de regalo; órdenes abiertas → pagadas.
   const { data: nuevasPerfiles } = await admin.from("perfiles").select("id, creditos, ilimitado").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
   const idsNuevas = new Set((nuevasPerfiles ?? []).map((p) => p.id));
-  const { data: todasOrdenes } = await admin.from("ordenes").select("usuario_id, estado").eq("es_prueba", false).gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const { data: todasOrdenesCrudas } = await admin.from("ordenes").select("usuario_id, estado").eq("es_prueba", false).gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
+  const todasOrdenes = deCliente(todasOrdenesCrudas);
   const embudo: ResumenSemanal["embudo"] = {
     nuevas: idsNuevas.size,
     conLectura: new Set(deSemana.filter((l) => l.estado === "lista" && idsNuevas.has(l.usuario_id)).map((l) => l.usuario_id)).size,
@@ -217,7 +229,8 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
 
   // El mes en curso contra la meta.
   const inicioMes = `${hoy.slice(0, 7)}-01`;
-  const { data: ventasMes } = await admin.from("ordenes").select("monto_centavos, moneda").eq("estado", "aprobada").eq("es_prueba", false).gte("creado_en", iso(inicioMes)).limit(5000);
+  const { data: ventasMesCrudas } = await admin.from("ordenes").select("usuario_id, monto_centavos, moneda").eq("estado", "aprobada").eq("es_prueba", false).gte("creado_en", iso(inicioMes)).limit(5000);
+  const ventasMes = deCliente(ventasMesCrudas);
   const copMes = Math.round((ventasMes ?? []).filter((o) => o.moneda === "COP").reduce((s, o) => s + o.monto_centavos, 0) / 100);
   const usdMes = (ventasMes ?? []).filter((o) => o.moneda === "USD").reduce((s, o) => s + o.monto_centavos, 0);
   const porUsd = (await tasasDelDia().catch(() => null))?.porUSD?.COP ?? 4000;
@@ -275,7 +288,7 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   if (redesWeb.comentarios >= 50 && redesWeb.mensajes.instagram === 0) a.push(`Sibila respondió ${redesWeb.comentarios} comentarios y ningún mensaje directo de Instagram: los mensajes de Instagram no están llegando (ver /admin/redes).`);
   const ritmo = mes.diasTranscurridos ? (mes.totalCop / mes.diasTranscurridos) * mes.diasMes : 0;
   if (ritmo < mes.meta) a.push(`Al ritmo actual el mes cerraría en ${formatoCOP(Math.round(ritmo))}, por debajo de la meta de ${formatoCOP(mes.meta)}.`);
-  if (resumen.cuentas.sinCreditos >= 10) a.push(`${resumen.cuentas.sinCreditos} cuentas están sin créditos: candidatas a un correo con el paquete de 1 crédito.`);
+  if (resumen.cuentas.sinCreditos >= 10) a.push(`${resumen.cuentas.sinCreditos} cuentas están sin créditos (quienes tienen el correo confirmado reciben una sola vez el código VUELVE, y en la página ven la compra en un toque).`);
   return resumen;
 }
 
