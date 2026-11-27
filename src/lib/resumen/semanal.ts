@@ -7,6 +7,12 @@ import { estadoOfertaFundadores } from "@/lib/pagos/fundadores";
 import { fechaBogota } from "@/lib/redes/carta-dia";
 import { fechaLargaEs, sumarDias } from "@/lib/redes/calendario";
 import { interacciones, promediosPorTipo, type PromedioTipo } from "@/lib/redes/metricas";
+import { tasasDelDia } from "@/lib/monedas";
+
+/** Lo que cuesta mantener Arcana al mes (pesos): la meta mínima de ingresos. */
+export const META_MENSUAL_COP = 500_000;
+/** Orígenes que vienen de redes (enlaces cortos, utm o Referer). */
+const ORIGENES_REDES = ["ig", "instagram", "facebook", "fb", "youtube", "yt", "tiktok", "tt", "whatsapp", "wa", "telegram", "tg"];
 
 /**
  * Estado del negocio: métricas de los últimos siete días comparadas con los
@@ -45,12 +51,19 @@ export interface ResumenSemanal {
    * una orden (intentaron pagar) y cuántas pagaron.
    */
   embudo: { nuevas: number; conLectura: number; sinCreditos: number; intentaron: number; pagaron: number; noCompletadas: number; huevo: number };
+  /**
+   * De las redes a la web: comentarios y mensajes que respondió Sibila (los árabes aparte), personas que pidieron la
+   * lectura por la palabra clave, visitas que llegaron desde redes, y cuentas y pagos de esas personas.
+   */
+  redesWeb: { comentarios: number; comentariosArabe: number; mensajes: { instagram: number; facebook: number }; palabraClave: number; visitas: { origen: string; n: number }[]; cuentas: number; pagos: number };
+  /** Ingresos del mes en curso contra la meta (los dólares, en pesos a la tasa del día). */
+  mes: { cop: number; usdCentavos: number; totalCop: number; meta: number; diasTranscurridos: number; diasMes: number };
   /** Por dónde llegan: origen (red) de las cuentas nuevas y de quienes pagaron en la semana. */
   origenes: { cuentas: { origen: string; n: number }[]; sinOrigen: number; pagos: { origen: string; n: number; cop: number; usdCentavos: number }[] };
   alertas: string[];
 }
 
-export const NOMBRE_ORIGEN: Record<string, string> = { "meta-ads": "Anuncios de Meta", "tiktok-ads": "Anuncios de TikTok", "google-ads": "Anuncios de Google", youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", whatsapp: "WhatsApp", telegram: "Telegram", google: "Google", bing: "Bing", x: "X", pinterest: "Pinterest", desconocido: "Sin origen conocido" };
+export const NOMBRE_ORIGEN: Record<string, string> = { ig: "Instagram", fb: "Facebook", yt: "YouTube", tt: "TikTok", wa: "WhatsApp", tg: "Telegram", "meta-ads": "Anuncios de Meta", "tiktok-ads": "Anuncios de TikTok", "google-ads": "Anuncios de Google", youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", whatsapp: "WhatsApp", telegram: "Telegram", google: "Google", bing: "Bing", x: "X", pinterest: "Pinterest", desconocido: "Sin origen conocido" };
 export const nombreOrigen = (o: string) => NOMBRE_ORIGEN[o] ?? o.charAt(0).toUpperCase() + o.slice(1);
 
 const DIA = 86_400_000;
@@ -186,6 +199,31 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
     console.error("[resumen] origenes:", e instanceof Error ? e.message : e);
   }
 
+  // De las redes a la web.
+  const { data: interRedes } = await admin.from("interacciones_redes").select("red, tipo, texto, estado, detalle").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(10000);
+  const { data: visitasRedes } = await admin.from("visitas").select("origen").gte("fecha", desde).lt("fecha", hasta).in("origen", ORIGENES_REDES).limit(20000);
+  const visitasMapa = new Map<string, number>();
+  for (const v of visitasRedes ?? []) visitasMapa.set(v.origen ?? "?", (visitasMapa.get(v.origen ?? "?") ?? 0) + 1);
+  const respondidas = (interRedes ?? []).filter((i) => i.estado === "respondida");
+  const redesWeb: ResumenSemanal["redesWeb"] = {
+    comentarios: respondidas.filter((i) => i.tipo === "comentario").length,
+    comentariosArabe: respondidas.filter((i) => i.tipo === "comentario" && /[\u0600-\u06FF]/.test(i.texto)).length,
+    mensajes: { instagram: respondidas.filter((i) => i.tipo === "mensaje" && i.red === "instagram").length, facebook: respondidas.filter((i) => i.tipo === "mensaje" && i.red === "facebook").length },
+    palabraClave: (interRedes ?? []).filter((i) => i.detalle?.startsWith("palabra clave")).length,
+    visitas: [...visitasMapa.entries()].map(([origen, n]) => ({ origen, n })).sort((a, b) => b.n - a.n),
+    cuentas: origenes.cuentas.filter((c) => ORIGENES_REDES.includes(c.origen)).reduce((s, c) => s + c.n, 0),
+    pagos: origenes.pagos.filter((p) => ORIGENES_REDES.includes(p.origen)).reduce((s, p) => s + p.n, 0),
+  };
+
+  // El mes en curso contra la meta.
+  const inicioMes = `${hoy.slice(0, 7)}-01`;
+  const { data: ventasMes } = await admin.from("ordenes").select("monto_centavos, moneda").eq("estado", "aprobada").eq("es_prueba", false).gte("creado_en", iso(inicioMes)).limit(5000);
+  const copMes = Math.round((ventasMes ?? []).filter((o) => o.moneda === "COP").reduce((s, o) => s + o.monto_centavos, 0) / 100);
+  const usdMes = (ventasMes ?? []).filter((o) => o.moneda === "USD").reduce((s, o) => s + o.monto_centavos, 0);
+  const porUsd = (await tasasDelDia().catch(() => null))?.porUSD?.COP ?? 4000;
+  const [anio, mesNum] = hoy.split("-").map(Number);
+  const mes: ResumenSemanal["mes"] = { cop: copMes, usdCentavos: usdMes, totalCop: Math.round(copMes + (usdMes / 100) * porUsd), meta: META_MENSUAL_COP, diasTranscurridos: Number(hoy.slice(8, 10)), diasMes: new Date(anio, mesNum, 0).getDate() };
+
   const resumen: ResumenSemanal = {
     desde,
     hasta,
@@ -218,6 +256,8 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
       sibila: { respondidas: cuenta(interaccionesSibila, "respondida"), humano: (interaccionesSibila ?? []).filter((i) => i.humano).length, visitantes: visitantes ?? 0 },
     },
     embudo,
+    redesWeb,
+    mes,
     origenes,
     alertas: [],
   };
@@ -232,6 +272,9 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   if (fundadores.activa && diasRestantes <= 7) a.push(`La oferta de fundadores termina en ${diasRestantes} días (${fundadores.restantes} cupos).`);
   if (resumen.embudo.noCompletadas > 0 && resumen.embudo.pagaron === 0) a.push(`${resumen.embudo.intentaron} personas intentaron pagar y nadie completó el pago: revisar la pasarela (Bold) y el precio.`);
   else if (resumen.embudo.noCompletadas >= 3) a.push(`${resumen.embudo.noCompletadas} pagos quedaron sin completar esta semana.`);
+  if (redesWeb.comentarios >= 50 && redesWeb.mensajes.instagram === 0) a.push(`Sibila respondió ${redesWeb.comentarios} comentarios y ningún mensaje directo de Instagram: los mensajes de Instagram no están llegando (ver /admin/redes).`);
+  const ritmo = mes.diasTranscurridos ? (mes.totalCop / mes.diasTranscurridos) * mes.diasMes : 0;
+  if (ritmo < mes.meta) a.push(`Al ritmo actual el mes cerraría en ${formatoCOP(Math.round(ritmo))}, por debajo de la meta de ${formatoCOP(mes.meta)}.`);
   if (resumen.cuentas.sinCreditos >= 10) a.push(`${resumen.cuentas.sinCreditos} cuentas están sin créditos: candidatas a un correo con el paquete de 1 crédito.`);
   return resumen;
 }
@@ -261,6 +304,31 @@ function filasEmbudo(r: ResumenSemanal): [string, string, string?][] {
     ["5. Pagaron", `${e.pagaron} personas`, pct(e.pagaron, e.intentaron)],
     ["Pagos sin completar", String(e.noCompletadas), e.noCompletadas ? "pendientes, rechazados o con error" : undefined],
     ["Lecturas de limpia con huevo", String(e.huevo), "el producto estrella"],
+  ];
+}
+
+function filasMes(r: ResumenSemanal): [string, string, string?][] {
+  const m = r.mes;
+  const ritmo = m.diasTranscurridos ? Math.round((m.totalCop / m.diasTranscurridos) * m.diasMes) : 0;
+  return [
+    ["Ingresos del mes", formatoCOP(m.totalCop), `${Math.round((m.totalCop / m.meta) * 100)} % de la meta de ${formatoCOP(m.meta)}`],
+    ["  en pesos", formatoCOP(m.cop)],
+    ["  en dólares", usd(m.usdCentavos), "convertidos a la tasa del día"],
+    ["Al ritmo actual", formatoCOP(ritmo), `día ${m.diasTranscurridos} de ${m.diasMes}`],
+  ];
+}
+
+/** Comentario → mensaje → visita → cuenta → pago, desde las redes. */
+function filasRedesWeb(r: ResumenSemanal): [string, string, string?][] {
+  const w = r.redesWeb;
+  const visitas = w.visitas.reduce((s, v) => s + v.n, 0);
+  return [
+    ["1. Comentarios respondidos por Sibila", String(w.comentarios), `${w.comentariosArabe} en árabe`],
+    ["2. Mensajes directos respondidos", String(w.mensajes.instagram + w.mensajes.facebook), `Instagram ${w.mensajes.instagram} · Messenger ${w.mensajes.facebook}`],
+    ["   Pidieron la lectura con la palabra clave", String(w.palabraClave), "recibieron el enlace directo por mensaje"],
+    ["3. Visitas a la web desde redes", String(visitas), w.visitas.map((v) => `${nombreOrigen(v.origen)} ${v.n}`).join(" · ") || undefined],
+    ["4. Cuentas nuevas desde redes", String(w.cuentas), visitas ? `${Math.round((w.cuentas / visitas) * 100)} % de las visitas` : undefined],
+    ["5. Pagos de personas que llegaron por redes", String(w.pagos)],
   ];
 }
 
@@ -300,6 +368,14 @@ export function filasResumen(r: ResumenSemanal): { titulo: string; filas: [strin
         ...r.ventas.porPaquete.map((p): [string, string] => [`  ${p.paquete}`, String(p.n)]),
         ["Fundadores", r.ventas.fundadores.activa ? `${r.ventas.fundadores.vendidos} de ${OFERTA_FUNDADORES.cupo} vendidos` : "terminada", r.ventas.fundadores.activa ? `${r.ventas.fundadores.diasRestantes} días restantes` : undefined],
       ],
+    },
+    {
+      titulo: "Meta del mes",
+      filas: filasMes(r),
+    },
+    {
+      titulo: "De las redes a la web",
+      filas: filasRedesWeb(r),
     },
     {
       titulo: "Embudo de la semana",

@@ -21,6 +21,7 @@ import { enviarImagenDirecta, enviarMensajeDirecto, responderComentario, textoDe
 import { responderComentarioYoutube, textoDeVideo } from "./youtube";
 import { esPublicacionAbjad, idiomaDePublicacion, nombreDelComentario, respuestaNombreAbjad } from "./abjad-comentarios";
 import { esPublicacionLetra, letraDelComentario, respuestaLetra } from "./letra-comentarios";
+import { invitacionPalabraClave, palabraClave, respuestaPalabraClave } from "./palabra-clave";
 import { esPublicacionYildizname, respuestaYildizname } from "./yildizname-comentarios";
 import { esPublicacionCartaNacimiento, respuestaCartaNacimiento } from "./nacimiento-comentarios";
 import { esPublicacionCompatibilidad, respuestaCompatibilidad } from "./compatibilidad-comentarios";
@@ -355,6 +356,20 @@ async function encolarDelAviso(admin: SupabaseClient<Database>, i: Interaccion):
   return firmar(r.consulta[Math.floor(Math.random() * r.consulta.length)]);
 }
 
+/**
+ * ¿Llegan los mensajes directos de esta red? Si Sibila respondió alguno en la última semana, sí. Se guarda una hora.
+ * Sirve para no invitar a escribir por privado donde nadie va a contestar (los de Instagram dependen de la app de Meta).
+ */
+const mensajesActivos = new Map<string, { activo: boolean; hasta: number }>();
+async function mensajesDirectosActivos(admin: SupabaseClient<Database>, red: "instagram" | "facebook") {
+  const guardado = mensajesActivos.get(red);
+  if (guardado && guardado.hasta > Date.now()) return guardado.activo;
+  const { count } = await admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", red).eq("tipo", "mensaje").eq("estado", "respondida").gte("creado_en", new Date(Date.now() - 7 * 86_400_000).toISOString());
+  const activo = (count ?? 0) > 0;
+  mensajesActivos.set(red, { activo, hasta: Date.now() + 3_600_000 });
+  return activo;
+}
+
 export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Interaccion): Promise<string> {
   const textoGuardado = (i.imagen ? `${MARCA_FOTO} ${i.texto}` : i.texto).trim();
   const { error } = await admin.from("interacciones_redes").insert({ red: i.red, tipo: i.tipo, id_meta: i.idMeta, remitente_id: i.remitenteId, remitente: i.remitente, objeto_id: i.objetoId, texto: textoGuardado.slice(0, 4000) });
@@ -404,6 +419,26 @@ export async function atenderInteraccion(admin: SupabaseClient<Database>, i: Int
       respuestaAbjad = respuestaLetra(i.texto, publicacion);
     }
     else if (nombreDelComentario(i.texto) && esPublicacionAbjad(publicacion)) respuestaAbjad = respuestaNombreAbjad(i.texto, publicacion, redPlantilla(i.red));
+    // Si los mensajes directos de esa red llegan, se invita a escribir la palabra clave: por mensaje el enlace sí se toca.
+    if (respuestaAbjad && i.red !== "youtube" && (await mensajesDirectosActivos(admin, i.red))) {
+      const idiomaClave = publicacion ? idiomaDePublicacion(publicacion) : idiomaConversacion(i.texto);
+      respuestaAbjad = `${respuestaAbjad}\n${invitacionPalabraClave(idiomaClave)}`;
+    }
+  }
+
+  // Palabra clave por mensaje directo («اسمي», «NOMBRE»…): el enlace directo a la lectura completa del nombre, sin el modelo.
+  if (i.tipo === "mensaje" && i.red !== "youtube") {
+    const idiomaClave = palabraClave(i.texto);
+    if (idiomaClave) {
+      const texto = respuestaPalabraClave(idiomaClave, i.red);
+      try {
+        await enviarMensajeDirecto(i.remitenteId, texto);
+        await marcar("respondida", { respuesta: texto, detalle: "palabra clave: lectura completa del nombre" });
+        return "palabra_clave";
+      } catch (e) {
+        console.error("[redes palabra clave]", e instanceof Error ? e.message : e);
+      }
+    }
   }
 
   // Mensajes directos: una lectura y pocas respuestas por persona. Después, Sibila sigue respondiendo con
