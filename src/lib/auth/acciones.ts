@@ -69,6 +69,8 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
   if (password.length < 8) return { error: "contrasena" };
   if (!acepta) return { error: "terminos" };
 
+  // Si venía de una página que pide cuenta (p. ej. la lectura del nombre desde Instagram), vuelve allí.
+  const volver = formData.get("volver") ? destinoSeguro(formData.get("volver")) : null;
   const supabase = await createClient();
   const h = await headers();
   const { data, error } = await supabase.auth.signUp({
@@ -76,7 +78,7 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
     password,
     options: {
       data: { nombre },
-      emailRedirectTo: `${urlBase(h)}/auth/callback?siguiente=/inicio`,
+      emailRedirectTo: `${urlBase(h)}/auth/callback?siguiente=${encodeURIComponent(volver ?? "/inicio")}`,
       captchaToken: tokenCaptcha(formData),
     },
   });
@@ -87,7 +89,7 @@ export async function accionRegistrar(_prev: EstadoAuth, formData: FormData): Pr
   if (data.session) {
     await aplicarInvitacionPendiente();
     await registrarOrigenPendiente(data.session.user.id);
-    redirect("/inicio?nueva=1");
+    redirect(volver ?? "/inicio?nueva=1");
   }
   return { mensaje: "revisaCorreo" };
 }

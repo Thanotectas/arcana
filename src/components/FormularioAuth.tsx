@@ -44,13 +44,14 @@ export function FormularioEntrar({ accion, volver }: { accion: Accion; volver?: 
   );
 }
 
-export function FormularioRegistro({ accion }: { accion: Accion }) {
+export function FormularioRegistro({ accion, volver }: { accion: Accion; volver?: string }) {
   const [estado, enviar] = useActionState(accion, {});
   const { t, error, mensaje } = useMensajes(estado);
   const [antes, resto] = t.auth.aceptoTerminos.split("{terminos}");
   const [medio, despues] = (resto ?? "").split("{privacidad}");
   return (
     <form action={enviar} className="space-y-4">
+      {volver && <input type="hidden" name="volver" value={volver} />}
       {error && <Aviso>{error}</Aviso>}
       {mensaje && <Aviso tipo="exito">{mensaje}</Aviso>}
       <div>

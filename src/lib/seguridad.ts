@@ -7,6 +7,9 @@
  * Rechaza URLs absolutas, "//evil", "/\\evil" (el navegador lo trata como //)
  * y cualquier cosa que no resuelva al mismo origen.
  */
+/** Cabecera interna (la pone el proxy) con la dirección que pidió la persona, para volver a ella tras entrar. */
+export const CABECERA_RUTA = "x-arcana-ruta";
+
 export function rutaInterna(valor: string | null | undefined, porDefecto = "/inicio") {
   const s = String(valor ?? "").trim();
   if (!/^\/(?![/\\])/.test(s)) return porDefecto;

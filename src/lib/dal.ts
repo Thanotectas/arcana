@@ -1,4 +1,6 @@
 import "server-only";
+import { headers } from "next/headers";
+import { CABECERA_RUTA, rutaInterna } from "@/lib/seguridad";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
@@ -75,7 +77,11 @@ export const requerirUsuario = cache(async () => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/entrar");
+  if (!user) {
+    // Vuelve a la página que pidió (p. ej. /ar/abjad desde Instagram) después de entrar o crear la cuenta.
+    const ruta = rutaInterna((await headers()).get(CABECERA_RUTA), "");
+    redirect(ruta && ruta !== "/" ? `/entrar?volver=${encodeURIComponent(ruta)}` : "/entrar");
+  }
   return user;
 });
 

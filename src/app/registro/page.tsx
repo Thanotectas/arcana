@@ -7,6 +7,7 @@ import { BotonGoogle } from "@/components/BotonGoogle";
 import { getIdioma, getT } from "@/lib/i18n/servidor";
 import { plantilla } from "@/lib/i18n/formato";
 import { Aviso } from "@/components/Aviso";
+import { rutaInterna } from "@/lib/seguridad";
 import { BONO_INVITADO, codigoInvitacionPendiente, nombreInvitador } from "@/lib/invitaciones";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ inv?: string }> }): Promise<Metadata> {
@@ -27,8 +28,9 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   };
 }
 
-export default async function PaginaRegistro({ searchParams }: { searchParams: Promise<{ inv?: string }> }) {
-  const [{ inv }, t] = await Promise.all([searchParams, getT()]);
+export default async function PaginaRegistro({ searchParams }: { searchParams: Promise<{ inv?: string; volver?: string }> }) {
+  const [{ inv, volver: volverCrudo }, t] = await Promise.all([searchParams, getT()]);
+  const volver = volverCrudo ? rutaInterna(volverCrudo) : undefined;
   const codigo = (await codigoInvitacionPendiente()) ?? (inv && /^[A-Z0-9]{4,12}$/i.test(inv) ? inv.toUpperCase() : null);
   const invitador = codigo ? await nombreInvitador(codigo) : null;
   return (
@@ -49,14 +51,14 @@ export default async function PaginaRegistro({ searchParams }: { searchParams: P
         </div>
       )}
       <div className="tarjeta p-6">
-        <BotonGoogle registro />
+        <BotonGoogle registro volver={volver} />
         <div className="my-5 flex items-center gap-3 text-xs text-texto-suave">
           <span className="h-px flex-1 bg-borde" />{t.auth.oConCorreo}<span className="h-px flex-1 bg-borde" />
         </div>
-        <FormularioRegistro accion={accionRegistrar} />
+        <FormularioRegistro accion={accionRegistrar} volver={volver} />
       </div>
       <p className="mt-4 text-center text-sm text-texto-suave">
-        {t.auth.conCuenta} <Link href="/entrar" className="text-oro-suave hover:underline">{t.comun.entrar}</Link>
+        {t.auth.conCuenta} <Link href={volver ? `/entrar?volver=${encodeURIComponent(volver)}` : "/entrar"} className="text-oro-suave hover:underline">{t.comun.entrar}</Link>
       </p>
     </div>
   );

@@ -26,7 +26,7 @@ export default async function PaginaEntrar({ searchParams }: { searchParams: Pro
         <FormularioEntrar accion={accionEntrar} volver={volver} />
       </div>
       <p className="mt-4 text-center text-sm text-texto-suave">
-        {t.auth.sinCuenta} <Link href="/registro" className="text-oro-suave hover:underline">{t.comun.crearCuenta}</Link>
+        {t.auth.sinCuenta} <Link href={volver ? `/registro?volver=${encodeURIComponent(volver)}` : "/registro"} className="text-oro-suave hover:underline">{t.comun.crearCuenta}</Link>
       </p>
     </div>
   );

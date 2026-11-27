@@ -8,6 +8,7 @@ import { createServerClient } from "@supabase/ssr";
 import { COOKIE_ORIGEN, OPCIONES_COOKIE_ORIGEN, detectarOrigen, serializarOrigen } from "@/lib/origen/comun";
 import { CABECERA_IDIOMA, separarPrefijo } from "@/lib/i18n/rutas";
 import { COOKIE_IDIOMA } from "@/lib/i18n/idiomas";
+import { CABECERA_RUTA, rutaInterna } from "@/lib/seguridad";
 
 const RUTAS_PRIVADAS = [
   "/tarot",
@@ -31,6 +32,8 @@ export async function proxy(request: NextRequest) {
   const cabeceras = new Headers(request.headers);
   if (prefijo) cabeceras.set(CABECERA_IDIOMA, prefijo.idioma);
   else cabeceras.delete(CABECERA_IDIOMA);
+  // La dirección pedida (con su prefijo de idioma): si la página exige cuenta, /entrar vuelve aquí después.
+  cabeceras.set(CABECERA_RUTA, request.nextUrl.pathname + request.nextUrl.search);
   const destino = request.nextUrl.clone();
   if (prefijo) destino.pathname = prefijo.ruta;
   const siguiente = () => (prefijo ? NextResponse.rewrite(destino, { request: { headers: cabeceras } }) : NextResponse.next({ request: { headers: cabeceras } }));
@@ -90,9 +93,12 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && (pathname === "/entrar" || pathname === "/registro")) {
+    // Con sesión, /entrar?volver=/ar/abjad lleva directo a esa página (no al inicio).
     const url = request.nextUrl.clone();
-    url.pathname = "/inicio";
-    url.search = "";
+    const volver = rutaInterna(request.nextUrl.searchParams.get("volver"));
+    const [ruta, consulta = ""] = volver.split("?");
+    url.pathname = ruta;
+    url.search = consulta ? `?${consulta}` : "";
     return redirigir(url, response);
   }
 
