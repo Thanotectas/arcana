@@ -357,15 +357,16 @@ async function encolarDelAviso(admin: SupabaseClient<Database>, i: Interaccion):
 }
 
 /**
- * ¿Llegan los mensajes directos de esta red? Si Sibila respondió alguno en la última semana, sí. Se guarda una hora.
+ * ¿Llegan los mensajes directos de esta red? Si Sibila respondió a tres personas distintas en la última semana, sí. Se guarda una hora.
  * Sirve para no invitar a escribir por privado donde nadie va a contestar (los de Instagram dependen de la app de Meta).
  */
 const mensajesActivos = new Map<string, { activo: boolean; hasta: number }>();
 async function mensajesDirectosActivos(admin: SupabaseClient<Database>, red: "instagram" | "facebook") {
   const guardado = mensajesActivos.get(red);
   if (guardado && guardado.hasta > Date.now()) return guardado.activo;
-  const { count } = await admin.from("interacciones_redes").select("id", { count: "exact", head: true }).eq("red", red).eq("tipo", "mensaje").eq("estado", "respondida").gte("creado_en", new Date(Date.now() - 7 * 86_400_000).toISOString());
-  const activo = (count ?? 0) > 0;
+  // Al menos tres personas distintas: con el acceso estándar de Meta solo llegan los mensajes de las cuentas de prueba.
+  const { data } = await admin.from("interacciones_redes").select("remitente_id").eq("red", red).eq("tipo", "mensaje").eq("estado", "respondida").gte("creado_en", new Date(Date.now() - 7 * 86_400_000).toISOString()).limit(500);
+  const activo = new Set((data ?? []).map((m) => m.remitente_id)).size >= 3;
   mensajesActivos.set(red, { activo, hasta: Date.now() + 3_600_000 });
   return activo;
 }
