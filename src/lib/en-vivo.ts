@@ -742,8 +742,14 @@ function segmentoArabe(n: number, hoy: Date): Segmento {
   return ronda[n % ronda.length];
 }
 
-export function segmentoDeRelleno(n: number, hoy = new Date(), idioma = "es"): Segmento {
-  if (idioma === "ar") return segmentoArabe(n, hoy);
+/**
+ * Mercado del directo, según la red (el plan de redes): «ar» Instagram en árabe; «es» Facebook y TikTok, solo en
+ * español; «multi» YouTube, que también tiene tiradas para quienes hablan portugués, inglés y francés.
+ */
+export type MercadoVivo = "ar" | "es" | "multi";
+
+export function segmentoDeRelleno(n: number, hoy = new Date(), mercado: MercadoVivo = "multi"): Segmento {
+  if (mercado === "ar") return segmentoArabe(n, hoy);
   const dia = Math.floor(hoy.getTime() / 86_400_000);
   const signo = SIGNOS[(dia * 5 + n * 7) % SIGNOS.length];
   const paraSigno = `Para todos los ${signo.nombre} ${signo.simbolo}`;
@@ -766,7 +772,9 @@ export function segmentoDeRelleno(n: number, hoy = new Date(), idioma = "es"): S
     { tipo: "tarot", autor: "Pour tous ceux qui regardent en français", texto: "Un tirage pour tous ceux qui regardent en français : que réservent les prochaines semaines en amour et au travail ?", signo: null },
     { tipo: "chino", autor: "Para todos", texto: `Horóscopo chino: ¿qué trae el año ${proximoAnio} para todos?`, signo: null },
   ];
-  return segmentos[n % segmentos.length];
+  // En Facebook y TikTok (mercado en español) no van las tiradas en otros idiomas.
+  const lista = mercado === "es" ? segmentos.filter((x) => !/^(Para quem|For everyone|Pour tous)/.test(x.autor)) : segmentos;
+  return lista[n % lista.length];
 }
 
 /**
@@ -782,7 +790,7 @@ export function minutosEntreRelleno() {
   return Number.isFinite(n) && n >= 0 ? n : 3;
 }
 
-export async function lecturaDeRelleno(admin: Admin, idioma = "es"): Promise<LecturaEnVivo | null> {
+export async function lecturaDeRelleno(admin: Admin, mercado: MercadoVivo = "multi"): Promise<LecturaEnVivo | null> {
   const maximo = maximoRelleno();
   if (!maximo) return null;
   const { count: esperando } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "leyendo"]);
@@ -796,7 +804,7 @@ export async function lecturaDeRelleno(admin: Admin, idioma = "es"): Promise<Lec
     .eq("origen", "sistema")
     .gte("creado_en", new Date(Date.now() - 6 * 3_600_000).toISOString());
   if ((hechos ?? 0) >= maximo) return null;
-  const seg = segmentoDeRelleno(hechos ?? 0, new Date(), idioma);
+  const seg = segmentoDeRelleno(hechos ?? 0, new Date(), mercado);
   const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "sistema", ...seg });
   if (error) {
     console.error("[en vivo] relleno:", error.message);

@@ -87,6 +87,8 @@ export async function GET(request: NextRequest) {
   // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
   // TikTok no tiene API de comentarios: con ?tiktok=1 se da por hecho que se está transmitiendo (el tope por noche limita).
   const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo || q.get("tiktok") === "1");
+  // Mercado de cada red (plan de redes): Instagram en árabe; TikTok (vertical) y Facebook solo en español; YouTube en varios idiomas.
+  const mercado = idioma === "ar" ? "ar" : q.get("tiktok") === "1" || (facebook?.directo && !chat?.directo) ? "es" : "multi";
   // El juego empieza si se pidió desde el panel o, sin nadie en la fila, como relleno (cada 20 minutos como mucho).
   const juego = await juegoSiToca(admin, q.get("modo") === "relleno" && alAire && idioma === "es").catch((e: unknown) => {
     console.error("[en vivo] juego:", e instanceof Error ? e.message : e);
@@ -96,7 +98,7 @@ export async function GET(request: NextRequest) {
   let lectura: Awaited<ReturnType<typeof siguienteLectura>> = null;
   let error: string | null = null;
   try {
-    lectura = q.get("modo") === "relleno" && alAire ? await lecturaDeRelleno(admin, idioma) : await siguienteLectura(admin);
+    lectura = q.get("modo") === "relleno" && alAire ? await lecturaDeRelleno(admin, mercado) : await siguienteLectura(admin);
   } catch (e) {
     error = e instanceof Error ? e.message : String(e);
     console.error("[en vivo] lectura:", error);
