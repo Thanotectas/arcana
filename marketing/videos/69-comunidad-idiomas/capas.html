@@ -1,0 +1,102 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:C;src:url(../../../src/app/fuentes/CormorantGaramond-SemiBold.ttf)}
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent}
+#sa{position:absolute;left:0;right:0;top:0;height:700px;background:linear-gradient(180deg,rgba(10,6,24,.88),rgba(10,6,24,.5) 60%,rgba(10,6,24,0))}
+#sb{position:absolute;left:0;right:0;bottom:0;height:1250px;background:linear-gradient(0deg,rgba(10,6,24,.94),rgba(10,6,24,.75) 60%,rgba(10,6,24,0));opacity:0}
+.c{position:absolute;left:50px;right:50px;text-align:center;color:#fff;text-shadow:0 4px 22px #000}
+#gancho{top:150px}
+#g1{font-family:C;font-size:112px;line-height:1.08;color:#fff6df;text-shadow:0 0 50px rgba(241,217,154,.5),0 6px 24px #000}
+#g2{font-family:I;font-size:44px;line-height:1.35;margin-top:22px;color:#e9dcff}
+#mini{position:absolute;left:50px;right:50px;top:120px;text-align:center;font-family:I;font-size:40px;color:#f1d99a;opacity:0;text-shadow:0 2px 14px #000}
+#chat{position:absolute;left:70px;right:70px;top:380px;opacity:0}
+#cab{display:flex;align-items:center;justify-content:center;gap:16px;font-family:I;font-size:34px;color:#f1d99a;margin-bottom:34px}
+#cab span{padding:10px 26px;border-radius:999px;border:2px solid rgba(241,217,154,.55);background:rgba(12,8,30,.7)}
+.b{position:relative;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);max-width:820px;padding:26px 34px 22px;border-radius:38px;background:rgba(24,16,52,.9);border:2px solid rgba(241,217,154,.45);box-shadow:0 10px 40px rgba(0,0,0,.5);opacity:0;margin-bottom:40px}
+.b.izq{margin-right:auto;border-bottom-left-radius:10px}
+.b.der{margin-left:auto;border-bottom-right-radius:10px;background:rgba(66,40,120,.9)}
+.quien{font-family:I;font-size:30px;color:#f1d99a;margin-bottom:10px}
+.txt{position:relative;font-size:52px;line-height:1.35;min-height:70px;display:grid}
+.txt div{transition:none}
+.t1,.t2{display:block;grid-area:1/1}
+.t2{opacity:0}
+.orig{font-family:I;font-size:26px;color:#b9a8e6;margin-top:12px;opacity:0}
+.sello{position:absolute;top:-24px;padding:6px 18px;border-radius:999px;background:#f1d99a;color:#14102a;font-family:I;font-size:26px;opacity:0;text-shadow:none}
+.izq .sello{right:30px}.der .sello{left:30px}
+.ar{font-family:NA;direction:rtl;text-align:right}
+.es{font-family:I;direction:ltr;text-align:left}
+#cta{bottom:330px;opacity:0}
+#c1{font-family:C;font-size:86px;line-height:1.1;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.5),0 6px 22px #000}
+#chips{margin-top:30px}
+.chip{display:inline-block;margin:10px 8px 0;padding:12px 26px;border-radius:999px;background:rgba(12,8,30,.74);border:2px solid rgba(241,217,154,.6);font-family:I;font-size:36px;opacity:0}
+.chip.ara{font-family:NA}
+#c2{font-family:I;font-size:52px;margin-top:40px;color:#fff}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.85;text-shadow:0 2px 10px #000}
+#marca b{color:#f1d99a}
+body.L-ar #g1,body.L-ar #c1{font-family:NA;line-height:1.35}
+body.L-ar #g1{font-size:96px}body.L-ar #c1{font-size:74px}
+body.L-ar #g2,body.L-ar #mini,body.L-ar #c2,body.L-ar #cab{font-family:NA;direction:rtl}
+body.L-ar #g2{font-size:50px}
+body.L-ar .quien{font-family:NA}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div id="gancho" class="c"><div id="g1"></div><div id="g2"></div></div>
+<div id="mini"></div>
+<div id="chat">
+ <div id="cab"><span id="cabT"></span></div>
+ <div class="b" id="b1"><div class="sello"></div><div class="quien"></div><div class="txt"><div class="t1"></div><div class="t2"></div></div><div class="orig"></div></div>
+ <div class="b" id="b2"><div class="sello"></div><div class="quien"></div><div class="txt"><div class="t1"></div><div class="t2"></div></div><div class="orig"></div></div>
+</div>
+<div id="cta" class="c"><div id="c1"></div><div id="chips"></div><div id="c2"></div></div>
+<p id="marca"><b>ARCANA</b> · miarcana.com</p>
+<script>
+// Mensajes: el de la persona que mira (escribe en su idioma) y el de la otra (responde en el suyo).
+const AR_1="ورقة اليوم: النجمة ✨ أشعر أن شيئًا جميلًا قادم", ES_1="Carta del día: La Estrella ✨ Siento que algo bonito viene";
+const ES_2="¡Yo también! Hoy empiezo algo nuevo 🌙", AR_2="وأنا أيضًا! اليوم أبدأ شيئًا جديدًا 🌙";
+const T={
+ ar:{g1:"تحدّث مع العالم<br>دون أن تعرف لغته 🌍",g2:"عن التاروت والأبراج",mini:"🌍 مجتمع أركانا",cab:"مجتمع أركانا · ورقة اليوم",
+  b1:{lado:"izq",quien:"أنت 🇸🇦",t1:[AR_1,"ar"],t2:[ES_1,"es"],orig:"تقرؤها ماريا بالإسبانية",sello:"مترجم ✓"},
+  b2:{lado:"der",quien:"ماريا · المكسيك 🇲🇽",t1:[ES_2,"es"],t2:[AR_2,"ar"],orig:"Original: español",sello:"مترجم ✓"},
+  c1:"كل يوم حديث جديد<br>عن ورقة اليوم",c2:"الرابط في البايو 🔮"},
+ es:{g1:"Habla con el mundo<br>sin saber su idioma 🌍",g2:"de tarot y astrología",mini:"🌍 Comunidad Arcana",cab:"Comunidad Arcana · Carta del día",
+  b1:{lado:"der",quien:"Tú · Colombia",t1:[ES_1,"es"],t2:[AR_1,"ar"],orig:"Nura la lee en árabe",sello:"Traducido ✓"},
+  b2:{lado:"izq",quien:"Nura · Arabia Saudita 🇸🇦",t1:[AR_2,"ar"],t2:[ES_2,"es"],orig:"Original: árabe",sello:"Traducido ✓"},
+  c1:"Cada día, una conversación<br>sobre la carta del día",c2:"Enlace en el perfil 🔮"},
+};
+const CHIPS=[["العربية","ara"],["Español",""],["Türkçe",""],["English",""],["Português",""],["Français",""],["Indonesia",""]];
+// #idioma,tChat,tTraduce1,tResponde,tCadaDia,fin
+const [L,...ts]=decodeURIComponent(location.hash.slice(1)).split(",");
+const [tC,tE,tR,tD,tFin]=ts.map(Number);
+const x=T[L];document.body.className="L-"+L;
+const $=id=>document.getElementById(id);
+$("g1").innerHTML=x.g1;$("g2").textContent=x.g2;$("mini").textContent=x.mini;$("cabT").textContent=x.cab;$("c1").innerHTML=x.c1;$("c2").textContent=x.c2;
+$("chips").innerHTML=CHIPS.map(([s,c])=>`<span class="chip ${c}">${s}</span>`).join("");
+for(const k of ["b1","b2"]){const b=$(k),d=x[k];b.classList.add(d.lado);b.querySelector(".quien").textContent=d.quien;b.querySelector(".sello").textContent=d.sello;
+ const a=b.querySelector(".t1"),c=b.querySelector(".t2");a.textContent=d.t1[0];a.className="t1 "+d.t1[1];c.textContent=d.t2[0];c.className="t2 "+d.t2[1];
+ const o=b.querySelector(".orig");o.textContent=d.orig;o.className="orig "+(L==="ar"&&k==="b1"?"ar":L==="ar"?"es":k==="b1"?"es":"es");
+ b.querySelector(".quien").classList.add(L==="ar"?"ar":"es");}
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=v=>v*v*(3-2*v);
+const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+// Burbuja: aparece en a, se traduce en f (el texto original se desvanece y entra la traducción, con el sello).
+function burbuja(k,t,a,f){const b=$(k);const o=su(pr(t,a,a+.4));b.style.opacity=o;b.style.transform=`translateY(${(1-o)*40}px)`;
+ const tr=su(pr(t,f,f+.6));b.querySelector(".t1").style.opacity=1-tr;b.querySelector(".t2").style.opacity=tr;
+ b.querySelector(".t1").style.filter=`blur(${tr*6}px)`;b.querySelector(".t2").style.filter=`blur(${(1-tr)*6}px)`;
+ const s=b.querySelector(".sello");s.style.opacity=su(pr(t,f+.3,f+.6));s.style.transform=`scale(${1+0.25*Math.max(0,1-pr(t,f+.3,f+1))})`;
+ b.querySelector(".orig").style.opacity=su(pr(t,f+.5,f+.9));
+ b.style.boxShadow=`0 10px 40px rgba(0,0,0,.5),0 0 ${50*Math.max(0,1-pr(t,f,f+1.2))*(t>f?1:0)}px rgba(241,217,154,.7)`;}
+window.pintar=t=>{
+ $("gancho").style.opacity=su(pr(t,0,.35))*(1-su(pr(t,tC-0.5,tC-0.1)));
+ $("g1").style.transform=`scale(${1+0.03*Math.sin(t*2.2)})`;
+ $("mini").style.opacity=su(pr(t,tC-0.2,tC+0.2))*(1-su(pr(t,tD-0.5,tD-0.1)));
+ $("sb").style.opacity=su(pr(t,tC-0.6,tC));
+ $("chat").style.opacity=ven(t,tC-0.2,tD-0.1);
+ burbuja("b1",t,tC+0.2,tE);
+ burbuja("b2",t,tR-0.6,tR+0.9);
+ $("cta").style.opacity=su(pr(t,tD-0.1,tD+.35));
+ [...document.querySelectorAll(".chip")].forEach((el,i)=>{const a=tD+0.6+i*0.25;const o=su(pr(t,a,a+.3));el.style.opacity=o;el.style.transform=`translateY(${(1-o)*24}px)`;});
+ $("c2").style.transform=`scale(${1+0.04*Math.sin((t-tD)*4)})`;
+ $("marca").style.opacity=(0.85*(1-ven(t,tC-0.1,tD))).toFixed(3);
+};
+window.pintar(0);
+</script></body></html>
