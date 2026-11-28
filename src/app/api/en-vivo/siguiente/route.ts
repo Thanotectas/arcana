@@ -86,7 +86,8 @@ export async function GET(request: NextRequest) {
   ]);
   // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
   // TikTok no tiene API de comentarios: con ?tiktok=1 se da por hecho que se está transmitiendo (el tope por noche limita).
-  const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo || q.get("tiktok") === "1");
+  // El vivo en árabe es de Instagram, que sí avisa: allí el relleno espera a que el vivo esté al aire.
+  const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo || (q.get("tiktok") === "1" && idioma !== "ar"));
   // Mercado de cada red (plan de redes): Instagram en árabe; TikTok (vertical) y Facebook solo en español; YouTube en varios idiomas.
   const mercado = idioma === "ar" ? "ar" : q.get("tiktok") === "1" || (facebook?.directo && !chat?.directo) ? "es" : "multi";
   // El juego empieza si se pidió desde el panel o, sin nadie en la fila, como relleno (cada 20 minutos como mucho).

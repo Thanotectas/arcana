@@ -48,6 +48,22 @@ export async function sincronizarInstagram(admin: Admin): Promise<EstadoInstagra
   const guardar = (cambios: Partial<Database["public"]["Tables"]["en_vivo_estado"]["Row"]>) =>
     admin.from("en_vivo_estado").upsert({ id: 1, ...cambios, actualizado_en: new Date().toISOString() }, { onConflict: "id" });
 
+  // El vivo guardado se vuelve a confirmar cada minuto: si terminó o empezó otro, se cambia (un vivo viejo
+  // puede seguir respondiendo a /comments aunque ya no esté al aire).
+  if (directo && (!estado?.ig_buscado_en || ahora - Date.parse(estado.ig_buscado_en) >= 60_000)) {
+    try {
+      const r = await graph<{ data?: { id: string }[] }>(`${igId}/live_media?fields=id&limit=1`, pagina.token);
+      const actual = r.data?.[0]?.id ?? null;
+      if (actual !== directo) {
+        await guardar({ ig_live_id: actual, ig_desde: null, ig_buscado_en: new Date().toISOString(), ig_detalle: null });
+        directo = actual;
+        if (!directo) return { configurado: true, directo: false, nuevas: 0 };
+      } else await guardar({ ig_buscado_en: new Date().toISOString() });
+    } catch {
+      // Si Meta no responde, se sigue con el vivo guardado.
+    }
+  }
+
   if (!directo) {
     if (estado?.ig_buscado_en && ahora - Date.parse(estado.ig_buscado_en) < 30_000) return { configurado: true, directo: false, nuevas: 0 };
     try {
