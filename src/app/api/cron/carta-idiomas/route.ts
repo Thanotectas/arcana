@@ -1,3 +1,4 @@
+import { publicaIdiomaEn } from "@/lib/redes/idioma-red";
 import { cronAutorizado } from "@/lib/cron";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { instagramConfigurado, publicarReel } from "@/lib/redes/instagram";
@@ -37,13 +38,13 @@ export async function GET(request: Request) {
         const url = await reelCartaDelDia(admin, fecha, { textos: textosReelIdioma(fecha, idioma, traduccion) });
         return { url, traduccion };
       })());
-    const instagram: Resultado = instagramConfigurado()
+    const instagram: Resultado = instagramConfigurado() && publicaIdiomaEn("instagram", idioma)
       ? await publicarUnaVez(admin, "instagram", tipo, fecha, async () => {
           const p = await preparar();
           return publicarReel(p.url, textoCartaIdioma(fecha, idioma, "instagram", p.traduccion));
         })
       : { omitida: "sin_configurar" };
-    const facebook: Resultado = facebookConfigurado()
+    const facebook: Resultado = facebookConfigurado() && publicaIdiomaEn("facebook", idioma)
       ? await publicarUnaVez(admin, "facebook", tipo, fecha, async () => {
           const p = await preparar();
           return publicarVideoFacebook(p.url, textoCartaIdioma(fecha, idioma, "facebook", p.traduccion));

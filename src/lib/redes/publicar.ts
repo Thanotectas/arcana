@@ -1,3 +1,4 @@
+import { publicaIdiomaEn } from "@/lib/redes/idioma-red";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -48,6 +49,11 @@ export async function publicarProgramada(admin: SupabaseClient<Database>, id: st
   for (const red of fila.redes as Red[]) {
     if (resultados[red]?.id) continue;
     const configurada = red === "instagram" ? instagramConfigurado() : facebookConfigurado();
+    // Las publicaciones del agente van en español: no salen en la red cuyo idioma es otro (Instagram va en árabe).
+    if (!publicaIdiomaEn(red, "es")) {
+      resultados[red] = { error: "otro_idioma" };
+      continue;
+    }
     if (!configurada) {
       resultados[red] = { error: "sin_configurar" };
       errores.push(`${red}: sin configurar`);

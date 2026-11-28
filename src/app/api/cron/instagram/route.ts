@@ -1,3 +1,4 @@
+import { publicaIdiomaEn } from "@/lib/redes/idioma-red";
 import { cronAutorizado } from "@/lib/cron";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -91,10 +92,10 @@ export async function GET(request: Request) {
     return foto();
   };
 
-  const instagram: Resultado = instagramConfigurado()
+  const instagram: Resultado = instagramConfigurado() && publicaIdiomaEn("instagram", "es")
     ? await publicarEn(admin, "instagram", fecha, () => conRespaldo("instagram", (url) => publicarReel(url, texto), () => publicarImagen(imagen, texto)))
     : { omitida: "sin_configurar" };
-  const facebook: Resultado = facebookConfigurado()
+  const facebook: Resultado = facebookConfigurado() && publicaIdiomaEn("facebook", "es")
     ? await publicarEn(admin, "facebook", fecha, () => conRespaldo("facebook", (url) => publicarVideoFacebook(url, textoFacebook), () => publicarFotoFacebook(imagen, textoFacebook)))
     : { omitida: "sin_configurar" };
 

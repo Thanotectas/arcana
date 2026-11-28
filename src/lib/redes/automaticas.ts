@@ -1,3 +1,4 @@
+import { publicaIdiomaEn } from "@/lib/redes/idioma-red";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
@@ -34,8 +35,8 @@ export async function historiaDelDia(admin: SupabaseClient<Database>, fecha = fe
   if (process.env.REDES_HISTORIA === "0") return { apagada: true };
   const imagen = `${sitio()}/api/redes/historia-dia?fecha=${fecha}`;
   const [instagram, facebook] = await Promise.all([
-    instagramConfigurado() ? publicarUnaVez(admin, "instagram", "historia", fecha, () => publicarHistoria(imagen)) : sinConfigurar,
-    facebookConfigurado() ? publicarUnaVez(admin, "facebook", "historia", fecha, () => publicarHistoriaFacebook(imagen)) : sinConfigurar,
+    instagramConfigurado() && publicaIdiomaEn("instagram", "es") ? publicarUnaVez(admin, "instagram", "historia", fecha, () => publicarHistoria(imagen)) : sinConfigurar,
+    facebookConfigurado() && publicaIdiomaEn("facebook", "es") ? publicarUnaVez(admin, "facebook", "historia", fecha, () => publicarHistoriaFacebook(imagen)) : sinConfigurar,
   ]);
   return { fecha, instagram, facebook };
 }
@@ -67,8 +68,8 @@ export async function juegoEnRedes(admin: SupabaseClient<Database>, fecha = fech
   if (process.env.REDES_JUEGO === "0") return { apagada: true };
   const imagen = `${sitio()}/api/juego/reto?fecha=${fecha}`;
   const [instagram, facebook] = await Promise.all([
-    instagramConfigurado() ? publicarUnaVez(admin, "instagram", "juego", fecha, () => publicarImagen(imagen, textoJuegoDelDia(fecha, "instagram"))) : sinConfigurar,
-    facebookConfigurado() ? publicarUnaVez(admin, "facebook", "juego", fecha, () => publicarFotoFacebook(imagen, textoJuegoDelDia(fecha, "facebook"))) : sinConfigurar,
+    instagramConfigurado() && publicaIdiomaEn("instagram", "es") ? publicarUnaVez(admin, "instagram", "juego", fecha, () => publicarImagen(imagen, textoJuegoDelDia(fecha, "instagram"))) : sinConfigurar,
+    facebookConfigurado() && publicaIdiomaEn("facebook", "es") ? publicarUnaVez(admin, "facebook", "juego", fecha, () => publicarFotoFacebook(imagen, textoJuegoDelDia(fecha, "facebook"))) : sinConfigurar,
   ]);
   return { fecha, instagram, facebook };
 }
@@ -83,8 +84,8 @@ export async function carruselSemanal(admin: SupabaseClient<Database>, hoy = fec
   const semana = semanaDelCarrusel(hoy);
   const contenido = (await contenidoGuardado(admin, semana)) ?? (await redactarCarrusel(semana));
   const laminas = urlsLaminas(semana, String(Date.now()).slice(-6));
-  const instagram = instagramConfigurado() ? await publicarUnaVez(admin, "instagram", "carrusel", semana, () => publicarCarrusel(laminas, contenido.texto), contenido) : sinConfigurar;
-  const facebook = facebookConfigurado() ? await publicarUnaVez(admin, "facebook", "carrusel", semana, () => publicarVariasFotosFacebook(laminas, contenido.texto), contenido) : sinConfigurar;
+  const instagram = instagramConfigurado() && publicaIdiomaEn("instagram", "es") ? await publicarUnaVez(admin, "instagram", "carrusel", semana, () => publicarCarrusel(laminas, contenido.texto), contenido) : sinConfigurar;
+  const facebook = facebookConfigurado() && publicaIdiomaEn("facebook", "es") ? await publicarUnaVez(admin, "facebook", "carrusel", semana, () => publicarVariasFotosFacebook(laminas, contenido.texto), contenido) : sinConfigurar;
   return { semana, titulo: contenido.titulo, instagram, facebook };
 }
 
