@@ -1,5 +1,6 @@
 import "server-only";
 import { pedidoDeNombre, prepararNombre } from "./en-vivo-nombre";
+import { SIGNOS_IDIOMA } from "@/lib/juego/textos";
 import { manual } from "@/lib/conocimiento";
 import { IDIOMA_PARA_IA, esIdioma } from "@/lib/i18n/idiomas";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
@@ -365,7 +366,7 @@ const FORMAS_LECTURA = [
 ];
 
 /** Lo que se suma a la instrucción en los segmentos «para todos» del relleno. */
-const SEGMENTO_PARA_TODOS = `Esta lectura no es de una persona del chat: es un segmento para todos los que están viendo mientras llegan las preguntas. El campo «Nombre» dice para quién es (un signo, quienes hablan un idioma, o todos). No inventes personas, nombres ni preguntas, y no digas que alguien preguntó. Empieza diciendo para quién es («Para todos los Leo que me ven…», «Para quem me assiste em português…») y háblale al grupo. Al final invita, en una frase y con tus palabras, a escribir en el chat su propia pregunta con su signo, en el idioma que quieran.`;
+const SEGMENTO_PARA_TODOS = `Esta lectura no es de una persona del chat: es un segmento para todos los que están viendo mientras llegan las preguntas. El campo «Nombre» dice para quién es (un signo, quienes hablan un idioma, o todos). No inventes personas, nombres ni preguntas, y no digas que alguien preguntó. Empieza diciendo para quién es («Para todos los Leo que me ven…», «Para quem me assiste em português…») y háblale al grupo. Si es la lectura de un nombre («para todos los que se llaman…»), háblales a quienes llevan ese nombre. Al final invita, en una frase y con tus palabras, a escribir en el chat su propia pregunta con su signo, o su nombre para leerlo, en el idioma que quieran.`;
 
 /** Fecha de nacimiento escrita en el mensaje (con números o con el mes en letras), si la hay. */
 function fechaEn(texto: string): Date | null {
@@ -642,7 +643,8 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
           ? `${prep.sistema}${forma}\nEsta vez, antes del consejo, deja una puerta abierta: menciona en una frase que hay algo más que se ve en su lectura (una fecha, una persona, una decisión, algo bueno en camino) y que con su lectura completa se ve con calma. Que despierte curiosidad, nunca miedo, y sin decir direcciones de páginas.`
           : `${prep.sistema}${forma}`;
       // El idioma de la pregunta manda sobre el contexto en español.
-      const otroIdioma = p.origen === "sistema" ? null : (marcada.idioma ?? idiomaDeTexto(q.texto ?? ""));
+      // Los segmentos «para todos» van en el idioma de su texto solo si es otra escritura (el vivo en árabe).
+      const otroIdioma = p.origen === "sistema" ? (/[\u0600-\u06ff]/.test(q.texto ?? "") ? idiomaDeTexto(q.texto ?? "") : null) : (marcada.idioma ?? idiomaDeTexto(q.texto ?? ""));
       const sistemaFinal = otroIdioma
         ? `${sistema}\nIDIOMA: la persona escribió en ${otroIdioma.nombre}. Toda la lectura, de la primera a la última palabra, va en ${otroIdioma.nombre}, aunque el contexto, las cartas y las notas lleguen en español: tradúcelo todo (nombres de cartas y signos con su nombre tradicional en ese idioma). Solo la línea «COLOR:» va en español.`
         : sistema;
@@ -710,7 +712,38 @@ interface Segmento {
  * española, francés y el año chino que viene. No simula espectadores: Sibila
  * dice para quién es y pide que escriban su propia pregunta.
  */
-export function segmentoDeRelleno(n: number, hoy = new Date()): Segmento {
+/** Nombres frecuentes en el Golfo y el mundo árabe, para las lecturas del nombre «para todos» (حساب الجُمَّل). */
+const NOMBRES_RELLENO: { nombre: string; ella: boolean }[] = [
+  { nombre: "محمد", ella: false }, { nombre: "فاطمة", ella: true }, { nombre: "نورة", ella: true }, { nombre: "عبدالله", ella: false },
+  { nombre: "سارة", ella: true }, { nombre: "خالد", ella: false }, { nombre: "مريم", ella: true }, { nombre: "فيصل", ella: false },
+  { nombre: "ريم", ella: true }, { nombre: "سلطان", ella: false }, { nombre: "هند", ella: true }, { nombre: "أحمد", ella: false },
+  { nombre: "لطيفة", ella: true }, { nombre: "عمر", ella: false }, { nombre: "دانة", ella: true }, { nombre: "يوسف", ella: false },
+];
+
+/**
+ * El segmento «para todos» del vivo en árabe: sobre todo lecturas del nombre (lo que más respuesta tiene en redes),
+ * alternadas con tarot y horóscopo para un signo, el péndulo y una tirada en inglés.
+ */
+function segmentoArabe(n: number, hoy: Date): Segmento {
+  const dia = Math.floor(hoy.getTime() / 86_400_000);
+  const signo = SIGNOS[(dia * 5 + n * 7) % SIGNOS.length];
+  const ar = SIGNOS_IDIOMA.ar[signo.id];
+  const persona = NOMBRES_RELLENO[(dia * 3 + Math.floor(n / 2)) % NOMBRES_RELLENO.length];
+  const nombre: Segmento = { tipo: "numerologia", autor: persona.ella ? `لكل من اسمها ${persona.nombre}` : `لكل من اسمه ${persona.nombre}`, texto: persona.nombre, signo: null };
+  const ronda: Segmento[] = [
+    nombre,
+    { tipo: "tarot", autor: `لكل مواليد برج ${ar} ${signo.simbolo}`, texto: `قراءة تاروت لمواليد برج ${ar}: ماذا تحمل لهم الأسابيع القادمة في الحب والعمل؟`, signo: signo.id },
+    nombre,
+    { tipo: "pendulo", autor: "لكل من يشاهد", texto: "البندول لكل من يشاهد الآن: هل تصل أخبار جميلة قبل نهاية الشهر؟", signo: null },
+    nombre,
+    { tipo: "horoscopo", autor: `لكل مواليد برج ${ar} ${signo.simbolo}`, texto: `برج ${ar} اليوم`, signo: signo.id },
+    { tipo: "tarot", autor: "For everyone watching in English", texto: "A reading for everyone watching in English: what do the coming weeks bring for love and work?", signo: null },
+  ];
+  return ronda[n % ronda.length];
+}
+
+export function segmentoDeRelleno(n: number, hoy = new Date(), idioma = "es"): Segmento {
+  if (idioma === "ar") return segmentoArabe(n, hoy);
   const dia = Math.floor(hoy.getTime() / 86_400_000);
   const signo = SIGNOS[(dia * 5 + n * 7) % SIGNOS.length];
   const paraSigno = `Para todos los ${signo.nombre} ${signo.simbolo}`;
@@ -743,18 +776,27 @@ export function segmentoDeRelleno(n: number, hoy = new Date()): Segmento {
  * su propio tope por noche. Sin la migración 0044 no hay origen «sistema» y
  * simplemente no hace nada (el escenario sigue con sus frases).
  */
-export async function lecturaDeRelleno(admin: Admin): Promise<LecturaEnVivo | null> {
+/** Minutos entre un segmento «para todos» y el siguiente (EN_VIVO_RELLENO_CADA_MIN, 3 por omisión). */
+export function minutosEntreRelleno() {
+  const n = Number(process.env.EN_VIVO_RELLENO_CADA_MIN ?? 3);
+  return Number.isFinite(n) && n >= 0 ? n : 3;
+}
+
+export async function lecturaDeRelleno(admin: Admin, idioma = "es"): Promise<LecturaEnVivo | null> {
   const maximo = maximoRelleno();
   if (!maximo) return null;
   const { count: esperando } = await admin.from("en_vivo_preguntas").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "leyendo"]);
   if (esperando) return siguienteLectura(admin);
+  // Uno cada pocos minutos como mucho: entre uno y otro, Sibila invita a preguntar con sus frases.
+  const { data: ultimo } = await admin.from("en_vivo_preguntas").select("creado_en").eq("origen", "sistema").order("creado_en", { ascending: false }).limit(1).maybeSingle();
+  if (ultimo && Date.now() - Date.parse(ultimo.creado_en) < minutosEntreRelleno() * 60_000) return null;
   const { count: hechos } = await admin
     .from("en_vivo_preguntas")
     .select("id", { count: "exact", head: true })
     .eq("origen", "sistema")
     .gte("creado_en", new Date(Date.now() - 6 * 3_600_000).toISOString());
   if ((hechos ?? 0) >= maximo) return null;
-  const seg = segmentoDeRelleno(hechos ?? 0);
+  const seg = segmentoDeRelleno(hechos ?? 0, new Date(), idioma);
   const { error } = await admin.from("en_vivo_preguntas").insert({ origen: "sistema", ...seg });
   if (error) {
     console.error("[en vivo] relleno:", error.message);

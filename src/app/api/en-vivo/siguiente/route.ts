@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   const admin = getSupabaseAdmin();
   await latido(admin).catch(() => null);
   // ?idioma=ar: el vivo en árabe (Instagram). Las lecturas igual salen en el idioma de cada pregunta; esto cambia lo
-  // que Sibila dice por su cuenta, y sin lecturas de relleno ni juego (sus textos están en español).
+  // que Sibila dice por su cuenta, y el relleno «para todos» lee nombres árabes; sin juego (sus textos están en español).
   const idioma = q.get("idioma") === "ar" ? "ar" : "es";
   if (q.get("modo") === "puente") {
     return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1", idioma)) }, { headers: { "Cache-Control": "no-store" } });
@@ -85,7 +85,8 @@ export async function GET(request: NextRequest) {
     }), "sincronizarInstagram"),
   ]);
   // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
-  const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo);
+  // TikTok no tiene API de comentarios: con ?tiktok=1 se da por hecho que se está transmitiendo (el tope por noche limita).
+  const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo || q.get("tiktok") === "1");
   // El juego empieza si se pidió desde el panel o, sin nadie en la fila, como relleno (cada 20 minutos como mucho).
   const juego = await juegoSiToca(admin, q.get("modo") === "relleno" && alAire && idioma === "es").catch((e: unknown) => {
     console.error("[en vivo] juego:", e instanceof Error ? e.message : e);
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest) {
   let lectura: Awaited<ReturnType<typeof siguienteLectura>> = null;
   let error: string | null = null;
   try {
-    lectura = q.get("modo") === "relleno" && alAire && idioma === "es" ? await lecturaDeRelleno(admin) : await siguienteLectura(admin);
+    lectura = q.get("modo") === "relleno" && alAire ? await lecturaDeRelleno(admin, idioma) : await siguienteLectura(admin);
   } catch (e) {
     error = e instanceof Error ? e.message : String(e);
     console.error("[en vivo] lectura:", error);
