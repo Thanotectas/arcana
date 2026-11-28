@@ -4,7 +4,7 @@
 set -euo pipefail
 IDIOMA=ar; CLIP="${1:-}"; DIR="$(cd "$(dirname "$0")" && pwd)"; T="$(mktemp -d)"; SALIDA="$DIR/68-en-vivo-ig-$IDIOMA.mp4"
 # Momentos de la voz (faster-whisper): «الساعة» «اكتب» «الحب» «فعّلوا» duración
-M="4.12 7.24 11.84 15.28 18.32"
+M="4.16 7.72 12.36 15.98 18.96"
 read -r F CAPAS <<< "$(python3 -c "
 v=[float(x)+0.2 for x in '$M'.split()]  # la voz entra 0,2 s después
 F=round(v[4]+1.0,2)
