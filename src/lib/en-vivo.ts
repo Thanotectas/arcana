@@ -692,10 +692,10 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
 
 // ───────────────────────── Relleno: segmentos «para todos» ─────────────────────────
 
-/** Cuántos segmentos «para todos» puede haber en una noche (EN_VIVO_RELLENO_MAX, 24 por omisión; 0 los apaga). */
+/** Cuántos segmentos «para todos» puede haber en una noche (EN_VIVO_RELLENO_MAX, 40 por omisión; 0 los apaga). */
 export function maximoRelleno() {
-  const n = Number(process.env.EN_VIVO_RELLENO_MAX ?? 24);
-  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 24;
+  const n = Number(process.env.EN_VIVO_RELLENO_MAX ?? 40);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 40;
 }
 
 interface Segmento {
