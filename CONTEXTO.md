@@ -1,6 +1,27 @@
 # Contexto del proyecto Arcana
 
-Resumen para retomar el trabajo desde cualquier entorno (otra sesión de Claude, otro computador u otra persona). Actualizado: 30 de septiembre de 2026.
+Resumen para retomar el trabajo desde cualquier entorno (otra sesión de Claude, otro computador u otra persona). Actualizado: 28 de noviembre de 2026 (ver «Estado al 28 de noviembre»).
+
+## Estado al 28 de noviembre de 2026 (leer primero)
+
+Lo de abajo es historia acumulada desde septiembre; esto es lo vigente.
+
+- **Migraciones aplicadas hasta la 0086** (`0086_comunidad_hilo_mundo.sql`). La próxima es la **0087**. Se aplican con el conector de Supabase y se agregan a `src/types/database.ts`.
+- **Mercados por red** (plan de redes): Instagram en **árabe**, Facebook y TikTok en **español**, YouTube en varios idiomas (`src/lib/redes/idioma-red.ts`, env `REDES_IDIOMAS`). Turquía en pausa (PayPal no opera allí). Portugués e inglés solo en YouTube. No pagar más a TikTok por seguidores.
+- **Ventas:** meta de 500.000 COP al mes. Compra en un toque al quedarse sin créditos, PayPal fuera de Colombia con precio Golfo (×2 en EAU, KW y QA; ×1,6 en SA, BH y OM), lectura completa del nombre (abjad premium, 5 créditos), códigos `VUELVE` (+2), `BLACK` y `WHITE` (+5, vencen el 1 dic 04:59 UTC). Embudo medido en `eventos_compra`. El resumen semanal excluye las cuentas admin.
+- **Redes:** los comentarios se responden con Haiku (`REDES_COMENTARIOS_HAIKU=0` vuelve a Sonnet) y los DM con Sonnet. Hay respuestas fijas para abjad, letra y Yıldızname. La palabra clave por DM da el enlace a la lectura completa. Los DM de Instagram necesitan acceso avanzado de Meta (App Review + verificación del negocio, en curso).
+- **En vivo (escenario OBS, `/admin/en-vivo`):** YouTube y Facebook horizontal, TikTok vertical (`&formato=vertical`), Instagram en árabe (`&formato=vertical&idioma=ar&frases=1`; perfil de OBS «Instagram árabe»).
+  - Los comentarios del vivo de Instagram entran solos (`src/lib/en-vivo-instagram.ts`).
+  - Sibila responde en el idioma de cada pregunta.
+  - En árabe lee el nombre por abjad con su primera letra y el Yıldızname (`src/lib/en-vivo-nombre.ts`).
+  - Sin preguntas, hace segmentos «para todos» según el mercado de cada red: como mucho uno cada 3 min (`EN_VIVO_RELLENO_CADA_MIN`) y hasta 40 por noche (`EN_VIVO_RELLENO_MAX`). Las preguntas del público van siempre primero.
+- **Comunidad** (`/comunidad`): cada día hay dos hilos, la carta del día y la **«Pregunta del mundo»** (`?hilo=mundo`), una conversación sin esoterismo entre países. Cada quien escribe en su idioma y lee a los demás traducidos. Sibila es la anfitriona y hay moderación con IA. Es la prueba para un posible proyecto aparte: un chat por temas entre idiomas.
+- **Reels:** `marketing/videos/NN-nombre/`, cada uno con `armar.sh`, `capas.html` y `redes.txt`.
+  - Voz de ElevenLabs: Marcela (`zAjVLCYNz6RBmYxLTj17`), modelo `eleven_v4`, una sola toma.
+  - Los tiempos de la voz salen de faster-whisper.
+  - Videos de menos de 10 MB.
+  - Los últimos son el 66 (nombre completo), el 67 (Black Friday / الجمعة البيضاء), el 68 (anuncio del vivo en árabe) y el 69 (comunidad entre idiomas).
+- **Reglas de trabajo:** responder en español; no pedir ni mostrar secretos; no comprar nada sin confirmación; sin resultados garantizados ni temas de salud; el contenido se escribe desde dentro de la tradición; nada religioso en lo dirigido al público árabe; no usar el nombre ni el correo del dueño en contenidos.
 
 ## Qué es
 
