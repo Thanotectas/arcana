@@ -581,10 +581,10 @@ export async function siguienteLectura(admin: Admin): Promise<LecturaEnVivo | nu
     // Los segmentos «para todos» (origen sistema) solo van cuando no hay nadie más esperando.
     const PRIORIDAD: Record<string, number> = { manual: 0, pagina: 1, chat: 2, facebook: 2, sistema: 9 };
     const candidatas = [...lista].sort((a, b) => (PRIORIDAD[a.origen] ?? 3) - (PRIORIDAD[b.origen] ?? 3));
-    const esChat = (origen: string) => origen === "chat" || origen === "facebook";
+    const esChat = (origen: string) => origen === "chat" || origen === "facebook" || origen === "instagram";
     const autoresChat = [...new Set(candidatas.filter((c) => esChat(c.origen)).map((c) => c.autor))];
     const { data: yaLeidas } = autoresChat.length
-      ? await admin.from("en_vivo_preguntas").select("autor").in("origen", ["chat", "facebook"]).eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
+      ? await admin.from("en_vivo_preguntas").select("autor").in("origen", ["chat", "facebook", "instagram"]).eq("estado", "leida").in("autor", autoresChat).gte("leida_en", inicioDia.toISOString())
       : { data: [] };
     const repiten = new Set((yaLeidas ?? []).map((l) => l.autor));
     // Quien ganó «La carta escondida» pasa de primero con su pregunta.

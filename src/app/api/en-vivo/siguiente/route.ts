@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { audioCierre, audioPuente, claveValida, despedida, enPausa, estadoCierre, latido, lecturaDeRelleno, porQueNoLee, siguienteLectura, sincronizarChat } from "@/lib/en-vivo";
 import { sincronizarAvisoFacebook, sincronizarFacebook } from "@/lib/en-vivo-facebook";
+import { sincronizarInstagram } from "@/lib/en-vivo-instagram";
 import { ganadorDelJuego, juegoSiToca, terminarJuego } from "@/lib/en-vivo-juego";
 
 // Escribir la lectura y narrarla toma unos segundos.
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
   if (cierre === "despedirse") return NextResponse.json({ clase: "despedida", ...(await despedida(admin)) }, { headers: { "Cache-Control": "no-store" } });
   if (cierre === "terminado") return NextResponse.json({ clase: "fin" }, { headers: { "Cache-Control": "no-store" } });
   // El chat de YouTube y los comentarios del directo de Facebook entran a la misma fila.
-  const [chat, facebook] = await Promise.all([
+  const [chat, facebook, , instagram] = await Promise.all([
     conLimite(sincronizarChat(admin).catch((e: unknown) => {
       console.error("[en vivo] chat:", e instanceof Error ? e.message : e);
       return null;
@@ -74,9 +75,14 @@ export async function GET(request: NextRequest) {
       console.error("[en vivo] aviso de facebook:", e instanceof Error ? e.message : e);
       return null;
     }), "sincronizarAvisoFacebook"),
+    // Y los comentarios del vivo de Instagram.
+    conLimite(sincronizarInstagram(admin).catch((e: unknown) => {
+      console.error("[en vivo] instagram:", e instanceof Error ? e.message : e);
+      return null;
+    }), "sincronizarInstagram"),
   ]);
   // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
-  const alAire = Boolean(chat?.directo || facebook?.directo);
+  const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo);
   // El juego empieza si se pidió desde el panel o, sin nadie en la fila, como relleno (cada 20 minutos como mucho).
   const juego = await juegoSiToca(admin, q.get("modo") === "relleno" && alAire).catch((e: unknown) => {
     console.error("[en vivo] juego:", e instanceof Error ? e.message : e);

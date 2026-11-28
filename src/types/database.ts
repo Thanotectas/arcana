@@ -255,7 +255,7 @@ type PublicacionYoutubeRow = {
 type EnVivoPreguntaRow = {
   id: number;
   mensaje_id: string | null;
-  origen: "chat" | "manual" | "pagina" | "facebook" | "sistema";
+  origen: "chat" | "manual" | "pagina" | "facebook" | "instagram" | "sistema";
   tipo: "tarot" | "aura" | "numerologia" | "horoscopo" | "chocolate" | "mano" | "carta" | "sinastria" | "huevo" | "pendulo" | "iching" | "runas" | "lenormand" | "baraja" | "chino";
   imagen: string | null;
   huella: string | null;
@@ -284,6 +284,10 @@ type EnVivoEstadoRow = {
   fb_desde: string | null;
   fb_buscado_en: string | null;
   fb_detalle: string | null;
+  ig_live_id: string | null;
+  ig_desde: string | null;
+  ig_buscado_en: string | null;
+  ig_detalle: string | null;
   juego_pedido_en: string | null;
   juego_carta: string | null;
   juego_inicio: string | null;
@@ -650,7 +654,7 @@ export type Database = {
       };
       en_vivo_estado: {
         Row: EnVivoEstadoRow;
-        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en" | "vivo_desde" | "vivo_en">;
+        Insert: Insertable<EnVivoEstadoRow, "id" | "live_chat_id" | "page_token" | "proxima_consulta" | "buscado_en" | "latido_en" | "cierre_en" | "despedida_en" | "pausa_hasta" | "fb_live_id" | "fb_desde" | "fb_buscado_en" | "fb_detalle" | "ig_live_id" | "ig_desde" | "ig_buscado_en" | "ig_detalle" | "juego_pedido_en" | "juego_carta" | "juego_inicio" | "juego_ganador" | "juego_ganador_en" | "juego_fin" | "actualizado_en" | "vivo_desde" | "vivo_en">;
         Update: Partial<EnVivoEstadoRow>;
         Relationships: [];
       };
