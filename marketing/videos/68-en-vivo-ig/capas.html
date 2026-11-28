@@ -1,0 +1,51 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:I;src:url(../../../src/app/fuentes/Inter-SemiBold.ttf)}
+@font-face{font-family:NA;src:url(fuentes/NotoNaskhArabic.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:transparent;direction:rtl}
+#sa{position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(180deg,rgba(12,8,28,.85),rgba(12,8,28,.45) 60%,rgba(12,8,28,0))}
+#sb{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(0deg,rgba(12,8,28,.93),rgba(12,8,28,.6) 55%,rgba(12,8,28,0));opacity:0}
+.c{position:absolute;left:50px;right:50px;text-align:center;color:#fff;font-family:NA;text-shadow:0 4px 22px #000}
+#gancho{top:140px}
+#vivo{display:inline-flex;align-items:center;gap:16px;padding:12px 34px;border-radius:999px;background:#e0245e;font-size:52px;line-height:1.4;box-shadow:0 0 40px rgba(224,36,94,.6);text-shadow:none}
+#vivo i{width:22px;height:22px;border-radius:50%;background:#fff;display:inline-block}
+#g1{font-size:120px;line-height:1.3;margin-top:26px;color:#fff6df;text-shadow:0 0 50px rgba(241,217,154,.55),0 6px 24px #000}
+#g2{font-size:60px;line-height:1.4;color:#e9dcff}
+#hora{bottom:470px;opacity:0}
+#h1{font-family:I;font-size:220px;line-height:1;color:#f1d99a;direction:ltr;text-shadow:0 0 60px rgba(241,217,154,.7),0 8px 30px #000}
+#h2{font-size:64px;line-height:1.4;margin-top:24px}
+#escribe{bottom:420px;opacity:0}
+#e1{font-size:84px;line-height:1.35}
+.it{display:inline-block;margin:14px 10px 0;padding:14px 34px;border-radius:999px;background:rgba(12,8,30,.74);border:2px solid rgba(241,217,154,.6);font-size:52px;opacity:0}
+#cta{bottom:360px;opacity:0}
+#c1{font-size:96px;line-height:1.35;color:#f1d99a;text-shadow:0 0 40px rgba(241,217,154,.5),0 6px 22px #000}
+#c2{font-size:58px;line-height:1.4;margin-top:18px;color:#e9dcff}
+#marca{position:absolute;left:0;right:0;bottom:120px;text-align:center;font-family:I;font-size:24px;letter-spacing:.3em;color:#e9dcff;opacity:.85;text-shadow:0 2px 10px #000;direction:ltr}
+#marca b{color:#f1d99a}
+</style></head><body>
+<div id="sa"></div><div id="sb"></div>
+<div id="gancho" class="c"><div id="vivo"><i></i>مباشر على إنستغرام</div><div id="g1">سيبيلا تقرأ لك<br>مباشرة 🔮</div><div id="g2">هذا السبت</div></div>
+<div id="hora" class="c"><div id="h1">9 PM</div><div id="h2">بتوقيت السعودية · السبت</div></div>
+<div id="escribe" class="c"><div id="e1">اكتب سؤالك<br>في التعليقات 👇</div><div id="items"><span class="it">الحب</span><span class="it">العمل</span><span class="it">خريطتك الفلكية</span></div></div>
+<div id="cta" class="c"><div id="c1">فعّل التذكير 🔔</div><div id="c2">السبت · ٩ مساءً بتوقيت السعودية</div></div>
+<p id="marca"><b>ARCANA</b> · miarcana.com</p>
+<script>
+// #ar,tHora,tEscribe,tTemas,tRecordar,fin
+const [,...ts]=decodeURIComponent(location.hash.slice(1)).split(",");
+const [tH,tE,tT,tR,tFin]=ts.map(Number);
+const $=id=>document.getElementById(id);
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),pr=(t,a,b)=>cl((t-a)/(b-a)),su=v=>v*v*(3-2*v);
+const ven=(t,a,b,f=.4)=>Math.min(su(pr(t,a,a+f)),1-su(pr(t,b-f,b)));
+window.pintar=t=>{
+ $("gancho").style.opacity=su(pr(t,0,.35))*(1-su(pr(t,tR-0.5,tR-0.1)));
+ $("g1").style.transform=`scale(${1+0.03*Math.sin(t*2.2)})`;
+ $("vivo").style.opacity=0.75+0.25*Math.sin(t*5);
+ $("sb").style.opacity=su(pr(t,tH-0.5,tH));
+ $("hora").style.opacity=ven(t,tH-0.1,tE-0.1);
+ $("h1").style.transform=`scale(${0.7+0.3*su(pr(t,tH-0.1,tH+0.5))})`;
+ $("escribe").style.opacity=ven(t,tE-0.1,tR-0.1);
+ [...document.querySelectorAll(".it")].forEach((el,i)=>{const a=tT+i*0.9;const o=su(pr(t,a,a+.35));el.style.opacity=o;el.style.transform=`translateY(${(1-o)*30}px)`;});
+ $("cta").style.opacity=su(pr(t,tR-0.1,tR+.35));
+ $("c1").style.transform=`scale(${1+0.05*Math.sin((t-tR)*4)})`;
+};
+window.pintar(0);
+</script></body></html>
