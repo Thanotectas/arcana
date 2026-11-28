@@ -34,12 +34,23 @@ export interface TextosComunidad {
   /** Aviso cuando alguien te responde. */
   avisoTitulo: string;
   avisoCuerpo: (quien: string) => string;
+  /** Pestañas de los dos hilos del día y textos de la pregunta del mundo. */
+  tabCarta: string;
+  tabMundo: string;
+  introMundo: string;
+  preguntaDeHoy: string;
+  placeholderMundo: string;
   /** Primer mensaje de Sibila en el hilo del día. */
   apertura: (carta: string, frase: string) => string;
 }
 
 export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
   es: {
+    tabCarta: "La carta del día",
+    tabMundo: "Pregunta del mundo",
+    introMundo: "Sin cartas: una pregunta sencilla cada día para conversar con gente de todo el mundo. Escribe en tu idioma: todos te leen en el suyo.",
+    preguntaDeHoy: "La pregunta de hoy",
+    placeholderMundo: "Cuéntanos desde dónde escribes y tu respuesta…",
     titulo: "Comunidad Arcana",
     descripcion: "La carta del día en comunidad: cuenta qué te dice a ti, lee a personas de todo el mundo en tu idioma y conversa con Sibila.",
     intro: "Cada día, una carta y una conversación. Escribe en tu idioma: todos te leen en el suyo.",
@@ -82,6 +93,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Buenos días, almas 🌙 La carta de hoy es ${c}. ${f} ¿Qué te dice a ti? ¿Dónde la ves hoy en tu vida? Cuéntalo aquí, en tu idioma.`,
   },
   en: {
+    tabCarta: "Card of the day",
+    tabMundo: "World question",
+    introMundo: "No cards: one simple question a day to chat with people from all over the world. Write in your language: everyone reads you in theirs.",
+    preguntaDeHoy: "Today's question",
+    placeholderMundo: "Tell us where you're writing from and your answer…",
     titulo: "Arcana Community",
     descripcion: "The card of the day, together: share what it tells you, read people from all over the world in your language and talk with Sibila.",
     intro: "Every day, one card and one conversation. Write in your language: everyone reads you in theirs.",
@@ -124,6 +140,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Good morning, dear souls 🌙 Today's card is ${c}. ${f} What does it tell you? Where do you see it in your life today? Share it here, in your own language.`,
   },
   pt: {
+    tabCarta: "A carta do dia",
+    tabMundo: "Pergunta do mundo",
+    introMundo: "Sem cartas: uma pergunta simples por dia para conversar com gente do mundo todo. Escreva no seu idioma: todos te leem no deles.",
+    preguntaDeHoy: "A pergunta de hoje",
+    placeholderMundo: "Conte de onde você escreve e a sua resposta…",
     titulo: "Comunidade Arcana",
     descripcion: "A carta do dia em comunidade: conte o que ela diz para você, leia pessoas do mundo todo no seu idioma e converse com a Sibila.",
     intro: "Todo dia, uma carta e uma conversa. Escreva no seu idioma: todos leem você no deles.",
@@ -166,6 +187,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Bom dia, almas 🌙 A carta de hoje é ${c}. ${f} O que ela diz para você? Onde você a vê hoje na sua vida? Conte aqui, no seu idioma.`,
   },
   fr: {
+    tabCarta: "La carte du jour",
+    tabMundo: "Question du monde",
+    introMundo: "Sans cartes : une question simple chaque jour pour discuter avec des gens du monde entier. Écris dans ta langue : chacun te lit dans la sienne.",
+    preguntaDeHoy: "La question du jour",
+    placeholderMundo: "Dis-nous d'où tu écris et ta réponse…",
     titulo: "Communauté Arcana",
     descripcion: "La carte du jour en communauté : raconte ce qu'elle te dit, lis des personnes du monde entier dans ta langue et parle avec Sibila.",
     intro: "Chaque jour, une carte et une conversation. Écris dans ta langue : chacun te lit dans la sienne.",
@@ -208,6 +234,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Bonjour à toutes et à tous 🌙 La carte du jour est ${c}. ${f} Que te dit-elle ? Où la vois-tu aujourd'hui dans ta vie ? Raconte-le ici, dans ta langue.`,
   },
   tr: {
+    tabCarta: "Günün kartı",
+    tabMundo: "Dünya sorusu",
+    introMundo: "Kart yok: dünyanın her yerinden insanlarla sohbet etmek için her gün basit bir soru. Kendi dilinde yaz: herkes seni kendi dilinde okur.",
+    preguntaDeHoy: "Bugünün sorusu",
+    placeholderMundo: "Nereden yazdığını ve cevabını anlat…",
     titulo: "Arcana Topluluğu",
     descripcion: "Günün kartını birlikte konuşalım: sana ne söylediğini anlat, dünyanın dört bir yanından insanları kendi dilinde oku ve Sibila ile sohbet et.",
     intro: "Her gün bir kart ve bir sohbet. Kendi dilinde yaz: herkes seni kendi dilinde okur.",
@@ -250,6 +281,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Günaydın 🌙 Bugünün kartı ${c}. ${f} Sana ne söylüyor? Bugün hayatında onu nerede görüyorsun? Burada, kendi dilinde anlat.`,
   },
   ar: {
+    tabCarta: "ورقة اليوم",
+    tabMundo: "سؤال العالم",
+    introMundo: "بلا أوراق: سؤال بسيط كل يوم لتتحدث مع أناس من كل العالم. اكتب بلغتك، ويقرؤك الجميع بلغتهم.",
+    preguntaDeHoy: "سؤال اليوم",
+    placeholderMundo: "أخبرنا من أين تكتب، وما جوابك…",
     titulo: "مجتمع أركانا",
     descripcion: "بطاقة اليوم معًا: شارك ما تقوله لك، واقرأ أشخاصًا من كل أنحاء العالم بلغتك، وتحدّث مع سيبيلا.",
     intro: "كل يوم بطاقة وحديث. اكتب بلغتك، والجميع يقرؤونك بلغتهم.",
@@ -292,6 +328,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `صباح الخير يا أرواح 🌙 بطاقة اليوم هي ${c}. ${f} ماذا تقول لك؟ وأين تراها اليوم في حياتك؟ احكِ هنا بلغتك.`,
   },
   id: {
+    tabCarta: "Kartu hari ini",
+    tabMundo: "Pertanyaan dunia",
+    introMundo: "Tanpa kartu: satu pertanyaan sederhana setiap hari untuk mengobrol dengan orang dari seluruh dunia. Tulis dalam bahasamu: semua membacamu dalam bahasa mereka.",
+    preguntaDeHoy: "Pertanyaan hari ini",
+    placeholderMundo: "Ceritakan dari mana kamu menulis dan jawabanmu…",
     titulo: "Komunitas Arcana",
     descripcion: "Kartu hari ini bersama-sama: ceritakan apa yang dikatakannya padamu, baca orang-orang dari seluruh dunia dalam bahasamu, dan ngobrol dengan Sibila.",
     intro: "Setiap hari, satu kartu dan satu obrolan. Tulis dalam bahasamu: semua orang membacamu dalam bahasa mereka.",
@@ -334,6 +375,11 @@ export const TEXTOS_COMUNIDAD: Record<Idioma, TextosComunidad> = {
     apertura: (c, f) => `Selamat pagi, jiwa-jiwa 🌙 Kartu hari ini adalah ${c}. ${f} Apa katanya untukmu? Di mana kamu melihatnya dalam hidupmu hari ini? Ceritakan di sini, dalam bahasamu.`,
   },
   hi: {
+    tabCarta: "आज का कार्ड",
+    tabMundo: "दुनिया का सवाल",
+    introMundo: "बिना कार्ड के: दुनिया भर के लोगों से बात करने के लिए हर दिन एक आसान सवाल। अपनी भाषा में लिखिए: सब आपको अपनी भाषा में पढ़ते हैं।",
+    preguntaDeHoy: "आज का सवाल",
+    placeholderMundo: "बताइए आप कहाँ से लिख रहे हैं और आपका जवाब…",
     titulo: "आर्काना समुदाय",
     descripcion: "आज का कार्ड, सबके साथ: बताइए यह आपसे क्या कहता है, दुनिया भर के लोगों को अपनी भाषा में पढ़िए और सिबिला से बात कीजिए।",
     intro: "हर दिन एक कार्ड और एक बातचीत। अपनी भाषा में लिखिए: सब आपको अपनी भाषा में पढ़ते हैं।",

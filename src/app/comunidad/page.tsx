@@ -8,7 +8,7 @@ import { nombreCarta } from "@/lib/juego/cartas-idiomas";
 import { cartaDelDia, esFecha, fechaBogota, mazoDelDia } from "@/lib/redes/carta-dia";
 import { imagenCarta } from "@/components/CartaVisual";
 import { TEXTOS_COMUNIDAD } from "@/lib/comunidad/textos";
-import { asegurarApertura, listarMensajes } from "@/lib/comunidad/servidor";
+import { asegurarApertura, listarMensajes, type Hilo } from "@/lib/comunidad/servidor";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { VistaComunidad } from "@/components/comunidad/VistaComunidad";
 
@@ -27,15 +27,19 @@ function diaAntes(fecha: string) {
   return d.toISOString().slice(0, 10);
 }
 
-export default async function PaginaComunidad({ searchParams }: { searchParams: Promise<{ fecha?: string }> }) {
-  const [{ fecha: pedida }, idioma, usuario] = await Promise.all([searchParams, getIdioma(), getUsuarioOpcional()]);
+export default async function PaginaComunidad({ searchParams }: { searchParams: Promise<{ fecha?: string; hilo?: string }> }) {
+  const [{ fecha: pedida, hilo: hiloPedido }, idioma, usuario] = await Promise.all([searchParams, getIdioma(), getUsuarioOpcional()]);
   const t = TEXTOS_COMUNIDAD[idioma];
   const hoy = fechaBogota();
   const fecha = esFecha(pedida) && pedida < hoy && pedida >= "2026-11-24" ? pedida : hoy;
   const esHoy = fecha === hoy;
+  const hilo: Hilo = hiloPedido === "mundo" ? "mundo" : "carta";
   const admin = getSupabaseAdmin();
-  if (esHoy) await asegurarApertura(admin, fecha);
-  const mensajes = await listarMensajes(admin, fecha, idioma, usuario?.id ?? null);
+  if (esHoy) await asegurarApertura(admin, fecha, hilo);
+  const mensajes = await listarMensajes(admin, fecha, idioma, usuario?.id ?? null, hilo);
+  // La pregunta del mundo se muestra arriba tal como la abrió Sibila (ya traducida al idioma de quien lee).
+  const apertura = hilo === "mundo" ? mensajes.find((m) => m.sibila && !m.respuestaA) : undefined;
+  const conHilo = (f?: string) => `/comunidad?${new URLSearchParams({ ...(f ? { fecha: f } : {}), ...(hilo === "mundo" ? { hilo } : {}) })}`.replace(/\?$/, "");
   const carta = cartaDelDia(fecha);
   const mazo = mazoDelDia(fecha);
   const anterior = diaAntes(fecha);
@@ -49,9 +53,28 @@ export default async function PaginaComunidad({ searchParams }: { searchParams: 
       <header className="space-y-2 text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-violeta-suave">{t.hiloDe} {fechaLarga(fecha, idioma)}</p>
         <h1 className="font-display text-4xl font-semibold text-oro-suave sm:text-5xl">{t.titulo}</h1>
-        <p className="text-texto-suave">{t.intro}</p>
+        <p className="text-texto-suave">{hilo === "mundo" ? t.introMundo : t.intro}</p>
       </header>
 
+      {/* Dos conversaciones por día: la carta del día y la pregunta del mundo (sin esoterismo). */}
+      <nav className="grid grid-cols-2 gap-2 rounded-2xl border border-borde bg-black/20 p-1 text-center text-sm">
+        {(["carta", "mundo"] as const).map((h) => (
+          <Link
+            key={h}
+            href={`/comunidad?${new URLSearchParams({ ...(esHoy ? {} : { fecha }), ...(h === "mundo" ? { hilo: h } : {}) })}`.replace(/\?$/, "")}
+            className={`rounded-xl px-3 py-2 transition ${hilo === h ? "bg-violeta/30 font-semibold text-oro-suave" : "text-texto-suave hover:text-texto"}`}
+          >
+            {h === "carta" ? `🃏 ${t.tabCarta}` : `🌍 ${t.tabMundo}`}
+          </Link>
+        ))}
+      </nav>
+
+      {hilo === "mundo" ? (
+        <div className="tarjeta space-y-1 p-5 text-center">
+          <p className="text-xs uppercase tracking-widest text-violeta-suave">{t.preguntaDeHoy}</p>
+          <p dir="auto" className="font-display text-2xl text-texto">{apertura ? (apertura.texto.split("\n").map((l) => l.trim()).filter(Boolean)[1] ?? apertura.texto) : "🌍"}</p>
+        </div>
+      ) : (
       <div className="tarjeta flex items-center gap-4 p-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imagenCarta(carta, mazo)} alt={mostrarNombre ? nombre : t.cartaDeHoy} className="h-28 w-auto rounded-lg border border-borde shadow-lg" />
@@ -60,12 +83,13 @@ export default async function PaginaComunidad({ searchParams }: { searchParams: 
           {mostrarNombre && <p className="font-display text-2xl text-texto">{nombre}</p>}
         </div>
       </div>
+      )}
 
-      <VistaComunidad fecha={fecha} esHoy={esHoy} conCuenta={Boolean(usuario)} inicial={mensajes} />
+      <VistaComunidad key={hilo} fecha={fecha} esHoy={esHoy} conCuenta={Boolean(usuario)} inicial={mensajes} hilo={hilo} />
 
       <nav className="flex justify-between text-sm">
-        {anterior >= "2026-11-24" ? <Link href={`/comunidad?fecha=${anterior}`} className="text-texto-suave hover:text-texto">{t.diaAnterior}</Link> : <span />}
-        {!esHoy && <Link href="/comunidad" className="text-oro-suave hover:underline">{t.volverHoy}</Link>}
+        {anterior >= "2026-11-24" ? <Link href={conHilo(anterior)} className="text-texto-suave hover:text-texto">{t.diaAnterior}</Link> : <span />}
+        {!esHoy && <Link href={conHilo()} className="text-oro-suave hover:underline">{t.volverHoy}</Link>}
       </nav>
     </section>
   );

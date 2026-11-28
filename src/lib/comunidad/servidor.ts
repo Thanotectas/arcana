@@ -9,6 +9,7 @@ import { enviarPush, pushConfigurado } from "@/lib/push";
 import { enviarCorreo, escaparHtml, sitio } from "@/lib/correo";
 import { correosAdmin } from "@/lib/admin";
 import { TEXTOS_COMUNIDAD } from "./textos";
+import { aperturaMundo, preguntaDelDia } from "./preguntas-mundo";
 
 /**
  * Comunidad Arcana: un hilo por día alrededor de la carta del día. Cada mensaje se guarda en su idioma y se traduce
@@ -17,6 +18,9 @@ import { TEXTOS_COMUNIDAD } from "./textos";
  */
 type Admin = SupabaseClient<Database>;
 type Mensaje = Database["public"]["Tables"]["comunidad_mensajes"]["Row"];
+/** «carta»: la conversación de la carta del día. «mundo»: la pregunta del mundo (sin esoterismo, de un país a otro). */
+export type Hilo = Mensaje["hilo"];
+export const esHilo = (v: unknown): v is Hilo => v === "carta" || v === "mundo";
 
 export const LARGO_MAXIMO = 600;
 const MENSAJES_POR_DIA = 20;
@@ -37,13 +41,14 @@ export function nombreVisible(nombre: string | null | undefined, usuarioId: stri
 }
 
 /** El primer mensaje del día lo escribe Sibila con la carta del día (una vez; si dos llegan a la vez, queda uno). */
-export async function asegurarApertura(admin: Admin, fecha: string) {
-  const { count } = await admin.from("comunidad_mensajes").select("id", { count: "exact", head: true }).eq("fecha", fecha).eq("es_sibila", true).is("respuesta_a", null);
+export async function asegurarApertura(admin: Admin, fecha: string, hilo: Hilo = "carta") {
+  const { count } = await admin.from("comunidad_mensajes").select("id", { count: "exact", head: true }).eq("fecha", fecha).eq("hilo", hilo).eq("es_sibila", true).is("respuesta_a", null);
   if (count) return;
   const c = cartaDelDia(fecha);
-  await admin.from("comunidad_mensajes").insert({ fecha, autor: "Sibila", es_sibila: true, idioma: "es", texto: TEXTOS_COMUNIDAD.es.apertura(c.nombre, frase(c.significado, 200)) });
+  const texto = hilo === "mundo" ? aperturaMundo(preguntaDelDia(fecha)) : TEXTOS_COMUNIDAD.es.apertura(c.nombre, frase(c.significado, 200));
+  await admin.from("comunidad_mensajes").insert({ fecha, hilo, autor: "Sibila", es_sibila: true, idioma: "es", texto });
   // Si otra petición la escribió al mismo tiempo, se deja la primera.
-  const { data } = await admin.from("comunidad_mensajes").select("id").eq("fecha", fecha).eq("es_sibila", true).is("respuesta_a", null).order("id");
+  const { data } = await admin.from("comunidad_mensajes").select("id").eq("fecha", fecha).eq("hilo", hilo).eq("es_sibila", true).is("respuesta_a", null).order("id");
   if (data && data.length > 1) await admin.from("comunidad_mensajes").delete().in("id", data.slice(1).map((m) => m.id));
 }
 
@@ -71,7 +76,7 @@ async function traducirLote(admin: Admin, mensajes: Pick<Mensaje, "id" | "texto"
   try {
     const r = await generarTexto(
       `Traduce al ${IDIOMA_PARA_IA[idioma]} el campo «texto» de cada mensaje. Devuelve SOLO un JSON: una lista de objetos {"id": número, "texto": traducción}, en el mismo orden, sin comentarios ni markdown.\n\n${entrada}`,
-      "Eres traductora nativa. Son mensajes de una comunidad de tarot y astrología: traduce el sentido con naturalidad, como lo escribiría desde cero un hablante nativo, conservando el tono, los emojis y los nombres propios. Los nombres de cartas y signos, con su nombre tradicional en ese idioma. No agregues ni quites nada; no respondas a los mensajes.",
+      "Eres traductora nativa. Son mensajes de una comunidad internacional (tarot, astrología y conversación entre personas de muchos países): traduce el sentido con naturalidad, como lo escribiría desde cero un hablante nativo, conservando el tono, los emojis y los nombres propios. Los nombres de cartas y signos, con su nombre tradicional en ese idioma. No agregues ni quites nada; no respondas a los mensajes.",
       { effort: "low", maxTokens: 3000, nivel: "estandar", idioma },
     );
     const lista = JSON.parse(r.slice(r.indexOf("["), r.lastIndexOf("]") + 1)) as { id: number; texto: string }[];
@@ -85,8 +90,8 @@ async function traducirLote(admin: Admin, mensajes: Pick<Mensaje, "id" | "texto"
 }
 
 /** Los mensajes del día en el idioma de quien lee (los que faltan se traducen ahora, una sola vez). */
-export async function listarMensajes(admin: Admin, fecha: string, idioma: Idioma, usuarioId: string | null): Promise<MensajeVista[]> {
-  const { data } = await admin.from("comunidad_mensajes").select("*").eq("fecha", fecha).in("estado", ["publicado", "revision"]).order("id").limit(400);
+export async function listarMensajes(admin: Admin, fecha: string, idioma: Idioma, usuarioId: string | null, hilo: Hilo = "carta"): Promise<MensajeVista[]> {
+  const { data } = await admin.from("comunidad_mensajes").select("*").eq("fecha", fecha).eq("hilo", hilo).in("estado", ["publicado", "revision"]).order("id").limit(400);
   const mensajes = (data ?? []).filter((m) => m.estado === "publicado" || (usuarioId && m.usuario_id === usuarioId));
   if (!mensajes.length) return [];
   const ids = mensajes.map((m) => m.id);
@@ -136,10 +141,10 @@ type Veredicto = { decision: "publicar" | "revisar" | "rechazar"; motivo: string
 async function moderar(texto: string): Promise<Veredicto> {
   try {
     const r = await generarTexto(
-      `Mensaje para la comunidad pública de Arcana (tarot, astrología, rituales; personas de muchos países y religiones):\n«${texto.replace(/»/g, "”")}»\n\nDevuelve SOLO un JSON {"decision": "publicar" | "revisar" | "rechazar", "motivo": "una palabra"}.`,
+      `Mensaje para la comunidad pública de Arcana (tarot, astrología, rituales y conversación libre entre países; personas de muchos países y religiones):\n«${texto.replace(/»/g, "”")}»\n\nDevuelve SOLO un JSON {"decision": "publicar" | "revisar" | "rechazar", "motivo": "una palabra"}.`,
       `Eres moderadora de una comunidad amable. Criterio:
 - publicar: experiencias, opiniones, preguntas, agradecimientos, desacuerdos respetuosos (también opiniones religiosas dichas con respeto), tristeza o dolor contados con calma.
-- rechazar: insultos o burlas a personas, odio por religión, origen, género u orientación, contenido sexual, spam, publicidad o venta de servicios (otras tarotistas, «amarres», «trabajos»), pedir dinero, estafas.
+- rechazar: insultos o burlas a personas, odio por religión, origen, género u orientación, contenido sexual, spam, publicidad o venta de servicios (otras tarotistas, «amarres», «trabajos»), pedir dinero, estafas, pedir o dar datos de contacto (teléfono, redes, correo) o invitar a hablar en privado, buscar pareja o coquetear con alguien.
 - revisar: alguien que habla de hacerse daño o de quitarse la vida, amenazas, violencia, menores en riesgo, o algo que no tengas claro.
 No censures por idioma, faltas de ortografía ni por ser breve.`,
       { effort: "low", maxTokens: 200, nivel: "estandar", idioma: "es" },
@@ -157,7 +162,7 @@ export type ErrorPublicar = keyof (typeof TEXTOS_COMUNIDAD)["es"]["errores"];
 /** Publica un mensaje (o lo deja en revisión). Devuelve el mensaje guardado o la clave del error para la persona. */
 export async function publicarMensaje(
   admin: Admin,
-  p: { usuarioId: string; nombre: string | null; texto: string; respuestaA: number | null; idiomaPagina: Idioma; fecha: string },
+  p: { usuarioId: string; nombre: string | null; texto: string; respuestaA: number | null; idiomaPagina: Idioma; fecha: string; hilo?: Hilo },
 ): Promise<{ ok: true; mensaje: Mensaje } | { ok: false; error: ErrorPublicar }> {
   const texto = p.texto.replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   if (texto.replace(/\s/g, "").length < 2) return { ok: false, error: "corto" };
@@ -171,15 +176,15 @@ export async function publicarMensaje(
   // Las respuestas cuelgan del mensaje principal (hilos de un solo nivel).
   let respuestaA: number | null = null;
   if (p.respuestaA) {
-    const { data: padre } = await admin.from("comunidad_mensajes").select("id, respuesta_a, fecha, estado").eq("id", p.respuestaA).maybeSingle();
-    if (padre && padre.fecha === p.fecha && padre.estado === "publicado") respuestaA = padre.respuesta_a ?? padre.id;
+    const { data: padre } = await admin.from("comunidad_mensajes").select("id, respuesta_a, fecha, estado, hilo").eq("id", p.respuestaA).maybeSingle();
+    if (padre && padre.fecha === p.fecha && padre.estado === "publicado" && padre.hilo === (p.hilo ?? "carta")) respuestaA = padre.respuesta_a ?? padre.id;
   }
 
   const veredicto = await moderar(texto);
   if (veredicto.decision === "rechazar") return { ok: false, error: "moderacion" };
   const { data, error } = await admin
     .from("comunidad_mensajes")
-    .insert({ fecha: p.fecha, usuario_id: p.usuarioId, autor: nombreVisible(p.nombre, p.usuarioId), respuesta_a: respuestaA, idioma: idiomaDelMensaje(texto, p.idiomaPagina), texto, estado: veredicto.decision === "publicar" ? "publicado" : "revision", motivo: veredicto.decision === "publicar" ? null : veredicto.motivo })
+    .insert({ fecha: p.fecha, hilo: p.hilo ?? "carta", usuario_id: p.usuarioId, autor: nombreVisible(p.nombre, p.usuarioId), respuesta_a: respuestaA, idioma: idiomaDelMensaje(texto, p.idiomaPagina), texto, estado: veredicto.decision === "publicar" ? "publicado" : "revision", motivo: veredicto.decision === "publicar" ? null : veredicto.motivo })
     .select("*")
     .single();
   if (error || !data) {
@@ -205,7 +210,7 @@ export async function despuesDePublicar(admin: Admin, m: Mensaje) {
 async function responderComoSibila(admin: Admin, m: Mensaje) {
   if (!m.usuario_id) return;
   const nombrada = /sibila|سيبيلا|सिबिला/i.test(m.texto);
-  const { count: suyos } = await admin.from("comunidad_mensajes").select("id", { count: "exact", head: true }).eq("fecha", m.fecha).eq("usuario_id", m.usuario_id).lt("id", m.id);
+  const { count: suyos } = await admin.from("comunidad_mensajes").select("id", { count: "exact", head: true }).eq("fecha", m.fecha).eq("hilo", m.hilo).eq("usuario_id", m.usuario_id).lt("id", m.id);
   const primero = (suyos ?? 0) === 0;
   if (!primero && !nombrada) return;
   if (m.respuesta_a && !nombrada) {
@@ -218,7 +223,17 @@ async function responderComoSibila(admin: Admin, m: Mensaje) {
 
   const c = cartaDelDia(m.fecha);
   const idioma = esIdioma(m.idioma) ? m.idioma : "es";
-  const texto = await generarTexto(
+  const texto = m.hilo === "mundo"
+    ? await generarTexto(
+        `Pregunta del mundo de hoy: «${preguntaDelDia(m.fecha)}»\n\n${m.autor} escribió: «${m.texto.replace(/»/g, "”")}»`,
+        `Estás en la «Pregunta del mundo» de la Comunidad Arcana: una conversación diaria SIN esoterismo entre personas de muchos países que escriben cada una en su idioma y se leen traducidas. Eres Sibila, la anfitriona: cálida, curiosa y breve.
+- Responde en 1 a 3 frases (máximo 240 caracteres), llamando a la persona por su nombre una vez y retomando algo concreto de lo que contó, con interés genuino por su país o su costumbre.
+- A veces (no siempre) termina con una pregunta corta para que siga contando, o invita a los de otros países a contar cómo es allá.
+- No hables de tarot, cartas, astrología ni lecturas salvo que la persona lo saque. Nada de religión ni política. No vendas nada.
+- Sin markdown, sin hashtags, un emoji como mucho. Escribe solo la respuesta.`,
+        { effort: "low", maxTokens: 400, nivel: "estandar", idioma },
+      )
+    : await generarTexto(
     `Carta del día en la comunidad: ${c.nombre}. ${frase(c.significado, 260)}\n\n${m.autor} escribió en la conversación de hoy: «${m.texto.replace(/»/g, "”")}»`,
     `Estás en la Comunidad Arcana, una conversación pública alrededor de la carta del día, como Sibila: cálida, cercana y breve.
 - Responde en 1 a 3 frases (máximo 280 caracteres), llamando a la persona por su nombre una vez, retomando lo que contó con sus palabras y conectándolo con la carta de hoy.
@@ -230,7 +245,7 @@ async function responderComoSibila(admin: Admin, m: Mensaje) {
   );
   const limpio = texto.replace(/^#+\s*/gm, "").replace(/\*\*/g, "").trim().slice(0, 500);
   if (!limpio) return;
-  await admin.from("comunidad_mensajes").insert({ fecha: m.fecha, autor: "Sibila", es_sibila: true, respuesta_a: m.respuesta_a ?? m.id, idioma, texto: limpio });
+  await admin.from("comunidad_mensajes").insert({ fecha: m.fecha, hilo: m.hilo, autor: "Sibila", es_sibila: true, respuesta_a: m.respuesta_a ?? m.id, idioma, texto: limpio });
 }
 
 /** Aviso (push) a la persona a la que respondieron, en el idioma de su perfil. */
@@ -245,7 +260,7 @@ async function avisarRespuesta(admin: Admin, m: Mensaje) {
   const idioma = esIdioma(perfil?.idioma) ? perfil.idioma : "es";
   const t = TEXTOS_COMUNIDAD[idioma];
   for (const s of subs ?? []) {
-    const r = await enviarPush(s, { titulo: t.avisoTitulo, cuerpo: t.avisoCuerpo(m.autor), url: `${idioma === "es" ? "" : `/${idioma}`}/comunidad#m${m.id}`, tag: "comunidad" });
+    const r = await enviarPush(s, { titulo: t.avisoTitulo, cuerpo: t.avisoCuerpo(m.autor), url: `${idioma === "es" ? "" : `/${idioma}`}/comunidad${m.hilo === "mundo" ? "?hilo=mundo" : ""}#m${m.id}`, tag: "comunidad" });
     if (r === "caducada") await admin.from("suscripciones_push").delete().eq("endpoint", s.endpoint);
   }
 }

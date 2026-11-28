@@ -12,7 +12,7 @@ const LARGO = 600;
 /** Cada cuánto se buscan mensajes nuevos mientras la página está abierta y visible. */
 const CADA_MS = 9000;
 
-export function VistaComunidad({ fecha, esHoy, conCuenta, inicial }: { fecha: string; esHoy: boolean; conCuenta: boolean; inicial: MensajeVista[] }) {
+export function VistaComunidad({ fecha, esHoy, conCuenta, inicial, hilo = "carta" }: { fecha: string; esHoy: boolean; conCuenta: boolean; inicial: MensajeVista[]; hilo?: "carta" | "mundo" }) {
   const { idioma } = useT();
   const t = TEXTOS_COMUNIDAD[idioma];
   const [mensajes, setMensajes] = useState(inicial);
@@ -25,11 +25,11 @@ export function VistaComunidad({ fecha, esHoy, conCuenta, inicial }: { fecha: st
   const caja = useRef<HTMLTextAreaElement>(null);
 
   const cargar = useCallback(async () => {
-    const r = await fetch(`/api/comunidad?fecha=${fecha}&idioma=${idioma}`, { cache: "no-store" }).catch(() => null);
+    const r = await fetch(`/api/comunidad?fecha=${fecha}&idioma=${idioma}&hilo=${hilo}`, { cache: "no-store" }).catch(() => null);
     if (!r?.ok) return;
     const d = (await r.json()) as { mensajes: MensajeVista[] };
     setMensajes(d.mensajes);
-  }, [fecha, idioma]);
+  }, [fecha, idioma, hilo]);
 
   useEffect(() => {
     if (!esHoy) return;
@@ -52,7 +52,7 @@ export function VistaComunidad({ fecha, esHoy, conCuenta, inicial }: { fecha: st
     setAviso(null);
     setEnviando(true);
     try {
-      const r = await fetch("/api/comunidad", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "publicar", texto, respuestaA: respondiendo?.id ?? null, idioma }) });
+      const r = await fetch("/api/comunidad", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "publicar", texto, respuestaA: respondiendo?.id ?? null, idioma, hilo }) });
       const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: keyof typeof t.errores; revision?: boolean };
       if (!d.ok) {
         setError(t.errores[d.error ?? "general"] ?? t.errores.general);
@@ -157,7 +157,7 @@ export function VistaComunidad({ fecha, esHoy, conCuenta, inicial }: { fecha: st
               onChange={(e) => setTexto(e.target.value.slice(0, LARGO))}
               rows={3}
               dir="auto"
-              placeholder={respondiendo ? t.placeholderRespuesta : t.placeholder}
+              placeholder={respondiendo ? t.placeholderRespuesta : hilo === "mundo" ? t.placeholderMundo : t.placeholder}
               className="campo w-full resize-none text-[0.97rem]"
             />
             <div className="flex items-center gap-3">

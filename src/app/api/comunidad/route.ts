@@ -2,12 +2,12 @@ import { after, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getUsuarioOpcional } from "@/lib/dal";
 import { fechaBogota, esFecha } from "@/lib/redes/carta-dia";
-import { EMOJIS, alternarReaccion, asegurarApertura, despuesDePublicar, esIdioma, listarMensajes, publicarMensaje, reportarMensaje, type Emoji } from "@/lib/comunidad/servidor";
+import { EMOJIS, alternarReaccion, asegurarApertura, despuesDePublicar, esHilo, esIdioma, listarMensajes, publicarMensaje, reportarMensaje, type Emoji } from "@/lib/comunidad/servidor";
 
 // Traducir los mensajes nuevos y moderar toman unos segundos.
 export const maxDuration = 60;
 
-/** Mensajes del día en el idioma de quien lee: GET /api/comunidad?fecha=AAAA-MM-DD&idioma=xx */
+/** Mensajes del día en el idioma de quien lee: GET /api/comunidad?fecha=AAAA-MM-DD&idioma=xx&hilo=carta|mundo */
 export async function GET(request: Request) {
   const q = new URL(request.url).searchParams;
   const hoy = fechaBogota();
@@ -15,8 +15,9 @@ export async function GET(request: Request) {
   const idioma = esIdioma(q.get("idioma")) ? q.get("idioma")! : "es";
   const admin = getSupabaseAdmin();
   const usuario = await getUsuarioOpcional();
-  if (fecha === hoy) await asegurarApertura(admin, fecha);
-  const mensajes = await listarMensajes(admin, fecha, idioma as Parameters<typeof listarMensajes>[2], usuario?.id ?? null);
+  const hilo = esHilo(q.get("hilo")) ? q.get("hilo") as "carta" | "mundo" : "carta";
+  if (fecha === hoy) await asegurarApertura(admin, fecha, hilo);
+  const mensajes = await listarMensajes(admin, fecha, idioma as Parameters<typeof listarMensajes>[2], usuario?.id ?? null, hilo);
   return NextResponse.json({ fecha, mensajes }, { headers: { "Cache-Control": "no-store" } });
 }
 
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
       respuestaA: Number.isInteger(Number(cuerpo.respuestaA)) && Number(cuerpo.respuestaA) > 0 ? Number(cuerpo.respuestaA) : null,
       idiomaPagina,
       fecha: fechaBogota(),
+      hilo: esHilo(cuerpo.hilo) ? cuerpo.hilo : "carta",
     });
     if (!r.ok) return NextResponse.json(r, { status: 400 });
     after(() => despuesDePublicar(admin, r.mensaje));

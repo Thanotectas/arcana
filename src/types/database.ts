@@ -150,6 +150,8 @@ type ComunidadMensajeRow = {
   texto: string;
   estado: "publicado" | "oculto" | "revision";
   motivo: string | null;
+  /** «carta» (la carta del día) o «mundo» (la pregunta del mundo, sin esoterismo). */
+  hilo: "carta" | "mundo";
   creado_en: string;
 };
 
@@ -738,7 +740,7 @@ export type Database = {
       };
       comunidad_mensajes: {
         Row: ComunidadMensajeRow;
-        Insert: Insertable<ComunidadMensajeRow, "id" | "usuario_id" | "es_sibila" | "respuesta_a" | "estado" | "motivo" | "creado_en">;
+        Insert: Insertable<ComunidadMensajeRow, "id" | "usuario_id" | "es_sibila" | "respuesta_a" | "estado" | "motivo" | "hilo" | "creado_en">;
         Update: Partial<ComunidadMensajeRow>;
         Relationships: [];
       };
