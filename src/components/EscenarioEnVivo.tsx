@@ -1,5 +1,6 @@
 "use client";
 
+import { TEXTOS_ESCENARIO, type IdiomaEscenario } from "@/lib/en-vivo-escenario-textos";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EscenaMesa } from "@/components/EscenaMesa";
 import { Bell } from "lucide-react";
@@ -63,40 +64,6 @@ type Respuesta =
 /** Segundos que el chat tiene para adivinar después de cada pista. */
 const SEGUNDOS_POR_PISTA = 17;
 
-const NOMBRE_TIPO: Record<TipoLectura, string> = {
-  tarot: "Tarot",
-  aura: "Lectura de aura",
-  numerologia: "Numerología",
-  horoscopo: "Horóscopo",
-  chocolate: "Lectura del chocolate",
-  mano: "Lectura de la mano",
-  huevo: "Limpia con huevo",
-  carta: "Carta astral",
-  sinastria: "Sinastría",
-  pendulo: "Péndulo",
-  iching: "I Ching",
-  runas: "Runas",
-  lenormand: "Lenormand",
-  baraja: "Baraja española",
-  chino: "Horóscopo chino",
-};
-
-/** Lo que se puede pedir en el chat: el recuadro de arriba lo va mostrando por turnos mientras no hay lectura. */
-// La carta astral y la sinastría salen la mitad del tiempo: son lo que el directo impulsa.
-const INSTRUCCIONES = [
-  { titulo: "Tu carta astral, dibujada en vivo", ejemplo: "carta astral 14/03/1985 10:30 Medellín" },
-  { titulo: "Sinastría · sus dos cielos juntos", ejemplo: "sinastría 14/03/1985 y 22/08/1990" },
-  { titulo: "Tarot · tres cartas para ti", ejemplo: "Leo, ¿me sale el trabajo?" },
-  { titulo: "Carta astral · sin la hora también", ejemplo: "carta astral 03/07/1992 Bogotá" },
-  { titulo: "Sinastría · ¿son compatibles?", ejemplo: "sinastría 25/11/1989 y 09/02/1994" },
-  { titulo: "Horóscopo · tu cielo de hoy", ejemplo: "horóscopo Piscis" },
-  { titulo: "Aura · el color de tu energía", ejemplo: "aura: ando muy cansada" },
-  { titulo: "Numerología · lo que trae tu año", ejemplo: "mi año 14/03/1985" },
-  { titulo: "Péndulo · sí o no", ejemplo: "péndulo: ¿me escribe esta semana?" },
-  { titulo: "I Ching · el libro de los cambios", ejemplo: "I Ching: ¿cambio de trabajo?" },
-  { titulo: "Runas · tres piedras para ti", ejemplo: "runas: ¿qué viene en el amor?" },
-  { titulo: "Horóscopo chino · tu animal", ejemplo: "horóscopo chino 1990" },
-];
 /** Frases de espera de Sibila (FRASES_PUENTE en src/lib/en-vivo.ts). */
 const FRASES_PUENTE = 15;
 /** Frases de después de la despedida (frasesCierre en src/lib/en-vivo.ts). */
@@ -215,7 +182,9 @@ function MarcoCamara({
   ganador,
   pequeno = false,
   children,
+  leePara = "Sibila lee para",
 }: {
+  leePara?: string;
   posicion: string;
   etiqueta: string;
   nivel: number;
@@ -253,7 +222,7 @@ function MarcoCamara({
       </div>
       {lectura && !pequeno && (
         <div key={`para-${lectura.id}`} className="aparecer absolute -top-5 right-6 max-w-[60%] truncate rounded-full border px-4 py-1 text-xl text-texto" style={{ borderColor: conAlfa(color, 0.8), background: "rgba(22,13,51,0.95)", boxShadow: `0 0 18px ${conAlfa(color, 0.5)}` }}>
-          ✦ Sibila lee para <span className="text-oro-suave">{lectura.autor}</span>
+          ✦ {leePara} <span className="text-oro-suave">{lectura.autor}</span>
         </div>
       )}
     </div>
@@ -272,6 +241,7 @@ export function EscenarioEnVivo({
   soloPreguntas = false,
   vozPresentador = false,
   musica = 0,
+  idioma = "es",
 }: {
   clave: string;
   qr: string;
@@ -291,7 +261,10 @@ export function EscenarioEnVivo({
   vozPresentador?: boolean;
   /** Volumen (0 a 1) de la música de Arcana de fondo; 0 la apaga. Baja sola mientras hay una lectura. */
   musica?: number;
+  /** Idioma de lo fijo en pantalla y de lo que Sibila dice por su cuenta (&idioma=ar: el vivo en árabe de Instagram). */
+  idioma?: IdiomaEscenario;
 }) {
+  const tx = TEXTOS_ESCENARIO[idioma];
   const xl = vertical && camaraCompleta;
   // Vertical (1080×1920) para TikTok: Sibila arriba, la lectura en el medio y abajo, donde TikTok pone
   // los comentarios, solo lo secundario. Misma lógica (voz, fila, oráculos, relleno, cierre).
@@ -355,9 +328,9 @@ export function EscenarioEnVivo({
   }, [musica, bajarMusica, cierre]);
 
   useEffect(() => {
-    const id = setInterval(() => setInstruccion((n) => (n + 1) % INSTRUCCIONES.length), 7000);
+    const id = setInterval(() => setInstruccion((n) => (n + 1) % tx.instrucciones.length), 7000);
     return () => clearInterval(id);
-  }, []);
+  }, [tx.instrucciones.length]);
 
   useEffect(() => {
     const ajustar = () => setEscala(Math.min(window.innerWidth / W, window.innerHeight / H));
@@ -370,7 +343,7 @@ export function EscenarioEnVivo({
     async (modo: "lectura" | "puente" | "relleno" | "cierre" | "estado" | "juego-estado" | "juego-fin", i = 0): Promise<Respuesta | null> => {
       try {
         // En vertical (TikTok) Sibila no nombra páginas, códigos ni otras redes: TikTok restringe los LIVE que sacan gente de la app.
-        const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}${vertical ? "&tiktok=1" : ""}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
+        const res = await fetch(`/api/en-vivo/siguiente?modo=${modo}&i=${i}${vertical ? "&tiktok=1" : ""}${idioma === "ar" ? "&idioma=ar" : ""}&clave=${encodeURIComponent(clave)}`, { cache: "no-store" });
         if (res.status === 401) {
           setAviso("Clave del escenario inválida: copia otra vez la dirección desde /admin/en-vivo.");
           return null;
@@ -380,7 +353,7 @@ export function EscenarioEnVivo({
         return null;
       }
     },
-    [clave, vertical],
+    [clave, vertical, idioma],
   );
 
   // El principal publica cada paso para el espejo (sin esperar: si falla, el principal sigue igual).
@@ -759,7 +732,7 @@ export function EscenarioEnVivo({
             {/* Cámara completa: el presentador ocupa la mitad de arriba (960×820) y se ve que hay una persona en vivo;
                 Sibila lee desde un círculo abajo, con sus subtítulos, y las cartas van compactas entre los dos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1400 }} nivel={nivel} modo="cielo" />
-            <MarcoCamara posicion="left-[60px] right-[60px] top-[110px] h-[820px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
+            <MarcoCamara leePara={tx.leePara} posicion="left-[60px] right-[60px] top-[110px] h-[820px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
               <EscenaMesa pista="Aquí va tu cámara: ponla encima y ajústala a este marco (960 × 820)" />
             </MarcoCamara>
             <div className="absolute left-[60px] top-[1395px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
@@ -779,7 +752,7 @@ export function EscenarioEnVivo({
             {/* Cámara grande: TikTok marca como «contenido pregrabado» un LIVE donde la persona ocupa un rincón. Aquí la
                 cámara del presentador es lo principal (arriba, 860×484) y Sibila habla desde un círculo junto a sus subtítulos. */}
             <CieloEnVivo ancho={W} alto={H} centro={{ x: 540, y: 1330 }} nivel={nivel} modo="cielo" />
-            <MarcoCamara posicion="left-[110px] right-[110px] top-[118px] h-[484px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
+            <MarcoCamara leePara={tx.leePara} posicion="left-[110px] right-[110px] top-[118px] h-[484px]" etiqueta="En vivo · mi mesa" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null}>
               <EscenaMesa pista="Aquí va tu cámara: ponla encima, del mismo tamaño" />
             </MarcoCamara>
             <div className="absolute left-[96px] top-[1262px] z-10 h-[150px] w-[150px] overflow-hidden rounded-full border-4 border-oro/70 bg-[#160d33]" style={{ boxShadow: "0 0 30px rgba(241,217,154,0.35)" }}>
@@ -814,7 +787,7 @@ export function EscenarioEnVivo({
             {/* Todo lo importante queda entre x 110 y 970: en celulares altos (19,5:9) TikTok recorta ~96 px por lado. */}
             {/* La mesa en vivo: recuadro (16:9) donde LIVE Studio pone, encima, la cámara de las manos, la vela y la baraja.
                 TikTok castiga como «pregrabado» un LIVE sin nada en tiempo real; así se ve que hay alguien, sin mostrar la cara. */}
-            <MarcoCamara posicion="right-[110px] top-[400px] h-[214px] w-[380px]" etiqueta="Mi mesa · en vivo" nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null} pequeno>
+            <MarcoCamara leePara={tx.leePara} posicion="right-[110px] top-[400px] h-[214px] w-[380px]" etiqueta={tx.miMesa} nivel={nivel} lectura={cierre === "abierto" ? lectura : null} volteadas={volteadas} ganador={juego?.ganador ?? null} pequeno>
               <EscenaMesa pista="Aquí va la cámara de la mesa" />
             </MarcoCamara>
           </>
@@ -831,11 +804,11 @@ export function EscenarioEnVivo({
               <Marca tamano={52} />
               <div>
                 <p className="font-display text-4xl leading-none text-oro-suave">Arcana</p>
-                <p className="text-base uppercase tracking-[0.3em] text-violeta-suave">Sibila en vivo</p>
+                <p className="text-base uppercase tracking-[0.3em] text-violeta-suave">{tx.sibilaEnVivo}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 rounded-full border border-red-400/50 bg-red-500/15 px-5 py-2 text-xl font-semibold text-red-200">
-              <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> EN VIVO
+              <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> {tx.enVivo}
             </div>
           </div>
         ) : (
@@ -844,7 +817,7 @@ export function EscenarioEnVivo({
             <Marca tamano={64} />
             <div>
               <p className="font-display text-5xl text-oro-suave">Arcana</p>
-              <p className="text-xl uppercase tracking-[0.35em] text-violeta-suave">Sibila en vivo</p>
+              <p className="text-xl uppercase tracking-[0.35em] text-violeta-suave">{tx.sibilaEnVivo}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -852,7 +825,7 @@ export function EscenarioEnVivo({
               <Bell className="h-6 w-6 vivo-campana" aria-hidden /> Suscríbete y activa la campanita
             </div>
             <div className="flex items-center gap-3 rounded-full border border-red-400/50 bg-red-500/15 px-6 py-3 text-2xl font-semibold text-red-200">
-              <span className="h-4 w-4 animate-pulse rounded-full bg-red-500" /> EN VIVO
+              <span className="h-4 w-4 animate-pulse rounded-full bg-red-500" /> {tx.enVivo}
             </div>
           </div>
         </div>
@@ -890,7 +863,7 @@ export function EscenarioEnVivo({
             </div>
           </div>
           <p className="mt-5 font-display text-5xl text-oro-suave">Sibila</p>
-          <p className="mt-1 text-xl text-texto-suave">Lecturas en vivo · Arcana</p>
+          <p className="mt-1 text-xl text-texto-suave">{tx.lecturasEnVivo}</p>
         </div>
         )}
 
@@ -928,25 +901,25 @@ export function EscenarioEnVivo({
         )}
 
         {/* Pregunta */}
-        <div key={lectura?.id ?? "espera"} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/55 aparecer ${xl ? "top-[950px] px-6 py-3" : vertical ? "top-[650px] px-7 py-4" : escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
+        <div key={lectura?.id ?? "espera"} dir={idioma === "ar" ? "rtl" : undefined} className={`absolute ${derecha} rounded-3xl border border-oro/30 bg-black/55 aparecer ${xl ? "top-[950px] px-6 py-3" : vertical ? "top-[650px] px-7 py-4" : escena ? "top-[120px] px-8 py-5" : "top-[180px] px-10 py-6"}`}>
           {cierre !== "abierto" ? (
             <>
-              <p className="text-2xl text-violeta-suave">Se acabó el tiempo por esta noche</p>
-              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>Gracias por acompañarnos ✦</p>
+              <p className="text-2xl text-violeta-suave">{tx.seAcabo}</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>{tx.gracias}</p>
             </>
           ) : lectura ? (
             <>
               <p className="text-2xl text-violeta-suave">
-                {NOMBRE_TIPO[lectura.tipo]} · {lectura.autor}
+                {tx.tipos[lectura.tipo]} · {lectura.autor}
                 {lectura.origen === "facebook" ? " · Facebook" : lectura.origen === "instagram" ? " · Instagram" : ""}
                 {lectura.signo ? ` · ${lectura.signo}` : ""}
               </p>
-              <p className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `Lectura para ${lectura.autor}`}</p>
+              <p dir="auto" className={`mt-2 line-clamp-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>{lectura.pregunta ? `«${lectura.pregunta}»` : `${tx.lecturaPara} ${lectura.autor}`}</p>
             </>
           ) : (
             <div key={instruccion} className="aparecer">
-              <p className="text-2xl text-violeta-suave">{vertical ? "Escribe en los comentarios" : "Escribe en el chat"} · {INSTRUCCIONES[instruccion].titulo}</p>
-              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>«{INSTRUCCIONES[instruccion].ejemplo}»</p>
+              <p className="text-2xl text-violeta-suave">{vertical ? tx.escribeComentarios : tx.escribeChat} · {tx.instrucciones[instruccion % tx.instrucciones.length].titulo}</p>
+              <p className={`mt-2 font-display leading-tight text-oro-suave ${compacto ? "text-[36px]" : "text-[44px]"}`}>«{tx.instrucciones[instruccion % tx.instrucciones.length].ejemplo}»</p>
             </div>
           )}
         </div>
@@ -955,9 +928,9 @@ export function EscenarioEnVivo({
         {cierre !== "abierto" ? (
           <div className={`absolute ${derecha} flex flex-col items-center justify-center gap-6 text-center aparecer ${xl ? "top-[1090px] h-[300px]" : vertical ? "top-[800px] h-[420px]" : escena ? "top-[300px] h-[440px]" : "top-[400px] h-[460px]"}`}>
             <Bell className={`text-oro-suave vivo-campana ${compacto ? "h-24 w-24" : "h-32 w-32"}`} aria-hidden />
-            <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>{vertical ? "Sígueme y activa las notificaciones" : "Suscríbete y activa la campanita"}</p>
-            <p className={`text-texto ${compacto ? "text-[26px]" : "text-[32px]"}`}>para enterarte del próximo directo de Sibila</p>
-            <p className={`text-violeta-suave ${compacto ? "text-[24px]" : "text-[28px]"}`}>Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
+            <p className={`font-display leading-tight text-oro-suave ${compacto ? "text-[44px]" : "text-[56px]"}`}>{vertical ? tx.sigueme : tx.suscribete}</p>
+            <p className={`text-texto ${compacto ? "text-[26px]" : "text-[32px]"}`}>{tx.proximo}</p>
+            <p className={`text-violeta-suave ${compacto ? "text-[24px]" : "text-[28px]"}`}>{tx.cartaGratis} <span className="text-oro-suave">miarcana.com</span></p>
           </div>
         ) : !lectura || (Boolean(lectura.cartas?.length) && !lectura.grafico) ? (
         <div
@@ -968,7 +941,7 @@ export function EscenarioEnVivo({
             const visible = Boolean(lectura && c.id && volteadas > i);
             return (
               <div key={i} className={`flex flex-col items-center ${compacto ? "w-[210px]" : "w-[250px]"}`}>
-                <p className={`mb-3 uppercase tracking-[0.2em] text-violeta-suave ${compacto ? "text-base" : "text-xl"}`}>{c.posicion}</p>
+                <p className={`mb-3 uppercase tracking-[0.2em] text-violeta-suave ${compacto ? "text-base" : "text-xl"}`}>{tx.posiciones[c.posicion] ?? c.posicion}</p>
                 <div className={`relative vivo-carta ${compacto ? "h-[330px] w-[190px]" : "h-[400px] w-[230px]"}`} style={{ perspective: 1200, animationDelay: `${i * 0.7}s` }}>
                   <div className="absolute inset-0 transition-transform duration-700" style={{ transformStyle: "preserve-3d", transform: visible ? "rotateY(180deg)" : "none" }}>
                     <div className="absolute inset-0 flex items-center justify-center rounded-2xl border-4 border-oro/70" style={{ backfaceVisibility: "hidden", background: "repeating-linear-gradient(45deg, #2a1a5e 0 14px, #21134d 14px 28px)" }}>
@@ -1068,7 +1041,7 @@ export function EscenarioEnVivo({
         {/* En el modo presentador no hay subtítulos: la lectura la dice quien presenta y no debe tapar la carta. */}
         {!vozPresentador && !(cierre === "fin" && !subtitulo) && (
         <div className={`absolute flex min-h-[110px] items-center justify-center rounded-3xl px-12 py-4 ${xl ? "left-[230px] right-[60px] top-[1395px] bg-black/60" : vertical ? `${camaraGrande ? "left-[262px]" : "left-[100px]"} right-[100px] top-[1275px] bg-black/60` : escena ? "bottom-[80px] left-16 right-[770px] bg-black/60" : "bottom-[80px] left-16 right-16 bg-black/45"}`}>
-          <p key={subtitulo} className={`text-center leading-snug text-texto aparecer ${xl ? "text-[30px]" : compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
+          <p key={subtitulo} dir="auto" className={`text-center leading-snug text-texto aparecer ${xl ? "text-[30px]" : compacto ? "text-[34px]" : "text-[38px]"}`}>{subtitulo}</p>
         </div>
         )}
 
@@ -1076,11 +1049,20 @@ export function EscenarioEnVivo({
         {vertical ? (
           <div className="absolute bottom-10 left-[110px] right-[110px] space-y-2 text-center text-2xl text-violeta-suave">
             {cierre !== "abierto" ? (
-              <p>✦ Gracias por acompañarnos ✦ Tu carta del día es gratis en <span className="text-oro-suave">miarcana.com</span></p>
+              <p dir="auto">✦ {tx.gracias} {tx.cartaGratis} <span className="text-oro-suave">miarcana.com</span></p>
             ) : (
               <>
-                <p>Escribe en los comentarios tu <span className="text-oro-suave">signo y tu pregunta</span></p>
-                <p><span className="text-oro-suave">carta astral</span> + fecha · <span className="text-oro-suave">sinastría</span> + dos fechas · <span className="text-oro-suave">péndulo</span></p>
+                {idioma === "ar" ? (
+                  <>
+                    <p dir="rtl">{tx.ayuda[0]}</p>
+                    <p dir="rtl" className="text-oro-suave">{tx.ayuda[1]}</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Escribe en los comentarios tu <span className="text-oro-suave">signo y tu pregunta</span></p>
+                    <p><span className="text-oro-suave">carta astral</span> + fecha · <span className="text-oro-suave">sinastría</span> + dos fechas · <span className="text-oro-suave">péndulo</span></p>
+                  </>
+                )}
               </>
             )}
           </div>

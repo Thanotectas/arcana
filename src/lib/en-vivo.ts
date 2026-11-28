@@ -840,9 +840,34 @@ export function frasesPuenteTikTok() {
   ].slice(0, FRASES_PUENTE);
 }
 
-export async function audioPuente(admin: Admin, i: number, tiktok = false) {
-  const codigo = tiktok ? null : await codigoVigente(admin).catch(() => null);
-  const frases = tiktok ? frasesPuenteTikTok() : frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
+/**
+ * Frases de espera del vivo en árabe (Instagram). Sibila responde cada pregunta en el idioma en que se la escriben;
+ * esto es solo lo que dice por su cuenta entre lecturas. Solo pide lo que el vivo sabe leer en árabe: una pregunta
+ * para el tarot, el signo (برج), la fecha de nacimiento (numerología) y la carta astral o el توافق con fechas.
+ */
+export function frasesPuenteArabe() {
+  return [
+    "أهلًا وسهلًا بكم، أنا سيبيلا. الليلة أقرأ لكم مباشرة: اكتبوا سؤالكم في التعليقات، وأختار لكم ثلاث أوراق من التاروت.",
+    "اكتب برجك في التعليقات، مثل: برج الأسد أو برج الحوت، وأقرأ لك ما تحمله لك السماء اليوم.",
+    "هل تريد أن ترى خريطتك الفلكية مرسومة هنا، كوكبًا بعد كوكب؟ اكتب: خريطة فلكية، وتاريخ ميلادك، والمدينة التي وُلدت فيها.",
+    "هل في قلبك شخص؟ اكتب: توافق، ثم تاريخ ميلادك وتاريخ ميلاده، وأرسم لكما سماءكما معًا.",
+    "اكتب تاريخ ميلادك، اليوم والشهر والسنة، وأقرأ لك الرقم الذي يرافقك هذه السنة.",
+    "أقرأ بالترتيب، وأبدأ بمن لم يحصل على قراءته بعد الليلة. اكتب سؤالك، فدورك قادم.",
+    "إن أعجبك هذا اللقاء، تابع الحساب وفعّل التنبيهات، لأخبرك في كل مرة أعود فيها للقراءة مباشرة.",
+    "اكتب لي بلغتك: العربية أو الإنجليزية أو الفرنسية أو التركية… وأقرأ لك بلغتك.",
+    "وإن أردت قراءة أعمق وبهدوء، فالقراءة الكاملة لاسمك بعلم الحروف تنتظرك على موقع أركانا، والرابط في البايو.",
+    "سؤال بنعم أو لا؟ اكتب: بندول، ثم سؤالك، وأرى ما يقوله لك.",
+    "شاركوا هذا البث مع من يحتاج إلى إشارة اليوم: كلما كنا أكثر، قرأنا أسئلة أكثر معًا.",
+    "لا تحتاج إلى معرفة شيء عن الفلك: يكفي تاريخ ميلادك ومدينتك. اكتب خريطة فلكية وانظر كيف تظهر سماؤك على الشاشة.",
+    "اكتب سؤالك عن الحب أو العمل أو الطريق، بكلماتك أنت، وأسحب لك الأوراق.",
+    "ورقة يومك مجانية كل يوم على موقع أركانا. والرابط في البايو.",
+    "شكرًا على القلوب وعلى بقائكم معي. كل سؤال تكتبونه يساعدني لأقرأ أفضل للجميع.",
+  ].slice(0, FRASES_PUENTE);
+}
+
+export async function audioPuente(admin: Admin, i: number, tiktok = false, idioma = "es") {
+  const codigo = tiktok || idioma === "ar" ? null : await codigoVigente(admin).catch(() => null);
+  const frases = idioma === "ar" ? frasesPuenteArabe() : tiktok ? frasesPuenteTikTok() : frasesPuente(codigo ? { codigo: codigo.codigo, creditos_extra: codigo.creditos_extra } : null);
   const texto = frases[((i % frases.length) + frases.length) % frases.length];
   return { texto, audio: await vozGuardada(admin, texto) };
 }
@@ -864,8 +889,14 @@ export function frasesCierre() {
   ];
 }
 
-export async function audioCierre(admin: Admin, i: number, tiktok = false) {
-  const frases = tiktok
+export async function audioCierre(admin: Admin, i: number, tiktok = false, idioma = "es") {
+  const frases = idioma === "ar"
+    ? [
+        "انتهت قراءة الليلة المباشرة. شكرًا لأنكم كنتم معي، ولكل سؤال.",
+        "سأعود قريبًا للقراءة مباشرة. تابع الحساب وفعّل التنبيهات لأخبرك.",
+        "ورقة يومك مجانية كل يوم على موقع أركانا، والرابط في البايو. تصبحون على خير.",
+      ]
+    : tiktok
     ? [
         "La lectura en vivo de esta noche terminó. Gracias por acompañarme y por cada pregunta.",
         "Pronto vuelvo a leer en vivo. Sígueme y activa las notificaciones, para que te avise cuando empiece.",
@@ -918,7 +949,7 @@ export async function estadoCierre(admin: Admin): Promise<"abierto" | "despedirs
  * alcanzó, el código si sigue vigente y la invitación a suscribirse. Marca la
  * despedida para que el escenario no la repita si se recarga.
  */
-export async function despedida(admin: Admin) {
+export async function despedida(admin: Admin, idioma = "es") {
   await admin.from("en_vivo_estado").update({ despedida_en: new Date().toISOString() }).eq("id", 1);
   const desde = new Date(Date.now() - 6 * 3_600_000).toISOString();
   const [{ count: leidas }, { count: pendientes }, codigo] = await Promise.all([
@@ -935,7 +966,16 @@ export async function despedida(admin: Admin) {
     "Si te gustó, sígueme y activa las notificaciones, para que te avise del próximo directo. Y durante la semana te espero en nuestro grupo de Facebook: mi arcana punto com, barra, grupo. Todas mis redes, en mi arcana punto com, barra, redes.",
     "Que las cartas te sean favorables. Buenas noches.",
   ];
-  const texto = partes.filter(Boolean).join(" ");
+  const texto =
+    idioma === "ar"
+      ? [
+          `انتهى وقتنا لهذه الليلة. شكرًا لأنكم كنتم معي${leidas ? `: قرأنا اليوم ${leidas} ${leidas === 1 ? "سؤالًا" : "أسئلة"}` : ""}.`,
+          pendientes ? "ولمن لم أصل إلى سؤاله، شكرًا على صبركم: سؤالكم يستحق الهدوء، وتجدون القراءة الكاملة على موقع أركانا، والرابط في البايو." : "",
+          "إن أعجبكم اللقاء، تابعوا الحساب وفعّلوا التنبيهات لأخبركم بالبث القادم. تصبحون على خير.",
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : partes.filter(Boolean).join(" ");
   let audio: string | null = null;
   if (vozConfigurada()) {
     try {

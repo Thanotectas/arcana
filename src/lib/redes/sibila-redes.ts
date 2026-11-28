@@ -244,7 +244,8 @@ async function fotosHoy(admin: SupabaseClient<Database>) {
 }
 
 function sinAcentos(t: string) {
-  return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  // También sin las marcas árabes (hamza, vocales cortas): «الأسد» se compara como «الاسد».
+  return t.normalize("NFD").replace(/[\u0300-\u036f\u064b-\u065f\u0670]/g, "").toLowerCase();
 }
 
 /**
@@ -253,18 +254,18 @@ function sinAcentos(t: string) {
  * en inglés y en español es una palabra corriente.
  */
 const OTROS_NOMBRES: Record<string, string[]> = {
-  aries: ["belier", "widder"],
-  tauro: ["taurus", "touro", "taureau", "stier"],
-  geminis: ["gemini", "gemeos", "gemeaux", "zwillinge"],
-  cancer: ["krebs"],
-  leo: ["leao", "lowe", "loewe"],
-  virgo: ["virgem", "vierge", "jungfrau"],
-  libra: ["waage"],
-  escorpio: ["scorpio", "escorpiao", "scorpion", "skorpion"],
-  sagitario: ["sagittarius", "sagittaire", "schutze", "schuetze"],
-  capricornio: ["capricorn", "capricorne", "steinbock"],
-  acuario: ["aquarius", "aquario", "verseau", "wassermann"],
-  piscis: ["pisces", "peixes", "poissons", "fische"],
+  aries: ["belier", "widder", "برج الحمل"],
+  tauro: ["taurus", "touro", "taureau", "stier", "الثور"],
+  geminis: ["gemini", "gemeos", "gemeaux", "zwillinge", "الجوزاء", "الجوزا"],
+  cancer: ["krebs", "السرطان"],
+  leo: ["leao", "lowe", "loewe", "الاسد"],
+  virgo: ["virgem", "vierge", "jungfrau", "العذراء", "العذرا"],
+  libra: ["waage", "الميزان"],
+  escorpio: ["scorpio", "escorpiao", "scorpion", "skorpion", "العقرب"],
+  sagitario: ["sagittarius", "sagittaire", "schutze", "schuetze", "القوس"],
+  capricornio: ["capricorn", "capricorne", "steinbock", "الجدي"],
+  acuario: ["aquarius", "aquario", "verseau", "wassermann", "الدلو"],
+  piscis: ["pisces", "peixes", "poissons", "fische", "الحوت"],
 };
 
 /** Signo mencionado en el texto (por nombre, sin acentos, también en inglés o portugués); si hay varios, el que aparece primero. */

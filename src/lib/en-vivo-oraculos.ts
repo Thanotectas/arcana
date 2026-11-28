@@ -19,7 +19,7 @@ export const ORACULOS_VIVO: OraculoVivo[] = ["pendulo", "iching", "runas", "leno
 
 /** Cómo se pide cada uno en el chat (español, inglés, portugués, francés, alemán). */
 const PIDE: Record<OraculoVivo, RegExp> = {
-  pendulo: /p[eéê]ndul|pendulum/,
+  pendulo: /p[eéê]ndul|pendulum|بندول/,
   iching: /\bi[\s-]?ching\b|\byi[\s-]?jing\b|libro de los cambios|book of changes|livro das muta/,
   runas: /\brun(a|as|e|es|en)\b/,
   lenormand: /lenormand/,

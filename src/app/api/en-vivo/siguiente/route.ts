@@ -38,11 +38,14 @@ export async function GET(request: NextRequest) {
   if (!claveValida(q.get("clave"))) return NextResponse.json({ error: "clave" }, { status: 401 });
   const admin = getSupabaseAdmin();
   await latido(admin).catch(() => null);
+  // ?idioma=ar: el vivo en árabe (Instagram). Las lecturas igual salen en el idioma de cada pregunta; esto cambia lo
+  // que Sibila dice por su cuenta, y sin lecturas de relleno ni juego (sus textos están en español).
+  const idioma = q.get("idioma") === "ar" ? "ar" : "es";
   if (q.get("modo") === "puente") {
-    return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1")) }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ clase: "puente", ...(await audioPuente(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1", idioma)) }, { headers: { "Cache-Control": "no-store" } });
   }
   if (q.get("modo") === "cierre") {
-    return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1")) }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ clase: "puente", ...(await audioCierre(admin, Number(q.get("i") ?? 0) || 0, q.get("tiktok") === "1", idioma)) }, { headers: { "Cache-Control": "no-store" } });
   }
   // «La carta escondida»: mientras Sibila da las pistas, el escenario pregunta si alguien ya la encontró
   // (?modo=juego-estado, que también lee el chat) y al final pide la revelación (?modo=juego-fin).
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest) {
   const pausa = await enPausa(admin).catch(() => false);
   if (q.get("modo") === "estado" || pausa) return NextResponse.json({ clase: pausa ? "pausa" : "ok" }, { headers: { "Cache-Control": "no-store" } });
   const cierre = await estadoCierre(admin).catch(() => "abierto" as const);
-  if (cierre === "despedirse") return NextResponse.json({ clase: "despedida", ...(await despedida(admin)) }, { headers: { "Cache-Control": "no-store" } });
+  if (cierre === "despedirse") return NextResponse.json({ clase: "despedida", ...(await despedida(admin, idioma)) }, { headers: { "Cache-Control": "no-store" } });
   if (cierre === "terminado") return NextResponse.json({ clase: "fin" }, { headers: { "Cache-Control": "no-store" } });
   // El chat de YouTube y los comentarios del directo de Facebook entran a la misma fila.
   const [chat, facebook, , instagram] = await Promise.all([
@@ -84,7 +87,7 @@ export async function GET(request: NextRequest) {
   // El relleno solo corre con un directo al aire (OBS abierto sin transmitir no gasta lecturas).
   const alAire = Boolean(chat?.directo || facebook?.directo || instagram?.directo);
   // El juego empieza si se pidió desde el panel o, sin nadie en la fila, como relleno (cada 20 minutos como mucho).
-  const juego = await juegoSiToca(admin, q.get("modo") === "relleno" && alAire).catch((e: unknown) => {
+  const juego = await juegoSiToca(admin, q.get("modo") === "relleno" && alAire && idioma === "es").catch((e: unknown) => {
     console.error("[en vivo] juego:", e instanceof Error ? e.message : e);
     return null;
   });
@@ -92,7 +95,7 @@ export async function GET(request: NextRequest) {
   let lectura: Awaited<ReturnType<typeof siguienteLectura>> = null;
   let error: string | null = null;
   try {
-    lectura = q.get("modo") === "relleno" && alAire ? await lecturaDeRelleno(admin) : await siguienteLectura(admin);
+    lectura = q.get("modo") === "relleno" && alAire && idioma === "es" ? await lecturaDeRelleno(admin) : await siguienteLectura(admin);
   } catch (e) {
     error = e instanceof Error ? e.message : String(e);
     console.error("[en vivo] lectura:", error);
