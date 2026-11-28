@@ -15,6 +15,7 @@ import { cookies, headers } from "next/headers";
 import { precioUSDPara } from "./paridad";
 import { COOKIE_CODIGO, validarCodigo } from "./codigos";
 import { origenPendiente } from "../origen";
+import { registrarEventoCompra } from "../eventos-compra";
 import { codigoPromo, promoActiva } from "../promo";
 
 /** Código de oferta del formulario o de la cookie del enlace corto; si vale para el paquete, créditos extra. */
@@ -33,6 +34,7 @@ export async function accionComprar(formData: FormData) {
   // En la app de Google Play no se vende (Play exige su facturación).
   if (!(await comprasVisibles())) redirect("/creditos");
   const idPaquete = String(formData.get("paquete") ?? "");
+  await registrarEventoCompra("toco_comprar", { paquete: idPaquete, via: String(formData.get("via") ?? "") || "pagina" });
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?error=paquete");
   if (!pagosConfigurados()) redirect("/creditos?error=config");
@@ -78,6 +80,7 @@ export async function accionComprar(formData: FormData) {
 export async function accionComprarInternacional(formData: FormData) {
   if (!(await comprasVisibles())) redirect("/creditos");
   const idPaquete = String(formData.get("paquete") ?? "");
+  await registrarEventoCompra("toco_comprar", { paquete: idPaquete, via: String(formData.get("via") ?? "") || "pagina" });
   const paquete = paquetePorId(idPaquete);
   if (!paquete) redirect("/creditos?moneda=usd&error=paquete");
   if (idPaquete === OFERTA_FUNDADORES.id && !(await estadoOfertaFundadores()).activa) redirect("/creditos?moneda=usd&error=oferta");
@@ -156,6 +159,7 @@ export async function accionCompraRapida(formData: FormData) {
   const pais = (await headers()).get("x-vercel-ip-country") ?? "CO";
   const datos = new FormData();
   datos.set("paquete", "inicial");
+  datos.set("via", "rapida");
   const codigo = formData.get("codigo");
   if (codigo) datos.set("codigo", String(codigo));
   if (pais !== "CO" && proveedorInternacional(user.email)) return accionComprarInternacional(datos);

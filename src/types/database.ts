@@ -309,6 +309,18 @@ type ChatVisitaRow = {
   creado_en: string;
 };
 
+/** Embudo de compra (migración 0085): ver paquetes, ver la invitación sin créditos, tocar «comprar». */
+type EventoCompraRow = {
+  id: number;
+  usuario_id: string | null;
+  evento: "vio_paquetes" | "vio_invitacion" | "toco_comprar";
+  paquete: string | null;
+  via: string | null;
+  pais: string | null;
+  idioma: string | null;
+  creado_en: string;
+};
+
 type ClicRedesRow = {
   id: number;
   fecha: string;
@@ -698,6 +710,12 @@ export type Database = {
         Row: MetricaRedesRow;
         Insert: Insertable<MetricaRedesRow, "id" | "formato" | "vistas" | "alcance" | "me_gusta" | "comentarios" | "guardados" | "compartidos" | "detalle" | "actualizado_en">;
         Update: Partial<MetricaRedesRow>;
+        Relationships: [];
+      };
+      eventos_compra: {
+        Row: EventoCompraRow;
+        Insert: Insertable<EventoCompraRow, "id" | "usuario_id" | "paquete" | "via" | "pais" | "idioma" | "creado_en">;
+        Update: Partial<EventoCompraRow>;
         Relationships: [];
       };
       clics_redes: {

@@ -1,3 +1,4 @@
+import { registrarEventoCompra } from "@/lib/eventos-compra";
 import { codigoPromo, promoActiva } from "@/lib/promo";
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
@@ -51,6 +52,7 @@ export default async function PaginaCreditos({ searchParams }: { searchParams: P
   const usd = (centavos: number) => precioUSDPara(centavos, pais);
   const precio = (p: { precioCOP: number; precioUSDCentavos: number }) =>
     internacional ? <PrecioDolares usdCentavos={usd(p.precioUSDCentavos)} /> : <PrecioPrincipal cop={p.precioCOP} usdCentavos={usd(p.precioUSDCentavos)} />;
+  await registrarEventoCompra("vio_paquetes");
   const miembro = circuloActivo(perfil);
   if (!(await comprasVisibles())) {
     return (

@@ -51,7 +51,7 @@ export interface ResumenSemanal {
    * cuántas gastaron los créditos de regalo; de todas las personas, cuántas abrieron
    * una orden (intentaron pagar) y cuántas pagaron.
    */
-  embudo: { nuevas: number; conLectura: number; sinCreditos: number; intentaron: number; pagaron: number; noCompletadas: number; huevo: number };
+  embudo: { nuevas: number; conLectura: number; sinCreditos: number; vieronInvitacion: number; vieronPaquetes: number; tocaronComprar: number; intentaron: number; pagaron: number; noCompletadas: number; huevo: number };
   /**
    * De las redes a la web: comentarios y mensajes que respondió Sibila (los árabes aparte), personas que pidieron la
    * lectura por la palabra clave, visitas que llegaron desde redes, y cuentas y pagos de esas personas.
@@ -172,7 +172,13 @@ export async function calcularResumen(admin: SupabaseClient<Database>, hoy = fec
   const idsNuevas = new Set((nuevasPerfiles ?? []).map((p) => p.id));
   const { data: todasOrdenesCrudas } = await admin.from("ordenes").select("usuario_id, estado").eq("es_prueba", false).gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(5000);
   const todasOrdenes = deCliente(todasOrdenesCrudas);
+  // Eventos del embudo de compra (migración 0085), personas distintas y sin las cuentas de administración.
+  const { data: eventosCompra } = await admin.from("eventos_compra").select("usuario_id, evento").gte("creado_en", iso(desde)).lt("creado_en", iso(hasta)).limit(20000);
+  const personas = (evento: string) => new Set(deCliente((eventosCompra ?? []).filter((e) => e.evento === evento && e.usuario_id) as { usuario_id: string }[]).map((e) => e.usuario_id)).size;
   const embudo: ResumenSemanal["embudo"] = {
+    vieronInvitacion: personas("vio_invitacion"),
+    vieronPaquetes: personas("vio_paquetes"),
+    tocaronComprar: personas("toco_comprar"),
     nuevas: idsNuevas.size,
     conLectura: new Set(deSemana.filter((l) => l.estado === "lista" && idsNuevas.has(l.usuario_id)).map((l) => l.usuario_id)).size,
     sinCreditos: (nuevasPerfiles ?? []).filter((p) => p.creditos === 0 && !p.ilimitado).length,
@@ -313,8 +319,11 @@ function filasEmbudo(r: ResumenSemanal): [string, string, string?][] {
     ["1. Crearon cuenta", String(e.nuevas)],
     ["2. Hicieron su primera lectura", String(e.conLectura), pct(e.conLectura, e.nuevas)],
     ["3. Gastaron los créditos de regalo", String(e.sinCreditos), pct(e.sinCreditos, e.conLectura)],
-    ["4. Intentaron pagar", `${e.intentaron} personas`, "abrieron una orden (todas las cuentas)"],
-    ["5. Pagaron", `${e.pagaron} personas`, pct(e.pagaron, e.intentaron)],
+    ["4. Vieron la invitación sin créditos", `${e.vieronInvitacion} personas`],
+    ["5. Abrieron la página de paquetes", `${e.vieronPaquetes} personas`],
+    ["6. Tocaron «comprar»", `${e.tocaronComprar} personas`, pct(e.tocaronComprar, e.vieronPaquetes)],
+    ["7. Abrieron el pago", `${e.intentaron} personas`, "se creó la orden"],
+    ["8. Pagaron", `${e.pagaron} personas`, pct(e.pagaron, e.intentaron)],
     ["Pagos sin completar", String(e.noCompletadas), e.noCompletadas ? "pendientes, rechazados o con error" : undefined],
     ["Lecturas de limpia con huevo", String(e.huevo), "el producto estrella"],
   ];

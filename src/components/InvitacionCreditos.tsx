@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { useT } from "@/lib/i18n/cliente";
 import { accionCompraRapida } from "@/lib/pagos/acciones";
@@ -21,6 +22,10 @@ const TEXTOS: Record<Idioma, { titulo: string; texto: string; boton: string; inv
 export function InvitacionCreditos() {
   const { idioma } = useT();
   const t = TEXTOS[idioma] ?? TEXTOS.es;
+  // Embudo de compra: cuántas personas ven esta invitación (una vez por montaje).
+  useEffect(() => {
+    fetch("/api/evento-compra", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ evento: "vio_invitacion", via: location.pathname }), keepalive: true }).catch(() => undefined);
+  }, []);
   return (
     <div role="status" className="tarjeta space-y-3 border-oro/50 bg-oro/5 p-5">
       <p className="flex items-center gap-2 font-display text-2xl text-oro-suave">
