@@ -989,9 +989,10 @@ export function EscenarioEnVivo({
             {tipo === "numerologia" && lectura.numero != null && (
               <div className="flex flex-col items-center">
                 <div className="flex h-[340px] w-[340px] items-center justify-center rounded-full border-4 border-oro/70 bg-black/30">
-                  <span className="font-display text-[200px] leading-none text-oro-suave">{lectura.numero}</span>
+                  <span className={`font-display leading-none text-oro-suave ${String(lectura.numero).length >= 4 ? "text-[115px]" : String(lectura.numero).length === 3 ? "text-[150px]" : "text-[200px]"}`}>{lectura.numero}</span>
                 </div>
-                <p className="mt-6 text-3xl uppercase tracking-[0.25em] text-violeta-suave">{lectura.etiquetaNumero}</p>
+                {/* En árabe, sin espaciado entre letras: las separa y rompe la escritura ligada */}
+                <p dir="auto" className={`mt-6 text-violeta-suave ${/[\u0600-\u06ff]/.test(lectura.etiquetaNumero ?? "") ? "text-4xl" : "text-3xl uppercase tracking-[0.25em]"}`}>{lectura.etiquetaNumero}</p>
               </div>
             )}
             {tipo === "pendulo" && <Pendulo respuesta={lectura.respuesta ?? ""} />}

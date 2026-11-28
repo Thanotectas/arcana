@@ -1,4 +1,5 @@
 import "server-only";
+import { pedidoDeNombre, prepararNombre } from "./en-vivo-nombre";
 import { manual } from "@/lib/conocimiento";
 import { IDIOMA_PARA_IA, esIdioma } from "@/lib/i18n/idiomas";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
@@ -124,6 +125,8 @@ export function idiomaDeTexto(texto: string): { codigo: string; nombre: string }
 
 export function pareceConsulta(texto: string) {
   const t = texto.trim();
+  // Un nombre solo en letras árabes, o «اسمي … واسم أمي …»: lectura del nombre (abjad) o Yıldızname.
+  if (pedidoDeNombre(t)) return true;
   if (t.length < 8 || t.length > 300) return false;
   // Una fecha de nacimiento o «mi año» también son consulta (numerología, año personal).
   return (
@@ -311,6 +314,8 @@ export function tipoDeMensaje(texto: string): TipoLectura | null {
   if (fechas >= 2 && PIDE_SINASTRIA.test(t)) return "sinastria";
   // «Carta astral» sin fecha también es carta: espera en la fila a que la persona escriba su fecha (se le suma).
   if (PIDE_CARTA.test(t)) return "carta";
+  // El nombre (abjad y su primera letra) y el Yıldızname se ven como número en pantalla.
+  if (!fechas && pedidoDeNombre(texto)) return "numerologia";
   if (/\baura\b/.test(t)) return "aura";
   if (fechas >= 1 || /numerolog|mi n[uú]mero|my number|meu n[uú]mero/.test(t)) return "numerologia";
   if (/hor[oó]scop/.test(t)) return "horoscopo";
@@ -414,6 +419,15 @@ async function preparar(admin: Admin, p: PreguntaEnVivo, signo: { nombre: string
       };
     case "numerologia": {
       const fecha = fechaEn(p.texto);
+      const pedido = fecha ? null : pedidoDeNombre(p.texto);
+      const nombre = pedido ? prepararNombre(pedido, p.texto) : null;
+      if (nombre) {
+        return {
+          entrada: [...base, nombre.contexto].join("\n"),
+          sistema: `${SISTEMA_EN_VIVO}\n${nombre.instruccion}`,
+          extra: { ...vacio, numero: nombre.numero, etiquetaNumero: nombre.etiqueta },
+        };
+      }
       const anio = fecha ? anioQuePide(p.texto) : null;
       if (fecha && anio) {
         // Lectura de su año: el año personal del año que pide (de enero a diciembre).
@@ -846,22 +860,24 @@ export function frasesPuenteTikTok() {
  * para el tarot, el signo (برج), la fecha de nacimiento (numerología) y la carta astral o el توافق con fechas.
  */
 export function frasesPuenteArabe() {
+  // Lo que más respuesta tiene en redes con el público árabe (el nombre, su primera letra y el Yıldızname) se
+  // invita cada pocas frases, sin dejar de ofrecer el tarot, la carta astral, el signo y la compatibilidad.
   return [
-    "أهلًا وسهلًا بكم، أنا سيبيلا. الليلة أقرأ لكم مباشرة: اكتبوا سؤالكم في التعليقات، وأختار لكم ثلاث أوراق من التاروت.",
+    "أهلًا وسهلًا بكم، أنا سيبيلا. الليلة أقرأ لكم مباشرة: اكتبوا اسمكم أو سؤالكم في التعليقات، ودوركم قادم.",
+    "اكتب اسمك فقط في التعليقات، وأحسب لك قيمته بحساب الجُمَّل، وأقرأ لك الحرف الأول الذي يحكم اسمك.",
+    "اكتب سؤالك عن الحب أو العمل أو الطريق، بكلماتك أنت، وأسحب لك ثلاث أوراق من التاروت.",
+    "هل تعرف نجمك في «يلدز نامه»، كتاب النجوم؟ اكتب اسمك، ثم علامة زائد، ثم اسم أمك، مثل: خالد + فاطمة، وأخبرك بنجمك وكوكبك ويوم حظك.",
     "اكتب برجك في التعليقات، مثل: برج الأسد أو برج الحوت، وأقرأ لك ما تحمله لك السماء اليوم.",
+    "الحرف الأول من اسمك يكشف كيف تحب وكيف تختار. اكتب اسمك، وأقرأه لك الآن على الشاشة.",
     "هل تريد أن ترى خريطتك الفلكية مرسومة هنا، كوكبًا بعد كوكب؟ اكتب: خريطة فلكية، وتاريخ ميلادك، والمدينة التي وُلدت فيها.",
+    "أقرأ بالترتيب، وأبدأ بمن لم يحصل على قراءته بعد الليلة. اكتب اسمك أو سؤالك، فدورك قادم.",
     "هل في قلبك شخص؟ اكتب: توافق، ثم تاريخ ميلادك وتاريخ ميلاده، وأرسم لكما سماءكما معًا.",
-    "اكتب تاريخ ميلادك، اليوم والشهر والسنة، وأقرأ لك الرقم الذي يرافقك هذه السنة.",
-    "أقرأ بالترتيب، وأبدأ بمن لم يحصل على قراءته بعد الليلة. اكتب سؤالك، فدورك قادم.",
+    "في «يلدز نامه» يُجمع اسمك مع اسم أمك، والنجم الذي يخرج يرافقك طوال حياتك. اكتب: اسمك + اسم أمك.",
     "إن أعجبك هذا اللقاء، تابع الحساب وفعّل التنبيهات، لأخبرك في كل مرة أعود فيها للقراءة مباشرة.",
+    "وإن أردت قراءة أعمق وبهدوء، فالقراءة الكاملة لاسمك بعلم الحروف، ونجمك في يلدز نامه، تنتظرك على موقع أركانا، والرابط في البايو.",
     "اكتب لي بلغتك: العربية أو الإنجليزية أو الفرنسية أو التركية… وأقرأ لك بلغتك.",
-    "وإن أردت قراءة أعمق وبهدوء، فالقراءة الكاملة لاسمك بعلم الحروف تنتظرك على موقع أركانا، والرابط في البايو.",
     "سؤال بنعم أو لا؟ اكتب: بندول، ثم سؤالك، وأرى ما يقوله لك.",
-    "شاركوا هذا البث مع من يحتاج إلى إشارة اليوم: كلما كنا أكثر، قرأنا أسئلة أكثر معًا.",
-    "لا تحتاج إلى معرفة شيء عن الفلك: يكفي تاريخ ميلادك ومدينتك. اكتب خريطة فلكية وانظر كيف تظهر سماؤك على الشاشة.",
-    "اكتب سؤالك عن الحب أو العمل أو الطريق، بكلماتك أنت، وأسحب لك الأوراق.",
-    "ورقة يومك مجانية كل يوم على موقع أركانا. والرابط في البايو.",
-    "شكرًا على القلوب وعلى بقائكم معي. كل سؤال تكتبونه يساعدني لأقرأ أفضل للجميع.",
+    "شكرًا على القلوب وعلى بقائكم معي. شاركوا هذا البث مع من يحتاج إلى إشارة اليوم، وكل اسم تكتبونه أقرأه.",
   ].slice(0, FRASES_PUENTE);
 }
 
