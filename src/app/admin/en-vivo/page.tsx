@@ -90,6 +90,11 @@ export default async function PaginaAdminEnVivo() {
         <h2 className="font-display text-2xl font-semibold">Escenario para OBS</h2>
         <p className="text-sm text-texto-suave">Esta dirección es secreta: quien la tenga puede mover la fila. Pégala en OBS como fuente de navegador.</p>
         <DireccionEscenario url={url} />
+        <p className="text-sm text-texto-suave">
+          <strong className="text-oro-suave">Instagram en árabe (vertical 1080×1920):</strong> la pantalla y las frases de Sibila en árabe; cada lectura sale en el
+          idioma de su pregunta. En OBS, el lienzo en 1080×1920 y la emisión con la URL y la clave que da instagram.com → Crear → Video en vivo.
+        </p>
+        <DireccionEscenario url={`${url}&formato=vertical&idioma=ar&frases=1`} />
         <p className="text-sm text-texto-suave">Versión vertical para TikTok LIVE (1080×1920):</p>
         <DireccionEscenario url={`${url}&formato=vertical`} />
         <p className="text-sm text-texto-suave">Vertical con tu cámara grande (recomendada en TikTok: así no lo marca como «contenido pregrabado»):</p>
