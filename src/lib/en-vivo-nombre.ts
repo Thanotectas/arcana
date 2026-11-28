@@ -27,6 +27,8 @@ const NO_NOMBRE = new RegExp(
     "شكرا|شكراً|مشكورة?|يسلمو|تسلمي?ن?|كفو|حرام|نعم|لا|ايوه|اي|مرحبا|مرحبتين|اهلا|أهلا|هلا|هلو|هاي|حلو|حلوة|جميل|جميلة|رائع|رائعة|واو|" +
     "الله|والله|ماشاء|سبحان|يارب|آمين|امين|سلام|السلام|عليكم|وعليكم|يا|انا|أنا|انت|أنت|هنا|وين|كيف|متى|ليش|ممكن|دوري|دورى|" +
     "احبك|أحبك|حبيبتي|حبيبي|قلبي|عمري|سيبيلا|مساء|صباح|الخير|النور|تاروت|برج|ابراج|أبراج|فلك|لايك|متابعة|تابعت|" +
+    // Pedidos de atención («ردي علي», «اقري لي», «جاوبيني»): no son nombres.
+    "رد|ردي|ردو|ردوا|ردى|جاوب|جاوبي|جاوبيني|جاوبني|اقري|اقرأي|اقرئي|اقرالي|اقريلي|لي|عليا|عليه|ابي|ابغى|ابغي|بدي|اريد|أريد|بليز|ارجوك|أرجوك|سؤال|سؤالي|دوري|شوفي|شوف|اسمعي|مرحبتين|" +
     "الحمل|الثور|الجوزاء|السرطان|الاسد|الأسد|العذراء|الميزان|العقرب|القوس|الجدي|الدلو|الحوت|abjad|ebced" +
     ")$",
 );
@@ -91,6 +93,7 @@ export function prepararNombre(p: PedidoNombre, textoOriginal: string): Preparad
       return {
         contexto: `Pide su Yıldızname (يلدز نامه, el «libro de las estrellas»). Nombre: ${p.nombre} (${y.abjad.persona.escritura}) = ${y.abjad.persona.total}. Nombre de su madre: ${p.madre} (${y.abjad.madre?.escritura}) = ${y.abjad.madre?.total}. Suma: ${y.total}. ${y.total} entre 12: resto ${y.resto} → signo ${signo.nombre} (${SIGNOS_IDIOMA.ar[signo.id]}), elemento ${signo.elemento}, planeta ${TEXTOS_YILDIZNAME.es.planetas[y.planeta]}, día ${TEXTOS_YILDIZNAME.es.dias[y.dia]}.`,
         instruccion:
+          `${arabe ? "TODA la lectura va en árabe, de la primera a la última palabra. " : ""}` +
           "Lectura del Yıldızname en vivo: en pantalla se ve el total. Di en voz alta la cuenta en una frase (su nombre más el de su madre, el total, y que el resto entre doce da su estrella), y luego lee su estrella: el carácter que marca, su planeta y su día de suerte de la semana, conectado con lo que preguntó si preguntó algo. " +
           "Es la tradición otomana del libro de las estrellas: cuéntala como saber de tradición, nunca con lenguaje religioso. " +
           "Antes del consejo, en una frase, di que su Yıldızname completo (con lo que anuncia para su año) está en el enlace de la bio. No inventes otras cuentas: usa solo estas.",
@@ -109,7 +112,8 @@ export function prepararNombre(p: PedidoNombre, textoOriginal: string): Preparad
       `Pide la lectura de su nombre por حساب الجُمَّل (abjad). Nombre: ${p.nombre}, escrito ${a.escritura}. Letras: ${a.letras.map((l) => `${l.escrita}=${l.valor}`).join(", ")}. Total: ${a.total}. Raíz: ${a.reduccion.join(" → ")} (raíz ${a.raiz}). ` +
       `Primera letra: ${primera.escrita} (${NOMBRE_LETRA[base] ?? base}), valor ${primera.valor}, elemento ${elemento}. Elementos de sus letras: ${Object.entries(a.elementos).filter(([, n]) => n > 0).map(([e, n]) => `${e} ${n}`).join(", ")}; domina ${a.dominantes.join(" y ")}.`,
     instruccion:
-      "Lectura del nombre en vivo (حساب الجُمَّل): en pantalla se ve el total. Di el valor de su nombre y su raíz en una frase, y dedica lo central a SU PRIMERA LETRA: la letra que abre su nombre y lo gobierna, su elemento y el rasgo que le da (cómo ama, cómo decide, su don). Luego el elemento que domina en sus letras y un anuncio o consejo concreto, conectado con lo que preguntó si preguntó algo. " +
+      `${arabe ? "TODA la lectura va en árabe, de la primera a la última palabra. " : ""}Si el campo «Nombre» es una persona (no «لكل من…»), háblale solo a ella por su nombre, no a un grupo. ` +
+        "Lectura del nombre en vivo (حساب الجُمَّل): en pantalla se ve el total. Di el valor de su nombre y su raíz en una frase, y dedica lo central a SU PRIMERA LETRA: la letra que abre su nombre y lo gobierna, su elemento y el rasgo que le da (cómo ama, cómo decide, su don). Luego el elemento que domina en sus letras y un anuncio o consejo concreto, conectado con lo que preguntó si preguntó algo. " +
       "Cuéntalo como saber de la tradición de las letras, nunca con lenguaje religioso. " +
       "Antes del consejo, en una frase, di que la lectura completa de su nombre (cómo ama, sus dones, y con el nombre de su madre, su estrella del Yıldızname) está en el enlace de la bio. No inventes otras cuentas: usa solo estas.",
     numero: a.total,
